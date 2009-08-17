@@ -1,0 +1,27 @@
+<bin file=VBF4jEfficiency.cpp VBF4jEfficiency>
+ <flags LCGDICT_ARGS="--deep">
+ <use name=HiggsAnalysis/VBFHiggsToWWTolnujj>
+</bin>
+
+<bin file=VBFElectronEfficiency.cpp VBFElectronEfficiency>
+ <flags LCGDICT_ARGS="--deep">
+ <use name=HiggsAnalysis/VBFHiggsToWWTolnujj>
+</bin>
+
+<bin file=VBFMuonEfficiency.cpp VBFMuonEfficiency>
+ <flags LCGDICT_ARGS="--deep">
+ <use name=HiggsAnalysis/VBFHiggsToWWTolnujj>
+</bin>
+
+<bin file=VBFJetCleaningStudy.cpp VBFJetCleaningStudy>
+ <flags LCGDICT_ARGS="--deep">
+ <use name=HiggsAnalysis/VBFHiggsToWWTolnujj>
+</bin>
+
+<bin file=VBFMcJetDistr.cpp VBFMcJetDistr>
+ <flags LCGDICT_ARGS="--deep">
+ <use name=HiggsAnalysis/VBFHiggsToWWTolnujj>
+</bin>
+
+
+
