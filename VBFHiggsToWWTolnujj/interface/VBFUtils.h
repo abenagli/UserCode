@@ -10,6 +10,21 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <algorithm>
+
+
+
+
+
+
+template <class T>
+struct deallocateVector: public std::unary_function<T*, void>
+{
+  void operator() (T* elem)
+  {
+    delete elem;
+  }
+}
 
 
 

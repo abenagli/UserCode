@@ -46,6 +46,11 @@ int GetMatching_recoJets_genJets(VBFNtupleContent& treeVars,
   else
     nRecoMatching = GetMatching(recoJets, genJets, 0.3, false, false);
   
+  
+  for_each(recoJets.begin(), recoJets.end(), deallocateVector());
+  for_each(genJets.begin(), genJets.end(), deallocateVector());
+  
+  
   return nRecoMatching;
 }
 
@@ -91,6 +96,11 @@ int GetMatching_recoE_mcE(VBFNtupleContent& treeVars,
   else
     nRecoMatching = GetMatching(recoElectrons, mcElectrons, 0.05, true, false);
   
+  
+  for_each(recoElectrons.begin(), recoElectrons.end(), deallocateVector());
+  for_each(genElectrons.begin(), genElectrons.end(), deallocateVector());
+  
+  
   return nRecoMatching;
 }
 
@@ -134,6 +144,11 @@ int GetMatching_recoMu_mcMu(VBFNtupleContent& treeVars,
     nRecoMatching = GetMatching(recoMuons, mcMuons, 0.05, true, false, matchRecoMuIt);
   else
     nRecoMatching = GetMatching(recoMuons, mcMuons, 0.05, true, false);
+  
+  
+  for_each(recoMuons.begin(), recoMuons.end(), deallocateVector());
+  for_each(genMuons.begin(), genMuons.end(), deallocateVector());
+  
   
   return nRecoMatching;
 }
