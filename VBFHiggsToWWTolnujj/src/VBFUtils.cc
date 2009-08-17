@@ -47,8 +47,8 @@ int GetMatching_recoJets_genJets(VBFNtupleContent& treeVars,
     nRecoMatching = GetMatching(recoJets, genJets, 0.3, false, false);
   
   
-  for_each(recoJets.begin(), recoJets.end(), deallocateVector());
-  for_each(genJets.begin(), genJets.end(), deallocateVector());
+  for_each(recoJets.begin(), recoJets.end(), deallocateVector<const reco::Particle*>());
+  for_each(genJets.begin(), genJets.end(), deallocateVector<const reco::Particle*>());
   
   
   return nRecoMatching;
@@ -97,8 +97,8 @@ int GetMatching_recoE_mcE(VBFNtupleContent& treeVars,
     nRecoMatching = GetMatching(recoElectrons, mcElectrons, 0.05, true, false);
   
   
-  for_each(recoElectrons.begin(), recoElectrons.end(), deallocateVector());
-  for_each(genElectrons.begin(), genElectrons.end(), deallocateVector());
+  for_each(recoElectrons.begin(), recoElectrons.end(), deallocateVector<const reco::Particle*>());
+  for_each(mcElectrons.begin(), mcElectrons.end(), deallocateVector<const reco::Particle*>());
   
   
   return nRecoMatching;
@@ -146,8 +146,8 @@ int GetMatching_recoMu_mcMu(VBFNtupleContent& treeVars,
     nRecoMatching = GetMatching(recoMuons, mcMuons, 0.05, true, false);
   
   
-  for_each(recoMuons.begin(), recoMuons.end(), deallocateVector());
-  for_each(genMuons.begin(), genMuons.end(), deallocateVector());
+  for_each(recoMuons.begin(), recoMuons.end(), deallocateVector<const reco::Particle*>());
+  for_each(mcMuons.begin(), mcMuons.end(), deallocateVector<const reco::Particle*>());
   
   
   return nRecoMatching;
