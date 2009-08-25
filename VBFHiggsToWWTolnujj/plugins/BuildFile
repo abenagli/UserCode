@@ -1,0 +1,6 @@
+<use name=HiggsAnalysis/VBFHiggsToWWTolnujj>
+
+<library file="*.cc" name=HiggsAnalysisVBFHiggsToWWTolnujjPlugins>
+    <flags EDM_PLUGIN=1>
+</library>
+
