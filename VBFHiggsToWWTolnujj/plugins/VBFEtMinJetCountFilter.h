@@ -43,8 +43,11 @@ class VBFEtMinJetCountFilter : public edm::EDFilter
   
   edm::InputTag m_srcJets;
   
-  double m_etThres;
-  int m_nJet;
+  double m_etMin;
+  double m_etaMin;
+  double m_etaMax;
+  int m_minNumber;
+  
 };
 
 #endif
@@ -57,9 +60,11 @@ class VBFEtMinJetCountFilter : public edm::EDFilter
 //! ctor
 template <class TCollection>
 VBFEtMinJetCountFilter<TCollection>::VBFEtMinJetCountFilter(const edm::ParameterSet& iConfig): 
-  m_srcJets(iConfig.getParameter<edm::InputTag>("srcJets")),
-  m_etThres(iConfig.getParameter<double>       ("etThres")),
-  m_nJet   (iConfig.getParameter<int>          ("nJet")) 
+  m_srcJets  (iConfig.getParameter<edm::InputTag>("srcJets")),
+  m_etMin    (iConfig.getParameter<double>("etMin")),
+  m_etaMin   (iConfig.getParameter<double>("etaMin")), 
+  m_etaMax   (iConfig.getParameter<double>("etaMin")),
+  m_minNumber(iConfig.getParameter<int>("minNumber"))
 {}
 
 // ----------------------------------------------------------------
@@ -107,8 +112,8 @@ void VBFEtMinJetCountFilter<TCollection>::endJob()
 template <class TCollection>
 bool VBFEtMinJetCountFilter<TCollection>::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 {
-  edm::Handle<TCollection> jetsHandle;
-  iEvent.getByLabel(m_srcJets, jetsHandle);
+  edm::Handle<TCollection> jets;
+  iEvent.getByLabel(m_srcJets, jets);
   
   
   
@@ -116,14 +121,15 @@ bool VBFEtMinJetCountFilter<TCollection>::filter(edm::Event& iEvent, const edm::
   
   
   //PG loop over jets
-  for(unsigned int iJet = 0; iJet < jetsHandle -> size(); ++iJet)
+  for(unsigned int iJet = 0; iJet < jets -> size(); ++iJet)
   {
-    if( (fabs(jetsHandle -> at(iJet).eta()) < 5.0) &&
-        (jetsHandle -> at(iJet).et () > m_etThres) )
+    if( (jets -> at(iJet).eta() > m_etaMin) &&
+        (jets -> at(iJet).eta() < m_etaMax) &&
+        (jets -> at(iJet).et () > m_etMin) )
       ++nSelected;
   } //PG loop over jets
   
   
-  if(nSelected >= m_nJet) return true;
+  if(nSelected >= m_minNumber) return true;
   return false;
 }

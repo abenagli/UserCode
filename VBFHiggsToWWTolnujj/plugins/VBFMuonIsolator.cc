@@ -53,6 +53,20 @@ void VBFMuonIsolator::select(edm::Handle<collection> muons,
   // loop over muons
   for(unsigned i = 0; i < muons -> size(); ++i)
   { 
+    // do the reference check 
+    bool isRefCheckOk = true;
+    muon muonRef(muons, i);
+    if(m_doRefCheck)
+      if(find(muonsRef -> begin(), muonsRef -> end(), muonRef) == muonsRef -> end())
+        isRefCheckOk = false;
+    
+    if(!isRefCheckOk) continue;
+    
+    
+    
+    
+    
+    
     bool isTkIsoOk  = false;
     bool isEmIsoOk  = false;
     bool isHadIsoOk = false;
@@ -91,19 +105,9 @@ void VBFMuonIsolator::select(edm::Handle<collection> muons,
     
     
     
-    // do the reference check 
-    bool selected = true;
-    muon muonRAWRef(muons, i);
-    if(m_doRefCheck)
-      if(find(muonsRef -> begin(), muonsRef -> end(), muonRAWRef) == muonsRef -> end())
-        selected=false;
-    
-    if(!selected) continue;
-    
-    
     if( (m_useCombinedIso == false && isTkIsoOk == true && isEmIsoOk == true && isHadIsoOk == true) ||
         (m_useCombinedIso == true  && isCombinedIsoOk == true ) )
-      m_selected.push_back(muonRAWRef);
+      m_selected.push_back(muonRef);
     
     
   } // loop over muons

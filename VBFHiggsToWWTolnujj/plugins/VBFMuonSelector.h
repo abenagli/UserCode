@@ -17,6 +17,8 @@
 
 class VBFMuonSelector
 {
+ public:
+  
   typedef reco::MuonCollection collection;
   typedef reco::MuonRef muon;
   typedef std::vector<muon> container;
@@ -50,6 +52,9 @@ class VBFMuonSelector
   double m_ptMin;
   double m_etaMin;
   double m_etaMax;
+  
+  bool m_doRefCheck;
+  edm::InputTag m_srcMuonsRef;
 
 };
 

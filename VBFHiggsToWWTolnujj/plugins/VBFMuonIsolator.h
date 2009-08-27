@@ -17,6 +17,8 @@
 
 class VBFMuonIsolator
 {
+ public:
+  
   typedef reco::MuonCollection collection;
   typedef reco::MuonRef muon;
   typedef std::vector<muon> container;

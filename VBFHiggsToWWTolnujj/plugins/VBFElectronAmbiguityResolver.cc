@@ -5,7 +5,9 @@
 
 
 
-VBFElectronAmbiguityResolver::VBFElectronAmbiguityResolver(const edm::ParameterSet& iConfig)
+VBFElectronAmbiguityResolver::VBFElectronAmbiguityResolver(const edm::ParameterSet& iConfig):
+  m_doRefCheck     (iConfig.getParameter<bool>("doRefCheck")),
+  m_srcElectronsRef(iConfig.getParameter<edm::InputTag>("srcElectronsRef"))
 {}
 
 // ------------------------------------------------------------
@@ -25,13 +27,13 @@ VBFElectronAmbiguityResolver::VBFElectronAmbiguityResolver(const edm::ParameterS
 
 
 
-void VBFElectronAmbiguityResolver::select(edm::Handle<collection> inputHandle,
+void VBFElectronAmbiguityResolver::select(edm::Handle<collection> recoElectrons,
                                           const edm::Event& iEvent, const edm::EventSetup& iSetup) 
 {
-  m_selected.clear ();
+  m_selected.clear();
   
   //PG get the actual product
-  dump(&m_selected, inputHandle);
+  dump(iEvent, &m_selected, recoElectrons);
   
   container::iterator ShorterEnd;
   
@@ -53,13 +55,28 @@ void VBFElectronAmbiguityResolver::select(edm::Handle<collection> inputHandle,
 
 
 
-void VBFElectronAmbiguityResolver::dump(container* output, const edm::Handle<collection>& input) 
+void VBFElectronAmbiguityResolver::dump(const edm::Event& iEvent,
+                                        container* output, const edm::Handle<collection>& electrons) 
 {
- for(unsigned int ii = 0; ii != input->size(); ++ii)
- {
-   edm::Ref<reco::GsfElectronCollection> electronRef(input, ii);
-   output -> push_back(electronRef);
- }   
+  edm::Handle< edm::RefVector<collection> > electronsRef;
+  if(m_doRefCheck)
+    iEvent.getByLabel(m_srcElectronsRef, electronsRef);
+  
+  
+  for(unsigned int ii = 0; ii != electrons -> size(); ++ii)
+  {
+    // do the reference check
+    bool isRefCheckOk = true;
+    electron electronRef(electrons, ii);
+    if(m_doRefCheck)
+      if(find(electronsRef -> begin(), electronsRef -> end(), electronRef) == electronsRef -> end())
+        isRefCheckOk = false;
+    
+    if(!isRefCheckOk) continue;
+    
+    
+    output -> push_back(electronRef);
+  }   
  
  return;
 }

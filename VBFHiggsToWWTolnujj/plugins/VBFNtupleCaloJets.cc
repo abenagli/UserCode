@@ -368,7 +368,7 @@ void VBFNtupleCaloJets::analyze(const edm::Event& iEvent, const edm::EventSetup&
   mcQuarks.push_back(mcQ2_fromW2);
 
   std::vector<int> matchGenJetIt;
-  GetMatching(genJets, mcQuarks, 0.3, false, false, &matchGenJetIt);
+  GetMatching(genJets, mcQuarks, 0.3, false, 0., 100., &matchGenJetIt);
   
   
   if(matchGenJetIt.at(0) != -1) 

@@ -28,14 +28,15 @@
 
 class VBFElectronAmbiguityResolver
 {
-
  public:
   
-  typedef edm::Ref<std::vector<reco::GsfElectron> > electron;
-  typedef std::vector<reco::GsfElectron> collection;
-  typedef std::vector<electron>  container;
+  typedef reco::GsfElectronCollection collection;
+  typedef reco::GsfElectronRef electron;
+  typedef std::vector<electron> container;
   typedef container::const_iterator const_iterator;
   
+  
+ public:
   
   //! ctor
   VBFElectronAmbiguityResolver(const edm::ParameterSet& conf);
@@ -114,9 +115,13 @@ class VBFElectronAmbiguityResolver
   
   //! the selected collection
   container m_selected ;
+
+  bool m_doRefCheck;
+  edm::InputTag m_srcElectronsRef;
+  
   
   //! fill the ouptut with the pointers to the elements of the input
-  void dump(container* output, const edm::Handle<collection>& input);
+  void dump(const edm::Event&, container*, const edm::Handle<collection>&);
   
 };  
 

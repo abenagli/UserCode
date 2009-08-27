@@ -96,7 +96,7 @@ VBFJetCleaner<TCollection>::~VBFJetCleaner()
 
   
 template <class TCollection> 
-void VBFJetCleaner<TCollection>::select(edm::Handle<VBFJetCleaner<TCollection>::collection> jetCollectionHandle, 
+void VBFJetCleaner<TCollection>::select(edm::Handle<VBFJetCleaner<TCollection>::collection> jets, 
                                         const edm::Event& iEvent,
                                         const edm::EventSetup& iSetup)
 {
@@ -109,8 +109,8 @@ void VBFJetCleaner<TCollection>::select(edm::Handle<VBFJetCleaner<TCollection>::
   
   
   //PG loop over jets
-  for(typename collection::const_iterator jetIt = jetCollectionHandle -> begin();
-      jetIt != jetCollectionHandle -> end(); ++jetIt)
+  for(typename collection::const_iterator jetIt = jets -> begin();
+      jetIt != jets -> end(); ++jetIt)
   {
     double electronsEnergy = 0.;
     
@@ -139,7 +139,7 @@ void VBFJetCleaner<TCollection>::select(edm::Handle<VBFJetCleaner<TCollection>::
       continue;
     
     
-    m_selected.push_back(jet(jetCollectionHandle, jetIt - jetCollectionHandle -> begin()));
+    m_selected.push_back(jet(jets, jetIt - jets -> begin()));
  } //PG loop over jets   
 
 }

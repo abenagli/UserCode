@@ -17,6 +17,8 @@
 
 class VBFElectronSelector
 {
+ public:
+  
   typedef reco::GsfElectronCollection collection;
   typedef reco::GsfElectronRef electron;
   typedef std::vector<electron> container;
@@ -50,7 +52,10 @@ class VBFElectronSelector
   double m_ptMin;
   double m_etaMin;
   double m_etaMax;
-
+  
+  bool m_doRefCheck;
+  edm::InputTag m_srcElectronsRef;
+  
 };
 
 #endif
