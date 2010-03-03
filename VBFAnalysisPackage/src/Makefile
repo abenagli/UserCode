@@ -48,7 +48,7 @@ CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGE
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)
-SONAME	 =  libTTBar.so
+SONAME	 =  libVBF.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
 GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) $(CLHEPLIBS) -lGenVector -lRooFit -lRooFitCore -lFoam -lMinuit -lTMVA -lMLP -lXMLIO  -lTreePlayer  $(NTUPLEPACKAGELIBS)
@@ -65,7 +65,7 @@ CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFL
 CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
-SONAME	 =  libTTBar.dylib
+SONAME	 =  libVBF.dylib
 SOFLAGS  =
 endif
 #################################################
@@ -109,7 +109,7 @@ $(LIB)$(SONAME): $(OBJS) $(OBJ)mydict.o
 	$(LD) $(LDFLAGS) $(OBJS) $(OBJ)mydict.o $(SOFLAGS) -o $(LIB)$(SONAME)
 
 $(BIN)%$(BinSuf): $(PRG)%$(PrgSuf) $(HDRS) $(LIB)$(SONAME)
-	$(CPP) $(CPPFLAGS) -L$(LIB) $(GLIBS) -lTTBar  -o $@ $<
+	$(CPP) $(CPPFLAGS) -L$(LIB) $(GLIBS) -lVBF  -o $@ $<
 
 
 clean:
