@@ -8,3 +8,6 @@ setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${THISDIR}/../NtuplePackage/lib
 setenv PATH ${PATH}:${THISDIR}/bin
 setenv PATH ${PATH}:${THISDIR}/../NtuplePackage/bin
 
+setenv NTUPLEPKGINCLUDE ${THISDIR}/../NtuplePackage/interface
+setenv NTUPLEPKGLIB ${THISDIR}/../NtuplePackage/lib
+
