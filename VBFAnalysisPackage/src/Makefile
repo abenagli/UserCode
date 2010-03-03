@@ -36,8 +36,7 @@ CLHEPLIBS     =  $(shell clhep-config --libs)
 NTUPLEPACKAGEFLAGS = $(shell ntuplepkg-config --include)
 NTUPLEPACKAGELIBS = $(shell ntuplepkg-config --libs)
 
-# NTUPLEPACKAGEFLAGS = -I/home/andrea/Cern/Code/VBF/PhysicsTools/NtuplePackage/interface/
-# NTUPLEPACKAGELIBS = -L/home/andrea/Cern/Code/VBF/PhysicsTools/NtuplePackage/lib/ -lEvent
+
 
 ARCHL = -m32
 
