@@ -53,6 +53,10 @@ int main(int argc, char** argv)
   float VBFMjjMIN = gConfigParser -> readFloatOption("Cuts::VBFMjjMIN");
   
   int totalEvents = GetTotalEvents("MCDecayModeFilterAll/totalEvents", inputFileList.c_str());  
+
+  std::string VBFPreselectionName = "EtMinCaloJetCountFilter" + jetAlgorithm+"/passedEvents"; 
+  int VBFPreselectionEvents = GetTotalEvents(VBFPreselectionName.c_str(), inputFileList.c_str());  
+  
   
   
   
@@ -74,14 +78,18 @@ int main(int argc, char** argv)
   
   
   // define histograms
-  TH1F* events = new TH1F("events", "events", 4, 0., 4.);
+  int nStep = 5;
+  TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepName;
-  
-  int nStep = 4;
+
   int step = 0;
   stepEvents[step] = totalEvents;
   stepName[step] = "total events";
+
+  step = step+1;
+  stepEvents[step] = VBFPreselectionEvents;
+  stepName[step] = "VBFPreselection";
   
   
   
@@ -148,7 +156,7 @@ int main(int argc, char** argv)
     
     //***************
     // cut on leptons
-    step = 1;
+    step = step+1;
     stepName[step] = "1 lepton";
     
     int nLep = 0;
@@ -189,7 +197,7 @@ int main(int argc, char** argv)
     
     //************
     // cut on jets
-    step = 2;
+    step = step+1;
     stepName[step] = "4 jets";
     
     int nJet = 0;
@@ -222,7 +230,7 @@ int main(int argc, char** argv)
     
     //*********
     // VBF cuts
-    step = 3;
+    step =step+1;
     stepName[step] = "VBF";
     
     bool isVBFCutsOk = false;
