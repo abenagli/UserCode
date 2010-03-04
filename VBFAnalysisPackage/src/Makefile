@@ -38,7 +38,7 @@ NTUPLEPACKAGELIBS = $(shell ntuplepkg-config --libs)
 
 
 
-ARCHL = -m64
+ARCHL = -m32
 
 CXX  =  c++
 CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS)
@@ -58,6 +58,8 @@ GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) $(CLHEPLIBS) -lGenVector -lRooFit -lR
 ARCH  =  $(shell root-config --arch)
 ifeq ($(ARCH),macosx64)
 LibSuf  =  .dylib
+
+ARCHL = -m64
 
 CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS)
 
