@@ -11,3 +11,4 @@ export PATH=${PATH}:${THISDIR}/../NtuplePackage/bin
 export NTUPLEPKGINCLUDE=${THISDIR}/../NtuplePackage/interface
 export NTUPLEPKGLIB=${THISDIR}/../NtuplePackage/lib
 
+export VBFANALYSISPKG=${THISDIR}/

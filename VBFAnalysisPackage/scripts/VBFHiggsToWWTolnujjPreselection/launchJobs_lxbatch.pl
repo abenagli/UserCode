@@ -4,6 +4,8 @@
 #      MAIN PROGRAM
 # ----------------------------------------------------------------------------
 
+use Env;
+
 #PG lettura dei parametri da cfg file
 #PG --------------------------------
 print "reading ".$ARGV[0]."\n" ;
@@ -21,8 +23,7 @@ while (<USERCONFIG>)
     $User_Preferences{$var} = $value;
   }
 
-
-$BASEDir          = $User_Preferences{"BASEDir"} ;
+$BASEDir          = $VBFANALYSISPKG;
 $JETAlgorithm     = $User_Preferences{"JETAlgorithm"} ;
 $LISTOFSamples    = $User_Preferences{"LISTOFSamples"} ;
 $JOBCfgTemplate   = $User_Preferences{"JOBCfgTemplate"} ;
@@ -30,6 +31,10 @@ $INPUTSAVEPath    = $User_Preferences{"INPUTSAVEPath"} ;
 $OUTPUTSAVEPath   = $User_Preferences{"OUTPUTSAVEPath"} ;
 $OUTPUTFILEName   = $User_Preferences{"OUTPUTFILEName"} ;
 $JOBModulo        = $User_Preferences{"JOBModulo"} ;
+
+$LISTOFSamples  = $BASEDir."/".$LISTOFSamples;
+$JOBCfgTemplate = $BASEDir."/".$JOBCfgTemplate;
+
 
 print "BASEDir = "          .$BASEDir."\n" ;
 print "JETAlgorithm = "     .$JETAlgorithm."\n" ;
