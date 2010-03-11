@@ -59,6 +59,24 @@ ARCH  =  $(shell root-config --arch)
 ifeq ($(ARCH),macosx64)
 LibSuf  =  .dylib
 
+ARCHL = -m32
+
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS)
+
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS)
+
+LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
+SONAME	 =  libVBF.dylib
+SOFLAGS  =
+endif
+#################################################
+
+#################################################
+#if mac 64
+ARCH  =  $(shell root-config --arch)
+ifeq ($(ARCH),macosx64)
+LibSuf  =  .dylib
+
 ARCHL = -m64
 
 CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS)
