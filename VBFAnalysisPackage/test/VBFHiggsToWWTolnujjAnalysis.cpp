@@ -103,69 +103,97 @@ int main(int argc, char** argv)
   
   // define histograms
   std::string outputRootFullFileName = outputRootFilePath+outputRootFileName+"_"+jetAlgorithm+".root";
+  
+  // histograms
+  hFactory* histograms = new hFactory(outputRootFullFileName);
+  
+  histograms -> add_h1("tagJJ_bTag",  "",  2000, -100., 100., nStep);
+
+  histograms -> add_h1("WJJ_zepp",     "", 2000,    -1.,   1., nStep);  
+  histograms -> add_h1("WJJ_max_zepp", "", 2000,    -1.,   1., nStep);
+  histograms -> add_h1("WJJ_min_zepp", "", 2000,    -1.,   1., nStep);
+  histograms -> add_h1("WJJ_bTag",     "", 2000,  -100., 100., nStep);
+
+  histograms -> add_h1("otherJ_zepp",   "", 2000, -1.,   1., nStep);
+  histograms -> add_h1("centralJ_zepp", "", 2000, -1.,   1., nStep);
+  
+  histograms -> add_h1("lep_zepp",    "", 2000,  -1.,  1., nStep);  
+  histograms -> add_h1("lep_lipSig",  "", 2000, -50., 50., nStep);
+  histograms -> add_h1("lep_tipSig",  "", 1000,   0., 50., nStep);  
+  histograms -> add_h1("lep_3DipSig", "", 2000, -50., 50., nStep);
+  
+  
+  // stdHistograms
   stdHisto* stdHistograms = new stdHisto(nStep, outputRootFullFileName);
-  //hFactory* histograms = new hFactory(outputRootFullFileName);
   
-  
-  
-  // tag jets
-  stdHistograms -> Add2("tagJJ", nStep);
-  stdHistograms -> Add2("WJJ", nStep);
-  stdHistograms -> Add1("otherJ", nStep);
+  stdHistograms -> Add2("tagJJ",    nStep);
+  stdHistograms -> Add2("WJJ",      nStep);
+  stdHistograms -> Add1("otherJ",   nStep);
   stdHistograms -> Add1("centralJ", nStep);
-  stdHistograms -> Add1("met", nStep);
-  stdHistograms -> Add1("lep", nStep);
-  stdHistograms -> Add2("lepMet", nStep);
-  stdHistograms -> Add2("lepMetW", nStep);
-  
-  //// other jets
-  //histograms -> add_h1("otherJet_n",    "",  10,  0.,  10., nStep);
-  //histograms -> add_h1("otherJet_et",   "", 500,  0., 500., nStep);
-  //histograms -> add_h1("otherJet_zepp", "", 400, -1.,   1., nStep);
-  //
-  //// central jets
-  //histograms -> add_h1("centralJet_n",    "",  10,  0.,  10., nStep);
-  //histograms -> add_h1("centralJet_et",   "", 500,  0., 500., nStep);
-  //histograms -> add_h1("centralJet_zepp", "", 400, -1.,   1., nStep);
-  //
-  //// lepton
-  //histograms -> add_h1("lep_pt",         "", 500,  0., 500., nStep);
-  //histograms -> add_h1("lep_zepp",       "", 400, -1.,   1., nStep);
-  //histograms -> add_h1("lep_W_Deta",     "", 400,  0.,  10., nStep);  
-  //histograms -> add_h1("lep_W_Dphi",     "", 200,  0.,   5., nStep);  
-  //histograms -> add_h1("lep_tag_Dphi",   "", 200,  0.,   5., nStep);
-  //histograms -> add_h1("lepMet_mt",      "", 500,  0., 500., nStep);
-  //histograms -> add_h1("lepMet_W_Dphi",  "", 200,  0.,   5., nStep);
-  //  
-  //// met
-  //histograms -> add_h1("met_et",       "", 500, 0., 500., nStep);
-  //histograms -> add_h1("met_lep_Dphi", "", 200, 0.,   5., nStep);
-  //histograms -> add_h1("met_W_Dphi",   "", 200, 0.,   5., nStep);
-  //histograms -> add_h1("met_tag_Dphi", "", 200, 0.,   5., nStep);  
-  //
-  //// higgs  
-  //histograms -> add_h1("lepMetW_pt",       "",  500, 0.,  500., nStep);
-  //histograms -> add_h1("lepMetW_mt",       "", 1000, 0., 1000., nStep);  
-  //histograms -> add_h1("lepMetW_tag_Dphi", "",  200, 0.,    5., nStep);  
-  //
-  //// pt tot  
-  //histograms -> add_h1("lepMetWTag_pt", "", 500, 0., 500., nStep);  
+  stdHistograms -> Add1("met",      nStep);
+  stdHistograms -> Add1("lep",      nStep);
+  stdHistograms -> Add2("lepMet",   nStep);
+  stdHistograms -> Add2("lepMetW",  nStep);
   
   
   
+  // define roofit variables
+  //RooRealVar var_tagJJ_Deta("var_tagJJ_Deta", "var_tagJJ_Deta", 0., 10.) ; 
+  //RooRealVar var_WJJ_mass("var_WJJ_mass", "var_WJJ_mass", 0., 500.) ; 
+  //RooRealVar var_lepMet_W_Dphi("var_lepMet_W_Dphi", "var_lepMet_W_Dphi", 0., 3.) ;
+  //RooArgSet var_set(var_tagJJ_Deta, var_WJJ_mass);
+    
+  // Define tree variables
+  int type;
+  float tagJJ_Deta;
+  float tagJJ_m;
+  float tagJJ_max_et;
+  float tagJJ_min_et;
+  float WJJ_Deta;
+  float WJJ_m;
+  float WJJ_max_et;
+  float WJJ_min_et;
+  float lepMetW_Dphi;
+  
+  // Define tree
+  std::vector<TTree*> tree;
+  for(int i = 0; i < nStep; ++i)
+  {
+    char treeName[50];
+    sprintf(treeName, "tree_%d", i);
+    tree.push_back( new TTree(treeName, treeName) );
+    
+    tree.at(i) -> Branch("type",         &type,                 "type/I");
+    tree.at(i) -> Branch("tagJJ_Deta",   &tagJJ_Deta,     "tagJJ_Deta/F");
+    tree.at(i) -> Branch("tagJJ_m",      &tagJJ_m,           "tagJJ_m/F");  
+    tree.at(i) -> Branch("tagJJ_max_et", &tagJJ_max_et, "tagJJ_max_et/F");   
+    tree.at(i) -> Branch("tagJJ_min_et", &tagJJ_min_et, "tagJJ_min_et/F"); 
+    tree.at(i) -> Branch("WJJ_Deta",     &WJJ_Deta,         "WJJ_Deta/F");
+    tree.at(i) -> Branch("WJJ_m",        &WJJ_m,               "WJJ_m/F");  
+    tree.at(i) -> Branch("WJJ_max_et",   &WJJ_max_et,     "WJJ_max_et/F");   
+    tree.at(i) -> Branch("WJJ_min_et",   &WJJ_min_et,     "WJJ_min_et/F");
+    tree.at(i) -> Branch("lepMetW_Dphi", &lepMetW_Dphi, "lepMetW_Dphi/F");
+  }
   
   
   
-  // Loop over events
+  
+  
+  
+  
+  
+  
+  
+  
+  //*********************
+  // LOOP OVER THE EVENTS
+  
   std::cout << ">>>>> VBFHiggsToWWTolnujjAnalysis::Read " << chain -> GetEntries() << " entries" << std::endl;  
   for(int entry = 0 ; entry < chain -> GetEntries() ; ++entry)
   {
     reader.GetEntry(entry);
     if((entry%entryMODULO) == 0) std::cout << ">>>>> VBFHiggsToWWTolnujjPreselection::GetEntry " << entry << std::endl;   
     if(entry == entryMAX) break;
-    
-    
-    
     
     
     
@@ -176,11 +204,12 @@ int main(int argc, char** argv)
     std::vector<ROOT::Math::XYZTVector> otherJets;
     std::vector<ROOT::Math::XYZTVector> centralJets;
     std::vector<ROOT::Math::XYZTVector> electrons_jetCleaning;
+    std::vector<float> jets_bTag;
     
     // build the collection of electros for jet cleaning
     for(unsigned int eleIt = 0; eleIt < (reader.Get4V("electrons")->size()); ++eleIt)
     {
-      if( reader.Get4V("electrons")->at(eleIt).pt() < 10. ) continue;
+      if( reader.Get4V("electrons")->at(eleIt).pt() < 5. ) continue;
       if( (reader.GetFloat("electrons_tkIso")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 0.5 ) continue;
       if( (reader.GetFloat("electrons_IdRobustLoose")->at(eleIt)) < 1. ) continue;
       
@@ -203,11 +232,13 @@ int main(int argc, char** argv)
       if(skipJet == true) continue;
       
       jets.push_back( reader.Get4V("jets")->at(jetIt) );
+      jets_bTag.push_back( reader.GetFloat("jets_trackCountingHighEffBJetTags")->at(jetIt) );
     }
     
     if( (int)(jets.size()) < jetNMIN ) continue;
     
-
+    
+    
     // select jets    
     std::vector<int> selectIt_tag;
     std::vector<int> blacklistIt_tag;
@@ -223,18 +254,40 @@ int main(int argc, char** argv)
         (selectIt_W.at(0)   == -1) || (selectIt_W.at(1)   == -1) )
       continue;
     
+    
+    
+    //*********
+    // tag jets
+    
     ROOT::Math::XYZTVector jet1_tag = jets.at(selectIt_tag.at(0));
     ROOT::Math::XYZTVector jet2_tag = jets.at(selectIt_tag.at(1));    
-    ROOT::Math::XYZTVector jet12_tag = jet1_tag + jet2_tag;
+    float jet1_tag_bTag = jets_bTag.at(selectIt_tag.at(0));
+    float jet2_tag_bTag = jets_bTag.at(selectIt_tag.at(1));
     
-    ROOT::Math::XYZTVector jet1_W = jets.at(selectIt_W.at(0));
-    ROOT::Math::XYZTVector jet2_W = jets.at(selectIt_W.at(1));        
-    ROOT::Math::XYZTVector jet12_W = jet1_W + jet2_W;
+    ROOT::Math::XYZTVector jet12_tag = jet1_tag + jet2_tag;
     
     float avgEta_tag = 0.5 * (jet1_tag.eta() + jet2_tag.eta());
     float absDeta_tag = deltaEta(jet1_tag.eta(), jet2_tag.eta());
     
     
+    
+    //*******
+    // W jets
+        
+    ROOT::Math::XYZTVector jet1_W = jets.at(selectIt_W.at(0));
+    ROOT::Math::XYZTVector jet2_W = jets.at(selectIt_W.at(1));        
+    float jet1_W_bTag = jets_bTag.at(selectIt_W.at(0));
+    float jet2_W_bTag = jets_bTag.at(selectIt_W.at(1));        
+    ROOT::Math::XYZTVector jet12_W = jet1_W + jet2_W;
+    
+    float jet12_W_zepp = (jet12_W.eta() - avgEta_tag)/absDeta_tag;
+    float jet1_W_zepp  = (jet1_W.eta()  - avgEta_tag)/absDeta_tag;
+    float jet2_W_zepp  = (jet2_W.eta()  - avgEta_tag)/absDeta_tag;    
+    
+    
+    
+    //***********
+    // other jets
     
     for(unsigned int jetIt = 0; jetIt < jets.size(); ++jetIt)
     {
@@ -251,11 +304,20 @@ int main(int argc, char** argv)
     
     
     
+    
+    
+    
+    //**************
+    // SELECT LEPTON
+    
     std::vector<ROOT::Math::XYZTVector> electrons;
     std::vector<ROOT::Math::XYZTVector> muons;
     std::vector<ROOT::Math::XYZTVector> leptons;
     std::vector<std::string> leptonFlavours;    
-    std::vector<float> leptonTkIso;
+    std::vector<float> leptons_tkIso;
+    std::vector<float> leptons_lipSig;
+    std::vector<float> leptons_tipSig;
+    std::vector<float> leptons_3DipSig;
         
     for(unsigned int eleIt = 0; eleIt < (reader.Get4V("electrons")->size()); ++eleIt)
     {
@@ -266,7 +328,10 @@ int main(int argc, char** argv)
       electrons.push_back( reader.Get4V("electrons")->at(eleIt) );
       leptons.push_back( reader.Get4V("electrons")->at(eleIt) );      
       leptonFlavours.push_back("electron");
-      leptonTkIso.push_back(reader.GetFloat("electrons_tkIso")->at(eleIt));
+      leptons_tkIso.push_back(reader.GetFloat("electrons_tkIso")->at(eleIt));
+      leptons_lipSig.push_back(reader.GetFloat("electrons_lipSignificance")->at(eleIt));
+      leptons_tipSig.push_back(reader.GetFloat("electrons_tipSignificance")->at(eleIt));
+      leptons_3DipSig.push_back(reader.GetFloat("electrons_3DipSignificance")->at(eleIt));
     }
     
     for(unsigned int muIt = 0; muIt < (reader.Get4V("muons")->size()); ++muIt)
@@ -277,10 +342,14 @@ int main(int argc, char** argv)
       muons.push_back( reader.Get4V("muons")->at(muIt) );
       leptons.push_back( reader.Get4V("muons")->at(muIt) );      
       leptonFlavours.push_back("muon");
-      leptonTkIso.push_back(reader.GetFloat("muons_tkIsoR03")->at(muIt));
+      leptons_tkIso.push_back(reader.GetFloat("muons_tkIsoR03")->at(muIt));
+      leptons_lipSig.push_back(reader.GetFloat("muons_lipSignificance")->at(muIt));
+      leptons_tipSig.push_back(reader.GetFloat("muons_tipSignificance")->at(muIt));
+      leptons_3DipSig.push_back(reader.GetFloat("muons_3DipSignificance")->at(muIt));
     }
     
     if( (int)(leptons.size()) < lepNMIN ) continue;
+    
     
     
     // select lepton
@@ -288,12 +357,39 @@ int main(int argc, char** argv)
     ROOT::Math::XYZTVector lepton = leptons.at(selectIt_lep);
     if(selectIt_lep == -1) continue;
     
-    
+    float lep_zepp = (lepton.eta() - avgEta_tag)/absDeta_tag;
+    float lep_lipSig = leptons_lipSig.at(selectIt_lep);
+    float lep_tipSig = leptons_tipSig.at(selectIt_lep);
+    float lep_3DipSig = leptons_3DipSig.at(selectIt_lep);
     
     ROOT::Math::XYZTVector met = reader.Get4V("met")->at(0);
     ROOT::Math::XYZTVector lepMet = lepton + met;
     ROOT::Math::XYZTVector lepMetW = lepMet + jet12_W;
     ROOT::Math::XYZTVector lepMetWTag = lepMetW + jet12_tag;
+    
+    
+    
+    
+    
+    
+    //***********************
+    // CUT VARIABLES FOR TREE
+    
+    tagJJ_Deta   = deltaEta(jet1_tag.eta(), jet2_tag.eta());
+    tagJJ_m      = jet12_tag.mass();
+    tagJJ_max_et = std::max(jet1_tag.Et(), jet2_tag.Et());
+    tagJJ_min_et = std::min(jet1_tag.Et(), jet2_tag.Et());
+    WJJ_Deta     = deltaEta(jet1_W.eta(), jet2_W.eta());
+    WJJ_m        = jet12_W.mass();
+    WJJ_max_et   = std::max(jet1_W.Et(), jet2_W.Et());
+    WJJ_min_et   = std::min(jet1_W.Et(), jet2_W.Et());
+    lepMetW_Dphi = deltaPhi(lepMet.phi(), jet12_W.phi());
+    
+    
+    
+    
+    
+    
     
     
     
@@ -310,6 +406,36 @@ int main(int argc, char** argv)
     // fill distributions
     stepEvents[step] += 1;
     
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    
+    histograms -> Fill("WJJ_zepp", step, jet12_W_zepp);
+    histograms -> Fill("WJJ_max_zepp", step, fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_min_zepp", step, fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );    
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    for(unsigned int jetIt = 0; jetIt < otherJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector otherJet = otherJets.at(jetIt);
+      float otherJet_zepp = (otherJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("otherJ_zepp", step, otherJet_zepp);
+    }
+
+    for(unsigned int jetIt = 0; jetIt < centralJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector centralJet = centralJets.at(jetIt);
+      float centralJet_zepp = (centralJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("centralJ_zepp", step, centralJet_zepp);
+    }
+    
+    histograms -> Fill("lep_zepp", step, lep_zepp);    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
     stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
     stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step);
     stdHistograms -> Fill1(otherJets, "otherJ", step);
@@ -318,6 +444,8 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(lepton, "lep", step);
     stdHistograms -> Fill2(lepton, met, "lepMet", step);
     stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step);
+    
+    tree.at(step) -> Fill();
     
     
     
@@ -339,7 +467,37 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
+
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
     
+    histograms -> Fill("WJJ_zepp", step, jet12_W_zepp);
+    histograms -> Fill("WJJ_max_zepp", step, fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_min_zepp", step, fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    for(unsigned int jetIt = 0; jetIt < otherJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector otherJet = otherJets.at(jetIt);
+      float otherJet_zepp = (otherJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("otherJ_zepp", step, otherJet_zepp);
+    }
+
+    for(unsigned int jetIt = 0; jetIt < centralJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector centralJet = centralJets.at(jetIt);
+      float centralJet_zepp = (centralJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("centralJ_zepp", step, centralJet_zepp);
+    }
+    
+    histograms -> Fill("lep_zepp", step, lep_zepp);    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+            
     stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
     stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step);
     stdHistograms -> Fill1(otherJets, "otherJ", step);
@@ -348,6 +506,8 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(lepton, "lep", step);
     stdHistograms -> Fill2(lepton, met, "lepMet", step);
     stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step);
+    
+    tree.at(step) -> Fill();
     
     
     
@@ -370,6 +530,36 @@ int main(int argc, char** argv)
     // fill distributions
     stepEvents[step] += 1;
     
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    
+    histograms -> Fill("WJJ_zepp", step, jet12_W_zepp);
+    histograms -> Fill("WJJ_max_zepp", step, fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_min_zepp", step, fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    for(unsigned int jetIt = 0; jetIt < otherJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector otherJet = otherJets.at(jetIt);
+      float otherJet_zepp = (otherJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("otherJ_zepp", step, otherJet_zepp);
+    }
+
+    for(unsigned int jetIt = 0; jetIt < centralJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector centralJet = centralJets.at(jetIt);
+      float centralJet_zepp = (centralJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("centralJ_zepp", step, centralJet_zepp);
+    }
+    
+    histograms -> Fill("lep_zepp", step, lep_zepp);    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
     stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
     stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step);
     stdHistograms -> Fill1(otherJets, "otherJ", step);
@@ -378,6 +568,8 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(lepton, "lep", step);
     stdHistograms -> Fill2(lepton, met, "lepMet", step);
     stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step);
+    
+    tree.at(step) -> Fill();
     
     
     
@@ -392,12 +584,42 @@ int main(int argc, char** argv)
     
     if( lepton.pt() < lepPtMIN ) continue;
     if( lepton.pt() > lepPtMAX ) continue;
-    if( leptonTkIso.at(selectIt_lep) / lepton.pt() > lepTkIsoOverPtMAX) continue;
-    if( fabs((lepton.eta() - avgEta_tag)/absDeta_tag) > lepZeppMAX ) continue;
+    if( leptons_tkIso.at(selectIt_lep) / lepton.pt() > lepTkIsoOverPtMAX) continue;
+    if( fabs(lep_zepp) > lepZeppMAX ) continue;
     
     
     // fill distributions
     stepEvents[step] += 1;
+    
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    
+    histograms -> Fill("WJJ_zepp", step, jet12_W_zepp);
+    histograms -> Fill("WJJ_max_zepp", step, fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_min_zepp", step, fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    for(unsigned int jetIt = 0; jetIt < otherJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector otherJet = otherJets.at(jetIt);
+      float otherJet_zepp = (otherJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("otherJ_zepp", step, otherJet_zepp);
+    }
+
+    for(unsigned int jetIt = 0; jetIt < centralJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector centralJet = centralJets.at(jetIt);
+      float centralJet_zepp = (centralJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("centralJ_zepp", step, centralJet_zepp);
+    }
+    
+    histograms -> Fill("lep_zepp", step, lep_zepp);    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
     
     stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
     stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step);
@@ -407,6 +629,8 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(lepton, "lep", step);
     stdHistograms -> Fill2(lepton, met, "lepMet", step);
     stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step);
+    
+    tree.at(step) -> Fill();
     
     
     
@@ -426,6 +650,36 @@ int main(int argc, char** argv)
     // fill distributions
     stepEvents[step] += 1;
     
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    
+    histograms -> Fill("WJJ_zepp", step, jet12_W_zepp);
+    histograms -> Fill("WJJ_max_zepp", step, fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_min_zepp", step, fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    for(unsigned int jetIt = 0; jetIt < otherJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector otherJet = otherJets.at(jetIt);
+      float otherJet_zepp = (otherJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("otherJ_zepp", step, otherJet_zepp);
+    }
+
+    for(unsigned int jetIt = 0; jetIt < centralJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector centralJet = centralJets.at(jetIt);
+      float centralJet_zepp = (centralJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("centralJ_zepp", step, centralJet_zepp);
+    }
+    
+    histograms -> Fill("lep_zepp", step, lep_zepp);    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
     stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
     stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step);
     stdHistograms -> Fill1(otherJets, "otherJ", step);
@@ -434,6 +688,8 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(lepton, "lep", step);
     stdHistograms -> Fill2(lepton, met, "lepMet", step);
     stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step);
+    
+    tree.at(step) -> Fill();
     
     
     
@@ -451,6 +707,36 @@ int main(int argc, char** argv)
     // fill distributions
     stepEvents[step] += 1;
     
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    
+    histograms -> Fill("WJJ_zepp", step, jet12_W_zepp);
+    histograms -> Fill("WJJ_max_zepp", step, fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_min_zepp", step, fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    for(unsigned int jetIt = 0; jetIt < otherJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector otherJet = otherJets.at(jetIt);
+      float otherJet_zepp = (otherJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("otherJ_zepp", step, otherJet_zepp);
+    }
+
+    for(unsigned int jetIt = 0; jetIt < centralJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector centralJet = centralJets.at(jetIt);
+      float centralJet_zepp = (centralJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("centralJ_zepp", step, centralJet_zepp);
+    }
+    
+    histograms -> Fill("lep_zepp", step, lep_zepp);    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
     stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
     stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step);
     stdHistograms -> Fill1(otherJets, "otherJ", step);
@@ -459,6 +745,8 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(lepton, "lep", step);
     stdHistograms -> Fill2(lepton, met, "lepMet", step);
     stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step);
+    
+    tree.at(step) -> Fill();
     
     
     
@@ -476,6 +764,36 @@ int main(int argc, char** argv)
     // fill distributions
     stepEvents[step] += 1;
     
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    
+    histograms -> Fill("WJJ_zepp", step, jet12_W_zepp);
+    histograms -> Fill("WJJ_max_zepp", step, fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_min_zepp", step, fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    for(unsigned int jetIt = 0; jetIt < otherJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector otherJet = otherJets.at(jetIt);
+      float otherJet_zepp = (otherJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("otherJ_zepp", step, otherJet_zepp);
+    }
+
+    for(unsigned int jetIt = 0; jetIt < centralJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector centralJet = centralJets.at(jetIt);
+      float centralJet_zepp = (centralJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("centralJ_zepp", step, centralJet_zepp);
+    }
+    
+    histograms -> Fill("lep_zepp", step, lep_zepp);    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
     stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
     stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step);
     stdHistograms -> Fill1(otherJets, "otherJ", step);
@@ -485,147 +803,7 @@ int main(int argc, char** argv)
     stdHistograms -> Fill2(lepton, met, "lepMet", step);
     stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step);
     
-    
-    
-    
-    //// tag jets
-    //float etJ1_tag = jet1_tag.Et();
-    //histograms -> Fill("tag_etJ1", step, etJ1_tag);
-    //
-    //float etJ2_tag = jet2_tag.Et();
-    //histograms -> Fill("tag_etJ2", step, etJ2_tag);
-    //
-    //float etJJ_tag = jet12_tag.Et();
-    //histograms -> Fill("tag_etJJ", step, etJJ_tag);
-    //    
-    //float mJJ_tag = jet12_tag.mass();
-    //histograms -> Fill("tag_mJJ", step, mJJ_tag);
-    //
-    //float DetaJJ_tag = deltaEta(jet1_tag.eta(), jet2_tag.eta());
-    //histograms -> Fill("tag_DetaJJ", step, DetaJJ_tag);
-    //
-    //float DphiJJ_tag = deltaPhi(jet1_tag.phi(), jet2_tag.phi());
-    //histograms -> Fill("tag_DphiJJ", step, DphiJJ_tag);    
-    //
-    //
-    //
-    //// W jets
-    //float etJ1_W = jet1_W.Et();
-    //histograms -> Fill("W_etJ1", step, etJ1_W);
-    //    
-    //float etJ2_W = jet2_W.Et();
-    //histograms -> Fill("W_etJ2", step, etJ2_W);
-    //
-    //float etJJ_W = jet12_W.Et();
-    //histograms -> Fill("W_etJJ", step, etJJ_W);
-    //    
-    //float mJJ_W = jet12_W.mass();
-    //histograms -> Fill("W_mJJ", step, mJJ_W);
-    //    
-    //float mtJJ_W = jet12_W.mt();
-    //histograms -> Fill("W_mtJJ", step, mtJJ_W);
-    //
-    //float DetaJJ_W = deltaEta(jet1_W.eta(), jet2_W.eta());
-    //histograms -> Fill("W_DetaJJ", step, DetaJJ_W);
-    //
-    //float DphiJJ_W = deltaPhi(jet1_W.phi(), jet2_W.phi());
-    //histograms -> Fill("W_DphiJJ", step, DphiJJ_W);
-    //
-    //float zeppJ1_W = (jet1_W.eta() - avgEta_tag) / absDeta_tag;
-    //histograms -> Fill("W_zeppJ1", step, zeppJ1_W);
-    //    
-    //float zeppJ2_W = (jet2_W.eta() - avgEta_tag) / absDeta_tag;
-    //histograms -> Fill("W_zeppJ2", step, zeppJ2_W);
-    //
-    //float zeppJJ_W = (jet12_W.eta() - avgEta_tag) / absDeta_tag;
-    //histograms -> Fill("W_zeppJJ", step, zeppJJ_W);
-    //
-    //float Dphi_W_tag = deltaPhi(jet12_W.phi(), jet12_tag.phi());
-    //histograms -> Fill("W_tag_Dphi", step, Dphi_W_tag);    
-    //
-    //// other jets
-    //unsigned int nOtherJet = otherJets.size();
-    //histograms -> Fill("otherJet_n", step, nOtherJet);
-    //
-    //for(unsigned int jetIt = 0; jetIt < nOtherJet; ++jetIt)
-    //{
-    //  float etOtherJet = otherJets.at(jetIt).Et();
-    //  histograms -> Fill("otherJet_et", step, etOtherJet);
-    //
-    //  float zeppOtherJet = (otherJets.at(jetIt).eta() - avgEta_tag)/absDeta_tag;
-    //  histograms -> Fill("otherJet_zepp", step, zeppOtherJet);      
-    //}
-    //
-    //// central jets
-    //unsigned int nCentralJet = centralJets.size();
-    //histograms -> Fill("centralJet_n", step, nCentralJet);
-    //
-    //for(unsigned int jetIt = 0; jetIt < nCentralJet; ++jetIt)
-    //{
-    //  float etCentralJet = centralJets.at(jetIt).Et();
-    //  histograms -> Fill("centralJet_et", step, etCentralJet);
-    //
-    //  float zeppCentralJet = (centralJets.at(jetIt).eta() - avgEta_tag)/absDeta_tag;
-    //  histograms -> Fill("centralJet_zepp", step, zeppCentralJet);      
-    //}
-    //
-    //// lepton
-    //float ptLep = lepton.pt();
-    //histograms -> Fill("lep_pt", step, ptLep);
-    //
-    //float zeppLep = (lepton.eta() - avgEta_tag) / absDeta_tag;
-    //histograms -> Fill("lep_zepp", step, zeppLep);
-    //    
-    //float DetaLep_W = deltaEta(lepton.eta(), jet12_W.eta());
-    //histograms -> Fill("lep_W_Deta", step, DetaLep_W); 
-    //
-    //float DphiLep_W = deltaPhi(lepton.phi(), jet12_W.phi());
-    //histograms -> Fill("lep_W_Dphi", step, DphiLep_W);
-    //
-    //float DphiLep_tag = deltaPhi(lepton.phi(), jet12_tag.phi());
-    //histograms -> Fill("lep_tag_Dphi", step, DphiLep_tag);
-    //
-    //float mtLepMet = lepMet.mt();
-    //histograms -> Fill("lepMet_mt", step, mtLepMet);
-    //    
-    //float DphiLepMet_W = deltaPhi(lepMet.phi(), jet12_W.phi());
-    //histograms -> Fill("lepMet_W_Dphi", step, DphiLepMet_W);
-    //
-    //
-    //
-    //// met
-    //float etMet = met.Et();
-    //histograms -> Fill("met_et", step, etMet);
-    //
-    //float DphiMet_lep = deltaPhi(met.phi(), lepton.phi());
-    //histograms -> Fill("met_lep_Dphi", step, DphiMet_lep);
-    //
-    //float DphiMet_W = deltaPhi(met.phi(), jet12_W.phi());
-    //histograms -> Fill("met_W_Dphi", step, DphiMet_W);
-    //
-    //float DphiMet_tag = deltaPhi(met.phi(), jet12_tag.phi());
-    //histograms -> Fill("met_tag_Dphi", step, DphiMet_tag);    
-    //
-    //
-    //
-    //// higgs
-    //float ptLepMetW = lepMetW.pt();
-    //histograms -> Fill("lepMetW_pt", step, ptLepMetW);
-    //    
-    //float mtLepMetW = lepMetW.mt();
-    //histograms -> Fill("lepMetW_mt", step, mtLepMetW);
-    //
-    //float DphiLepMetW_tag = deltaPhi(lepMetW.phi(), jet12_tag.phi());
-    //histograms -> Fill("lepMetW_tag_Dphi", step, DphiLepMetW_tag);    
-    //
-    //
-    //
-    //// pt tot
-    //float ptLepMetWTag = lepMetWTag.pt();
-    //histograms -> Fill("lepMetWTag_pt", step, ptLepMetWTag);
-    
-    
-    
+    tree.at(step) -> Fill();
     
     
     
@@ -646,13 +824,21 @@ int main(int argc, char** argv)
   {
     events -> SetBinContent(step+1, stepEvents[step]);
     events -> GetXaxis() -> SetBinLabel(step+1, stepName[step].c_str());
+    
+    tree.at(step) -> Write();
   }
   
   events -> Write(); 
+  
+
+  //RooDataSet data("data", "data", &ntu, var_set) ;
+  //data.Write();
+  
   outputRootFile -> Close();
   
+  delete histograms;
   delete stdHistograms;
-  //delete histograms;
+  
   
   return 0;
 }

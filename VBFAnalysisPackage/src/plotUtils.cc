@@ -274,3 +274,4 @@ void drawTStack::SetYaxisTitle(const std::string& yTitle)
   m_yAxisTitle = true;
   m_yTitle = yTitle;
 }
+
