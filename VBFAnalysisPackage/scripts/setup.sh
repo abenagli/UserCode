@@ -13,4 +13,6 @@ export NTUPLEPKGLIB=${THISDIR}/../NtuplePackage/lib
 
 export VBFANALYSISPKG=${THISDIR}/
 
-source ${THISDIR}/../NtuplePackage/scripts/setup.sh
+cd ${THISDIR}/../NtuplePackage/
+source scripts/setup.sh
+cd -

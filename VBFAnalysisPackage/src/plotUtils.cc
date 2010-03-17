@@ -72,6 +72,10 @@ void drawTStack::Draw(const std::string& histoName, const int& step,
   TLegend legend(0.15, 0.15, 0.35, 0.45);
   legend.SetFillColor(kWhite);
   
+  double globalMaximum = 0.;
+  double globalMinimum = 1.;
+  
+  
   
   //---------------------------------------------
   // define the map with summed cross sections
@@ -138,10 +142,7 @@ void drawTStack::Draw(const std::string& histoName, const int& step,
   
   
   
-  TCanvas* c1 = new TCanvas();
-  c1 -> cd();
-  if(logy)
-    c1 -> SetLogy();
+  
   
   
   
@@ -149,34 +150,60 @@ void drawTStack::Draw(const std::string& histoName, const int& step,
   for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
       mapIt != crossSection_summed.end(); ++mapIt)
   {    
-    // fill stack
-    histo_summed[mapIt->first] -> Scale(1./mapIt->second);
-    histo_summed[mapIt->first] -> SetLineColor(getColor(i));
-    if(i == 0)
-      histo_summed[mapIt->first] -> SetLineWidth(4);
-    else
-      histo_summed[mapIt->first] -> SetLineWidth(2);
+    TH1F* globalHisto = histo_summed[mapIt->first];
     
-    hs -> Add(histo_summed[mapIt->first]);
-    legend.AddEntry(histo_summed[mapIt->first], (mapIt->first).c_str(), "L");
+    
+    globalHisto -> Scale(1./mapIt->second);
+    globalHisto -> SetLineColor(getColor(i));
+    if(m_xAxisRange)
+      globalHisto->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
+    if(i == 0)
+      globalHisto -> SetLineWidth(4);
+    else
+      globalHisto -> SetLineWidth(2);
+        
+    
+    if(globalHisto->GetMaximum() > globalMaximum)
+      globalMaximum = globalHisto -> GetMaximum();
+    if( (globalHisto->GetMinimum() < globalMinimum) && (globalHisto->GetMinimum() > 0.) )
+      globalMinimum = globalHisto -> GetMinimum();    
+    
+    
+    hs -> Add(globalHisto);
+    legend.AddEntry(globalHisto, (mapIt->first).c_str(), "L");
     
     ++i;
   }
-
+  
+  
+  
+  
+  
+  
+  // draw the stack and save file
+  TCanvas* c1 = new TCanvas();
+  c1 -> cd();
+  
+  
   hs -> Draw("nostack");
   legend.Draw("same");
   
   
-  if(m_xAxisRange)
-    hs->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
+  if(logy)
+    c1 -> SetLogy();
+  if(logy)
+    hs->GetYaxis()->SetRangeUser(globalMinimum - 0.1*globalMinimum,
+                                 globalMaximum + 0.1*globalMaximum);
+  
+  
+  hs->GetXaxis()->SetTitle(histoName.c_str());
   if(m_xAxisTitle)
     hs->GetXaxis()->SetTitle(m_xTitle.c_str());
   hs -> GetXaxis() -> SetTitleSize(0.04);
   hs -> GetXaxis() -> SetLabelSize(0.03);
   hs -> GetXaxis() -> SetTitleOffset(1.25);
 
-  if(m_yAxisRange)
-    hs->GetYaxis()->SetRangeUser(m_yRangeMin, m_yRangeMax);
+  hs->GetYaxis()->SetTitle("event fraction");  
   if(m_yAxisTitle)
     hs->GetYaxis()->SetTitle(m_yTitle.c_str());    
   hs -> GetYaxis() -> SetTitleSize(0.04);
@@ -184,8 +211,18 @@ void drawTStack::Draw(const std::string& histoName, const int& step,
   hs -> GetYaxis() -> SetTitleOffset(1.50);
   
   
+  if(m_xAxisRange)
+    hs->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
+  
+  hs->GetYaxis()->SetRangeUser(0., globalMaximum+0.1*globalMaximum);
+  if(m_yAxisRange)
+    hs->GetYaxis()->SetRangeUser(m_yRangeMin, m_yRangeMax);
+  
   
   c1->Print((m_outputDir+histoName+".pdf").c_str(), "pdf");
+  
+  
+  
   
   
   
