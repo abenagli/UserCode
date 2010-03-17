@@ -12,7 +12,3 @@ setenv NTUPLEPKGINCLUDE ${THISDIR}/../NtuplePackage/interface
 setenv NTUPLEPKGLIB ${THISDIR}/../NtuplePackage/lib
 
 setenv VBFANALYSISPKG ${THISDIR}/
-
-cd ${THISDIR}/../NtuplePackage/
-source scripts/setup.csh
-cd -
