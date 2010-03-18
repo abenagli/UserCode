@@ -206,10 +206,13 @@ while (<LISTOFSamples>)
     $command = "VBFHiggsToWWTolnujjPreselection.exe ".$JOBCfgFile ;
     system ("echo ".$command." >> ".$tempBjob) ;
     
-    $command = "echo rfcp ./".$OUTPUTFILEName."_".$jobIt."_".$JETAlgorithm.".root ".$INPUTSAVEPath."/".$sample;
+    $command = "echo rfmkdir ".$OUTPUTSAVEPath."/".$sample;
     system ("echo ".$command." >> ".$tempBjob) ;
 
-    $command = "rfcp ./".$OUTPUTFILEName."_".$jobIt."_".$JETAlgorithm.".root ".$INPUTSAVEPath."/".$sample;
+    $command = "echo rfcp ./".$OUTPUTFILEName."_".$jobIt."_".$JETAlgorithm.".root ".$OUTPUTSAVEPath."/".$sample."/";
+    system ("echo ".$command." >> ".$tempBjob) ;
+
+    $command = "rfcp ./".$OUTPUTFILEName."_".$jobIt."_".$JETAlgorithm.".root ".$OUTPUTSAVEPath."/".$sample."/";
     system ("echo ".$command." >> ".$tempBjob) ;
     
     $command = "rm -rf abenagli/" ;
