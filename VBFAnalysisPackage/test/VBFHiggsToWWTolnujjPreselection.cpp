@@ -54,7 +54,7 @@ int main(int argc, char** argv)
   
   int totalEvents = GetTotalEvents("MCDecayModeFilterAll/totalEvents", inputFileList.c_str());  
 
-  std::string VBFPreselectionName = "EtMinCaloJetCountFilter" + jetAlgorithm+"/passedEvents"; 
+  std::string VBFPreselectionName = "VBFEtMinCaloJetCountFilter" + jetAlgorithm+"/passedEvents"; 
   int VBFPreselectionEvents = GetTotalEvents(VBFPreselectionName.c_str(), inputFileList.c_str());  
   
   
