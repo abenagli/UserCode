@@ -209,6 +209,9 @@ while (<LISTOFSamples>)
     $command = "echo rfmkdir ".$OUTPUTSAVEPath."/".$sample;
     system ("echo ".$command." >> ".$tempBjob) ;
 
+    $command = "rfmkdir ".$OUTPUTSAVEPath."/".$sample;
+    system ("echo ".$command." >> ".$tempBjob) ;
+
     $command = "echo rfcp ./".$OUTPUTFILEName."_".$jobIt."_".$JETAlgorithm.".root ".$OUTPUTSAVEPath."/".$sample."/";
     system ("echo ".$command." >> ".$tempBjob) ;
 
