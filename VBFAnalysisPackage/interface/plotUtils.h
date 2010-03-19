@@ -5,6 +5,7 @@
 #include <map>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 #include "TCanvas.h"
 #include "TFile.h"
@@ -33,6 +34,7 @@ class drawTStack
   //! methods
   void Draw(const std::string& histoName, const int& step,
             const int& rebin, const bool& logy);
+  void DrawEvents(const std::string& mode, const float& lumi, const bool& logy);
   
   void SetXaxisRange(const double& xMin, const double& xMax);
   void SetXaxisTitle(const std::string& xTitle);
