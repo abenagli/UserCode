@@ -87,7 +87,7 @@ int main(int argc, char** argv)
   stepEvents[step] = totalEvents;
   stepName[step] = "total events";
 
-  step = step+1;
+  step = 1;
   stepEvents[step] = VBFPreselectionEvents;
   stepName[step] = "VBFPreselection";
   
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
     
     //***************
     // cut on leptons
-    step = step+1;
+    step = 2;
     stepName[step] = "1 lepton";
     
     int nLep = 0;

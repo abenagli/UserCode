@@ -52,6 +52,7 @@ int main(int argc, char** argv)
   float lepTkIsoOverPtMAX = gConfigParser -> readFloatOption("Cuts::lepTkIsoOverPtMAX");
   float eleIdValueMIN = gConfigParser -> readFloatOption("Cuts::eleIdValueMIN");
   float lepZeppMAX = gConfigParser -> readFloatOption("Cuts::lepZeppMAX");
+  float lepTipSigMAX = gConfigParser -> readFloatOption("Cuts::lepTipSigMAX");
   
   float tagJetDetaMIN = gConfigParser -> readFloatOption("Cuts::tagJetDetaMIN");
   float tagJetMjjMIN = gConfigParser -> readFloatOption("Cuts::tagJetMjjMIN");
@@ -59,6 +60,7 @@ int main(int argc, char** argv)
   float tagJet1EtMAX = gConfigParser -> readFloatOption("Cuts::tagJet1EtMAX");
   float tagJet2EtMIN = gConfigParser -> readFloatOption("Cuts::tagJet2EtMIN");
   float tagJet2EtMAX = gConfigParser -> readFloatOption("Cuts::tagJet2EtMAX");
+  float tagJetBTagMAX = gConfigParser -> readFloatOption("Cuts::tagJetBTagMAX");
 
   float WJetMjjMIN = gConfigParser -> readFloatOption("Cuts::WJetMjjMIN");
   float WJetMjjMAX = gConfigParser -> readFloatOption("Cuts::WJetMjjMAX");
@@ -66,13 +68,14 @@ int main(int argc, char** argv)
   float WJet1EtMAX = gConfigParser -> readFloatOption("Cuts::WJet1EtMAX");
   float WJet2EtMIN = gConfigParser -> readFloatOption("Cuts::WJet2EtMIN");
   float WJet2EtMAX = gConfigParser -> readFloatOption("Cuts::WJet2EtMAX");
+  float WJetBTagMAX = gConfigParser -> readFloatOption("Cuts::WJetBTagMAX");
   
   float metEtMIN = gConfigParser -> readFloatOption("Cuts::metEtMIN");
   float metEtMAX = gConfigParser -> readFloatOption("Cuts::metEtMAX");
   
   float lepMet_W_DphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMAX");
   
-  int totalEvents = GetTotalEvents("events", inputFileList.c_str()); 
+  std::map<int, int> totalEvents = GetTotalEvents("events", inputFileList.c_str()); 
   
   
   
@@ -88,7 +91,7 @@ int main(int argc, char** argv)
   
   
   // define histograms
-  int nStep = 8;
+  int nStep = 9;
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepName;
@@ -96,8 +99,12 @@ int main(int argc, char** argv)
   
   
   int step = 0;
-  stepEvents[step] = totalEvents;
+  stepEvents[step] = totalEvents[1];
   stepName[step] = "total events";
+  
+  step = 1;
+  stepEvents[step] = totalEvents[2];
+  stepName[step] = "VBFHiggsToWWTolnujjPreselection";
   
   
   
@@ -286,8 +293,8 @@ int main(int argc, char** argv)
     
     
     
-    //***********
-    // other jets
+    //***********************
+    // other and central jets
     
     for(unsigned int jetIt = 0; jetIt < jets.size(); ++jetIt)
     {
@@ -397,10 +404,10 @@ int main(int argc, char** argv)
     
     
     //**********************
-    // STEP 1 - Preselection
-    step = 1;
+    // STEP 2 - Preselection
+    step = 2;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "preselection";
+    stepName[step] = "VBFHiggsToWWTolnujjPreselection";
     
         
     // fill distributions
@@ -453,7 +460,7 @@ int main(int argc, char** argv)
     
     
     //*********************************
-    // STEP 2 - Initial cuts - tag jets
+    // STEP 3 - Initial cuts - tag jets
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = "tag jet cuts";
@@ -464,6 +471,8 @@ int main(int argc, char** argv)
     if( jet1_tag.Et() > tagJet1EtMAX ) continue;    
     if( jet2_tag.Et() < tagJet2EtMIN ) continue;
     if( jet2_tag.Et() > tagJet2EtMAX ) continue;
+    if( jet1_tag_bTag > tagJetBTagMAX ) continue; 
+    if( jet2_tag_bTag > tagJetBTagMAX ) continue; 
     
     // fill distributions
     stepEvents[step] += 1;
@@ -515,7 +524,7 @@ int main(int argc, char** argv)
     
     
     //*******************************
-    // STEP 3 - Initial cuts - W jets
+    // STEP 4 - Initial cuts - W jets
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = "W jet cuts";
@@ -526,6 +535,8 @@ int main(int argc, char** argv)
     if( jet1_W.Et() > WJet1EtMAX ) continue;
     if( jet2_W.Et() < WJet2EtMIN ) continue;
     if( jet2_W.Et() > WJet2EtMAX ) continue;
+    if( jet1_W_bTag > WJetBTagMAX ) continue; 
+    if( jet2_W_bTag > WJetBTagMAX ) continue; 
     
     // fill distributions
     stepEvents[step] += 1;
@@ -577,7 +588,7 @@ int main(int argc, char** argv)
     
     
     //*******************************
-    // STEP 4 - Initial cuts - lepton
+    // STEP 5 - Initial cuts - lepton
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = "lepton cuts";
@@ -586,6 +597,7 @@ int main(int argc, char** argv)
     if( lepton.pt() > lepPtMAX ) continue;
     if( leptons_tkIso.at(selectIt_lep) / lepton.pt() > lepTkIsoOverPtMAX) continue;
     if( fabs(lep_zepp) > lepZeppMAX ) continue;
+    if( lep_tipSig < lepTipSigMAX ) continue; 
     
     
     // fill distributions
@@ -638,7 +650,7 @@ int main(int argc, char** argv)
     
     
     //*******************************
-    // STEP 5 - Initial cuts - met
+    // STEP 6 - Initial cuts - met
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = "met cuts";
@@ -697,7 +709,7 @@ int main(int argc, char** argv)
     
     
     //***************************************
-    // STEP 6 - Initial cuts - lepMet - W cut
+    // STEP 7 - Initial cuts - lepMet - W cut
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = "lepMet-W Dphi";
@@ -754,7 +766,7 @@ int main(int argc, char** argv)
     
     
     //***************************************
-    // STEP 7 - Initial cuts - CJV
+    // STEP 8 - Initial cuts - CJV
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = "CJV";

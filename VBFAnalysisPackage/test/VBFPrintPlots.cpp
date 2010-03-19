@@ -51,7 +51,7 @@ int main(int argc, char** argv)
   drawTStack* stack = new drawTStack(inputDir, "listOfSamplesAndCrossSections.txt", "VBFHiggsToWWTolnujjAnalysis", jetAlgorithm, outputDir);
   
   std::string histoName;
-  int step = 1;
+  int step = 2;
   
   
   
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 
   histoName = "tagJJ_bTag";
   stack -> SetXaxisRange(-50., 50.);
-  stack -> Draw(histoName, step, 50, true);
+  stack -> Draw(histoName, step, 10, true);
   
   //c1 = drawPlot(inputDir,"h_7_W_tag_Dphi",
   //             5, 1., 
@@ -135,6 +135,9 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-1., 1.);
   stack -> Draw(histoName, step, 50, true);  
   
+  histoName = "WJJ_bTag";
+  stack -> SetXaxisRange(-50., 50.);
+  stack -> Draw(histoName, step, 10, true);
   
   
   
@@ -207,24 +210,52 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 50.);
   stack -> Draw(histoName, step, 50, true);
   
-  //c1 = drawPlot(inputDir,"h_7_lep_W_Deta",
-  //              10, 1., 
-  //              0., 10.,
-  //              0.001, 0.5, true,
-  //              "lep_W - Deta", "event fraction");
-  //c1 -> Print((outputDir+"/lep_W_Deta.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
-  //c1 = drawPlot(inputDir,"h_7_lep_W_Dphi",
-  //              5, 1., 
-  //              0., 3.15,
-  //              0.01, 0.2, true,
-  //              "lep_W - Dphi", "event fraction");
-  //c1 -> Print((outputDir+"/lep_W_Dphi.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
+  
+  
+  
+  
+  
+  // met
+  histoName = "met_et";
+  stack -> SetXaxisRange(0., 500.);
+  stack -> Draw(histoName, step, 10, true);
+  
+  
+  
+  
+  
+  
+  // lepton + met
+  histoName = "lepMet_mt";
+  stack -> SetXaxisRange(0., 500.);
+  stack -> Draw(histoName, step, 10, true);
+  
+  histoName = "lepMetW_DR";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 10, true);
+  
+  histoName = "lepMetW_Deta";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 10, true);
+  
+  histoName = "lepMetW_Dphi";
+  stack -> SetXaxisRange(0., 3.);
+  stack -> Draw(histoName, step, 10, true);
+  
+  
+  
+  
+  
+  
+  // lepton + W + met
+  histoName = "lepMetW_mt";
+  stack -> SetXaxisRange(0., 500.);
+  stack -> Draw(histoName, step, 10, true);
+  
+  histoName = "lepMetW_pt";
+  stack -> SetXaxisRange(0., 500.);
+  stack -> Draw(histoName, step, 10, true);
+  
   //c1 = drawPlot(inputDir,"h_7_lep_tag_Dphi",
   //              5, 1., 
   //              0., 3.15,
@@ -233,57 +264,7 @@ int main(int argc, char** argv)
   //c1 -> Print((outputDir+"/lep_tag_Dphi.png").c_str(), "png");
   //delete c1;
   //Close(inRootFiles);
-  //
-  //c1 = drawPlot(inputDir,"h_7_lepMet_mt",
-  //              10, 1., 
-  //              0., 300.,
-  //              0.001, 0.5, true,
-  //              "lepMet - mt", "event fraction");
-  //c1 -> Print((outputDir+"/lepMet_mt.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
-  //c1 = drawPlot(inputDir,"h_7_lepMet_W_Dphi",
-  //              5, 1., 
-  //              0., 3.15,
-  //              0.01, 0.2, true,
-  //              "lepMet_W - Dphi", "event fraction");
-  //c1 -> Print((outputDir+"/lepMet_W_Dphi.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
-  //
-  //
-  //
-  //
-  //
-  //c1 = drawPlot(inputDir,"h_7_met_et",
-  //              10, 1., 
-  //              0., 250.,
-  //              0.001, 0.5, true,
-  //              "met - et", "event fraction");
-  //c1 -> Print((outputDir+"/met_et.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
-  //c1 = drawPlot(inputDir,"h_7_met_lep_Dphi",
-  //              5, 1., 
-  //              0., 3.15,
-  //              0.01, 0.2, true,
-  //              "met_lep - Dphi", "event fraction");
-  //c1 -> Print((outputDir+"/met_lep_Dphi.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
-  //c1 = drawPlot(inputDir,"h_7_met_W_Dphi",
-  //              5, 0.2, 
-  //              0., 3.15,
-  //              0.01, 0.2, true,
-  //              "met_W - Dphi", "event fraction");
-  //c1 -> Print((outputDir+"/met_W_Dphi.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
+
   //c1 = drawPlot(inputDir,"h_7_met_tag_Dphi",
   //              5, 1., 
   //              0., 3.15,
@@ -292,30 +273,7 @@ int main(int argc, char** argv)
   //c1 -> Print((outputDir+"/met_tag_Dphi.png").c_str(), "png");
   //delete c1;
   //Close(inRootFiles);
-  //
-  //
-  //
-  //
-  //
-  //
-  //c1 = drawPlot(inputDir,"h_7_lepMetW_mt",
-  //              10, 1., 
-  //              0., 500.,
-  //              0.001, 0.1, true,
-  //              "lepMetW - mt", "event fraction");
-  //c1 -> Print((outputDir+"/lepMetW_mt.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
-  //c1 = drawPlot(inputDir,"h_7_lepMetW_pt",
-  //              10, 1., 
-  //              0., 500.,
-  //              0.001, 0.1, true,
-  //              "lepMetW - pt", "event fraction");
-  //c1 -> Print((outputDir+"/lepMetW_pt.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  //
+
   //c1 = drawPlot(inputDir,"h_7_lepMetW_tag_Dphi",
   //              2, 1., 
   //              0., 3.15,
