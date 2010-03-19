@@ -52,10 +52,10 @@ int main(int argc, char** argv)
   float VBFDetaMIN = gConfigParser -> readFloatOption("Cuts::VBFDetaMIN");
   float VBFMjjMIN = gConfigParser -> readFloatOption("Cuts::VBFMjjMIN");
   
-  int totalEvents = GetTotalEvents("MCDecayModeFilterAll/totalEvents", inputFileList.c_str());  
+  std::map<int,int> totalEvents = GetTotalEvents("MCDecayModeFilterAll/totalEvents", inputFileList.c_str());  
 
   std::string VBFPreselectionName = "VBFEtMinCaloJetCountFilter" + jetAlgorithm+"/passedEvents"; 
-  int VBFPreselectionEvents = GetTotalEvents(VBFPreselectionName.c_str(), inputFileList.c_str());  
+  std::map<int,int> VBFPreselectionEvents = GetTotalEvents(VBFPreselectionName.c_str(), inputFileList.c_str());  
   
   
   
@@ -84,11 +84,11 @@ int main(int argc, char** argv)
   std::map<int, std::string> stepName;
 
   int step = 0;
-  stepEvents[step] = totalEvents;
+  stepEvents[step] = totalEvents[1];
   stepName[step] = "total events";
 
   step = 1;
-  stepEvents[step] = VBFPreselectionEvents;
+  stepEvents[step] = VBFPreselectionEvents[1];
   stepName[step] = "VBFPreselection";
   
   
