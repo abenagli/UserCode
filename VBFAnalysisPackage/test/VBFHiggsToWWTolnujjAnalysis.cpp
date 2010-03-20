@@ -7,6 +7,7 @@
 #include <iomanip>
 
 #include "TH1F.h"
+#include "TObject.h"
 #include "RooFitResult.h"
 #include "RooWorkspace.h"
 #include "RooPlot.h"
@@ -42,6 +43,8 @@ int main(int argc, char** argv)
   
   int entryMAX = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
+  int type = gConfigParser -> readIntOption("Options::type");
+  float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   
   int jetNMIN = gConfigParser -> readIntOption("Cuts::jetNMIN");
   float jetEtMIN = gConfigParser -> readFloatOption("Cuts::jetEtMIN");
@@ -151,7 +154,6 @@ int main(int argc, char** argv)
   //RooArgSet var_set(var_tagJJ_Deta, var_WJJ_mass);
     
   // Define tree variables
-  int type;
   float tagJJ_Deta;
   float tagJJ_m;
   float tagJJ_max_et;
@@ -163,23 +165,49 @@ int main(int argc, char** argv)
   float lepMetW_Dphi;
   
   // Define tree
+  std::string outputTreeFileName = outputRootFilePath+"../tree.root";
+  TFile* outputTreeFile = new TFile(outputTreeFileName.c_str(), "UPDATE");
+  
   std::vector<TTree*> tree;
   for(int i = 0; i < nStep; ++i)
-  {
+    tree.push_back(NULL);
+  
+  for(int i = 0; i < nStep; ++i)
+  { 
     char treeName[50];
     sprintf(treeName, "tree_%d", i);
-    tree.push_back( new TTree(treeName, treeName) );
+    tree.at(i) = (TTree*)(outputTreeFile -> Get(treeName));
     
-    tree.at(i) -> Branch("type",         &type,                 "type/I");
-    tree.at(i) -> Branch("tagJJ_Deta",   &tagJJ_Deta,     "tagJJ_Deta/F");
-    tree.at(i) -> Branch("tagJJ_m",      &tagJJ_m,           "tagJJ_m/F");  
-    tree.at(i) -> Branch("tagJJ_max_et", &tagJJ_max_et, "tagJJ_max_et/F");   
-    tree.at(i) -> Branch("tagJJ_min_et", &tagJJ_min_et, "tagJJ_min_et/F"); 
-    tree.at(i) -> Branch("WJJ_Deta",     &WJJ_Deta,         "WJJ_Deta/F");
-    tree.at(i) -> Branch("WJJ_m",        &WJJ_m,               "WJJ_m/F");  
-    tree.at(i) -> Branch("WJJ_max_et",   &WJJ_max_et,     "WJJ_max_et/F");   
-    tree.at(i) -> Branch("WJJ_min_et",   &WJJ_min_et,     "WJJ_min_et/F");
-    tree.at(i) -> Branch("lepMetW_Dphi", &lepMetW_Dphi, "lepMetW_Dphi/F");
+    if(tree.at(i) == NULL)
+    {
+      tree.at(i) = new TTree(treeName, treeName);
+      
+      tree.at(i) -> Branch("type",         &type,                 "type/I");
+      tree.at(i) -> Branch("crossSection", &crossSection, "crossSection/F");
+      tree.at(i) -> Branch("tagJJ_Deta",   &tagJJ_Deta,     "tagJJ_Deta/F");
+      tree.at(i) -> Branch("tagJJ_m",      &tagJJ_m,           "tagJJ_m/F");  
+      tree.at(i) -> Branch("tagJJ_max_et", &tagJJ_max_et, "tagJJ_max_et/F");   
+      tree.at(i) -> Branch("tagJJ_min_et", &tagJJ_min_et, "tagJJ_min_et/F"); 
+      tree.at(i) -> Branch("WJJ_Deta",     &WJJ_Deta,         "WJJ_Deta/F");
+      tree.at(i) -> Branch("WJJ_m",        &WJJ_m,               "WJJ_m/F");  
+      tree.at(i) -> Branch("WJJ_max_et",   &WJJ_max_et,     "WJJ_max_et/F");   
+      tree.at(i) -> Branch("WJJ_min_et",   &WJJ_min_et,     "WJJ_min_et/F");
+      tree.at(i) -> Branch("lepMetW_Dphi", &lepMetW_Dphi, "lepMetW_Dphi/F");
+    }
+    else
+    {
+      tree.at(i) -> SetBranchAddress("type",         &type);
+      tree.at(i) -> SetBranchAddress("crossSection", &crossSection);
+      tree.at(i) -> SetBranchAddress("tagJJ_Deta",   &tagJJ_Deta);
+      tree.at(i) -> SetBranchAddress("tagJJ_m",      &tagJJ_m);  
+      tree.at(i) -> SetBranchAddress("tagJJ_max_et", &tagJJ_max_et);   
+      tree.at(i) -> SetBranchAddress("tagJJ_min_et", &tagJJ_min_et); 
+      tree.at(i) -> SetBranchAddress("WJJ_Deta",     &WJJ_Deta);
+      tree.at(i) -> SetBranchAddress("WJJ_m",        &WJJ_m);  
+      tree.at(i) -> SetBranchAddress("WJJ_max_et",   &WJJ_max_et);   
+      tree.at(i) -> SetBranchAddress("WJJ_min_et",   &WJJ_min_et);
+      tree.at(i) -> SetBranchAddress("lepMetW_Dphi", &lepMetW_Dphi);
+    }
   }
   
   
@@ -826,27 +854,37 @@ int main(int argc, char** argv)
   
   
   
-  // Open output root file
-  TFile* outputRootFile = new TFile(outputRootFullFileName.c_str(), "recreate");
+  // clone tree
+  /*std::vector<TTree*> newTree;
+  for(step = 0; step < nStep; ++step)
+    newTree.push_back( (TTree*)(tree.at(step)->Clone()) );
+  outputTreeFile -> Close(); 
+  */
+  // save tree in a new file
+  //outputTreeFile = new TFile(outputTreeFileName.c_str(), "RECREATE");
+  outputTreeFile -> cd();
+  for(step = 0; step < nStep; ++step)
+    tree.at(step) -> Write("", TObject::kOverwrite);
+  outputTreeFile -> Close();
+  
+  
+  
+  
+  
+  // save event histogram
+  TFile* outputRootFile = new TFile(outputRootFileName.c_str(), "RECREATE");
   outputRootFile -> cd();
-  
-  
-  
   for(step = 0; step < nStep; ++step)
   {
     events -> SetBinContent(step+1, stepEvents[step]);
     events -> GetXaxis() -> SetBinLabel(step+1, stepName[step].c_str());
-    
-    tree.at(step) -> Write();
   }
   
   events -> Write(); 
+  outputRootFile -> Close(); 
   
-
   //RooDataSet data("data", "data", &ntu, var_set) ;
   //data.Write();
-  
-  outputRootFile -> Close();
   
   delete histograms;
   delete stdHistograms;
