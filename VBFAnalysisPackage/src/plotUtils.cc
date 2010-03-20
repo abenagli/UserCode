@@ -354,7 +354,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const bo
     
     if(mode == "efficiencies")
     {
-      int totalEvents = globalHisto -> GetBinContent(1);
+      int totalEvents = (int)(globalHisto -> GetBinContent(1));
       for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)
         globalHisto->SetBinContent(bin, globalHisto->GetBinContent(bin)/totalEvents);
     }
@@ -362,9 +362,9 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const bo
     if(mode == "efficienciesRelative")
     {
       std::map<int, int > totalEvents;
-      totalEvents[0] = globalHisto->GetBinContent(1);
+      totalEvents[0] = (int)(globalHisto->GetBinContent(1));
       for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)
-        totalEvents[bin] = globalHisto->GetBinContent(bin);
+        totalEvents[bin] = (int)(globalHisto->GetBinContent(bin));
       
       for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)        
         globalHisto->SetBinContent(bin, globalHisto->GetBinContent(bin)/totalEvents[bin-1]);
