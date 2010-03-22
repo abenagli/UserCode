@@ -27,6 +27,7 @@ while (<USERCONFIG>)
 
 $BASEDir               = $VBFANALYSISPKG;
 $SELECTIONSCfgTemplate = $User_Preferences{"SELECTIONSCfgTemplate"};
+$EXEName               = $User_Preferences{"EXEName"};
 $JETAlgorithm          = $User_Preferences{"JETAlgorithm"};
 $SAMPLESListFile       = $User_Preferences{"SAMPLESListFile"};
 $SAMPLESDir            = $User_Preferences{"SAMPLESDir"};
@@ -39,6 +40,7 @@ $OUTPUTSaveDir         = $BASEDir."/".$OUTPUTSaveDir;
 
 print "BASEDir = "          .$BASEDir."\n" ;
 print "SELECTIONSCfgTemplate = ".$SELECTIONSCfgTemplate."\n";
+print "EXEName = ".$EXEName."\n";
 print "JETAlgorithm = ".$JETAlgorithm."\n";
 print "SAMPLESListFile = ".$SAMPLESListFile."\n";
 print "SAMPLESDir = ".$SAMPLESDir."\n";
@@ -52,7 +54,7 @@ $command = "mkdir ".$OUTPUTSaveDir;
 print($command."\n");
 system($command);
 
-$command = "rm ".$OUTPUTSaveDir."/tree.root";
+$command = "rm ".$OUTPUTSaveDir."/tree*.root";
 print($command."\n");
 system($command);
 
@@ -76,7 +78,7 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$crossSection) = split(" ") ;
+  ($sample,$sampleName,$mH,$crossSection) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
@@ -111,9 +113,10 @@ while(<SAMPLESListFile>)
   $selectionsCfgFile = $sampleDir."/selections_VBFHiggsToWWTolnujjAnalysis.cfg" ;
   print("selectionsCfgFile = ".$selectionsCfgFile."\n");
   system("cat ".$SELECTIONSCfgTemplate."   | sed -e s%INPUTFILELIST%".$inputFileList.
+                                       "%g | sed -e s%BASEDIR%".$BASEDir.
                                        "%g | sed -e s%OUTPUTSAVEPATH%".$sampleDir.
                                        "%g | sed -e s%JETALGORITHM%".$JETAlgorithm.
-                                       "%g | sed -e s%TYPE%".$type.
+                                       "%g | sed -e s%MH%".$mH.
                                        "%g | sed -e s%CROSSSECTION%".$crossSection.
                                        "%g > ".$selectionsCfgFile);
   
@@ -134,7 +137,7 @@ while(<SAMPLESListFile>)
   $command = "cd ".$sampleDir;
   print SAMPLEJOBFILE $command."\n";
   
-  $command = "VBFHiggsToWWTolnujjAnalysis.exe ".$selectionsCfgFile;
+  $command = $EXEName." ./selections_VBFHiggsToWWTolnujjAnalysis.cfg";
   print SAMPLEJOBFILE $command."\n";
   
   
