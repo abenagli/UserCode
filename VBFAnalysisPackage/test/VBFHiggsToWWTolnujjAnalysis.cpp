@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   
   int entryMAX = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
-  int type = gConfigParser -> readIntOption("Options::type");
+  float mH = gConfigParser -> readFloatOption("Options::mH");
   float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   
   int jetNMIN = gConfigParser -> readIntOption("Cuts::jetNMIN");
@@ -168,9 +168,16 @@ int main(int argc, char** argv)
   std::string outputTreeFileName = outputRootFilePath+"../tree.root";
   TFile* outputTreeFile = new TFile(outputTreeFileName.c_str(), "UPDATE");
   
+  std::string outputTreeEventsFileName = outputRootFilePath+"../treeEvents.root";
+  TFile* outputTreeEventsFile = new TFile(outputTreeEventsFileName.c_str(), "UPDATE");
+  
   std::vector<TTree*> tree;
+  std::vector<TTree*> treeEvents;
   for(int i = 0; i < nStep; ++i)
+  {
     tree.push_back(NULL);
+    treeEvents.push_back(NULL);
+  }
   
   for(int i = 0; i < nStep; ++i)
   { 
@@ -178,11 +185,16 @@ int main(int argc, char** argv)
     sprintf(treeName, "tree_%d", i);
     tree.at(i) = (TTree*)(outputTreeFile -> Get(treeName));
     
+    char treeEventsName[50];
+    sprintf(treeEventsName, "treeEvents_%d", i);
+    treeEvents.at(i) = (TTree*)(outputTreeEventsFile -> Get(treeEventsName));
+    
     if(tree.at(i) == NULL)
     {
       tree.at(i) = new TTree(treeName, treeName);
       
-      tree.at(i) -> Branch("type",         &type,                 "type/I");
+      tree.at(i) -> Branch("mH",           &mH,                     "mH/F");
+      tree.at(i) -> Branch("totEvents",    &stepEvents[0],   "totEvents/I");
       tree.at(i) -> Branch("crossSection", &crossSection, "crossSection/F");
       tree.at(i) -> Branch("tagJJ_Deta",   &tagJJ_Deta,     "tagJJ_Deta/F");
       tree.at(i) -> Branch("tagJJ_m",      &tagJJ_m,           "tagJJ_m/F");  
@@ -193,10 +205,19 @@ int main(int argc, char** argv)
       tree.at(i) -> Branch("WJJ_max_et",   &WJJ_max_et,     "WJJ_max_et/F");   
       tree.at(i) -> Branch("WJJ_min_et",   &WJJ_min_et,     "WJJ_min_et/F");
       tree.at(i) -> Branch("lepMetW_Dphi", &lepMetW_Dphi, "lepMetW_Dphi/F");
+      
+      
+      treeEvents.at(i) = new TTree(treeEventsName, treeEventsName);
+      
+      treeEvents.at(i) -> Branch("mH",           &mH,                     "mH/F");
+      treeEvents.at(i) -> Branch("totEvents",    &stepEvents[0],   "totEvents/I");
+      treeEvents.at(i) -> Branch("crossSection", &crossSection, "crossSection/F");
+      treeEvents.at(i) -> Branch("events",       &stepEvents[i],      "events/I");
     }
     else
     {
-      tree.at(i) -> SetBranchAddress("type",         &type);
+      tree.at(i) -> SetBranchAddress("mH",           &mH);
+      tree.at(i) -> SetBranchAddress("totEvents",    &stepEvents[0]);
       tree.at(i) -> SetBranchAddress("crossSection", &crossSection);
       tree.at(i) -> SetBranchAddress("tagJJ_Deta",   &tagJJ_Deta);
       tree.at(i) -> SetBranchAddress("tagJJ_m",      &tagJJ_m);  
@@ -207,6 +228,12 @@ int main(int argc, char** argv)
       tree.at(i) -> SetBranchAddress("WJJ_max_et",   &WJJ_max_et);   
       tree.at(i) -> SetBranchAddress("WJJ_min_et",   &WJJ_min_et);
       tree.at(i) -> SetBranchAddress("lepMetW_Dphi", &lepMetW_Dphi);
+      
+      
+      treeEvents.at(i) -> SetBranchAddress("mH",           &mH);
+      treeEvents.at(i) -> SetBranchAddress("totEvents",    &stepEvents[0]);
+      treeEvents.at(i) -> SetBranchAddress("crossSection", &crossSection);
+      treeEvents.at(i) -> SetBranchAddress("events",       &stepEvents[i]);
     }
   }
   
@@ -869,10 +896,21 @@ int main(int argc, char** argv)
   
   
   
+
+  outputTreeEventsFile -> cd();
+  for(step = 0; step < nStep; ++step)
+  {
+    treeEvents.at(step) -> Fill();
+    treeEvents.at(step) -> Write("", TObject::kOverwrite);
+  }  
+  outputTreeEventsFile -> Close();
+  
+  
+  
   
   
   // save event histogram
-  TFile* outputRootFile = new TFile(outputRootFileName.c_str(), "RECREATE");
+  TFile* outputRootFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
   outputRootFile -> cd();
   for(step = 0; step < nStep; ++step)
   {
