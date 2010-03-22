@@ -31,18 +31,24 @@ drawTStack::drawTStack(const std::string& inputDir,
   
   std::string listFullFileName = inputDir+listFileName;
   std::ifstream listFile( listFullFileName.c_str() );
-  //std::cout << "Opening file " << listFullFileName << std::endl;
+  std::cout << "Opening file " << listFullFileName << std::endl;
   
   while(!listFile.eof())
   {
     std::string sample;
     std::string sumName;
+    double mH;
     double crossSection;
     
-    listFile >> sample >> sumName >> crossSection;
+    listFile >> sample >> sumName >> mH >> crossSection;
     
     if(sample.at(0) == '#')
       continue;
+
+    std::cout << sample << "\t"
+              << sumName << "\t"
+              << mH << "\t"
+              << crossSection << std::endl;
     
     m_list[sample] = sumName;
     m_crossSection[sample] = crossSection;
@@ -186,6 +192,8 @@ void drawTStack::Draw(const std::string& histoName, const int& step,
   // draw the stack and save file
   TCanvas* c1 = new TCanvas();
   c1 -> cd();
+  c1 -> SetGridx();
+  c1 -> SetGridy();
   
   
   hs -> Draw("nostack");
@@ -354,7 +362,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const bo
     
     if(mode == "efficiencies")
     {
-      int totalEvents = (int)(globalHisto -> GetBinContent(1));
+      int totalEvents = globalHisto -> GetBinContent(1);
       for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)
         globalHisto->SetBinContent(bin, globalHisto->GetBinContent(bin)/totalEvents);
     }
@@ -362,9 +370,9 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const bo
     if(mode == "efficienciesRelative")
     {
       std::map<int, int > totalEvents;
-      totalEvents[0] = (int)(globalHisto->GetBinContent(1));
+      totalEvents[0] = globalHisto->GetBinContent(1);
       for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)
-        totalEvents[bin] = (int)(globalHisto->GetBinContent(bin));
+        totalEvents[bin] = globalHisto->GetBinContent(bin);
       
       for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)        
         globalHisto->SetBinContent(bin, globalHisto->GetBinContent(bin)/totalEvents[bin-1]);
@@ -417,6 +425,8 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const bo
   // draw the stack and save file
   TCanvas* c1 = new TCanvas();
   c1 -> cd();
+  c1 -> SetGridx();
+  c1 -> SetGridy();
   
   
   hs -> Draw("nostack");

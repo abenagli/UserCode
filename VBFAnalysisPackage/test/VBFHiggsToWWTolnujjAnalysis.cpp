@@ -77,6 +77,7 @@ int main(int argc, char** argv)
   float metEtMAX = gConfigParser -> readFloatOption("Cuts::metEtMAX");
   
   float lepMet_W_DphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMAX");
+  float lepMetWMtMAX = gConfigParser -> readFloatOption("Cuts::lepMetWMtMAX");
   
   std::map<int, int> totalEvents = GetTotalEvents("events", inputFileList.c_str()); 
   
@@ -94,7 +95,7 @@ int main(int argc, char** argv)
   
   
   // define histograms
-  int nStep = 9;
+  int nStep = 10;
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepName;
@@ -529,6 +530,7 @@ int main(int argc, char** argv)
     if( jet1_tag_bTag > tagJetBTagMAX ) continue; 
     if( jet2_tag_bTag > tagJetBTagMAX ) continue; 
     
+    
     // fill distributions
     stepEvents[step] += 1;
 
@@ -592,6 +594,7 @@ int main(int argc, char** argv)
     if( jet2_W.Et() > WJet2EtMAX ) continue;
     if( jet1_W_bTag > WJetBTagMAX ) continue; 
     if( jet2_W_bTag > WJetBTagMAX ) continue; 
+    
     
     // fill distributions
     stepEvents[step] += 1;
@@ -710,9 +713,9 @@ int main(int argc, char** argv)
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = "met cuts";
     
-    
     if( met.Et() < metEtMIN ) continue;
     if( met.Et() > metEtMAX ) continue;
+    
     
     // fill distributions
     stepEvents[step] += 1;
@@ -771,6 +774,7 @@ int main(int argc, char** argv)
     
     if( deltaPhi(lepMet.phi(), jet12_W.phi()) > lepMet_W_DphiMAX ) continue;
     
+    
     // fill distributions
     stepEvents[step] += 1;
     
@@ -826,7 +830,66 @@ int main(int argc, char** argv)
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = "CJV";
     
-    if( centralJets.size() > 0 ) continue;
+    
+    if( otherJets.size() > 0 ) continue;
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    
+    histograms -> Fill("WJJ_zepp", step, jet12_W_zepp);
+    histograms -> Fill("WJJ_max_zepp", step, fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_min_zepp", step, fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? jet1_W_zepp : jet2_W_zepp );
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    for(unsigned int jetIt = 0; jetIt < otherJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector otherJet = otherJets.at(jetIt);
+      float otherJet_zepp = (otherJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("otherJ_zepp", step, otherJet_zepp);
+    }
+
+    for(unsigned int jetIt = 0; jetIt < centralJets.size(); ++jetIt)
+    {
+      ROOT::Math::XYZTVector centralJet = centralJets.at(jetIt);
+      float centralJet_zepp = (centralJet.eta() - avgEta_tag)/absDeta_tag;
+      
+      histograms -> Fill("centralJ_zepp", step, centralJet_zepp);
+    }
+    
+    histograms -> Fill("lep_zepp", step, lep_zepp);    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
+    stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
+    stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step);
+    stdHistograms -> Fill1(otherJets, "otherJ", step);
+    stdHistograms -> Fill1(centralJets, "centralJ", step);
+    stdHistograms -> Fill1(met, "met", step);
+    stdHistograms -> Fill1(lepton, "lep", step);
+    stdHistograms -> Fill2(lepton, met, "lepMet", step);
+    stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step);
+    
+    tree.at(step) -> Fill();
+    
+    
+    
+    
+    
+    
+    //**********************************************
+    // STEP 9 - Initial cuts - higgs transverse mass
+    step += 1;
+    //std::cout << ">>> step: " << step << std::endl;
+    stepName[step] = "Higgs mt";
+    
+    if( lepMetW.mt() > lepMetWMtMAX ) continue;
+    
     
     // fill distributions
     stepEvents[step] += 1;

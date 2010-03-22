@@ -40,7 +40,8 @@ int main(int argc, char** argv)
   std::string jetAlgorithm  = gConfigParser -> readStringOption("Input::jetAlgorithm");
 
   std::string outputDir = gConfigParser -> readStringOption("Output::outputDir");
-  
+
+  int step = gConfigParser -> readIntOption("Options::step");  
   //float lumi = gConfigParser -> readFloatOption("Options::lumi");
   
   
@@ -51,7 +52,6 @@ int main(int argc, char** argv)
   drawTStack* stack = new drawTStack(inputDir, "listOfSamplesAndCrossSections.txt", "VBFHiggsToWWTolnujjAnalysis", jetAlgorithm, outputDir);
   
   std::string histoName;
-  int step = 2;
   
   
   
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
   stack -> Draw(histoName, step, 50, true);
 
   histoName = "tagJJ_bTag";
-  stack -> SetXaxisRange(-50., 50.);
+  stack -> SetXaxisRange(-20., 20.);
   stack -> Draw(histoName, step, 10, true);
   
   //c1 = drawPlot(inputDir,"h_7_W_tag_Dphi",
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
   stack -> Draw(histoName, step, 50, true);  
   
   histoName = "WJJ_bTag";
-  stack -> SetXaxisRange(-50., 50.);
+  stack -> SetXaxisRange(-20., 20.);
   stack -> Draw(histoName, step, 10, true);
   
   
@@ -250,7 +250,7 @@ int main(int argc, char** argv)
   // lepton + W + met
   histoName = "lepMetW_mt";
   stack -> SetXaxisRange(0., 500.);
-  stack -> Draw(histoName, step, 10, true);
+  stack -> Draw(histoName, step, 10, false);
   
   histoName = "lepMetW_pt";
   stack -> SetXaxisRange(0., 500.);
