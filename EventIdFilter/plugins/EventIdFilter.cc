@@ -1,4 +1,4 @@
-#include "HiggsAnalysis/VBFHiggsToVV/plugins/EventIdFilter.h"
+#include "CommonTools/EventIdFilter/plugins/EventIdFilter.h"
 
 
 
@@ -32,8 +32,8 @@ EventIdFilter::~EventIdFilter()
 //! loop over the reco particles and count leptons
 bool EventIdFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 {
-  if( iEvent.id().run() != m_runId ) return false;
-  if( iEvent.id().event() != m_eventId ) return false;
+  if( (int)(iEvent.id().run()) != m_runId ) return false;
+  if( (int)(iEvent.id().event()) != m_eventId ) return false;
   
   return true;
 }
