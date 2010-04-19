@@ -5,7 +5,7 @@ process = cms.Process("EventIdFilter")
 
 # initialize MessageLogger and output report
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 process.MessageLogger.cerr.threshold = 'INFO'
 
 
