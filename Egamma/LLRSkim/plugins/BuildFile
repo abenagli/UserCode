@@ -1,0 +1,6 @@
+<library file="*.cc" name=CommonToolsEventIdFilterPlugins>
+    <flags EDM_PLUGIN=1>
+    <use name=Egamma/LLRSkim>
+    <use name=FWCore/Framework>
+    <use name=clhep>
+</library>
