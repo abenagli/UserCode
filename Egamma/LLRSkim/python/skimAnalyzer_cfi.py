@@ -11,7 +11,7 @@ skimAnalyzer = cms.EDFilter(
     sigmaIetaIetaEndcapMIN = cms.double(0.02),
     ele_ptLow = cms.double(5.),
     ele_ptHigh = cms.double(15.),
-    nEle_ptLowMIN = cms.int32(1),
+    nEle_ptLowMIN = cms.int32(2),
     nEle_ptHighMIN = cms.int32(1)
 )
 
