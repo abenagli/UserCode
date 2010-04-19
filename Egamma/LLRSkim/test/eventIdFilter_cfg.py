@@ -5,7 +5,7 @@ process = cms.Process("EventIdFilter")
 
 # initialize MessageLogger and output report
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
 process.MessageLogger.cerr.threshold = 'INFO'
 
 
@@ -50,7 +50,7 @@ process.source = cms.Source(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(-1)
 )
 
 
@@ -59,7 +59,10 @@ process.out = cms.OutputModule(
     "PoolOutputModule",
     verbose = cms.untracked.bool(True),
     outputCommands = cms.untracked.vstring('keep *_*_*_*'),
-    fileName = cms.untracked.string('run132959_ev346686.root')
+    fileName = cms.untracked.string('run132959_ev346686.root'),
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('p')
+        )
     )
 
 
@@ -71,7 +74,7 @@ process.myEventIdFilter.eventId = cms.int32(346686)
 
 
 # Paths
-process.p = cms.Path(
-    process.myEventIdFilter *
-    process.out
-    )
+process.p = cms.Path(process.myEventIdFilter)
+
+process.o = cms.EndPath(process.out)
+
