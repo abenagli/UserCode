@@ -17,9 +17,7 @@ SkimAnalyzer::SkimAnalyzer(const edm::ParameterSet& iConfig):
   ele_ptLow_                        (iConfig.getParameter<double>("ele_ptLow")),
   ele_ptHigh_                       (iConfig.getParameter<double>("ele_ptHigh")),
   nEle_ptLowMIN_                    (iConfig.getParameter<int>("nEle_ptLowMIN")),
-  nEle_ptHighMIN_                   (iConfig.getParameter<int>("nEle_ptHighMIN")),
-  nEle_ptLow_(0),
-  nEle_ptHigh_(0)
+  nEle_ptHighMIN_                   (iConfig.getParameter<int>("nEle_ptHighMIN"))
 {}
 
 
@@ -42,8 +40,12 @@ void SkimAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   
   edm::Handle<reco::GsfElectronCollection> EleHandle;
   iEvent.getByLabel(electronCollection_.label(), EleHandle);
-    
+  
+  
+  
   // loop on electrons
+  int nEle_ptLow = 0;
+  int nEle_ptHigh = 0;
   for(unsigned int eleIt = 0; eleIt < EleHandle->size(); ++eleIt)
   {
     
@@ -58,20 +60,20 @@ void SkimAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     if( (eleRef->isEE()) && (eleRef->sigmaIetaIeta() < sigmaIetaIetaEndcapMIN_) ) continue; 
     
     // count electrons
-    if( eleRef->pt() > ele_ptLow_) ++nEle_ptLow_; 
-    if( eleRef->pt() > ele_ptHigh_) ++nEle_ptHigh_; 
+    if( eleRef->pt() > ele_ptLow_) ++nEle_ptLow;
+    if( eleRef->pt() > ele_ptHigh_) ++nEle_ptHigh;
     
   } // loop on electrons
   
   
   
   // print out results
-  if( nEle_ptLow_ >= nEle_ptLowMIN_ )
+  if( nEle_ptLow >= nEle_ptLowMIN_ )
     std::cout << ">>>SkimAnalyzer::run=" << runId << "::lumi=" 
                                          << lumiId << "::eventId=" 
                                          << eventId << "::Found at least "
                                          << nEle_ptLowMIN_ << " electrons with pt > " << ele_ptLow_ << std::endl; 
-  if( nEle_ptHigh_ >= nEle_ptHighMIN_ )
+  if( nEle_ptHigh >= nEle_ptHighMIN_ )
     std::cout << ">>>SkimAnalyzer::run=" << runId << "::lumi=" 
                                          << lumiId << "::eventId=" 
                                          << eventId << "::Found at least "

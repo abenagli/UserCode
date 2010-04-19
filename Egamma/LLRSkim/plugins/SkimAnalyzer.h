@@ -50,8 +50,6 @@ class SkimAnalyzer : public edm::EDAnalyzer
   double ele_ptHigh_;
   double nEle_ptLowMIN_;
   double nEle_ptHighMIN_;
-  double nEle_ptLow_;
-  double nEle_ptHigh_;
   
 };
 
