@@ -59,15 +59,15 @@ process.out = cms.OutputModule(
     "PoolOutputModule",
     verbose = cms.untracked.bool(True),
     outputCommands = cms.untracked.vstring('keep *_*_*_*'),
-    fileName = cms.untracked.string('run1333472_ev4147404.root')
+    fileName = cms.untracked.string('run132959_ev346686.root')
     )
 
 
 # Event id filter
 from Egamma.LLRSkim.eventIdFilter_cfi import *
 process.myEventIdFilter = eventIdFilter.clone()
-process.myEventIdFilter.runId = cms.int32(133472)
-process.myEventIdFilter.eventId = cms.int32(4147404)
+process.myEventIdFilter.runId = cms.int32(132959)
+process.myEventIdFilter.eventId = cms.int32(346686)
 
 
 # Paths
