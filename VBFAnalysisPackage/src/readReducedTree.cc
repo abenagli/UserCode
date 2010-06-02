@@ -206,7 +206,7 @@ void readReducedTree(const std::string& inFileName,
   {
     myCuts = new std::vector<cuts*>;
     myCuts -> push_back(new cuts);
-    //initializeCuts(myCuts->at(0));
+    initializeCuts(*(myCuts->at(0)));
   }
   
   
