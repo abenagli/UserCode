@@ -151,5 +151,6 @@ while(<SAMPLESListFile>)
 }
 
 print SAMPLEJOBLISTFILE "cd ..\n";
+print SAMPLEJOBLISTFILE "rm tree_all.root\n";
 print SAMPLEJOBLISTFILE $haddCommand."\n";
 print SAMPLEJOBLISTFILE "cd ".$BASEDir."\n";
