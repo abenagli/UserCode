@@ -1,3 +1,6 @@
+f (${?VBFANALYSISPKG}) then
+echo "already set"
+else
 export THISDIR=`pwd`
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${THISDIR}/lib
@@ -13,3 +16,4 @@ export NTUPLEPKGINCLUDE=${THISDIR}/../NtuplePackage/interface
 export NTUPLEPKGLIB=${THISDIR}/../NtuplePackage/lib
 
 export VBFANALYSISPKG=${THISDIR}/
+endif
