@@ -3,9 +3,12 @@
 
 #include <string>
 #include <map>
+#include <utility>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <cmath>
+#include <sys/stat.h> 
 
 #include "TCanvas.h"
 #include "TFile.h"
@@ -24,7 +27,6 @@ class drawTStack
   drawTStack(const std::string& inputDir,
              const std::string& listFileName,
              const std::string& baseRootFileName,
-             const std::string& jetAlgorithm,
              const std::string& outputDir);
   
   //! dtor
@@ -34,14 +36,19 @@ class drawTStack
   //! methods
   void Draw(const std::string& histoName, const int& step,
             const int& rebin, const bool& logy);
-  void DrawEvents(const std::string& mode, const float& lumi, const bool& logy);
+  void DrawData(const std::string& histoName, const int& step,
+                const int& rebin, const bool& logy);
+  void DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy);
   
   void SetXaxisRange(const double& xMin, const double& xMax);
   void SetXaxisTitle(const std::string& xTitle);
 
   void SetYaxisRange(const double& yMin, const double& yMax);
   void SetYaxisTitle(const std::string& yTitle);
-    
+
+  void SetDrawLegend(const bool& drawLegend);
+  void SetXLegend(const double& xLow, const double& xHigh);
+  void SetYLegend(const double& yLow, const double& yHigh);
   
   
  private:
@@ -49,11 +56,13 @@ class drawTStack
   std::string m_inputDir;
   std::string m_listFileName;
   std::string m_baseRootFileName;
-  std::string m_jetAlgorithm;
   std::string m_outputDir;
   
-  std::map<std::string, std::string> m_list;
+  std::vector<std::pair<std::string, std::string> > m_list;
+  std::map<std::string, int> m_dataFlag;
+  std::map<std::string, double> m_mH;
   std::map<std::string, double> m_crossSection;
+  std::vector<std::pair<std::string, std::string> > m_jetAlgorithm;
   
   bool m_xAxisRange;
   double m_xRangeMin;
@@ -66,6 +75,12 @@ class drawTStack
   double m_yRangeMax;
   bool m_yAxisTitle;
   std::string m_yTitle;
+  
+  bool m_drawLegend;
+  double m_xLowLegend;
+  double m_yLowLegend;
+  double m_xHighLegend;
+  double m_yHighLegend;
   
   TCanvas* c1;
 };
