@@ -580,6 +580,8 @@ int main(int argc, char** argv)
     
     stdHistograms -> Fill1(jets, "allJ", step);
     
+    tree.at(step) -> Fill();
+    
     
     
     
