@@ -128,7 +128,7 @@ while(<SAMPLESListFile>)
   $command = "cd ".$BASEDir;
   print SAMPLEJOBFILE $command."\n";
   
-  $command = "source ./scripts/setup.sh";
+  $command = "source ./scripts/setup.csh";
   print SAMPLEJOBFILE $command."\n";
     
   $command = "cd ".$sampleDir;
@@ -150,6 +150,6 @@ while(<SAMPLESListFile>)
   ++$type;
 }
 
-print SAMPLEJOBLISTFILE "cd..\n";
+print SAMPLEJOBLISTFILE "cd ..\n";
 print SAMPLEJOBLISTFILE $haddCommand."\n";
 print SAMPLEJOBLISTFILE "cd ".$BASEDir."\n";
