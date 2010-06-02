@@ -29,6 +29,7 @@ $BASEDir               = $VBFANALYSISPKG;
 $SELECTIONSCfgTemplate = $User_Preferences{"SELECTIONSCfgTemplate"};
 $EXEName               = $User_Preferences{"EXEName"};
 $JETAlgorithm          = $User_Preferences{"JETAlgorithm"};
+$JETType               = $User_Preferences{"JETType"};
 $SAMPLESListFile       = $User_Preferences{"SAMPLESListFile"};
 $SAMPLESDir            = $User_Preferences{"SAMPLESDir"};
 $OUTPUTSaveDir         = $User_Preferences{"OUTPUTSaveDir"};
@@ -42,6 +43,7 @@ print "BASEDir = "          .$BASEDir."\n" ;
 print "SELECTIONSCfgTemplate = ".$SELECTIONSCfgTemplate."\n";
 print "EXEName = ".$EXEName."\n";
 print "JETAlgorithm = ".$JETAlgorithm."\n";
+print "JETType = ".$JETType."\n";
 print "SAMPLESListFile = ".$SAMPLESListFile."\n";
 print "SAMPLESDir = ".$SAMPLESDir."\n";
 print "OUTPUTSaveDir = ".$OUTPUTSaveDir."\n";
@@ -51,10 +53,6 @@ print "OUTPUTSaveDir = ".$OUTPUTSaveDir."\n";
 
 
 $command = "mkdir ".$OUTPUTSaveDir;
-print($command."\n");
-system($command);
-
-$command = "rm ".$OUTPUTSaveDir."/tree*.root";
 print($command."\n");
 system($command);
 
@@ -78,7 +76,7 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$mH,$crossSection) = split(" ") ;
+  ($sample,$sampleName,$dataFlag,$mH,$crossSection) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
@@ -116,6 +114,7 @@ while(<SAMPLESListFile>)
                                        "%g | sed -e s%BASEDIR%".$BASEDir.
                                        "%g | sed -e s%OUTPUTSAVEPATH%".$sampleDir.
                                        "%g | sed -e s%JETALGORITHM%".$JETAlgorithm.
+                                       "%g | sed -e s%JETType%".$JETType.
                                        "%g | sed -e s%MH%".$mH.
                                        "%g | sed -e s%CROSSSECTION%".$crossSection.
                                        "%g > ".$selectionsCfgFile);
