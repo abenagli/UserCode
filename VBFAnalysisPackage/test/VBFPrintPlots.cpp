@@ -37,8 +37,7 @@ int main(int argc, char** argv)
   parseConfigFile (argv[1]) ;
   
   std::string inputDir = gConfigParser -> readStringOption("Input::inputDir");
-  std::string jetAlgorithm  = gConfigParser -> readStringOption("Input::jetAlgorithm");
-
+  
   std::string outputDir = gConfigParser -> readStringOption("Output::outputDir");
 
   int step = gConfigParser -> readIntOption("Options::step");  
@@ -49,237 +48,415 @@ int main(int argc, char** argv)
   
   
   // draw plots
-  drawTStack* stack = new drawTStack(inputDir, "listOfSamplesAndCrossSections.txt", "VBFHiggsToWWTolnujjAnalysis", jetAlgorithm, outputDir);
+  drawTStack* stack = new drawTStack(inputDir, "listOfSamplesAndCrossSections.txt", "VBFHiggsToWWTolnujjAnalysis", outputDir);
   
   std::string histoName;
   
   
   
+  
+  
+  
+  //---------------------------------------------  
   // tag jets
-  histoName = "tagJJ_Deta";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 5, true);
-
-  histoName = "tagJJ_Dphi";
-  stack -> SetXaxisRange(0., 3.);
-  stack -> Draw(histoName, step, 5, true);  
-
-  histoName = "tagJJ_max_et";
-  stack -> SetXaxisRange(0., 500.);
-  stack -> Draw(histoName, step, 5, true);  
-
-  histoName = "tagJJ_min_et";
-  stack -> SetXaxisRange(0., 250.);
-  stack -> Draw(histoName, step, 5, true);
-
-  histoName = "tagJJ_et";
-  stack -> SetXaxisRange(0., 500.);
-  stack -> Draw(histoName, step, 5, true);
-
+  //---------------------------------------------  
+  
   histoName = "tagJJ_m";
   stack -> SetXaxisRange(0., 3000.);
-  stack -> Draw(histoName, step, 50, true);
+  stack -> SetXaxisTitle("m_{jj tag}");
+  stack -> Draw(histoName, step, 20., false);
+  
+  histoName = "tagJJ_Deta";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("#Delta#eta_{jj tag}");
+  stack -> Draw(histoName, step, 5., false);
 
-  histoName = "tagJJ_bTag";
-  stack -> SetXaxisRange(-20., 20.);
-  stack -> Draw(histoName, step, 10, true);
-  
-  //c1 = drawPlot(inputDir,"h_7_W_tag_Dphi",
-  //             5, 1., 
-  //             0., 3.15,
-  //             0.001, 1., true,
-  //             "W_tag - Dphi", "event fraction");
-  //c1 -> Print((outputDir+"/W_tag_Dphi.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-
-  
-  
-  
-  
-  
-  // W jets
-  histoName = "WJJ_Deta";
-  stack -> SetXaxisRange(0., 5.);
-  stack -> Draw(histoName, step, 5, true);
-  
-  histoName = "WJJ_Dphi";
+  histoName = "tagJJ_etaProd";
+  stack -> SetXaxisRange(-25., 25.);
+  stack -> SetXaxisTitle("#etaProd_{jj tag}");
+  stack -> Draw(histoName, step, 20., false);
+    
+  histoName = "tagJJ_Dphi";
   stack -> SetXaxisRange(0., 3.);
-  stack -> Draw(histoName, step, 5, true);
-
-  histoName = "WJJ_max_et";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> Draw(histoName, step, 5, true);  
+  stack -> SetXaxisTitle("#Delta#phi_{jj tag}");
+  stack -> Draw(histoName, step, 5., false);
   
-  histoName = "WJJ_min_et";
-  stack -> SetXaxisRange(0., 150.);
+  histoName = "tagJJ_max_absEta";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("|#eta_{tag j}| max");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "tagJJ_min_absEta";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("|#eta_{tag j}| min");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "tagJJ_max_et";
+  stack -> SetXaxisRange(0., 400.);
+  stack -> SetXaxisTitle("et_{j tag} max");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "tagJJ_min_et";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("et_{j tag} min");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "tagJJ_max_e";
+  stack -> SetXaxisRange(0., 2000.);
+  stack -> SetXaxisTitle("e_{j tag} max");
+  stack -> Draw(histoName, step, 20., false);
+  
+  histoName = "tagJJ_min_e";
+  stack -> SetXaxisRange(0., 1000.);
+  stack -> SetXaxisTitle("e_{j tag} min");
+  stack -> Draw(histoName, step, 10., false);
+  
+  histoName = "tagJJ_bTag";
+  stack -> SetXaxisTitle("b-tag");
+  stack -> SetXaxisRange(-10., 30.);
+  stack -> SetXaxisTitle("btag_{j tag}");
   stack -> Draw(histoName, step, 5, true);
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  //---------------------------------------------  
+  // Wjets
+  //---------------------------------------------  
+  
+  histoName = "WJJ_m";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("m_{Wjj}");
+  stack -> Draw(histoName, step, 5., false);
   
   histoName = "WJJ_et";
   stack -> SetXaxisRange(0., 300.);
-  stack -> Draw(histoName, step, 5, true);
-
-  histoName = "WJJ_m";
-  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("et_{Wjj}");
   stack -> Draw(histoName, step, 5, false);
   
+  histoName = "WJJ_absEta";
+  stack -> SetXaxisRange(-5., 5.);
+  stack -> SetXaxisTitle("|#eta_{Wjj}|");
+  stack -> Draw(histoName, step, 5., false);
+  
   histoName = "WJJ_zepp";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> Draw(histoName, step, 50, true);
+  stack -> SetXaxisRange(0., 2.);
+  stack -> SetXaxisTitle("z_{Wjj}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "WJJ_Dphi";
+  stack -> SetXaxisRange(0., 3.);
+  stack -> SetXaxisTitle("#Delta#phi_{Wjj}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "WJJ_Deta";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("#Delta#eta_{Wjj}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "WJJ_DR";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("#DeltaR_{Wjj}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  
+  
+  histoName = "WJJ_max_et";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("et_{Wj} max");
+  stack -> Draw(histoName, step, 5, false);  
+  
+  histoName = "WJJ_min_et";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("et_{Wj} min");
+  stack -> Draw(histoName, step, 5, false);
+  
+  histoName = "WJJ_max_e";
+  stack -> SetXaxisRange(0., 2000.);
+  stack -> SetXaxisTitle("e_{Wj} max");
+  stack -> Draw(histoName, step, 20, false);  
+  
+  histoName = "WJJ_min_e";
+  stack -> SetXaxisRange(0., 1000.);
+  stack -> SetXaxisTitle("e_{Wj} min");
+  stack -> Draw(histoName, step, 10, false);
+  
+  histoName = "WJJ_max_absEta";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("|#eta_{Wj}| max");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "WJJ_min_absEta";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("|#eta_{Wj}| min");
+  stack -> Draw(histoName, step, 5., false);
   
   histoName = "WJJ_max_zepp";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> Draw(histoName, step, 50, true);
+  stack -> SetXaxisRange(0., 2.);
+  stack -> SetXaxisTitle("z_{Wj} max");
+  stack -> Draw(histoName, step, 5, false);  
   
   histoName = "WJJ_min_zepp";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> Draw(histoName, step, 50, true);  
+  stack -> SetXaxisRange(0., 2.);
+  stack -> SetXaxisTitle("z_{Wj} min");
+  stack -> Draw(histoName, step, 5, false);
   
   histoName = "WJJ_bTag";
-  stack -> SetXaxisRange(-20., 20.);
-  stack -> Draw(histoName, step, 10, true);
-  
-  
-  
-  
-  
-  // other jets
-  histoName = "otherJ_n";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
-  
-  histoName = "otherJ_et";
-  stack -> SetXaxisRange(0., 250.);
-  stack -> Draw(histoName, step, 5, true);  
-  
-  //c1 = drawPlot(inputDir,"h_7_otherJet_zepp",
-  //              10, 1., 
-  //              -1., 1.,
-  //              0.0001, 1., true,
-  //              "otherJet - zepp", "event fraction");
-  //c1 -> Print((outputDir+"/otherJet_zepp.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  
-  
-  
-  
-  
-  
-  // central jets
-  histoName = "centralJ_n";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
-  
-  histoName = "centralJ_et";
-  stack -> SetXaxisRange(0., 250.);
-  stack -> Draw(histoName, step, 5, true);  
-  
-  //c1 = drawPlot(inputDir,"h_7_otherJet_zepp",
-  //              10, 1., 
-  //              -1., 1.,
-  //              0.0001, 1., true,
-  //              "otherJet - zepp", "event fraction");
-  //c1 -> Print((outputDir+"/otherJet_zepp.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
-  
-  
-  
-  
-  
-  
-  // lepton
-  histoName = "lep_pt";
-  stack -> SetXaxisRange(0., 250.);
+  stack -> SetXaxisRange(-10., 30.);
+  stack -> SetXaxisTitle("b-tag_{W j}");
   stack -> Draw(histoName, step, 5, true);
   
-  histoName = "lep_zepp";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> Draw(histoName, step, 50, true);  
-  
-  histoName = "lep_lipSig";
-  stack -> SetXaxisRange(-50., 50.);
-  stack -> Draw(histoName, step, 50, true);
-  
-  histoName = "lep_tipSig";
-  stack -> SetXaxisRange(0., 50.);
-  stack -> Draw(histoName, step, 50, true);
-  
-  histoName = "lep_3DipSig";
-  stack -> SetXaxisRange(0., 50.);
-  stack -> Draw(histoName, step, 50, true);
   
   
   
   
   
   
-  // met
-  histoName = "met_et";
-  stack -> SetXaxisRange(0., 500.);
-  stack -> Draw(histoName, step, 10, true);
   
   
   
   
   
+  //---------------------------------------------  
+  // Lepton
+  //---------------------------------------------  
   
-  // lepton + met
-  histoName = "lepMet_mt";
-  stack -> SetXaxisRange(0., 500.);
-  stack -> Draw(histoName, step, 10, true);
+  histoName = "lep_pt";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("pt_{lep}");
+  stack -> Draw(histoName, step, 5., false);
   
-  histoName = "lepMetW_DR";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 10, true);
-  
-  histoName = "lepMetW_Deta";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 10, true);
-  
-  histoName = "lepMetW_Dphi";
+  histoName = "lep_absEta";
   stack -> SetXaxisRange(0., 3.);
-  stack -> Draw(histoName, step, 10, true);
+  stack -> SetXaxisTitle("|#eta_{lep}|");
+  stack -> Draw(histoName, step, 2., false);
+  
+  histoName = "lep_zepp";
+  stack -> SetXaxisRange(0., 1.);
+  stack -> SetXaxisTitle("z_{lep}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "lep_etaGap_min";
+  stack -> SetXaxisRange(0., 5.);
+  stack -> SetXaxisTitle("#eta gap_{lep}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "lep_etaGap_max";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("#eta gap_{lep}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "lepMet_mt";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("mt_{lep+met}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  histoName = "lepMet_Dphi";
+  stack -> SetXaxisRange(0., 3.);
+  stack -> SetXaxisTitle("#Delta#phi_{lep-met}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  
+  
+    histoName = "ele_tkIso";
+  stack -> SetXaxisRange(0., 0.1);
+  stack -> SetXaxisTitle("#Sigma pt_{tracks}/pt_{ele}");
+  stack -> Draw(histoName, step, 1., true);
+  
+  histoName = "ele_emIso";
+  stack -> SetXaxisRange(0., 0.1);
+  stack -> SetXaxisTitle("#Sigma et_{em}/et_{ele}");
+  stack -> Draw(histoName, step, 1., true);  
+  
+  histoName = "ele_hadIso";
+  stack -> SetXaxisRange(0., 0.1);
+  stack -> SetXaxisTitle("#Sigma et_{had}/et_{ele}");
+  stack -> Draw(histoName, step, 1., true);  
+  
+  
+  
+  histoName = "mu_tkIso";
+  stack -> SetXaxisRange(0., 0.1);
+  stack -> SetXaxisTitle("#Sigma pt_{tracks}/pt_{mu}");
+  stack -> Draw(histoName, step, 1., true);
+  
+  histoName = "mu_emIso";
+  stack -> SetXaxisRange(0., 0.1);
+  stack -> SetXaxisTitle("#Sigma et_{em}/et_{mu}");
+  stack -> Draw(histoName, step, 1., true);  
+  
+  histoName = "mu_hadIso";
+  stack -> SetXaxisRange(0., 0.1);
+  stack -> SetXaxisTitle("#Sigma et_{had}/et_{mu}");
+  stack -> Draw(histoName, step, 1., true);
   
   
   
   
   
   
-  // lepton + W + met
+  
+  
+  
+  
+  
+  
+  //---------------------------------------------  
+  // Met
+  //---------------------------------------------
+  
+  histoName = "met_et";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("et_{met}");
+  stack -> Draw(histoName, step, 5, false);
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  //---------------------------------------------  
+  // Lepton + met + W
+  //---------------------------------------------  
+  
   histoName = "lepMetW_mt";
-  stack -> SetXaxisRange(0., 500.);
-  stack -> Draw(histoName, step, 10, false);
+  stack -> SetXaxisRange(0., 1000.);
+  stack -> SetXaxisTitle("mt_{lep+W+met}");
+  stack -> Draw(histoName, step, 10., false);
   
   histoName = "lepMetW_pt";
   stack -> SetXaxisRange(0., 500.);
-  stack -> Draw(histoName, step, 10, true);
+  stack -> SetXaxisTitle("pt_{lep+W+met}");
+  stack -> Draw(histoName, step, 5, false);
   
-  //c1 = drawPlot(inputDir,"h_7_lep_tag_Dphi",
-  //              5, 1., 
-  //              0., 3.15,
-  //              0.01, 0.1, true,
-  //              "lep_tag - Dphi", "event fraction");
-  //c1 -> Print((outputDir+"/lep_tag_Dphi.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
+  histoName = "lepMetW_Dphi";
+  stack -> SetXaxisRange(0., 3.);
+  stack -> SetXaxisTitle("#Delta#phi_{lep+met-W}");
+  stack -> Draw(histoName, step, 5., false);
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  //---------------------------------------------  
+  // pt ordering
+  //---------------------------------------------  
+  
+  histoName = "tagWJ_et1";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> Draw(histoName, step, 10, false);
 
-  //c1 = drawPlot(inputDir,"h_7_met_tag_Dphi",
-  //              5, 1., 
-  //              0., 3.15,
-  //              0.01, 0.2, true,
-  //              "met_tag - Dphi", "event fraction");
-  //c1 -> Print((outputDir+"/met_tag_Dphi.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
+  histoName = "tagWJ_et2";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> Draw(histoName, step, 10, false);
+  
+  histoName = "tagWJ_et3";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> Draw(histoName, step, 10, false);
+  
+  histoName = "tagWJ_et4";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> Draw(histoName, step, 10, false);  
+  
+  
+  
+  
+  
+  
+  histoName = "lepWJ_pt1";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("pt1_{lep-W}");
+  stack -> Draw(histoName, step, 10., false);
 
-  //c1 = drawPlot(inputDir,"h_7_lepMetW_tag_Dphi",
-  //              2, 1., 
-  //              0., 3.15,
-  //              0.01, 0.2, true,
-  //              "lepMetW_tag - Dphi", "event fraction");
-  //c1 -> Print((outputDir+"/lepMetW_tag_Dphi.png").c_str(), "png");
-  //delete c1;
-  //Close(inRootFiles);
+  histoName = "lepWJ_pt2";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("pt2_{lep-W}");
+  stack -> Draw(histoName, step, 10., false);
+  
+  histoName = "lepWJ_pt3";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("pt3_{lep-W}");
+  stack -> Draw(histoName, step, 10., false);
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  //---------------------------------------------  
+  // other jets
+  //---------------------------------------------  
+  
+  histoName = "otherJ_et30_n";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 1, true);
+  
+  histoName = "otherJ_et25_n";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 1, true);
+  
+  histoName = "otherJ_et20_n";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 1, true);
+  
+  histoName = "otherJ_et15_n";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 1, true);
+  
+  
+  
+  histoName = "centralJ_et30_n";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 1, true);
+  
+  histoName = "centralJ_et25_n";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 1, true);
+  
+  histoName = "centralJ_et20_n";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 1, true);
+  
+  histoName = "centralJ_et15_n";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> Draw(histoName, step, 1, true);
+  
+  
+  
+ // all jets
+ //histoName = "allJ_n";
+ //stack -> SetXaxisRange(4., 10.);
+ //stack -> SetXaxisTitle("jet multiplicity");
+ //stack -> Draw(histoName, step, 1, true);
 }

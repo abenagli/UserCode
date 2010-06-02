@@ -37,10 +37,10 @@ int main(int argc, char** argv)
   parseConfigFile (argv[1]) ;
   
   std::string inputDir = gConfigParser -> readStringOption("Input::inputDir");
-  std::string jetAlgorithm  = gConfigParser -> readStringOption("Input::jetAlgorithm");
-
+  
   std::string outputDir = gConfigParser -> readStringOption("Output::outputDir");
   
+  int step = gConfigParser -> readIntOption("Options::step"); 
   float lumi = gConfigParser -> readFloatOption("Options::lumi");
   
   
@@ -48,11 +48,11 @@ int main(int argc, char** argv)
   
   
   // draw plots
-  drawTStack* stack = new drawTStack(inputDir, "listOfSamplesAndCrossSections.txt", "VBFHiggsToWWTolnujjAnalysis",
-                                     jetAlgorithm, outputDir);
+  drawTStack* stack = new drawTStack(inputDir, "listOfSamplesAndCrossSections.txt", "VBFHiggsToWWTolnujjAnalysis", outputDir);
   
-  stack -> DrawEvents("events", lumi, true);
-  stack -> DrawEvents("eventsScaled", lumi, true);
-  stack -> DrawEvents("efficiencies", lumi, true);
-  stack -> DrawEvents("efficienciesRelative", lumi, true);
+  stack -> DrawEvents("events", lumi, step, true);
+  stack -> DrawEvents("eventsScaled", lumi, step, true);
+  stack -> DrawEvents("efficiencies", lumi, step, true);
+  stack -> DrawEvents("efficienciesRelative", lumi, step, true);
+  stack -> DrawEvents("significance", lumi, step, true);
 }
