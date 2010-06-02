@@ -137,8 +137,9 @@ int main(int argc, char** argv)
   
   
   
-  // define histograms
+  // define out file names
   std::string outputRootFullFileName = outputRootFilePath+outputRootFileName+"_"+jetAlgorithm+".root";
+  std::string outputTreeFileName = outputRootFilePath+"/tree.root";
   
   // histograms
   TH2F* controlRegion_lepMetW_Dphi_vs_tagJJ_Deta = new TH2F("controlRegion_lepMetW_Dphi_vs_tagJJ_Deta", "", 200, 0., 10., 100, 0., 5.);
@@ -265,10 +266,6 @@ int main(int argc, char** argv)
   int nCentralJets_et30;
   
   // Define tree
-  std::string outputTreeFileName = outputRootFilePath+"/tree.root";
-  TFile* outputTreeFile = new TFile(outputTreeFileName.c_str(), "RECREATE");
-  outputTreeFile -> cd();
-  
   std::vector<TTree*> tree;
   std::vector<TTree*> treeEvents;
   
@@ -277,6 +274,7 @@ int main(int argc, char** argv)
     char treeName[50];
     sprintf(treeName, "tree_%d", i);
     tree.push_back(new TTree(treeName, treeName));
+    tree.at(i) -> SetDirectory(0);
     
     tree.at(i) -> Branch("mH",                &mH,                               "mH/F");
     tree.at(i) -> Branch("totEvents",         &stepEvents[0],             "totEvents/I");
@@ -2002,6 +2000,10 @@ int main(int argc, char** argv)
   
   
   
+  // save tree
+  TFile* outputTreeFile = new TFile(outputTreeFileName.c_str(), "RECREATE");
+  outputTreeFile -> cd();
+  
   for(step = 0; step < nStep; ++step)
     tree.at(step) -> Write();
   
@@ -2016,9 +2018,10 @@ int main(int argc, char** argv)
   
   
   
-  // save event histogram
+  // save histograms
   TFile* outputRootFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
   outputRootFile -> cd();
+  
   for(step = 0; step < nStep; ++step)
   {
     events -> SetBinContent(step+1, stepEvents[step]);
@@ -2038,6 +2041,7 @@ int main(int argc, char** argv)
   delete histograms;
   delete histograms2;
   delete stdHistograms;
+  delete outputRootFile;
   
   
   
