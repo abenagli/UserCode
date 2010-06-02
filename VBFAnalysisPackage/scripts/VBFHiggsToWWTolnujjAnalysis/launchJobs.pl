@@ -52,11 +52,6 @@ print "OUTPUTSaveDir = ".$OUTPUTSaveDir."\n";
 
 
 
-$command = "mkdir ".$OUTPUTSaveDir;
-print($command."\n");
-system($command);
-
-
 $sampleJobListFile = "./lancia.sh";
 open(SAMPLEJOBLISTFILE, ">", $sampleJobListFile); 
 
@@ -67,6 +62,9 @@ open(SAMPLEJOBLISTFILE, ">", $sampleJobListFile);
 
 print("\n");
 open(SAMPLESListFile, $SAMPLESListFile) ;
+
+
+$haddCommand = "hadd tree_all.root ";
 
 $type = 0;
 while(<SAMPLESListFile>)
@@ -147,5 +145,11 @@ while(<SAMPLESListFile>)
   
   print SAMPLEJOBLISTFILE "source ".$sampleJobFile."\n";
   
+  $haddCommand = $haddCommand." ".$sampleDir."/tree.root ";
+  
   ++$type;
 }
+
+print SAMPLEJOBLISTFILE "cd..\n";
+print SAMPLEJOBLISTFILE $haddCommand."\n";
+print SAMPLEJOBLISTFILE "cd ".$BASEDir."\n";
