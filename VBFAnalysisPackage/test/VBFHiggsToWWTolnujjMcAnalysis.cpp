@@ -9,14 +9,7 @@
 
 #include "TH1F.h"
 #include "TObject.h"
-#include "RooFitResult.h"
-#include "RooWorkspace.h"
-#include "RooPlot.h"
-#include "RooDataSet.h"
-#include "RooRealVar.h"
-#include "RooAbsPdf.h"
-#include "RooAddPdf.h"
-#include "RooGaussian.h"
+
 
 
 

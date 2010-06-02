@@ -266,7 +266,7 @@ void readReducedTree(const std::string& inFileName,
   for(int entry = 0 ; entry < t -> GetEntries() ; ++entry)
   {
     t -> GetEntry(entry);
-    double mvaValue;
+    double mvaValue = 0.;
     if(useTMVA) mvaValue = TMVAReader -> EvaluateMVA("kBDT");
     if((entry%100000) == 0) std::cout << ">>>>> readReducedTree::GetEntry " << entry << std::endl;
     

@@ -1,6 +1,7 @@
 #ifndef plotUtils_h
 #define plotUtils_h
 
+#include <cstdlib>
 #include <string>
 #include <map>
 #include <utility>
