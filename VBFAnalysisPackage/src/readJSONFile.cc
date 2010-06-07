@@ -30,7 +30,7 @@ std::map<int, std::vector<std::pair<int, int> > >
     // find run number
     if( (*(it) == '"') && (*(it+7) == '"') )   
     {
-      std::string run(it+1, it+6);
+      std::string run(it+1, it+7);
       //std::cout << "found run " << run << std::endl;
       
       
