@@ -1,4 +1,4 @@
-f (${?VBFANALYSISPKG}) then
+if [ -n "${VBFANALYSISPKG}" ] ; then
 echo "already set"
 else
 export THISDIR=`pwd`
@@ -16,4 +16,4 @@ export NTUPLEPKGINCLUDE=${THISDIR}/../NtuplePackage/interface
 export NTUPLEPKGLIB=${THISDIR}/../NtuplePackage/lib
 
 export VBFANALYSISPKG=${THISDIR}/
-endif
+fi

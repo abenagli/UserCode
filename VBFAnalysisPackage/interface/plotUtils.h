@@ -20,6 +20,10 @@
 
 
 
+double MyGetMinimum(const TH1F* histo, const double& minval, int binMin=-1, int binMax=-1);
+
+
+
 class drawTStack
 {
  public:
@@ -35,10 +39,9 @@ class drawTStack
   
   
   //! methods
-  void Draw(const std::string& histoName, const int& step,
+  void Draw(const std::vector<std::string>& histoNames, const std::string& mode,
+            const float& lumi, const int& step,
             const int& rebin, const bool& logy);
-  void DrawData(const std::string& histoName, const int& step,
-                const int& rebin, const bool& logy);
   void DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy);
   
   void SetXaxisRange(const double& xMin, const double& xMax);

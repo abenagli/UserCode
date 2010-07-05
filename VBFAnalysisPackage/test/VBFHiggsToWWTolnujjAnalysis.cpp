@@ -40,6 +40,7 @@ int main(int argc, char** argv)
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
   
+  int entryFIRST = gConfigParser -> readIntOption("Options::entryFIRST");
   int entryMAX = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
   float mH = gConfigParser -> readFloatOption("Options::mH");
@@ -56,9 +57,17 @@ int main(int argc, char** argv)
   float jetEtMIN4 = gConfigParser -> readFloatOption("Cuts::jetEtMIN4");
   
   int lepNMIN = gConfigParser -> readIntOption("Cuts::lepNMIN");
+  int lepNMAX = gConfigParser -> readIntOption("Cuts::lepNMAX");
+  int eleNMIN = gConfigParser -> readIntOption("Cuts::eleNMIN");
+  int muNMIN = gConfigParser -> readIntOption("Cuts::muNMIN");
   float lepPtMIN = gConfigParser -> readFloatOption("Cuts::lepPtMIN");
   float lepPtMAX = gConfigParser -> readFloatOption("Cuts::lepPtMAX");
-  float lepTkIsoOverPtMAX = gConfigParser -> readFloatOption("Cuts::lepTkIsoOverPtMAX");
+  float eleTkIsoMAX = gConfigParser -> readFloatOption("Cuts::eleTkIsoMAX");
+  float eleEmIsoMAX = gConfigParser -> readFloatOption("Cuts::eleEmIsoMAX");
+  float eleHadIsoMAX = gConfigParser -> readFloatOption("Cuts::eleHadIsoMAX");
+  float muTkIsoMAX = gConfigParser -> readFloatOption("Cuts::muTkIsoMAX");
+  float muEmIsoMAX = gConfigParser -> readFloatOption("Cuts::muEmIsoMAX");
+  float muHadIsoMAX = gConfigParser -> readFloatOption("Cuts::muHadIsoMAX");
   float eleIdValueMIN = gConfigParser -> readFloatOption("Cuts::eleIdValueMIN");
   float lepZeppMAX = gConfigParser -> readFloatOption("Cuts::lepZeppMAX");
   float lepEtaGapMIN = gConfigParser -> readFloatOption("Cuts::lepEtaGapMIN");
@@ -102,6 +111,9 @@ int main(int argc, char** argv)
   std::map<int, int> totalEvents = GetTotalEvents("events", inputFileList.c_str()); 
   
   
+  std::cout << ">>>>> VBFHiggsToWWTolnujjAnalysis::inputFileList = " << inputFileList << std::endl;
+  
+  
   
   
   
@@ -115,7 +127,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 13;
+  int nStep = 15;
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TProfile* purity_tag = new TProfile("purity_tag", "purity_tag", 3, 0., 3.);
   TProfile* purity_W = new TProfile("purity_W", "purity_W", 3, 0., 3.);
@@ -124,13 +136,13 @@ int main(int argc, char** argv)
   
   
   
-  int step = 0;
+  int step = 1;
   stepEvents[step] = totalEvents[1];
-  stepName[step] = "0) total events";
+  stepName[step] = "1) total events";
   
-  step = 1;
-  stepEvents[step] = totalEvents[2];
-  stepName[step] = "1) Preselection >= 1 lepton";
+  step = 2;
+  stepEvents[step] = totalEvents[5];
+  stepName[step] = "2) Preselection";
   
   
   
@@ -142,67 +154,80 @@ int main(int argc, char** argv)
   std::string outputTreeFileName = outputRootFilePath+"/tree.root";
   
   // histograms
-  TH2F* controlRegion_lepMetW_Dphi_vs_tagJJ_Deta = new TH2F("controlRegion_lepMetW_Dphi_vs_tagJJ_Deta", "", 200, 0., 10., 100, 0., 5.);
-  
-  
   hFactory* histograms = new hFactory(outputRootFullFileName);
   h2Factory* histograms2 = new h2Factory(outputRootFullFileName);
 
-  histograms -> add_h1("tagJJ_etaProd",  "",  2000, -25., 25., nStep);  
-  histograms -> add_h1("tagJJ_bTag",  "",  2000, -100., 100., nStep);
-  histograms -> add_h1("WJJ_bTag",     "", 2000,  -100., 100., nStep);
-  histograms -> add_h1("tagWJ_et1", "",  3000, 0.,  3000., nStep);   
-  histograms -> add_h1("tagWJ_et2", "",  3000, 0.,  3000., nStep);
-  histograms -> add_h1("tagWJ_et3", "",  3000, 0.,  3000., nStep);
-  histograms -> add_h1("tagWJ_et4", "",  3000, 0.,  3000., nStep);
+  histograms -> add_h1("tagJJ_etaProd", "", 2000, -25., 25., nStep+1);  
+  histograms -> add_h1("tagJJ_bTag",    "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("tagJJ_bTagSum", "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("WJJ_bTag",      "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("WJJ_bTagSum",   "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("tagWJ_bTagSum", "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("tagWJ_bTag1", "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("tagWJ_bTag2", "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("tagWJ_bTag3", "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("tagWJ_bTag4", "", 2000, -500., 500., nStep+1);
+  histograms -> add_h1("tagWJ_et1", "",  3000, 0.,  3000., nStep+1);   
+  histograms -> add_h1("tagWJ_et2", "",  3000, 0.,  3000., nStep+1);
+  histograms -> add_h1("tagWJ_et3", "",  3000, 0.,  3000., nStep+1);
+  histograms -> add_h1("tagWJ_et4", "",  3000, 0.,  3000., nStep+1);
 
-  histograms -> add_h1("WJJ_matched_right_m", "",  3000, 0.,  3000., nStep);
-  histograms -> add_h1("WJJ_matched_wrong_m", "",  3000, 0.,  3000., nStep);
-  histograms -> add_h1("WJJ_nonMatched_m", "",  3000, 0.,  3000., nStep);
+  histograms -> add_h1("WJJ_matched_right_m", "",  3000, 0.,  3000., nStep+1);
+  histograms -> add_h1("WJJ_matched_wrong_m", "",  3000, 0.,  3000., nStep+1);
+  histograms -> add_h1("WJJ_nonMatched_m", "",  3000, 0.,  3000., nStep+1);
 
-  histograms -> add_h1("ele_tkIso",  "", 1000, 0., 0.5, nStep);
-  histograms -> add_h1("ele_emIso",  "", 1000, 0., 0.5, nStep);
-  histograms -> add_h1("ele_hadIso", "", 1000, 0., 0.5, nStep);
-  histograms -> add_h1("mu_tkIso",   "", 1000, 0., 0.5, nStep);
-  histograms -> add_h1("mu_emIso",   "", 1000, 0., 0.5, nStep);
-  histograms -> add_h1("mu_hadIso",  "", 1000, 0., 0.5, nStep);
-  histograms -> add_h1("lep_lipSig",  "", 2000, -50., 50., nStep);
-  histograms -> add_h1("lep_tipSig",  "", 1000,   0., 50., nStep);  
-  histograms -> add_h1("lep_3DipSig", "", 2000, -50., 50., nStep);
+  histograms -> add_h1("ele_tkIso",         "", 1000,  0.000, 10.000, nStep+1);
+  histograms -> add_h1("ele_emIso",         "", 1000,  0.000, 10.000, nStep+1);
+  histograms -> add_h1("ele_hadIso",        "", 1000,  0.000, 10.000, nStep+1);
+  histograms -> add_h1("ele_fbrem",         "", 1000,  0.000,  1.000, nStep+1);
+  histograms -> add_h1("ele_HoverE",        "", 1000,  0.000,  0.100, nStep+1);
+  histograms -> add_h1("ele_DphiIn",        "", 1000, -0.100,  0.100, nStep+1);
+  histograms -> add_h1("ele_DetaIn",        "", 1000, -0.015,  0.015, nStep+1);
+  histograms -> add_h1("ele_sigmaIetaIeta", "", 1000,  0.000,  0.500, nStep+1);
+  histograms -> add_h1("ele_dxy",           "", 1000, -0.100,  0.100, nStep+1);
+  histograms -> add_h1("ele_dz",            "", 1000, -1.000,  1.000, nStep+1);
   
-  histograms -> add_h1("lepMet_mt",  "", 3000, 0., 3000., nStep);
-  histograms -> add_h1("lepMetW_mt", "", 3000, 0., 3000., nStep);  
+  histograms -> add_h1("mu_tkIso",   "", 1000, 0., 10., nStep+1);
+  histograms -> add_h1("mu_emIso",   "", 1000, 0., 10., nStep+1);
+  histograms -> add_h1("mu_hadIso",  "", 1000, 0., 10., nStep+1);
   
-  histograms -> add_h1("lepWJ_pt1", "",  3000, 0.,  3000., nStep);
-  histograms -> add_h1("lepWJ_pt2", "",  3000, 0.,  3000., nStep);
-  histograms -> add_h1("lepWJ_pt3", "",  3000, 0.,  3000., nStep);
+  histograms -> add_h1("lep_lipSig",  "", 2000, -50., 50., nStep+1);
+  histograms -> add_h1("lep_tipSig",  "", 1000,   0., 50., nStep+1);  
+  histograms -> add_h1("lep_3DipSig", "", 2000, -50., 50., nStep+1);
   
-  histograms2 -> add_h2("tagWJJ_m_vs_Deta", "", 200,  0., 10., 3000, 0., 3000., nStep);
-  histograms2 -> add_h2("tagWJJ_matched_right_m_vs_Deta", "", 200,  0., 10., 3000, 0., 3000., nStep);
-  histograms2 -> add_h2("tagWJJ_matched_wrong_m_vs_Deta", "", 200,  0., 10., 3000, 0., 3000., nStep);
-  histograms2 -> add_h2("tagWJJ_matched_all_m_vs_Deta", "", 200,  0., 10., 3000, 0., 3000., nStep);
-  histograms2 -> add_h2("lepWJ_pt1_vs_tagJJ_pt", "", 500, 0., 500., 500, 0., 500., nStep);
+  histograms -> add_h1("lepMet_mt",  "", 3000, 0., 3000., nStep+1);
+  histograms -> add_h1("lepMetW_mt", "", 3000, 0., 3000., nStep+1);  
   
-  histograms -> add_h1("TMVA_kBDT",  "",  1000, -1., 1., nStep);
+  histograms -> add_h1("lepWJ_pt1", "",  3000, 0.,  3000., nStep+1);
+  histograms -> add_h1("lepWJ_pt2", "",  3000, 0.,  3000., nStep+1);
+  histograms -> add_h1("lepWJ_pt3", "",  3000, 0.,  3000., nStep+1);
+  
+  histograms2 -> add_h2("tagWJJ_m_vs_Deta", "", 200,  0., 10., 3000, 0., 3000., nStep+1);
+  histograms2 -> add_h2("tagWJJ_matched_right_m_vs_Deta", "", 200,  0., 10., 3000, 0., 3000., nStep+1);
+  histograms2 -> add_h2("tagWJJ_matched_wrong_m_vs_Deta", "", 200,  0., 10., 3000, 0., 3000., nStep+1);
+  histograms2 -> add_h2("tagWJJ_matched_all_m_vs_Deta", "", 200,  0., 10., 3000, 0., 3000., nStep+1);
+  histograms2 -> add_h2("lepWJ_pt1_vs_tagJJ_pt", "", 500, 0., 500., 500, 0., 500., nStep+1);
+  
+  histograms -> add_h1("TMVA_kBDT",  "",  1000, -1., 1., nStep+1);
   
   // stdHistograms
-  stdHisto* stdHistograms = new stdHisto(nStep, outputRootFullFileName);
+  stdHisto* stdHistograms = new stdHisto(nStep+1, outputRootFullFileName);
   
-  stdHistograms -> Add2("tagJJ",    nStep);
-  stdHistograms -> Add2("WJJ",      nStep, true);
-  stdHistograms -> Add1("allJ",   nStep);
-  stdHistograms -> Add1("met",      nStep);
-  stdHistograms -> Add1("lep",      nStep, true);
-  stdHistograms -> Add2("lepMet",   nStep, true);
-  stdHistograms -> Add2("lepMetW",  nStep, true);
-  stdHistograms -> Add1("otherJ_et15", nStep, true);
-  stdHistograms -> Add1("otherJ_et20", nStep, true);
-  stdHistograms -> Add1("otherJ_et25", nStep, true);
-  stdHistograms -> Add1("otherJ_et30", nStep, true);
-  stdHistograms -> Add1("centralJ_et15", nStep, true);
-  stdHistograms -> Add1("centralJ_et20", nStep, true);
-  stdHistograms -> Add1("centralJ_et25", nStep, true);
-  stdHistograms -> Add1("centralJ_et30", nStep, true);
+  stdHistograms -> Add2("tagJJ",    nStep+1);
+  stdHistograms -> Add2("WJJ",      nStep+1, true);
+  stdHistograms -> Add1("allJ",   nStep+1);
+  stdHistograms -> Add1("met",      nStep+1);
+  stdHistograms -> Add1("lep",      nStep+1, true);
+  stdHistograms -> Add2("lepMet",   nStep+1, true);
+  stdHistograms -> Add2("lepMetW",  nStep+1, true);
+  stdHistograms -> Add1("otherJ_et15", nStep+1, true);
+  stdHistograms -> Add1("otherJ_et20", nStep+1, true);
+  stdHistograms -> Add1("otherJ_et25", nStep+1, true);
+  stdHistograms -> Add1("otherJ_et30", nStep+1, true);
+  stdHistograms -> Add1("centralJ_et15", nStep+1, true);
+  stdHistograms -> Add1("centralJ_et20", nStep+1, true);
+  stdHistograms -> Add1("centralJ_et25", nStep+1, true);
+  stdHistograms -> Add1("centralJ_et30", nStep+1, true);
   
   
   
@@ -269,84 +294,84 @@ int main(int argc, char** argv)
   TFile* outputTreeFile = new TFile(outputTreeFileName.c_str(), "RECREATE");
   outputTreeFile -> cd();
   
-  std::vector<TTree*> tree;
-  std::vector<TTree*> treeEvents;
+  std::map<int, TTree*> tree;
+  std::map<int, TTree*> treeEvents;
   
-  for(int i = 0; i < nStep; ++i)
+  for(int i = 1; i <= nStep; ++i)
   { 
     char treeName[50];
     sprintf(treeName, "tree_%d", i);
-    tree.push_back(new TTree(treeName, treeName));
-    tree.at(i) -> SetDirectory(outputTreeFile);
+    tree[i] = new TTree(treeName, treeName);
+    tree[i] -> SetDirectory(outputTreeFile);
     
-    tree.at(i) -> Branch("mH",                &mH,                               "mH/F");
-    tree.at(i) -> Branch("totEvents",         &stepEvents[0],             "totEvents/I");
-    tree.at(i) -> Branch("crossSection",      &crossSection,           "crossSection/F");
-    tree.at(i) -> Branch("type",              &type,                           "type/I");
-    tree.at(i) -> Branch("tagJJ_Deta",        &tagJJ_Deta,               "tagJJ_Deta/F");
-    tree.at(i) -> Branch("tagJJ_etaProd",     &tagJJ_etaProd,         "tagJJ_etaProd/F");
-    tree.at(i) -> Branch("tagJJ_m",           &tagJJ_m,                     "tagJJ_m/F");  
-    tree.at(i) -> Branch("tagJJ_max_e",       &tagJJ_max_e,             "tagJJ_max_e/F");   
-    tree.at(i) -> Branch("tagJJ_min_e",       &tagJJ_min_e,             "tagJJ_min_e/F");
-    tree.at(i) -> Branch("tagJJ_max_et",      &tagJJ_max_et,           "tagJJ_max_et/F");   
-    tree.at(i) -> Branch("tagJJ_min_et",      &tagJJ_min_et,           "tagJJ_min_et/F"); 
-    tree.at(i) -> Branch("tagJJ_max_eta",     &tagJJ_max_eta,         "tagJJ_max_eta/F");   
-    tree.at(i) -> Branch("tagJJ_min_eta",     &tagJJ_min_eta,         "tagJJ_min_eta/F");
-    tree.at(i) -> Branch("tagJ1_bTag",        &tagJ1_bTag,               "tagJ1_bTag/F");
-    tree.at(i) -> Branch("tagJ2_bTag",        &tagJ2_bTag,               "tagJ2_bTag/F");
-    tree.at(i) -> Branch("WJJ_pt",            &WJJ_pt,                       "WJJ_pt/F");
-    tree.at(i) -> Branch("WJJ_eta",           &WJJ_eta,                     "WJJ_eta/F");
-    tree.at(i) -> Branch("WJJ_zepp",          &WJJ_zepp,                   "WJJ_zepp/F");
-    tree.at(i) -> Branch("WJJ_Deta",          &WJJ_Deta,                   "WJJ_Deta/F");
-    tree.at(i) -> Branch("WJJ_Dphi",          &WJJ_Dphi,                   "WJJ_Dphi/F");
-    tree.at(i) -> Branch("WJJ_DR",            &WJJ_DR,                       "WJJ_DR/F");
-    tree.at(i) -> Branch("WJJ_etaProd",       &WJJ_etaProd,             "WJJ_etaProd/F");
-    tree.at(i) -> Branch("WJJ_m",             &WJJ_m,                         "WJJ_m/F");  
-    tree.at(i) -> Branch("WJJ_max_et",        &WJJ_max_et,               "WJJ_max_et/F");   
-    tree.at(i) -> Branch("WJJ_min_et",        &WJJ_min_et,               "WJJ_min_et/F");
-    tree.at(i) -> Branch("WJJ_max_eta",       &WJJ_max_eta,             "WJJ_max_eta/F");   
-    tree.at(i) -> Branch("WJJ_min_eta",       &WJJ_min_eta,             "WJJ_min_eta/F");
-    tree.at(i) -> Branch("WJJ_max_zepp",      &WJJ_max_zepp,           "WJJ_max_zepp/F");   
-    tree.at(i) -> Branch("WJJ_min_zepp",      &WJJ_min_zepp,           "WJJ_min_zepp/F");
-    tree.at(i) -> Branch("WJ1_bTag",          &WJ1_bTag,                   "WJ1_bTag/F");
-    tree.at(i) -> Branch("WJ2_bTag",          &WJ2_bTag,                   "WJ2_bTag/F");
-    tree.at(i) -> Branch("lep_n",             &lep_n,                         "lep_n/I");
-    tree.at(i) -> Branch("lep_pt",            &lep_pt,                       "lep_pt/F");
-    tree.at(i) -> Branch("lep_eta",           &lep_eta,                     "lep_eta/F");
-    tree.at(i) -> Branch("lep_zepp",          &lep_zepp,                   "lep_zepp/F");
-    tree.at(i) -> Branch("lep_eleId",         &lep_eleId,                 "lep_eleId/F");
-    tree.at(i) -> Branch("lep_tkIso",         &lep_tkIso,                 "lep_tkIso/F");
-    tree.at(i) -> Branch("lep_emIso",         &lep_emIso,                 "lep_emIso/F");
-    tree.at(i) -> Branch("lep_hadIso",        &lep_hadIso,               "lep_hadIso/F");
-    tree.at(i) -> Branch("lep_tipSig",        &lep_tipSig,               "lep_tipSig/F");
-    tree.at(i) -> Branch("lep_lipSig",        &lep_lipSig,               "lep_lipSig/F");
-    tree.at(i) -> Branch("lep_3DipSig",       &lep_3DipSig,             "lep_3DipSig/F");
-    tree.at(i) -> Branch("lepWJJ_pt1",        &lepWJJ_pt1,               "lepWJJ_pt1/F");
-    tree.at(i) -> Branch("lepWJJ_pt2",        &lepWJJ_pt2,               "lepWJJ_pt2/F");
-    tree.at(i) -> Branch("lepWJJ_pt3",        &lepWJJ_pt3,               "lepWJJ_pt3/F");
-    tree.at(i) -> Branch("met_et",            &met_et,                       "met_et/F");
-    tree.at(i) -> Branch("lepMet_mt",         &lepMet_mt,                 "lepMet_mt/F");
-    tree.at(i) -> Branch("lepMetW_mt",        &lepMetW_mt,               "lepMetW_mt/F");
-    tree.at(i) -> Branch("lepMetW_Dphi",      &lepMetW_Dphi,           "lepMetW_Dphi/F");
-    tree.at(i) -> Branch("nOtherJets_et15",   &nOtherJets_et15,     "nOtherJets_et15/I");
-    tree.at(i) -> Branch("nOtherJets_et20",   &nOtherJets_et20,     "nOtherJets_et20/I");
-    tree.at(i) -> Branch("nOtherJets_et25",   &nOtherJets_et25,     "nOtherJets_et25/I");
-    tree.at(i) -> Branch("nOtherJets_et30",   &nOtherJets_et30,     "nOtherJets_et30/I");        
-    tree.at(i) -> Branch("nCentralJets_et15", &nCentralJets_et15, "nCentralJets_et15/I");
-    tree.at(i) -> Branch("nCentralJets_et20", &nCentralJets_et20, "nCentralJets_et20/I");
-    tree.at(i) -> Branch("nCentralJets_et25", &nCentralJets_et25, "nCentralJets_et25/I");
-    tree.at(i) -> Branch("nCentralJets_et30", &nCentralJets_et30, "nCentralJets_et30/I");
+    tree[i] -> Branch("mH",                &mH,                               "mH/F");
+    tree[i] -> Branch("totEvents",         &stepEvents[1],             "totEvents/I");
+    tree[i] -> Branch("crossSection",      &crossSection,           "crossSection/F");
+    tree[i] -> Branch("type",              &type,                           "type/I");
+    tree[i] -> Branch("tagJJ_Deta",        &tagJJ_Deta,               "tagJJ_Deta/F");
+    tree[i] -> Branch("tagJJ_etaProd",     &tagJJ_etaProd,         "tagJJ_etaProd/F");
+    tree[i] -> Branch("tagJJ_m",           &tagJJ_m,                     "tagJJ_m/F");  
+    tree[i] -> Branch("tagJJ_max_e",       &tagJJ_max_e,             "tagJJ_max_e/F");   
+    tree[i] -> Branch("tagJJ_min_e",       &tagJJ_min_e,             "tagJJ_min_e/F");
+    tree[i] -> Branch("tagJJ_max_et",      &tagJJ_max_et,           "tagJJ_max_et/F");   
+    tree[i] -> Branch("tagJJ_min_et",      &tagJJ_min_et,           "tagJJ_min_et/F"); 
+    tree[i] -> Branch("tagJJ_max_eta",     &tagJJ_max_eta,         "tagJJ_max_eta/F");   
+    tree[i] -> Branch("tagJJ_min_eta",     &tagJJ_min_eta,         "tagJJ_min_eta/F");
+    tree[i] -> Branch("tagJ1_bTag",        &tagJ1_bTag,               "tagJ1_bTag/F");
+    tree[i] -> Branch("tagJ2_bTag",        &tagJ2_bTag,               "tagJ2_bTag/F");
+    tree[i] -> Branch("WJJ_pt",            &WJJ_pt,                       "WJJ_pt/F");
+    tree[i] -> Branch("WJJ_eta",           &WJJ_eta,                     "WJJ_eta/F");
+    tree[i] -> Branch("WJJ_zepp",          &WJJ_zepp,                   "WJJ_zepp/F");
+    tree[i] -> Branch("WJJ_Deta",          &WJJ_Deta,                   "WJJ_Deta/F");
+    tree[i] -> Branch("WJJ_Dphi",          &WJJ_Dphi,                   "WJJ_Dphi/F");
+    tree[i] -> Branch("WJJ_DR",            &WJJ_DR,                       "WJJ_DR/F");
+    tree[i] -> Branch("WJJ_etaProd",       &WJJ_etaProd,             "WJJ_etaProd/F");
+    tree[i] -> Branch("WJJ_m",             &WJJ_m,                         "WJJ_m/F");  
+    tree[i] -> Branch("WJJ_max_et",        &WJJ_max_et,               "WJJ_max_et/F");   
+    tree[i] -> Branch("WJJ_min_et",        &WJJ_min_et,               "WJJ_min_et/F");
+    tree[i] -> Branch("WJJ_max_eta",       &WJJ_max_eta,             "WJJ_max_eta/F");   
+    tree[i] -> Branch("WJJ_min_eta",       &WJJ_min_eta,             "WJJ_min_eta/F");
+    tree[i] -> Branch("WJJ_max_zepp",      &WJJ_max_zepp,           "WJJ_max_zepp/F");   
+    tree[i] -> Branch("WJJ_min_zepp",      &WJJ_min_zepp,           "WJJ_min_zepp/F");
+    tree[i] -> Branch("WJ1_bTag",          &WJ1_bTag,                   "WJ1_bTag/F");
+    tree[i] -> Branch("WJ2_bTag",          &WJ2_bTag,                   "WJ2_bTag/F");
+    tree[i] -> Branch("lep_n",             &lep_n,                         "lep_n/I");
+    tree[i] -> Branch("lep_pt",            &lep_pt,                       "lep_pt/F");
+    tree[i] -> Branch("lep_eta",           &lep_eta,                     "lep_eta/F");
+    tree[i] -> Branch("lep_zepp",          &lep_zepp,                   "lep_zepp/F");
+    tree[i] -> Branch("lep_eleId",         &lep_eleId,                 "lep_eleId/F");
+    tree[i] -> Branch("lep_tkIso",         &lep_tkIso,                 "lep_tkIso/F");
+    tree[i] -> Branch("lep_emIso",         &lep_emIso,                 "lep_emIso/F");
+    tree[i] -> Branch("lep_hadIso",        &lep_hadIso,               "lep_hadIso/F");
+    tree[i] -> Branch("lep_tipSig",        &lep_tipSig,               "lep_tipSig/F");
+    tree[i] -> Branch("lep_lipSig",        &lep_lipSig,               "lep_lipSig/F");
+    tree[i] -> Branch("lep_3DipSig",       &lep_3DipSig,             "lep_3DipSig/F");
+    tree[i] -> Branch("lepWJJ_pt1",        &lepWJJ_pt1,               "lepWJJ_pt1/F");
+    tree[i] -> Branch("lepWJJ_pt2",        &lepWJJ_pt2,               "lepWJJ_pt2/F");
+    tree[i] -> Branch("lepWJJ_pt3",        &lepWJJ_pt3,               "lepWJJ_pt3/F");
+    tree[i] -> Branch("met_et",            &met_et,                       "met_et/F");
+    tree[i] -> Branch("lepMet_mt",         &lepMet_mt,                 "lepMet_mt/F");
+    tree[i] -> Branch("lepMetW_mt",        &lepMetW_mt,               "lepMetW_mt/F");
+    tree[i] -> Branch("lepMetW_Dphi",      &lepMetW_Dphi,           "lepMetW_Dphi/F");
+    tree[i] -> Branch("nOtherJets_et15",   &nOtherJets_et15,     "nOtherJets_et15/I");
+    tree[i] -> Branch("nOtherJets_et20",   &nOtherJets_et20,     "nOtherJets_et20/I");
+    tree[i] -> Branch("nOtherJets_et25",   &nOtherJets_et25,     "nOtherJets_et25/I");
+    tree[i] -> Branch("nOtherJets_et30",   &nOtherJets_et30,     "nOtherJets_et30/I");        
+    tree[i] -> Branch("nCentralJets_et15", &nCentralJets_et15, "nCentralJets_et15/I");
+    tree[i] -> Branch("nCentralJets_et20", &nCentralJets_et20, "nCentralJets_et20/I");
+    tree[i] -> Branch("nCentralJets_et25", &nCentralJets_et25, "nCentralJets_et25/I");
+    tree[i] -> Branch("nCentralJets_et30", &nCentralJets_et30, "nCentralJets_et30/I");
     
     
     
     char treeEventsName[50];
     sprintf(treeEventsName, "treeEvents_%d", i);
-    treeEvents.push_back(new TTree(treeEventsName, treeEventsName));
+    treeEvents[i] = new TTree(treeEventsName, treeEventsName);
     
-    treeEvents.at(i) -> Branch("mH",           &mH,                     "mH/F");
-    treeEvents.at(i) -> Branch("totEvents",    &stepEvents[0],   "totEvents/I");
-    treeEvents.at(i) -> Branch("crossSection", &crossSection, "crossSection/F");
-    treeEvents.at(i) -> Branch("events",       &stepEvents[i],      "events/I");
+    treeEvents[i] -> Branch("mH",           &mH,                     "mH/F");
+    treeEvents[i] -> Branch("totEvents",    &stepEvents[0],   "totEvents/I");
+    treeEvents[i] -> Branch("crossSection", &crossSection, "crossSection/F");
+    treeEvents[i] -> Branch("events",       &stepEvents[i],      "events/I");
   }
   
   
@@ -398,11 +423,20 @@ int main(int argc, char** argv)
   // LOOP OVER THE EVENTS
   
   std::cout << ">>>>> VBFHiggsToWWTolnujjAnalysis::Read " << chain -> GetEntries() << " entries" << std::endl;  
-  for(int entry = 0 ; entry < chain -> GetEntries() ; ++entry)
+  for(int entry = entryFIRST ; entry < chain -> GetEntries() ; ++entry)
   {
-    reader.GetEntry(entry);
-    if((entry%entryMODULO) == 0) std::cout << ">>>>> VBFHiggsToWWTolnujjAnalysis::GetEntry " << entry << std::endl;   
     if(entry == entryMAX) break;
+    if((entry%entryMODULO) == 0) std::cout << ">>>>> VBFHiggsToWWTolnujjAnalysis::GetEntry " << entry << std::endl;   
+    
+    
+    
+    
+    
+    
+    //***********
+    // DUMP EVENT
+    reader.GetEntry(entry);
+    //std::cout << ">>> Get Entry" << std::endl;    
     
     
     
@@ -458,15 +492,242 @@ int main(int argc, char** argv)
     
     
     
-    //************
-    // SELECT JETS
-    //std::cout << ">>> Select Jets" << std::endl;
+    
+    
+    
+    
+    
+    
+    //********************************
+    // STEP 3 - Initial cuts - Trigger
+    step = 3;
+    //std::cout << ">>> step: " << step << std::endl;
+    stepName[step] = "3) HLT";
+    
+    
+//    bool skipEvent = true;
+//    
+//    std::vector<std::string> HLT_names = *(reader.GetString("HLT_Names"));
+//    int HLT_Photon10_L1R_bit = -1;
+//    int HLT_Ele10_LW_L1R_bit = -1;
+//    int HLT_Mu9_bit = -1;
+//    for(unsigned int HLTIt = 0; HLTIt < HLT_names.size(); ++HLTIt)
+//    {
+//      if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Photon10_L1R" )
+//        HLT_Photon10_L1R_bit = HLTIt;
+//      if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Ele10_LW_L1R" )
+//        HLT_Ele10_LW_L1R_bit = HLTIt;
+//      if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Mu9" )
+//        HLT_Mu9_bit = HLTIt;
+//    }
+//    
+//    //HLT_Photon10_L1R
+//    //if( HLT_Photon10_L1R_bit == -1 ) continue; 
+//    //if( reader.GetFloat("HLT_Accept")->at(HLT_Photon10_L1R_bit) == 1 ) skipEvent = false;
+//    
+//    //HLT_Ele10_LW_L1R
+//    if( HLT_Ele10_LW_L1R_bit == -1 ) continue; 
+//    if( reader.GetFloat("HLT_Accept")->at(HLT_Ele10_LW_L1R_bit) == 1 ) skipEvent = false;
+//        
+//    //HLT_Mu9
+//    if( HLT_Mu9_bit == -1 ) continue; 
+//    if( reader.GetFloat("HLT_Accept")->at(HLT_Mu9_bit) == 1 ) skipEvent = false;
+//    
+//    
+//    if( skipEvent == true ) continue;
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    
+    
+    
+    
+    
+    
+    //***********************
+    // STEP 4 - select lepton
+    step += 1;
+    //std::cout << ">>> step: " << step << std::endl;
+    stepName[step] = "4) select lepton";
+    
+    std::vector<ROOT::Math::XYZTVector> electrons;
+    std::vector<ROOT::Math::XYZTVector> muons;
+    std::vector<ROOT::Math::XYZTVector> leptons;
+    std::vector<float> leptonCharges;
+    std::vector<std::string> leptonFlavours;    
+    std::vector<float> leptons_tkIso;
+    std::vector<float> leptons_emIso;
+    std::vector<float> leptons_hadIso;
+    std::vector<float> leptons_lipSig;
+    std::vector<float> leptons_tipSig;
+    std::vector<float> leptons_3DipSig;
+    std::vector<float> electrons_eleIdRobustTight;
+    
+    
+    
+    int nEle = 0;
+    for(unsigned int eleIt = 0; eleIt < (reader.Get4V("electrons")->size()); ++eleIt)
+    {
+      if( reader.Get4V("electrons")->at(eleIt).pt() < 10. ) continue;
+      //if( (reader.GetFloat("electrons_tkIso")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 0.1 ) continue;
+      //if( (reader.GetFloat("electrons_hadIso03_1")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 0.1 ) continue;
+      
+      electrons.push_back( reader.Get4V("electrons")->at(eleIt) );
+      leptons.push_back( reader.Get4V("electrons")->at(eleIt) );      
+      leptonCharges.push_back( reader.GetFloat("electrons_charge")->at(eleIt) );
+      leptonFlavours.push_back("electron");
+      
+      leptons_tkIso.push_back(reader.GetFloat("electrons_tkIso")->at(eleIt));
+      leptons_emIso.push_back(reader.GetFloat("electrons_emIso03")->at(eleIt));
+      leptons_hadIso.push_back(reader.GetFloat("electrons_hadIso03_1")->at(eleIt));          
+      leptons_lipSig.push_back(reader.GetFloat("electrons_lipSignificance")->at(eleIt));
+      leptons_tipSig.push_back(reader.GetFloat("electrons_tipSignificance")->at(eleIt));
+      leptons_3DipSig.push_back(reader.GetFloat("electrons_3DipSignificance")->at(eleIt));
+      
+      electrons_eleIdRobustTight.push_back(reader.GetFloat("electrons_IdRobustTight")->at(eleIt));
+      ++nEle;
+    }
+    
+    for(unsigned int muIt = 0; muIt < (reader.Get4V("muons")->size()); ++muIt)
+    {
+      if( reader.Get4V("muons")->at(muIt).pt() < 10. ) continue;
+      //if( (reader.GetFloat("muons_emIsoR03")->at(muIt)) / reader.Get4V("muons")->at(muIt).pt() > 0.1 ) continue;
+      //if( (reader.GetFloat("muons_hadIsoR03")->at(muIt)) / reader.Get4V("muons")->at(muIt).pt() > 0.1 ) continue;
+      
+      muons.push_back( reader.Get4V("muons")->at(muIt) );
+      leptons.push_back( reader.Get4V("muons")->at(muIt) );      
+      leptonCharges.push_back( reader.GetFloat("muons_charge")->at(muIt) );
+      leptonFlavours.push_back("muon");
+      leptons_tkIso.push_back(reader.GetFloat("muons_tkIsoR03")->at(muIt));
+      leptons_emIso.push_back(reader.GetFloat("muons_emIsoR03")->at(muIt));
+      leptons_hadIso.push_back(reader.GetFloat("muons_hadIsoR03")->at(muIt));
+      leptons_lipSig.push_back(reader.GetFloat("muons_lipSignificance")->at(muIt));
+      leptons_tipSig.push_back(reader.GetFloat("muons_tipSignificance")->at(muIt));
+      leptons_3DipSig.push_back(reader.GetFloat("muons_3DipSignificance")->at(muIt));
+    }
+    
+    if( (int)(leptons.size()) < lepNMIN ) continue;
+    if( (int)(leptons.size()) > lepNMAX ) continue;
+    if( (int)(electrons.size()) < eleNMIN ) continue;
+    if( (int)(muons.size()) < muNMIN ) continue;
+    
+    
+    // select lepton
+    int selectIt_lep = SelectLepton(leptons, "maxPt", 10.);    
+    ROOT::Math::XYZTVector lepton = leptons.at(selectIt_lep);
+    if(selectIt_lep == -1) continue;
+    if( lepton.pt() < lepPtMIN ) continue;
+    if( lepton.pt() > lepPtMAX ) continue;
+    if( leptonCharges.at(selectIt_lep) > 0. ) continue;
+
+    
+    
+    int selectIt_ele = -1;
+    if(leptonFlavours.at(selectIt_lep) == "electron")
+      for(unsigned int eleIt = 0; eleIt < electrons.size(); ++eleIt)
+      {
+        ROOT::Math::XYZTVector ele = electrons.at(eleIt);
+        if( deltaR(ele.eta(), ele.phi(), lepton.eta(), lepton.phi()) < 0.0001 )
+          selectIt_ele = eleIt;
+      }
+
+    int selectIt_mu = -1;
+    if(leptonFlavours.at(selectIt_lep) == "muon")
+      for(unsigned int muIt = 0; muIt < muons.size(); ++muIt)
+      {
+        ROOT::Math::XYZTVector mu = muons.at(muIt);
+        if(deltaR(mu.eta(), mu.phi(), lepton.eta(), lepton.phi()) < 0.0001)
+          selectIt_mu = muIt;
+      }
+    
+    
+    
+    
+    
+    
+    if(leptonFlavours.at(selectIt_lep) == "electron")
+    {
+      //isolation
+      if( leptons_tkIso.at(selectIt_lep)  > eleTkIsoMAX ) continue;
+      if( leptons_hadIso.at(selectIt_lep) > eleEmIsoMAX ) continue;
+      if( leptons_hadIso.at(selectIt_lep) > eleHadIsoMAX ) continue;
+      
+      //eleID
+      if( electrons_eleIdRobustTight.at(selectIt_lep) < eleIdValueMIN ) continue; 
+    }
+    
+    if(leptonFlavours.at(selectIt_lep) == "muon")
+    {
+      //isolation
+      if( leptons_tkIso.at(selectIt_lep)  > muTkIsoMAX ) continue;
+      if( leptons_hadIso.at(selectIt_lep) > muEmIsoMAX ) continue;
+      if( leptons_hadIso.at(selectIt_lep) > muHadIsoMAX ) continue;
+      
+      //muonID
+    }    
+    
+    
+    
+    
+    
+    //****
+    // met
+    
+    ROOT::Math::XYZTVector met;
+    if(jetType == "Calo")    
+      met = reader.Get4V("met")->at(0);
+    if(jetType == "PF")    
+      met = reader.Get4V("PFMet")->at(0);
+    ROOT::Math::XYZTVector lepMet = lepton + met;
+    
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+
+    if(leptonFlavours.at(selectIt_lep) == "electron")
+    {
+      histograms -> Fill("ele_tkIso",         step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso",         step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso",        step, leptons_hadIso.at(selectIt_lep));
+    }
+    if(leptonFlavours.at(selectIt_lep) == "muon")
+    {
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
+    }
+    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
+    histograms -> Fill("lepMet_mt", step, lepMet_mt);
+    stdHistograms -> Fill1(met, "met", step);
+    stdHistograms -> Fill1(lepton, "lep", step);
+    stdHistograms -> Fill2(lepton, met, "lepMet", step);
+    
+    tree[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //***********************
+    // STEP 5 - select 4 jets
+    step += 1;
+    //std::cout << ">>> step: " << step << std::endl;
+    stepName[step] = "5) select 4 jets";
+    
     
     std::vector<ROOT::Math::XYZTVector> jets;
     std::vector<ROOT::Math::XYZTVector> electrons_jetCleaning;
     std::vector<ROOT::Math::XYZTVector> muons_jetCleaning;
     std::vector<float> jets_bTag;
-    
+    std::vector<float> jets_et;
+
     // build the collection of leptons for jet cleaning
     for(unsigned int eleIt = 0; eleIt < (reader.Get4V("electrons")->size()); ++eleIt)
     {
@@ -510,7 +771,11 @@ int main(int argc, char** argv)
       
       jets.push_back( reader.Get4V("jets")->at(jetIt) );
       jets_bTag.push_back( reader.GetFloat("jets_trackCountingHighEffBJetTags")->at(jetIt) );
+      jets_et.push_back( reader.Get4V("jets")->at(jetIt).Et() );
     }
+    
+    std::sort(jets_et.begin(), jets_et.end(), maggiore);
+    
     
     if( (int)(jets.size()) < jetNMIN ) continue;
     if( (int)(jets.size()) > jetNMAX ) continue;
@@ -558,43 +823,6 @@ int main(int argc, char** argv)
     
     
     
-    
-    //************************
-    // STEP 2 - Preselection
-    step = 2;
-    //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "2) Preselection >= 4 jets";      
-    
-    std::vector<float> jets_et;
-    for(unsigned int jetIt = 0; jetIt < jets.size(); ++jetIt)
-      jets_et.push_back(jets.at(jetIt).Et());
-    
-    std::sort(jets_et.begin(), jets_et.end(), maggiore);
-    
-    if(jets_et.at(0) < jetEtMIN1) continue;
-    if(jets_et.at(1) < jetEtMIN2) continue;
-    if(jets_et.at(2) < jetEtMIN3) continue;
-    if(jets_et.at(3) < jetEtMIN4) continue;
-    
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    
-    stdHistograms -> Fill1(jets, "allJ", step);
-    
-    tree.at(step) -> Fill();
-    
-    
-    
-    
-    
-    
-    //********************
-    // STEP 3 - 4j et cuts
-    step = 3;
-    //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "3) select 4 jets";
     
     
     // select jets
@@ -707,11 +935,10 @@ int main(int argc, char** argv)
           if(tempCombination == matchIt) type = 0;
           else type = 1;
           
-          tree.at(step) -> Fill();
+          tree[step] -> Fill();
         }
       }
     }
-    
     
     
     //std::cout << "tag: " << selectIt_tag.at(0) << " " << selectIt_tag.at(1) << std::endl;
@@ -719,9 +946,6 @@ int main(int argc, char** argv)
     if( (selectIt_tag.at(0) == -1) || (selectIt_tag.at(1) == -1) ||
         (selectIt_W.at(0)   == -1) || (selectIt_W.at(1)   == -1) )
       continue;
-    
-    
-    
     
     
     
@@ -768,12 +992,84 @@ int main(int argc, char** argv)
     tagWJ_et.push_back(jet2_W.Et());
     sort(tagWJ_et.begin(), tagWJ_et.end(), maggiore);
     
+    std::vector<float> tagWJ_bTag;
+    tagWJ_bTag.push_back(jet1_tag_bTag);
+    tagWJ_bTag.push_back(jet2_tag_bTag);
+    tagWJ_bTag.push_back(jet1_W_bTag);
+    tagWJ_bTag.push_back(jet2_W_bTag);
+    sort(tagWJ_bTag.begin(), tagWJ_bTag.end(), maggiore);
+    
+    
+    //***********************
+    // other and central jets
+    
+    std::vector<ROOT::Math::XYZTVector> otherJets_et15;
+    std::vector<ROOT::Math::XYZTVector> otherJets_et20;
+    std::vector<ROOT::Math::XYZTVector> otherJets_et25;
+    std::vector<ROOT::Math::XYZTVector> otherJets_et30;
+    std::vector<ROOT::Math::XYZTVector> centralJets_et15;
+    std::vector<ROOT::Math::XYZTVector> centralJets_et20;
+    std::vector<ROOT::Math::XYZTVector> centralJets_et25;
+    std::vector<ROOT::Math::XYZTVector> centralJets_et30;
+    for(unsigned int jetIt = 0; jetIt < jets.size(); ++jetIt)
+    {
+      if( jetIt == (unsigned int)(selectIt_tag.at(0)) ) continue;
+      if( jetIt == (unsigned int)(selectIt_tag.at(1)) ) continue;
+      if( jetIt == (unsigned int)(selectIt_W.at(0)) ) continue;
+      if( jetIt == (unsigned int)(selectIt_W.at(1)) ) continue;      
+      
+
+      if( jets.at(jetIt).Et() > 15. )
+        otherJets_et15.push_back(jets.at(jetIt));
+      if( jets.at(jetIt).Et() > 20. )
+        otherJets_et20.push_back(jets.at(jetIt));
+      if( jets.at(jetIt).Et() > 25. )
+        otherJets_et25.push_back(jets.at(jetIt));
+      if( jets.at(jetIt).Et() > 30. )
+        otherJets_et30.push_back(jets.at(jetIt));
+      
+      if( (jets.at(jetIt).eta() > etaMin_tag) &&
+          (jets.at(jetIt).eta() < etaMax_tag) )
+      {
+        if( jets.at(jetIt).Et() > 15. )
+          centralJets_et15.push_back(jets.at(jetIt));
+        if( jets.at(jetIt).Et() > 20. )
+          centralJets_et20.push_back(jets.at(jetIt));
+        if( jets.at(jetIt).Et() > 25. )
+          centralJets_et25.push_back(jets.at(jetIt));
+        if( jets.at(jetIt).Et() > 30. )
+          centralJets_et30.push_back(jets.at(jetIt));
+      }
+    }
+    
+    
+    
+    //*************************
+    // lepton-related variables
+
+    float lep_etaGap1 = deltaEta(lepton.eta(), jet1_tag.eta());
+    float lep_etaGap2 = deltaEta(lepton.eta(), jet2_tag.eta());
+    
+    ROOT::Math::XYZTVector lepMetW = lepMet + jet12_W;
+    ROOT::Math::XYZTVector lepW = lepton + jet12_W;
+    ROOT::Math::XYZTVector lepMetWTag = lepMetW + jet12_tag;
+    
+    std::vector<float> lepWJ_pt;
+    lepWJ_pt.push_back( lepton.pt() );
+    lepWJ_pt.push_back( jet1_W.Et() );
+    lepWJ_pt.push_back( jet2_W.Et() );
+    std::sort(lepWJ_pt.begin(), lepWJ_pt.end(), maggiore);
+
+    
+    
+    
     
     
     //**************
-    // match with mc    
-
-    if(mH > 0.)
+    // MATCH WITH MC
+    //std::cout << ">>> Match with MC" << std::endl;    
+    
+    if(mH > 0)
     {
       if(nMatching == 4)
       {
@@ -837,209 +1133,6 @@ int main(int argc, char** argv)
         }
       }
     }
-    
-    
-    
-    
-    
-    
-    
-    //***********************
-    // other and central jets
-    
-    std::vector<ROOT::Math::XYZTVector> otherJets_et15;
-    std::vector<ROOT::Math::XYZTVector> otherJets_et20;
-    std::vector<ROOT::Math::XYZTVector> otherJets_et25;
-    std::vector<ROOT::Math::XYZTVector> otherJets_et30;
-    std::vector<ROOT::Math::XYZTVector> centralJets_et15;
-    std::vector<ROOT::Math::XYZTVector> centralJets_et20;
-    std::vector<ROOT::Math::XYZTVector> centralJets_et25;
-    std::vector<ROOT::Math::XYZTVector> centralJets_et30;
-    for(unsigned int jetIt = 0; jetIt < jets.size(); ++jetIt)
-    {
-      if( jetIt == (unsigned int)(selectIt_tag.at(0)) ) continue;
-      if( jetIt == (unsigned int)(selectIt_tag.at(1)) ) continue;
-      if( jetIt == (unsigned int)(selectIt_W.at(0)) ) continue;
-      if( jetIt == (unsigned int)(selectIt_W.at(1)) ) continue;      
-      
-
-      if( jets.at(jetIt).Et() > 15. )
-        otherJets_et15.push_back(jets.at(jetIt));
-      if( jets.at(jetIt).Et() > 20. )
-        otherJets_et20.push_back(jets.at(jetIt));
-      if( jets.at(jetIt).Et() > 25. )
-        otherJets_et25.push_back(jets.at(jetIt));
-      if( jets.at(jetIt).Et() > 30. )
-        otherJets_et30.push_back(jets.at(jetIt));
-      
-      if( (jets.at(jetIt).eta() > etaMin_tag) &&
-          (jets.at(jetIt).eta() < etaMax_tag) )
-      {
-        if( jets.at(jetIt).Et() > 15. )
-          centralJets_et15.push_back(jets.at(jetIt));
-        if( jets.at(jetIt).Et() > 20. )
-          centralJets_et20.push_back(jets.at(jetIt));
-        if( jets.at(jetIt).Et() > 25. )
-          centralJets_et25.push_back(jets.at(jetIt));
-        if( jets.at(jetIt).Et() > 30. )
-          centralJets_et30.push_back(jets.at(jetIt));
-      }
-    }
-    
-    
-    
-    
-    
-    
-    //**************
-    // SELECT LEPTON
-    
-    std::vector<ROOT::Math::XYZTVector> electrons;
-    std::vector<ROOT::Math::XYZTVector> muons;
-    std::vector<ROOT::Math::XYZTVector> leptons;
-    std::vector<float> leptonCharges;
-    std::vector<std::string> leptonFlavours;    
-    std::vector<float> leptons_tkIso;
-    std::vector<float> leptons_emIso;
-    std::vector<float> leptons_hadIso;
-    std::vector<float> leptons_eleIdRobustTight;
-    std::vector<float> leptons_lipSig;
-    std::vector<float> leptons_tipSig;
-    std::vector<float> leptons_3DipSig;
-    
-    for(unsigned int eleIt = 0; eleIt < (reader.Get4V("electrons")->size()); ++eleIt)
-    {
-      if( reader.Get4V("electrons")->at(eleIt).pt() < 10. ) continue;
-      if( (reader.GetFloat("electrons_tkIso")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 0.1 ) continue;
-      if( (reader.GetFloat("electrons_hadIso03_1")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 0.1 ) continue;
-      if( (reader.GetFloat("electrons_IdRobustTight")->at(eleIt)) < eleIdValueMIN ) continue;
-      
-      electrons.push_back( reader.Get4V("electrons")->at(eleIt) );
-      leptons.push_back( reader.Get4V("electrons")->at(eleIt) );      
-      leptonCharges.push_back( reader.GetFloat("electrons_charge")->at(eleIt) );
-      leptonFlavours.push_back("electron");
-      leptons_tkIso.push_back(reader.GetFloat("electrons_tkIso")->at(eleIt));
-      leptons_emIso.push_back(reader.GetFloat("electrons_emIso03")->at(eleIt));
-      leptons_hadIso.push_back(reader.GetFloat("electrons_hadIso03_1")->at(eleIt));    
-      leptons_eleIdRobustTight.push_back(reader.GetFloat("electrons_IdRobustTight")->at(eleIt));
-      leptons_lipSig.push_back(reader.GetFloat("electrons_lipSignificance")->at(eleIt));
-      leptons_tipSig.push_back(reader.GetFloat("electrons_tipSignificance")->at(eleIt));
-      leptons_3DipSig.push_back(reader.GetFloat("electrons_3DipSignificance")->at(eleIt));
-    }
-    
-    for(unsigned int muIt = 0; muIt < (reader.Get4V("muons")->size()); ++muIt)
-    {
-      if( reader.Get4V("muons")->at(muIt).pt() < 10. ) continue;
-      if( (reader.GetFloat("muons_emIsoR03")->at(muIt)) / reader.Get4V("muons")->at(muIt).pt() > 0.1 ) continue;
-      if( (reader.GetFloat("muons_hadIsoR03")->at(muIt)) / reader.Get4V("muons")->at(muIt).pt() > 0.1 ) continue;
-      
-      muons.push_back( reader.Get4V("muons")->at(muIt) );
-      leptons.push_back( reader.Get4V("muons")->at(muIt) );      
-      leptonCharges.push_back( reader.GetFloat("muons_charge")->at(muIt) );
-      leptonFlavours.push_back("muon");
-      leptons_tkIso.push_back(reader.GetFloat("muons_tkIsoR03")->at(muIt));
-      leptons_emIso.push_back(reader.GetFloat("muons_emIsoR03")->at(muIt));
-      leptons_hadIso.push_back(reader.GetFloat("muons_hadIsoR03")->at(muIt));
-      leptons_eleIdRobustTight.push_back(1.);
-      leptons_lipSig.push_back(reader.GetFloat("muons_lipSignificance")->at(muIt));
-      leptons_tipSig.push_back(reader.GetFloat("muons_tipSignificance")->at(muIt));
-      leptons_3DipSig.push_back(reader.GetFloat("muons_3DipSignificance")->at(muIt));
-    }
-    
-    if( (int)(leptons.size()) < lepNMIN ) continue;
-    
-    
-    
-    // select lepton
-    int selectIt_lep = SelectLepton(leptons, "maxPt", 10.);    
-    ROOT::Math::XYZTVector lepton = leptons.at(selectIt_lep);
-    if(selectIt_lep == -1) continue;
-    
-    float lep_etaGap1 = deltaEta(lepton.eta(), jet1_tag.eta());
-    float lep_etaGap2 = deltaEta(lepton.eta(), jet2_tag.eta());
-    
-    
-    
-    
-    ROOT::Math::XYZTVector met;
-    if(jetType == "Calo")    
-      met = reader.Get4V("met")->at(0);
-    if(jetType == "PF")    
-      met = reader.Get4V("PFMet")->at(0);
-    ROOT::Math::XYZTVector lepMet = lepton + met;
-    ROOT::Math::XYZTVector lepMetW = lepMet + jet12_W;
-    ROOT::Math::XYZTVector lepW = lepton + jet12_W;
-    ROOT::Math::XYZTVector lepMetWTag = lepMetW + jet12_tag;
-    
-    
-    
-    std::vector<float> lepWJ_pt;
-    lepWJ_pt.push_back( lepton.pt() );
-    lepWJ_pt.push_back( jet1_W.Et() );
-    lepWJ_pt.push_back( jet2_W.Et() );
-    std::sort(lepWJ_pt.begin(), lepWJ_pt.end(), maggiore);
-    
-    
-    
-    
-    
-    
-    //***********************
-    // CUT VARIABLES FOR TREE
-    
-    tagJJ_Deta   = deltaEta(jet1_tag.eta(), jet2_tag.eta());
-    tagJJ_etaProd =jet1_tag.eta()*jet2_tag.eta();
-    tagJJ_m      = jet12_tag.mass();
-    tagJJ_max_e = std::max(jet1_tag.energy(), jet2_tag.energy());
-    tagJJ_min_e = std::min(jet1_tag.energy(), jet2_tag.energy());
-    tagJJ_max_et = std::max(jet1_tag.Et(), jet2_tag.Et());
-    tagJJ_min_et = std::min(jet1_tag.Et(), jet2_tag.Et());
-    tagJJ_max_eta = fabs(jet1_tag.eta()) > fabs(jet2_tag.eta()) ? jet1_tag.eta() : jet2_tag.eta();
-    tagJJ_min_eta = fabs(jet1_tag.eta()) < fabs(jet2_tag.eta()) ? jet1_tag.eta() : jet2_tag.eta();
-    tagJ1_bTag = jet1_tag_bTag;
-    tagJ2_bTag = jet2_tag_bTag;
-    WJJ_pt       = jet12_W.pt();
-    WJJ_eta      = jet12_W.eta();
-    WJJ_zepp     = jet12_W_zepp;
-    WJJ_Deta     = deltaEta(jet1_W.eta(), jet2_W.eta());
-    WJJ_Dphi     = deltaPhi(jet1_W.phi(), jet2_W.phi());
-    WJJ_DR       = deltaR(jet1_W.eta(), jet1_W.phi(), jet2_W.eta(), jet2_W.phi());
-    WJJ_etaProd  = jet1_W.eta()*jet2_W.eta();
-    WJJ_m        = jet12_W.mass();
-    WJJ_max_et   = std::max(jet1_W.Et(), jet2_W.Et());
-    WJJ_min_et   = std::min(jet1_W.Et(), jet2_W.Et());
-    WJJ_max_eta  = fabs(jet1_W.eta()) > fabs(jet2_W.eta()) ? jet1_W.eta() : jet2_W.eta();
-    WJJ_min_eta  = fabs(jet1_W.eta()) < fabs(jet2_W.eta()) ? jet1_W.eta() : jet2_W.eta();
-    WJJ_max_zepp = fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? fabs(jet1_W_zepp) : fabs(jet2_W_zepp);
-    WJJ_min_zepp = fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? fabs(jet1_W_zepp) : fabs(jet2_W_zepp);
-    WJ1_bTag = jet1_W_bTag;
-    WJ2_bTag = jet2_W_bTag;
-    lep_n = leptons.size();
-    lep_pt = lepton.pt();
-    lep_eta = lepton.eta();
-    lep_eleId = leptons_eleIdRobustTight.at(selectIt_lep);
-    lep_zepp = (lepton.eta() - avgEta_tag)/absDeta_tag;    
-    lep_tkIso = leptons_tkIso.at(selectIt_lep);
-    lep_emIso = leptons_emIso.at(selectIt_lep);
-    lep_hadIso = leptons_hadIso.at(selectIt_lep);
-    lep_lipSig = leptons_lipSig.at(selectIt_lep);
-    lep_tipSig = leptons_tipSig.at(selectIt_lep);
-    lep_3DipSig = leptons_3DipSig.at(selectIt_lep);
-    lepWJJ_pt1 = lepWJ_pt.at(0);
-    lepWJJ_pt2 = lepWJ_pt.at(1);
-    lepWJJ_pt3 = lepWJ_pt.at(2);    
-    met_et = met.Et();
-    lepMetW_Dphi = deltaPhi(lepMet.phi(), jet12_W.phi());
-    lepMet_mt = sqrt( lepton.mass()*lepton.mass() + 2.*lepton.pt()*met.pt()*(1-cos(deltaPhi(lepton.phi(), met.phi()))));    
-    lepMetW_mt = sqrt( lepW.mass()*lepW.mass() + 2.*lepW.pt()*met.pt()*(1-cos(deltaPhi(lepW.phi(), met.phi()))));
-    nOtherJets_et15 = (int)(otherJets_et15.size());
-    nOtherJets_et20 = (int)(otherJets_et20.size());
-    nOtherJets_et25 = (int)(otherJets_et25.size());
-    nOtherJets_et30 = (int)(otherJets_et30.size());        
-    nCentralJets_et15 = (int)(centralJets_et15.size());
-    nCentralJets_et20 = (int)(centralJets_et20.size());
-    nCentralJets_et25 = (int)(centralJets_et25.size());
-    nCentralJets_et30 = (int)(centralJets_et30.size());
     
     
     
@@ -1136,6 +1229,71 @@ int main(int argc, char** argv)
     
     
     
+    
+    
+    
+    //***********************
+    // CUT VARIABLES FOR TREE
+    
+    tagJJ_Deta   = deltaEta(jet1_tag.eta(), jet2_tag.eta());
+    tagJJ_etaProd =jet1_tag.eta()*jet2_tag.eta();
+    tagJJ_m      = jet12_tag.mass();
+    tagJJ_max_e = std::max(jet1_tag.energy(), jet2_tag.energy());
+    tagJJ_min_e = std::min(jet1_tag.energy(), jet2_tag.energy());
+    tagJJ_max_et = std::max(jet1_tag.Et(), jet2_tag.Et());
+    tagJJ_min_et = std::min(jet1_tag.Et(), jet2_tag.Et());
+    tagJJ_max_eta = fabs(jet1_tag.eta()) > fabs(jet2_tag.eta()) ? jet1_tag.eta() : jet2_tag.eta();
+    tagJJ_min_eta = fabs(jet1_tag.eta()) < fabs(jet2_tag.eta()) ? jet1_tag.eta() : jet2_tag.eta();
+    tagJ1_bTag = jet1_tag_bTag;
+    tagJ2_bTag = jet2_tag_bTag;
+    WJJ_pt       = jet12_W.pt();
+    WJJ_eta      = jet12_W.eta();
+    WJJ_zepp     = jet12_W_zepp;
+    WJJ_Deta     = deltaEta(jet1_W.eta(), jet2_W.eta());
+    WJJ_Dphi     = deltaPhi(jet1_W.phi(), jet2_W.phi());
+    WJJ_DR       = deltaR(jet1_W.eta(), jet1_W.phi(), jet2_W.eta(), jet2_W.phi());
+    WJJ_etaProd  = jet1_W.eta()*jet2_W.eta();
+    WJJ_m        = jet12_W.mass();
+    WJJ_max_et   = std::max(jet1_W.Et(), jet2_W.Et());
+    WJJ_min_et   = std::min(jet1_W.Et(), jet2_W.Et());
+    WJJ_max_eta  = fabs(jet1_W.eta()) > fabs(jet2_W.eta()) ? jet1_W.eta() : jet2_W.eta();
+    WJJ_min_eta  = fabs(jet1_W.eta()) < fabs(jet2_W.eta()) ? jet1_W.eta() : jet2_W.eta();
+    WJJ_max_zepp = fabs(jet1_W_zepp) > fabs(jet2_W_zepp) ? fabs(jet1_W_zepp) : fabs(jet2_W_zepp);
+    WJJ_min_zepp = fabs(jet1_W_zepp) < fabs(jet2_W_zepp) ? fabs(jet1_W_zepp) : fabs(jet2_W_zepp);
+    WJ1_bTag = jet1_W_bTag;
+    WJ2_bTag = jet2_W_bTag;
+    lep_n = leptons.size();
+    lep_pt = lepton.pt();
+    lep_eta = lepton.eta();
+    lep_eleId = 1.;
+    lep_zepp = (lepton.eta() - avgEta_tag)/absDeta_tag;    
+    lep_tkIso = leptons_tkIso.at(selectIt_lep);
+    lep_emIso = leptons_emIso.at(selectIt_lep);
+    lep_hadIso = leptons_hadIso.at(selectIt_lep);
+    lep_lipSig = leptons_lipSig.at(selectIt_lep);
+    lep_tipSig = leptons_tipSig.at(selectIt_lep);
+    lep_3DipSig = leptons_3DipSig.at(selectIt_lep);
+    lepWJJ_pt1 = lepWJ_pt.at(0);
+    lepWJJ_pt2 = lepWJ_pt.at(1);
+    lepWJJ_pt3 = lepWJ_pt.at(2);    
+    met_et = met.Et();
+    lepMetW_Dphi = deltaPhi(lepMet.phi(), jet12_W.phi());
+    lepMet_mt = sqrt( lepton.mass()*lepton.mass() + 2.*lepton.pt()*met.pt()*(1-cos(deltaPhi(lepton.phi(), met.phi()))));    
+    lepMetW_mt = sqrt( lepW.mass()*lepW.mass() + 2.*lepW.pt()*met.pt()*(1-cos(deltaPhi(lepW.phi(), met.phi()))));
+    nOtherJets_et15 = (int)(otherJets_et15.size());
+    nOtherJets_et20 = (int)(otherJets_et20.size());
+    nOtherJets_et25 = (int)(otherJets_et25.size());
+    nOtherJets_et30 = (int)(otherJets_et30.size());        
+    nCentralJets_et15 = (int)(centralJets_et15.size());
+    nCentralJets_et20 = (int)(centralJets_et20.size());
+    nCentralJets_et25 = (int)(centralJets_et25.size());
+    nCentralJets_et30 = (int)(centralJets_et30.size());
+    
+    
+    
+    
+    
+    
     // fill distributions
     stepEvents[step] += 1;
 
@@ -1144,21 +1302,28 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
     histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
     histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass()); 
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
-    }
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
+   }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1196,31 +1361,23 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    controlRegion_lepMetW_Dphi_vs_tagJJ_Deta -> Fill(deltaEta(jet1_tag.eta(), jet2_tag.eta()), deltaPhi(lepMet.phi(), jet12_W.phi()));
-    
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
     
     
     
     
     
     
-    //*********************************
-    // STEP 4 - Initial cuts - tag jets
+    //**********************************
+    // STEP 6 - Initial cuts - lepton mt
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "4) tag jet cuts";
+    stepName[step] = "6) lepton mt";
     
-    if( deltaEta(jet1_tag.eta(), jet2_tag.eta()) < tagJetDetaMIN ) continue;
-    if( jet12_tag.mass() < tagJetMjjMIN ) continue;
-    if( jet1_tag.Et() < tagJet1EtMIN ) continue;
-    if( jet1_tag.Et() > tagJet1EtMAX ) continue;    
-    if( jet2_tag.Et() < tagJet2EtMIN ) continue;
-    if( jet2_tag.Et() > tagJet2EtMAX ) continue;
+    if( (lepMet_mt < lepMetMtMIN) || (lepMet_mt > lepMetMtMAX) ) continue;
     
     
-    
-    // fill distributions
+        // fill distributions
     stepEvents[step] += 1;
 
     histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());
@@ -1228,21 +1385,28 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
     histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
     histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1280,7 +1444,186 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //**********************************
+    // STEP 7 - Initial cuts - b-tagging
+    step += 1;
+    //std::cout << ">>> step: " << step << std::endl;
+    stepName[step] = "7) b-tagging";
+    
+    //if( jet1_tag_bTag > tagJetBTagMAX ) continue; 
+    //if( jet2_tag_bTag > tagJetBTagMAX ) continue;
+    //if( jet1_W_bTag > WJetBTagMAX ) continue; 
+    //if( jet2_W_bTag > WJetBTagMAX ) continue;
+    if( tagWJ_bTag.at(0) > 4. ) continue;
+    if( tagWJ_bTag.at(1) > 3. ) continue;
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    
+    histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());    
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
+    
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    
+    histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
+    histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
+    
+    if(leptonFlavours.at(selectIt_lep) == "electron")
+    {
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
+    }
+    if(leptonFlavours.at(selectIt_lep) == "muon")
+    {
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
+    }
+    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
+    histograms -> Fill("tagWJ_et1", step, tagWJ_et.at(0));
+    histograms -> Fill("tagWJ_et2", step, tagWJ_et.at(1));
+    histograms -> Fill("tagWJ_et3", step, tagWJ_et.at(2));
+    histograms -> Fill("tagWJ_et4", step, tagWJ_et.at(3));
+    histograms -> Fill("lepWJ_pt1", step, lepWJ_pt.at(0));
+    histograms -> Fill("lepWJ_pt2", step, lepWJ_pt.at(1));
+    histograms -> Fill("lepWJ_pt3", step, lepWJ_pt.at(2));
+    
+    histograms2 -> Fill("lepWJ_pt1_vs_tagJJ_pt", step, jet12_tag.pt(), lepWJ_pt.at(0));
+    
+    histograms -> Fill("lepMet_mt", step, lepMet_mt);
+    histograms -> Fill("lepMetW_mt", step, lepMetW_mt);
+    
+    histograms -> Fill("TMVA_kBDT",  step, bestMvaValue);
+    
+    
+    stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
+    stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step, &eta1_tag, &eta2_tag);
+    stdHistograms -> Fill1(jets, "allJ", step);
+    stdHistograms -> Fill1(met, "met", step);
+    stdHistograms -> Fill1(lepton, "lep", step, &eta1_tag, &eta2_tag);
+    stdHistograms -> Fill2(lepton, met, "lepMet", step, &eta1_tag, &eta2_tag);
+    stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step, &eta1_tag, &eta2_tag);
+    stdHistograms -> Fill1(otherJets_et15, "otherJ_et15", step);
+    stdHistograms -> Fill1(otherJets_et20, "otherJ_et20", step);
+    stdHistograms -> Fill1(otherJets_et25, "otherJ_et25", step);
+    stdHistograms -> Fill1(otherJets_et30, "otherJ_et30", step);
+    stdHistograms -> Fill1(centralJets_et15, "centralJ_et15", step);    
+    stdHistograms -> Fill1(centralJets_et20, "centralJ_et20", step);
+    stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
+    stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
+    
+    tree[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //*********************************
+    // STEP 8 - Initial cuts - tag jets
+    step += 1;
+    //std::cout << ">>> step: " << step << std::endl;
+    stepName[step] = "8) tag jet cuts";
+    
+    if( deltaEta(jet1_tag.eta(), jet2_tag.eta()) < tagJetDetaMIN ) continue;
+    if( jet12_tag.mass() < tagJetMjjMIN ) continue;
+    if( jet1_tag.Et() < tagJet1EtMIN ) continue;
+    if( jet1_tag.Et() > tagJet1EtMAX ) continue;    
+    if( jet2_tag.Et() < tagJet2EtMIN ) continue;
+    if( jet2_tag.Et() > tagJet2EtMAX ) continue;
+    
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+
+    histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());
+    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
+    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
+    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
+    
+    histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
+    histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
+    
+    if(leptonFlavours.at(selectIt_lep) == "electron")
+    {
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
+    }
+    if(leptonFlavours.at(selectIt_lep) == "muon")
+    {
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
+    }
+    
+    histograms -> Fill("lep_lipSig", step, lep_lipSig);
+    histograms -> Fill("lep_tipSig", step, lep_tipSig);
+    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
+    
+    histograms -> Fill("tagWJ_et1", step, tagWJ_et.at(0));
+    histograms -> Fill("tagWJ_et2", step, tagWJ_et.at(1));
+    histograms -> Fill("tagWJ_et3", step, tagWJ_et.at(2));
+    histograms -> Fill("tagWJ_et4", step, tagWJ_et.at(3));
+    histograms -> Fill("lepWJ_pt1", step, lepWJ_pt.at(2));
+    histograms -> Fill("lepWJ_pt2", step, lepWJ_pt.at(1));
+    histograms -> Fill("lepWJ_pt3", step, lepWJ_pt.at(0));
+    histograms2 -> Fill("lepWJ_pt1_vs_tagJJ_pt", step, jet12_tag.pt(), lepWJ_pt.at(0));
+    
+    histograms -> Fill("lepMet_mt", step, lepMet_mt);
+    histograms -> Fill("lepMetW_mt", step, lepMetW_mt);
+    
+    histograms -> Fill("TMVA_kBDT",  step, bestMvaValue);
+    
+    
+    stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
+    stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step, &eta1_tag, &eta2_tag);
+    stdHistograms -> Fill1(jets, "allJ", step);
+    stdHistograms -> Fill1(met, "met", step);
+    stdHistograms -> Fill1(lepton, "lep", step, &eta1_tag, &eta2_tag);
+    stdHistograms -> Fill2(lepton, met, "lepMet", step, &eta1_tag, &eta2_tag);
+    stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step, &eta1_tag, &eta2_tag);
+    stdHistograms -> Fill1(otherJets_et15, "otherJ_et15", step);
+    stdHistograms -> Fill1(otherJets_et20, "otherJ_et20", step);
+    stdHistograms -> Fill1(otherJets_et25, "otherJ_et25", step);
+    stdHistograms -> Fill1(otherJets_et30, "otherJ_et30", step);
+    stdHistograms -> Fill1(centralJets_et15, "centralJ_et15", step);    
+    stdHistograms -> Fill1(centralJets_et20, "centralJ_et20", step);
+    stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
+    stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
+    
+    tree[step] -> Fill();
     
     
     
@@ -1288,10 +1631,10 @@ int main(int argc, char** argv)
     
     
     //*******************************
-    // STEP 5 - Initial cuts - W jets
+    // STEP 9 - Initial cuts - W jets
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "5) W jet cuts";
+    stepName[step] = "9) W jet cuts";
     
     if( jet12_W.mass() < WJetMjjMIN ) continue;
     if( jet12_W.mass() > WJetMjjMAX ) continue;
@@ -1310,21 +1653,28 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());
     histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1362,7 +1712,7 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
     
     
     
@@ -1370,10 +1720,10 @@ int main(int argc, char** argv)
     
     
     //*******************************
-    // STEP 6 - Initial cuts - CJV
+    // STEP 10 - Initial cuts - CJV
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "6) CJV";
+    stepName[step] = "10) CJV";
     
     if(centralJets_et25.size() > 0) continue;
     
@@ -1384,21 +1734,28 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());    
     histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1436,7 +1793,7 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
     
     
     
@@ -1444,21 +1801,15 @@ int main(int argc, char** argv)
     
     
     //*******************************
-    // STEP 7 - Initial cuts - lepton
+    // STEP 11 - Initial cuts - lepton
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "7) lepton cuts";
+    stepName[step] = "11) lepton cuts";
     
-    if( leptons.size() > 1 ) continue;
-    if( lepton.pt() < lepPtMIN ) continue;
-    if( lepton.pt() > lepPtMAX ) continue;
-    if( leptons_tkIso.at(selectIt_lep) / lepton.pt() > lepTkIsoOverPtMAX) continue;
-    if( (leptonFlavours.at(selectIt_lep) == "electron") &&
-        (leptons_eleIdRobustTight.at(selectIt_lep) < eleIdValueMIN) ) continue;
     if( fabs(lep_zepp) > lepZeppMAX ) continue;
-    if( lep_tipSig > lepTipSigMAX ) continue; 
+    //if( lep_tipSig > lepTipSigMAX ) continue; 
     if( fabs(lepton.eta()) > lepAbsEtaMAX) continue;
-    if( (lepMet_mt < lepMetMtMIN) || (lepMet_mt > lepMetMtMAX) ) continue;
+    //if( (lepMet_mt < lepMetMtMIN) || (lepMet_mt > lepMetMtMAX) ) continue;
     
     
     // fill distributions
@@ -1467,21 +1818,28 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());
     histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1520,7 +1878,7 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
     
     
     
@@ -1528,92 +1886,10 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 8 - Initial cuts - b-tagging
+    // STEP 12 - Initial cuts - met
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "8) b-tagging";
-    
-    if( jet1_tag_bTag > tagJetBTagMAX ) continue; 
-    if( jet2_tag_bTag > tagJetBTagMAX ) continue;
-    if( jet1_W_bTag > WJetBTagMAX ) continue; 
-    if( jet2_W_bTag > WJetBTagMAX ) continue;
-    
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    
-    histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());    
-    histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
-    histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
-    
-    histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
-    histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
-    
-    histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
-    histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
-    
-    if(leptonFlavours.at(selectIt_lep) == "electron")
-    {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
-    }
-    if(leptonFlavours.at(selectIt_lep) == "muon")
-    {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
-    }
-    
-    histograms -> Fill("lep_lipSig", step, lep_lipSig);
-    histograms -> Fill("lep_tipSig", step, lep_tipSig);
-    histograms -> Fill("lep_3DipSig", step, lep_3DipSig);
-    
-    histograms -> Fill("tagWJ_et1", step, tagWJ_et.at(0));
-    histograms -> Fill("tagWJ_et2", step, tagWJ_et.at(1));
-    histograms -> Fill("tagWJ_et3", step, tagWJ_et.at(2));
-    histograms -> Fill("tagWJ_et4", step, tagWJ_et.at(3));
-    histograms -> Fill("lepWJ_pt1", step, lepWJ_pt.at(0));
-    histograms -> Fill("lepWJ_pt2", step, lepWJ_pt.at(1));
-    histograms -> Fill("lepWJ_pt3", step, lepWJ_pt.at(2));
-    
-    histograms2 -> Fill("lepWJ_pt1_vs_tagJJ_pt", step, jet12_tag.pt(), lepWJ_pt.at(0));
-    
-    histograms -> Fill("lepMet_mt", step, lepMet_mt);
-    histograms -> Fill("lepMetW_mt", step, lepMetW_mt);
-    
-    histograms -> Fill("TMVA_kBDT",  step, bestMvaValue);
-    
-    
-    stdHistograms -> Fill2(jet1_tag, jet2_tag, "tagJJ", step);
-    stdHistograms -> Fill2(jet1_W, jet2_W, "WJJ", step, &eta1_tag, &eta2_tag);
-    stdHistograms -> Fill1(jets, "allJ", step);
-    stdHistograms -> Fill1(met, "met", step);
-    stdHistograms -> Fill1(lepton, "lep", step, &eta1_tag, &eta2_tag);
-    stdHistograms -> Fill2(lepton, met, "lepMet", step, &eta1_tag, &eta2_tag);
-    stdHistograms -> Fill2(lepMet, jet12_W, "lepMetW", step, &eta1_tag, &eta2_tag);
-    stdHistograms -> Fill1(otherJets_et15, "otherJ_et15", step);
-    stdHistograms -> Fill1(otherJets_et20, "otherJ_et20", step);
-    stdHistograms -> Fill1(otherJets_et25, "otherJ_et25", step);
-    stdHistograms -> Fill1(otherJets_et30, "otherJ_et30", step);
-    stdHistograms -> Fill1(centralJets_et15, "centralJ_et15", step);    
-    stdHistograms -> Fill1(centralJets_et20, "centralJ_et20", step);
-    stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
-    stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
-    
-    tree.at(step) -> Fill();
-    
-    
-    
-    
-    
-    
-    //**********************************
-    // STEP 9 - Initial cuts - met
-    step += 1;
-    //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "9) met";
+    stepName[step] = "12) met";
     
     if( met.Et() < metEtMIN ) continue; 
     if( met.Et() > metEtMAX ) continue;    
@@ -1626,24 +1902,31 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());    
     histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
     
     histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
     histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1682,7 +1965,7 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
     
     
     
@@ -1690,10 +1973,10 @@ int main(int argc, char** argv)
     
     
     //***************************************
-    // STEP 10 - Initial cuts - lepMet - W cut
+    // STEP 13 - Initial cuts - lepMet - W cut
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "10) lepMet-W Dphi";
+    stepName[step] = "13) lepMet-W Dphi";
     
     if( deltaPhi(lepMet.phi(), jet12_W.phi()) > lepMet_W_DphiMAX ) continue;
     
@@ -1704,21 +1987,28 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_etaProd", step, jet1_tag.eta()*jet2_tag.eta());    
     histograms -> Fill("tagJJ_bTag", step, jet1_tag_bTag);
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1757,7 +2047,7 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
     
     
     
@@ -1765,10 +2055,10 @@ int main(int argc, char** argv)
     
     
     //*******************************
-    // STEP 11 - Initial cuts - pt max
+    // STEP 14 - Initial cuts - pt max
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "11) pt max";
+    stepName[step] = "14) pt max";
     
     if( lepWJ_pt.at(0) < ptMaxMIN ) continue;
     if( tagWJ_et.at(0) < tagWJetEt1MIN ) continue;
@@ -1785,21 +2075,28 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
     histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
     histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1838,7 +2135,7 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
     
     
     
@@ -1846,10 +2143,10 @@ int main(int argc, char** argv)
     
     
     ////*******************************
-    //// STEP 12 - Initial cuts - rapGap
+    //// STEP 14 - Initial cuts - rapGap
     //step += 1;
-    ////std::cout << ">>> step: " << step << std::endl;
-    //stepName[step] = "12) rapGap";
+    //////std::cout << ">>> step: " << step << std::endl;
+    //stepName[step] = "14) rapGap";
     //
     //if( std::min(lep_etaGap1, lep_etaGap2) < lepEtaGapMIN ) continue;
     //
@@ -1863,21 +2160,28 @@ int main(int argc, char** argv)
     //histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
     //histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
     //histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    //histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    //histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    //histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    //histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    //histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    //histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    //histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     //
     //histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     //histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
     //
     //if(leptonFlavours.at(selectIt_lep) == "electron")
     //{
-    //  histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-    //  histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-    //  histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+    //  histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+    //  histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+    //  histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     //}
     //if(leptonFlavours.at(selectIt_lep) == "muon")
     //{
-    //  histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-    //  histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-    //  histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+    //  histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+    //  histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+    //  histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     //}
     //
     //histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1916,7 +2220,7 @@ int main(int argc, char** argv)
     //stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     //stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     //
-    //tree.at(step) -> Fill();
+    //tree[step] -> Fill();
     
     
     
@@ -1924,10 +2228,10 @@ int main(int argc, char** argv)
     
     
     //**********************************************
-    // STEP 12 - Initial cuts - higgs transverse mass
+    // STEP 15 - Initial cuts - higgs transverse mass
     step += 1;
     //std::cout << ">>> step: " << step << std::endl;
-    stepName[step] = "12) Higgs m2";
+    stepName[step] = "15) Higgs mt";
     
     if( lepMetW_mt < lepMetWMtMIN ) continue;
     if( lepMetW_mt > lepMetWMtMAX ) continue;
@@ -1941,21 +2245,28 @@ int main(int argc, char** argv)
     histograms -> Fill("tagJJ_bTag", step, jet2_tag_bTag);
     histograms -> Fill("WJJ_bTag", step, jet1_W_bTag);
     histograms -> Fill("WJJ_bTag", step, jet2_W_bTag);
+    histograms -> Fill("tagJJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag);  
+    histograms -> Fill("WJJ_bTagSum", step, jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTagSum", step, jet1_tag_bTag+jet2_tag_bTag+jet1_W_bTag+jet2_W_bTag);
+    histograms -> Fill("tagWJ_bTag1", step, tagWJ_bTag.at(0));
+    histograms -> Fill("tagWJ_bTag2", step, tagWJ_bTag.at(1));
+    histograms -> Fill("tagWJ_bTag3", step, tagWJ_bTag.at(2));
+    histograms -> Fill("tagWJ_bTag4", step, tagWJ_bTag.at(3));
     
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_W.eta(),   jet2_W.eta()),   (jet1_W+jet2_W).mass()); 
     histograms2 -> Fill("tagWJJ_m_vs_Deta", step, deltaEta(jet1_tag.eta(), jet2_tag.eta()), (jet1_tag+jet2_tag).mass());
     
     if(leptonFlavours.at(selectIt_lep) == "electron")
     {
-      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("ele_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("ele_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("ele_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     if(leptonFlavours.at(selectIt_lep) == "muon")
     {
-      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep)/lepton.pt());        
-      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep)/lepton.Et());
-      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep)/lepton.Et());
+      histograms -> Fill("mu_tkIso", step, leptons_tkIso.at(selectIt_lep));        
+      histograms -> Fill("mu_emIso", step, leptons_emIso.at(selectIt_lep));
+      histograms -> Fill("mu_hadIso", step, leptons_hadIso.at(selectIt_lep));
     }
     
     histograms -> Fill("lep_lipSig", step, lep_lipSig);
@@ -1994,7 +2305,7 @@ int main(int argc, char** argv)
     stdHistograms -> Fill1(centralJets_et25, "centralJ_et25", step);
     stdHistograms -> Fill1(centralJets_et30, "centralJ_et30", step);
     
-    tree.at(step) -> Fill();
+    tree[step] -> Fill();
     
     
     
@@ -2006,13 +2317,13 @@ int main(int argc, char** argv)
   
   
   // save tree
-  for(step = 0; step < nStep; ++step)
-    tree.at(step) -> Write();
+  for(step = 1; step <= nStep; ++step)
+    tree[step] -> Write();
   
-  for(step = 0; step < nStep; ++step)
+  for(step = 1; step <= nStep; ++step)
   {
-    treeEvents.at(step) -> Fill();
-    treeEvents.at(step) -> Write();
+    treeEvents[step] -> Fill();
+    treeEvents[step] -> Write();
   }  
   
   outputTreeFile -> Close();
@@ -2024,17 +2335,15 @@ int main(int argc, char** argv)
   TFile* outputRootFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
   outputRootFile -> cd();
   
-  for(step = 0; step < nStep; ++step)
+  for(step = 1; step <= nStep; ++step)
   {
-    events -> SetBinContent(step+1, stepEvents[step]);
-    events -> GetXaxis() -> SetBinLabel(step+1, stepName[step].c_str());
+    events -> SetBinContent(step, stepEvents[step]);
+    events -> GetXaxis() -> SetBinLabel(step, stepName[step].c_str());
   }
   
   events -> Write();
   purity_tag -> Write();
   purity_W -> Write();
-  
-  controlRegion_lepMetW_Dphi_vs_tagJJ_Deta -> Write();
   
   outputRootFile -> Close(); 
   

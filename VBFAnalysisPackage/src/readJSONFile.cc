@@ -80,3 +80,32 @@ std::map<int, std::vector<std::pair<int, int> > >
   
   return jsonMap;
 }
+
+
+
+
+
+
+bool AcceptEventByRunAndLumiSection(const int& runId, const int& lumiId,
+                                    std::map<int, std::vector<std::pair<int, int> > >& jsonMap)
+{
+  // select by runId
+  if( jsonMap.find(runId) == jsonMap.end() ) return false;
+  
+  
+  
+  // select by lumiId
+  std::vector<std::pair<int, int> > lumisections = jsonMap[runId];
+  
+  int skipEvent = true;
+  for(unsigned int i = 0; i < lumisections.size(); ++i)
+    if( (lumiId >= lumisections.at(i).first) &&
+        (lumiId <= lumisections.at(i).second) )
+      skipEvent = false;
+  
+  if( skipEvent == true ) return false;
+  
+  
+  return true;
+}
+  

@@ -36,7 +36,7 @@ $OUTPUTSaveDir         = $User_Preferences{"OUTPUTSaveDir"};
 
 $SELECTIONSCfgTemplate = $BASEDir."/".$SELECTIONSCfgTemplate;
 $SAMPLESListFile       = $BASEDir."/".$SAMPLESListFile;
-$SAMPLESDir            = $BASEDir."/".$SAMPLESDir;
+#$SAMPLESDir            = $BASEDir."/".$SAMPLESDir;
 $OUTPUTSaveDir         = $BASEDir."/".$OUTPUTSaveDir;
 
 print "BASEDir = "          .$BASEDir."\n" ;
@@ -76,12 +76,14 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$mH,$crossSection) = split(" ") ;
+  ($sample,$sampleName,$dataFlag,$mH,$crossSection) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
     next;
   }
+  
+  print("Sample: ".$sample."\n") ;
   
   print("sample = ".$sample."   name = ".$sampleName."   crossSection = ".$crossSection."\n");
   $sampleDir = $OUTPUTSaveDir.$sample."/";
@@ -105,7 +107,7 @@ while(<SAMPLESListFile>)
   
   
   #print INPUTFILELIST $SAMPLESDir.$sample."/VBFHiggsToWWTolnujjPreselection_all_".$JETAlgorithm.".root\n";
-  print INPUTFILELIST $SAMPLESDir.$sample."/VBFPreselection_all.root\n";
+  print INPUTFILELIST $SAMPLESDir.$sample."/Collisions7TeVPreselection_all_".$JETAlgorithm.".root\n";
   print("inputFileList = ".$inputFileList."\n");
   
   

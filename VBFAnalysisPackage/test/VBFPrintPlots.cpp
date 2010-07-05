@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   std::string outputDir = gConfigParser -> readStringOption("Output::outputDir");
 
   int step = gConfigParser -> readIntOption("Options::step");  
-  //float lumi = gConfigParser -> readFloatOption("Options::lumi");
+  float lumi = gConfigParser -> readFloatOption("Options::lumi");
   
   
   
@@ -51,6 +51,8 @@ int main(int argc, char** argv)
   drawTStack* stack = new drawTStack(inputDir, "listOfSamplesAndCrossSections.txt", "VBFHiggsToWWTolnujjAnalysis", outputDir);
   
   std::string histoName;
+  std::vector<std::string> histoNames;
+  histoNames.push_back("");
   
   
   
@@ -61,62 +63,67 @@ int main(int argc, char** argv)
   // tag jets
   //---------------------------------------------  
   
-  histoName = "tagJJ_m";
+  histoNames.at(0) = "tagJJ_m";
   stack -> SetXaxisRange(0., 3000.);
   stack -> SetXaxisTitle("m_{jj tag}");
-  stack -> Draw(histoName, step, 20., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 20., false);
   
-  histoName = "tagJJ_Deta";
+  histoNames.at(0) = "tagJJ_Deta";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("#Delta#eta_{jj tag}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
 
-  histoName = "tagJJ_etaProd";
+  histoNames.at(0) = "tagJJ_etaProd";
   stack -> SetXaxisRange(-25., 25.);
   stack -> SetXaxisTitle("#etaProd_{jj tag}");
-  stack -> Draw(histoName, step, 20., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 20., false);
     
-  histoName = "tagJJ_Dphi";
+  histoNames.at(0) = "tagJJ_Dphi";
   stack -> SetXaxisRange(0., 3.);
   stack -> SetXaxisTitle("#Delta#phi_{jj tag}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "tagJJ_max_absEta";
+  histoNames.at(0) = "tagJJ_max_absEta";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("|#eta_{tag j}| max");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "tagJJ_min_absEta";
+  histoNames.at(0) = "tagJJ_min_absEta";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("|#eta_{tag j}| min");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "tagJJ_max_et";
+  histoNames.at(0) = "tagJJ_max_et";
   stack -> SetXaxisRange(0., 400.);
   stack -> SetXaxisTitle("et_{j tag} max");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "tagJJ_min_et";
+  histoNames.at(0) = "tagJJ_min_et";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("et_{j tag} min");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "tagJJ_max_e";
+  histoNames.at(0) = "tagJJ_max_e";
   stack -> SetXaxisRange(0., 2000.);
   stack -> SetXaxisTitle("e_{j tag} max");
-  stack -> Draw(histoName, step, 20., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 20., false);
   
-  histoName = "tagJJ_min_e";
+  histoNames.at(0) = "tagJJ_min_e";
   stack -> SetXaxisRange(0., 1000.);
   stack -> SetXaxisTitle("e_{j tag} min");
-  stack -> Draw(histoName, step, 10., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10., false);
   
-  histoName = "tagJJ_bTag";
+  histoNames.at(0) = "tagJJ_bTag";
   stack -> SetXaxisTitle("b-tag");
   stack -> SetXaxisRange(-10., 30.);
   stack -> SetXaxisTitle("btag_{j tag}");
-  stack -> Draw(histoName, step, 5, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, true);
   
+//  histoNames.at(0) = "tagJJ_bTagSum";
+//  stack -> SetXaxisTitle("b-tag");
+//  stack -> SetXaxisRange(-10., 30.);
+//  stack -> SetXaxisTitle("sum btag_{j tag}");
+//  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, true);
   
   
   
@@ -132,88 +139,92 @@ int main(int argc, char** argv)
   // Wjets
   //---------------------------------------------  
   
-  histoName = "WJJ_m";
+  histoNames.at(0) = "WJJ_m";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("m_{Wjj}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "WJJ_et";
+  histoNames.at(0) = "WJJ_et";
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("et_{Wjj}");
-  stack -> Draw(histoName, step, 5, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, false);
   
-  histoName = "WJJ_absEta";
+  histoNames.at(0) = "WJJ_absEta";
   stack -> SetXaxisRange(-5., 5.);
   stack -> SetXaxisTitle("|#eta_{Wjj}|");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "WJJ_zepp";
+  histoNames.at(0) = "WJJ_zepp";
   stack -> SetXaxisRange(0., 2.);
   stack -> SetXaxisTitle("z_{Wjj}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "WJJ_Dphi";
+  histoNames.at(0) = "WJJ_Dphi";
   stack -> SetXaxisRange(0., 3.);
   stack -> SetXaxisTitle("#Delta#phi_{Wjj}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "WJJ_Deta";
+  histoNames.at(0) = "WJJ_Deta";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("#Delta#eta_{Wjj}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "WJJ_DR";
+  histoNames.at(0) = "WJJ_DR";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("#DeltaR_{Wjj}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
   
   
-  histoName = "WJJ_max_et";
+  histoNames.at(0) = "WJJ_max_et";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("et_{Wj} max");
-  stack -> Draw(histoName, step, 5, false);  
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, false);  
   
-  histoName = "WJJ_min_et";
+  histoNames.at(0) = "WJJ_min_et";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("et_{Wj} min");
-  stack -> Draw(histoName, step, 5, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, false);
   
-  histoName = "WJJ_max_e";
+  histoNames.at(0) = "WJJ_max_e";
   stack -> SetXaxisRange(0., 2000.);
   stack -> SetXaxisTitle("e_{Wj} max");
-  stack -> Draw(histoName, step, 20, false);  
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 20, false);  
   
-  histoName = "WJJ_min_e";
+  histoNames.at(0) = "WJJ_min_e";
   stack -> SetXaxisRange(0., 1000.);
   stack -> SetXaxisTitle("e_{Wj} min");
-  stack -> Draw(histoName, step, 10, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10, false);
   
-  histoName = "WJJ_max_absEta";
+  histoNames.at(0) = "WJJ_max_absEta";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("|#eta_{Wj}| max");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "WJJ_min_absEta";
+  histoNames.at(0) = "WJJ_min_absEta";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("|#eta_{Wj}| min");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "WJJ_max_zepp";
+  histoNames.at(0) = "WJJ_max_zepp";
   stack -> SetXaxisRange(0., 2.);
   stack -> SetXaxisTitle("z_{Wj} max");
-  stack -> Draw(histoName, step, 5, false);  
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, false);  
   
-  histoName = "WJJ_min_zepp";
+  histoNames.at(0) = "WJJ_min_zepp";
   stack -> SetXaxisRange(0., 2.);
   stack -> SetXaxisTitle("z_{Wj} min");
-  stack -> Draw(histoName, step, 5, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, false);
   
-  histoName = "WJJ_bTag";
+  histoNames.at(0) = "WJJ_bTag";
   stack -> SetXaxisRange(-10., 30.);
   stack -> SetXaxisTitle("b-tag_{W j}");
-  stack -> Draw(histoName, step, 5, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, true);
   
+//  histoNames.at(0) = "WJJ_bTagSum";
+//  stack -> SetXaxisRange(-10., 30.);
+//  stack -> SetXaxisTitle("sum b-tag_{W j}");
+//  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, true);
   
   
   
@@ -229,74 +240,74 @@ int main(int argc, char** argv)
   // Lepton
   //---------------------------------------------  
   
-  histoName = "lep_pt";
+  histoNames.at(0) = "lep_pt";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("pt_{lep}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "lep_absEta";
+  histoNames.at(0) = "lep_absEta";
   stack -> SetXaxisRange(0., 3.);
   stack -> SetXaxisTitle("|#eta_{lep}|");
-  stack -> Draw(histoName, step, 2., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 2., false);
   
-  histoName = "lep_zepp";
+  histoNames.at(0) = "lep_zepp";
   stack -> SetXaxisRange(0., 1.);
   stack -> SetXaxisTitle("z_{lep}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "lep_etaGap_min";
+  histoNames.at(0) = "lep_etaGap_min";
   stack -> SetXaxisRange(0., 5.);
   stack -> SetXaxisTitle("#eta gap_{lep}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "lep_etaGap_max";
+  histoNames.at(0) = "lep_etaGap_max";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("#eta gap_{lep}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "lepMet_mt";
+  histoNames.at(0) = "lepMet_mt";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("mt_{lep+met}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
-  histoName = "lepMet_Dphi";
+  histoNames.at(0) = "lepMet_Dphi";
   stack -> SetXaxisRange(0., 3.);
   stack -> SetXaxisTitle("#Delta#phi_{lep-met}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
   
   
-    histoName = "ele_tkIso";
+    histoNames.at(0) = "ele_tkIso";
   stack -> SetXaxisRange(0., 0.1);
   stack -> SetXaxisTitle("#Sigma pt_{tracks}/pt_{ele}");
-  stack -> Draw(histoName, step, 1., true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1., true);
   
-  histoName = "ele_emIso";
+  histoNames.at(0) = "ele_emIso";
   stack -> SetXaxisRange(0., 0.1);
   stack -> SetXaxisTitle("#Sigma et_{em}/et_{ele}");
-  stack -> Draw(histoName, step, 1., true);  
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1., true);  
   
-  histoName = "ele_hadIso";
+  histoNames.at(0) = "ele_hadIso";
   stack -> SetXaxisRange(0., 0.1);
   stack -> SetXaxisTitle("#Sigma et_{had}/et_{ele}");
-  stack -> Draw(histoName, step, 1., true);  
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1., true);  
   
   
   
-  histoName = "mu_tkIso";
+  histoNames.at(0) = "mu_tkIso";
   stack -> SetXaxisRange(0., 0.1);
   stack -> SetXaxisTitle("#Sigma pt_{tracks}/pt_{mu}");
-  stack -> Draw(histoName, step, 1., true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1., true);
   
-  histoName = "mu_emIso";
+  histoNames.at(0) = "mu_emIso";
   stack -> SetXaxisRange(0., 0.1);
   stack -> SetXaxisTitle("#Sigma et_{em}/et_{mu}");
-  stack -> Draw(histoName, step, 1., true);  
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1., true);  
   
-  histoName = "mu_hadIso";
+  histoNames.at(0) = "mu_hadIso";
   stack -> SetXaxisRange(0., 0.1);
   stack -> SetXaxisTitle("#Sigma et_{had}/et_{mu}");
-  stack -> Draw(histoName, step, 1., true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1., true);
   
   
   
@@ -313,10 +324,10 @@ int main(int argc, char** argv)
   // Met
   //---------------------------------------------
   
-  histoName = "met_et";
+  histoNames.at(0) = "met_et";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("et_{met}");
-  stack -> Draw(histoName, step, 5, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, false);
   
   
   
@@ -333,20 +344,20 @@ int main(int argc, char** argv)
   // Lepton + met + W
   //---------------------------------------------  
   
-  histoName = "lepMetW_mt";
+  histoNames.at(0) = "lepMetW_mt";
   stack -> SetXaxisRange(0., 1000.);
   stack -> SetXaxisTitle("mt_{lep+W+met}");
-  stack -> Draw(histoName, step, 10., false);
+  stack -> Draw(histoNames, "eventsScaled", lumi, step, 10., false);
   
-  histoName = "lepMetW_pt";
+  histoNames.at(0) = "lepMetW_pt";
   stack -> SetXaxisRange(0., 500.);
   stack -> SetXaxisTitle("pt_{lep+W+met}");
-  stack -> Draw(histoName, step, 5, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5, false);
   
-  histoName = "lepMetW_Dphi";
+  histoNames.at(0) = "lepMetW_Dphi";
   stack -> SetXaxisRange(0., 3.);
   stack -> SetXaxisTitle("#Delta#phi_{lep+met-W}");
-  stack -> Draw(histoName, step, 5., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 5., false);
   
   
   
@@ -367,41 +378,66 @@ int main(int argc, char** argv)
   // pt ordering
   //---------------------------------------------  
   
-  histoName = "tagWJ_et1";
+  histoNames.at(0) = "tagWJ_et1";
   stack -> SetXaxisRange(0., 200.);
-  stack -> Draw(histoName, step, 10, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10, false);
 
-  histoName = "tagWJ_et2";
+  histoNames.at(0) = "tagWJ_et2";
   stack -> SetXaxisRange(0., 200.);
-  stack -> Draw(histoName, step, 10, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10, false);
   
-  histoName = "tagWJ_et3";
+  histoNames.at(0) = "tagWJ_et3";
   stack -> SetXaxisRange(0., 200.);
-  stack -> Draw(histoName, step, 10, false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10, false);
   
-  histoName = "tagWJ_et4";
+  histoNames.at(0) = "tagWJ_et4";
   stack -> SetXaxisRange(0., 200.);
-  stack -> Draw(histoName, step, 10, false);  
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10, false);
+  
+//  histoNames.at(0) = "tagWJ_bTagSum";
+//  stack -> SetXaxisRange(-20., 50.);
+//  stack -> SetXaxisTitle("sum b-tag_{tag/W j}");
+//  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 2, true);
+//  
+  histoNames.at(0) = "tagWJ_bTag1";
+  stack -> SetXaxisRange(-10., 20.);
+  stack -> SetXaxisTitle("b-tag1_{tag/W j}");
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 2, true);
+  
+  histoNames.at(0) = "tagWJ_bTag2";
+  stack -> SetXaxisRange(-10., 20.);
+  stack -> SetXaxisTitle("b-tag2_{tag/W j}");
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 2, true);
+  
+  histoNames.at(0) = "tagWJ_bTag3";
+  stack -> SetXaxisRange(-10., 20.);
+  stack -> SetXaxisTitle("b-tag3_{tag/W j}");
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 2, true);
+
+  histoNames.at(0) = "tagWJ_bTag4";
+  stack -> SetXaxisRange(-10., 20.);
+  stack -> SetXaxisTitle("b-tag4_{tag/W j}");
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 2, true);  
   
   
   
   
   
   
-  histoName = "lepWJ_pt1";
+  histoNames.at(0) = "lepWJ_pt1";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("pt1_{lep-W}");
-  stack -> Draw(histoName, step, 10., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10., false);
 
-  histoName = "lepWJ_pt2";
+  histoNames.at(0) = "lepWJ_pt2";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("pt2_{lep-W}");
-  stack -> Draw(histoName, step, 10., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10., false);
   
-  histoName = "lepWJ_pt3";
+  histoNames.at(0) = "lepWJ_pt3";
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("pt3_{lep-W}");
-  stack -> Draw(histoName, step, 10., false);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 10., false);
   
   
   
@@ -418,45 +454,45 @@ int main(int argc, char** argv)
   // other jets
   //---------------------------------------------  
   
-  histoName = "otherJ_et30_n";
+  histoNames.at(0) = "otherJ_et30_n";
   stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
   
-  histoName = "otherJ_et25_n";
+  histoNames.at(0) = "otherJ_et25_n";
   stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
   
-  histoName = "otherJ_et20_n";
+  histoNames.at(0) = "otherJ_et20_n";
   stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
   
-  histoName = "otherJ_et15_n";
+  histoNames.at(0) = "otherJ_et15_n";
   stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
   
   
   
-  histoName = "centralJ_et30_n";
+  histoNames.at(0) = "centralJ_et30_n";
   stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
   
-  histoName = "centralJ_et25_n";
+  histoNames.at(0) = "centralJ_et25_n";
   stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
   
-  histoName = "centralJ_et20_n";
+  histoNames.at(0) = "centralJ_et20_n";
   stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
   
-  histoName = "centralJ_et15_n";
+  histoNames.at(0) = "centralJ_et15_n";
   stack -> SetXaxisRange(0., 10.);
-  stack -> Draw(histoName, step, 1, true);
+  stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
   
   
   
  // all jets
- //histoName = "allJ_n";
+ //histoNames.at(0) = "allJ_n";
  //stack -> SetXaxisRange(4., 10.);
  //stack -> SetXaxisTitle("jet multiplicity");
- //stack -> Draw(histoName, step, 1, true);
+ //stack -> Draw(histoNames, "sameAreaNoStack", lumi, step, 1, true);
 }
