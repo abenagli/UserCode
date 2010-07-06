@@ -127,6 +127,7 @@ int main(int argc, char** argv)
     //************************
     // STEP 3 - cut on leptons
     step = 3;
+    //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = ">= 1 lepton";
     
     int nLep = 0;
@@ -137,22 +138,48 @@ int main(int argc, char** argv)
         
     for(unsigned int eleIt = 0; eleIt < (reader.Get4V("electrons")->size()); ++eleIt)
     {
-      if( reader.Get4V("electrons")->at(eleIt).pt() < lepPtMIN ) continue;
-      ++nLep;
+      if( reader.Get4V("electrons")->at(eleIt).pt() < 10. ) continue;
+      
+      if( (reader.GetInt("electrons_isEB")->at(eleIt)) == 1 )
+      {      
+        if( (reader.GetFloat("electrons_tkIsoR03")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 0.15 ) continue;
+        if( (reader.GetFloat("electrons_emIsoR03")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 2.00 ) continue;
+        if( ( (reader.GetFloat("electrons_hadIsoR03_depth1")->at(eleIt)) +
+              (reader.GetFloat("electrons_hadIsoR03_depth2")->at(eleIt)) ) / reader.Get4V("electrons")->at(eleIt).pt() > 0.12 ) continue;
+        if( (reader.GetFloat("electrons_sigmaIetaIeta")->at(eleIt)) > 0.01 ) continue;
+        if( fabs((reader.GetFloat("electrons_deltaPhiIn")->at(eleIt))) > 0.08 ) continue;
+        if( fabs((reader.GetFloat("electrons_deltaEtaIn")->at(eleIt))) > 0.007 ) continue;
+        if( (reader.GetFloat("electrons_hOverE")->at(eleIt)) > 0.1 ) continue;
+      }
+      
+      else
+      {      
+        if( (reader.GetFloat("electrons_tkIsoR03")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 0.08 ) continue;
+        if( (reader.GetFloat("electrons_emIsoR03")->at(eleIt)) / reader.Get4V("electrons")->at(eleIt).pt() > 0.06 ) continue;
+        if( ( (reader.GetFloat("electrons_hadIsoR03_depth1")->at(eleIt)) +
+              (reader.GetFloat("electrons_hadIsoR03_depth2")->at(eleIt)) ) / reader.Get4V("electrons")->at(eleIt).pt() > 0.05 ) continue;
+        if( (reader.GetFloat("electrons_sigmaIetaIeta")->at(eleIt)) > 0.03 ) continue;
+        if( fabs((reader.GetFloat("electrons_deltaPhiIn")->at(eleIt))) > 0.07 ) continue;
+        if( fabs((reader.GetFloat("electrons_deltaEtaIn")->at(eleIt))) > 0.01 ) continue;
+        if( (reader.GetFloat("electrons_hOverE")->at(eleIt)) > 0.07 ) continue;
+      }
       
       electrons.push_back( reader.Get4V("electrons")->at(eleIt) );
-      leptons.push_back( reader.Get4V("electrons")->at(eleIt) );      
-      leptonFlavours.push_back("electron");
+      leptons.push_back( reader.Get4V("electrons")->at(eleIt) );
+      
+      if( reader.Get4V("electrons")->at(eleIt).pt() >= lepPtMIN )
+        ++nLep;
     }
     
     for(unsigned int muIt = 0; muIt < (reader.Get4V("muons")->size()); ++muIt)
     {
-      if( reader.Get4V("muons")->at(muIt).pt() < lepPtMIN ) continue;
-      ++nLep;
+      if( reader.Get4V("muons")->at(muIt).pt() < 10. ) continue;
       
       muons.push_back( reader.Get4V("muons")->at(muIt) );
-      leptons.push_back( reader.Get4V("muons")->at(muIt) );      
-      leptonFlavours.push_back("muon");
+      leptons.push_back( reader.Get4V("muons")->at(muIt) ); 
+      
+      if( reader.Get4V("muons")->at(muIt).pt() >= lepPtMIN )
+        ++nLep;
     }
     
     if( nLep < nLepMIN ) continue;
@@ -160,9 +187,13 @@ int main(int argc, char** argv)
     
     
     
+    
+    
+    
     //*********************
     // STEP 4 - cut on jets
     step = step+1;
+    //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = ">= 2 jets";
     
     int nJet = 0;
@@ -170,7 +201,30 @@ int main(int argc, char** argv)
     for(unsigned int jetIt = 0; jetIt < (reader.Get4V("jets")->size()); ++jetIt)
     {
       ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);
+      
       if( jet.Et() < jetEtMIN ) continue;
+      if( reader.GetFloat("jets_emEnergyFraction")->at(jetIt) > 0.98 ) continue;
+      
+      
+      // clean jets from electrons
+      bool skipJet = false;
+      for(unsigned int eleIt = 0; eleIt < electrons.size(); ++eleIt)
+      {
+        ROOT::Math::XYZTVector ele = electrons.at(eleIt);
+        if( deltaR(jet.eta(), jet.phi(), ele.eta(), ele.phi()) < 0.5 )
+          skipJet = true;
+      }
+      
+      // clean jets from muons
+      for(unsigned int muIt = 0; muIt < muons.size(); ++muIt)
+      {
+        ROOT::Math::XYZTVector mu = muons.at(muIt);
+        if( deltaR(jet.eta(), jet.phi(), mu.eta(), mu.phi()) < 0.5 )
+          skipJet = true;
+      }
+      
+      if(skipJet == true) continue;  
+      
       
       ++nJet;
       jets.push_back( reader.Get4V("jets")->at(jetIt) );
@@ -205,34 +259,34 @@ int main(int argc, char** argv)
     
     
     
-    //***********************
-    // STEP 5 - HLT selection
-    step = step+1;
-    stepName[step] = "HLT";
-    
-    bool skipEvent = true;
-    
-    std::vector<std::string> HLT_names = *(reader.GetString("HLT_Names"));
-    int HLT_Photon10_L1R_bit = -1;
-    int HLT_Mu9_bit = -1;
-    for(unsigned int HLTIt = 0; HLTIt < HLT_names.size(); ++HLTIt)
-    {
-      if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Photon10_L1R" )
-        HLT_Photon10_L1R_bit = HLTIt;
-      if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Mu9" )
-        HLT_Mu9_bit = HLTIt;
-    }
-    
-    //HLT_Photon10_L1R
-    if( HLT_Photon10_L1R_bit == -1 ) continue; 
-    if( reader.GetFloat("HLT_Accept")->at(HLT_Photon10_L1R_bit) == 1 ) skipEvent = false;
-    
-    //HLT_Mu9
-    if( HLT_Mu9_bit == -1 ) continue; 
-    if( reader.GetFloat("HLT_Accept")->at(HLT_Mu9_bit) == 1 ) skipEvent = false;
-    
-    if( skipEvent == true ) continue;
-    stepEvents[step] += 1;    
+    ////***********************
+    //// STEP 5 - HLT selection
+    //step = step+1;
+    //stepName[step] = "HLT";
+    //
+    //bool skipEvent = true;
+    //
+    //std::vector<std::string> HLT_names = *(reader.GetString("HLT_Names"));
+    //int HLT_Photon10_L1R_bit = -1;
+    //int HLT_Mu9_bit = -1;
+    //for(unsigned int HLTIt = 0; HLTIt < HLT_names.size(); ++HLTIt)
+    //{
+    //  if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Photon10_L1R" )
+    //    HLT_Photon10_L1R_bit = HLTIt;
+    //  if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Mu9" )
+    //    HLT_Mu9_bit = HLTIt;
+    //}
+    //
+    ////HLT_Photon10_L1R
+    //if( HLT_Photon10_L1R_bit == -1 ) continue; 
+    //if( reader.GetFloat("HLT_Accept")->at(HLT_Photon10_L1R_bit) == 1 ) skipEvent = false;
+    //
+    ////HLT_Mu9
+    //if( HLT_Mu9_bit == -1 ) continue; 
+    //if( reader.GetFloat("HLT_Accept")->at(HLT_Mu9_bit) == 1 ) skipEvent = false;
+    //
+    //if( skipEvent == true ) continue;
+    //stepEvents[step] += 1;    
     
     
     
