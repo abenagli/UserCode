@@ -54,12 +54,15 @@ while (<LISTOFSamples>)
 {
   chomp($_);
   $sample = $_;
-  print("\n\n\nSample: ".$sample."\n") ;  
+  print("\n\n\n************** Sample: ".$sample." **************\n") ;  
   
 
   $LISTOFFiles = "./list_".$sample.".txt" ;
   system ("ls -l ".$INPUTSAVEPath.$sample." | grep root | grep Preselection | awk '{print \$9}' > ".$LISTOFFiles."\n") ;
   
+  $command = "rm -rf ".$OUTPUTSAVEPath."/".$sample;
+  system($command);
+
   $command = "mkdir ".$OUTPUTSAVEPath."/".$sample;
   system($command);
   
@@ -72,6 +75,23 @@ while (<LISTOFSamples>)
     $command = $command.$command2;
   }
   
-  print($command."\n");
   system($command);
+  
 }  
+
+
+
+###############
+# rm list files
+###############
+
+open (LISTOFSamples,$LISTOFSamples) ;
+while (<LISTOFSamples>)
+{
+  chomp($_);
+  $sample = $_;
+
+  $LISTOFFiles = "./list_".$sample.".txt" ;
+  $command = "rm ".$LISTOFFiles;
+  system($command);
+}
