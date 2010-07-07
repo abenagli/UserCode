@@ -34,12 +34,12 @@ ROOTGLIBS     = $(shell root-config --glibs)
 CLHEPCFLAGS   =  $(shell clhep-config --include)
 CLHEPLIBS     =  $(shell clhep-config --libs)
 
-ARCHL = -m32
+ARCHL = -m64
 
 CXX  =  c++
-CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS)
+CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
 CPP  =  c++
-CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS)
+CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)

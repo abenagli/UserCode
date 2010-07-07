@@ -28,7 +28,7 @@ std::map<int, int> GetTotalEvents(const std::string& histoName, const std::strin
     inFile >> buffer;
     if(!inFile.good()) break;
 
-    TFile* f = new TFile(buffer.c_str(), "READ");
+    TFile* f = TFile::Open(buffer.c_str());
     TH1F* histo = NULL;
     f -> GetObject(histoName.c_str(), histo);
     if(histo == NULL)
@@ -68,7 +68,7 @@ bool FillChain(TChain& chain, const std::string& inputFileList)
     inFile >> buffer;
     if(!inFile.good()) break;
     chain.Add(buffer.c_str());
-    std::cout << ">>> ntupleUtils::FillChain - treeName = " << chain.GetName() << " from file " << buffer << std::endl;
+    //std::cout << ">>> ntupleUtils::FillChain - treeName = " << chain.GetName() << " from file " << buffer << std::endl;
   }
 
   return true;
@@ -90,7 +90,7 @@ int parseConfigFile (const TString& config)
      return -1;
   }
   
-  gConfigParser -> print();
+  //gConfigParser -> print();
   
   return 0 ;
 }

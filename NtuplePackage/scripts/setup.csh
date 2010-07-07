@@ -1,4 +1,4 @@
-f (${?VBFANALYSISPKG}) then
+if (${?VBFANALYSISPKG}) then
 echo "already set"
 else
 setenv THISDIR `pwd`

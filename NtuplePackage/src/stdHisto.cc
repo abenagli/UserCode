@@ -46,7 +46,7 @@ void stdHisto::Add1(const std::string& histoName,
   m_hFactory -> add_h1(histoName+"_pl",     histoName+"_pl",     3000,   0., 3000., nStep);  
   m_hFactory -> add_h1(histoName+"_eta",    histoName+"_eta",     400, -10.,   10., nStep);
   m_hFactory -> add_h1(histoName+"_absEta", histoName+"_absEta",  200,   0.,   10., nStep);
-  m_hFactory -> add_h1(histoName+"_phi",    histoName+"_phi",     200,   0.,    5., nStep);
+  m_hFactory -> add_h1(histoName+"_phi",    histoName+"_phi",     200,  -5.,    5., nStep);
   
   if( doZeppPlots == true )
   {
@@ -75,7 +75,7 @@ void stdHisto::Add2(const std::string& histoName,
   m_hFactory -> add_h1(histoName+"_pl",     histoName+"_pl",     3000,   0., 3000., nStep);  
   m_hFactory -> add_h1(histoName+"_eta",    histoName+"_eta",     400, -10.,   10., nStep);
   m_hFactory -> add_h1(histoName+"_absEta", histoName+"_absEta",  200,   0.,   10., nStep);
-  m_hFactory -> add_h1(histoName+"_phi",    histoName+"_phi",     200,   0.,    5., nStep);
+  m_hFactory -> add_h1(histoName+"_phi",    histoName+"_phi",     200,  -5.,    5., nStep);
   m_hFactory -> add_h1(histoName+"_Deta",   histoName+"_Deta",    200,   0.,   10., nStep);
   m_hFactory -> add_h1(histoName+"_Dphi",   histoName+"_Dphi",    200,   0.,    5., nStep);
   m_hFactory -> add_h1(histoName+"_DR",     histoName+"_DR",      200,   0.,   10., nStep);
@@ -264,7 +264,7 @@ void stdHisto::Fill2(const std::string& histoName,
   m_hFactory -> Fill( histoName+"_absEta", step, fabs(vSum.eta()) );
   m_hFactory -> Fill( histoName+"_phi",    step, vSum.phi() );
   m_hFactory -> Fill( histoName+"_Deta",   step, fabs(v1.eta() - v2.eta()) );
-  m_hFactory -> Fill( histoName+"_Dphi",   step, ROOT::Math::VectorUtil::DeltaPhi(v1, v2) );
+  m_hFactory -> Fill( histoName+"_Dphi",   step, fabs(ROOT::Math::VectorUtil::DeltaPhi(v1, v2)) );
   m_hFactory -> Fill( histoName+"_DR",     step, ROOT::Math::VectorUtil::DeltaR(v1, v2) );
   
   m_hFactory -> Fill( histoName+"_max_e",      step, std::max(v1.E(), v2.E()) );
@@ -321,7 +321,7 @@ void stdHisto::Fill2(const ROOT::Math::XYZTVector& v1,
   m_hFactory -> Fill( histoName+"_absEta", step, fabs(vSum.eta()) );
   m_hFactory -> Fill( histoName+"_phi",    step, vSum.phi() );
   m_hFactory -> Fill( histoName+"_Deta",   step, fabs(v1.eta() - v2.eta()) );
-  m_hFactory -> Fill( histoName+"_Dphi",   step, ROOT::Math::VectorUtil::DeltaPhi(v1, v2) );
+  m_hFactory -> Fill( histoName+"_Dphi",   step, fabs(ROOT::Math::VectorUtil::DeltaPhi(v1, v2)) );
   m_hFactory -> Fill( histoName+"_DR",     step, ROOT::Math::VectorUtil::DeltaR(v1, v2) );
   
   m_hFactory -> Fill( histoName+"_max_e",      step, std::max(v1.E(), v2.E()) );
