@@ -38,12 +38,12 @@ NTUPLEPACKAGELIBS = $(shell ntuplepkg-config --libs)
 
 
 
-ARCHL = -m32
+ARCHL = -m64
 
 CXX  =  c++
-CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
 CPP  =  c++
-CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS) $(CLHEPCFLAGS) $(NTUPLEPACKAGEFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)

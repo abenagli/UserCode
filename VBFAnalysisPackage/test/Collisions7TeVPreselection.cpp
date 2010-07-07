@@ -40,7 +40,11 @@ int main(int argc, char** argv)
   float jetEtMIN = gConfigParser -> readFloatOption("Cuts::jetEtMIN");
   
   int nLepMIN = gConfigParser -> readIntOption("Cuts::nLepMIN");
+  int nEleMIN = gConfigParser -> readIntOption("Cuts::nEleMIN");
+  int nMuMIN = gConfigParser -> readIntOption("Cuts::nMuMIN");
   float lepPtMIN = gConfigParser -> readFloatOption("Cuts::lepPtMIN");
+  
+  std::string HLTBitNAME = gConfigParser -> readStringOption("Cuts::HLTBitNAME");  
   
   
   
@@ -92,22 +96,22 @@ int main(int argc, char** argv)
   
   // define histograms
   std::cout << ">>> Collisions7TeVPreselection::Define histograms" << std::endl;
-  int nStep = 7;
+  int nStep = 6;
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepName;
 
-  int step = 0;
+  int step = 1;
   stepEvents[step] = totalEvents[1];
   stepName[step] = "total events";
 
-  step = 1;
+  step = 2;
   stepEvents[step] = GoodVertexPreselectionEvents[1];
   stepName[step] = "GoodVertexPreselection";
   
-  step = 2;
+  step = 3;
   stepEvents[step] = VBFPreselectionEvents[1];
-  stepName[step] = "VBFPreselection";
+  stepName[step] = "Preselection";
   
   
   
@@ -125,12 +129,14 @@ int main(int argc, char** argv)
     
     
     //************************
-    // STEP 3 - cut on leptons
-    step = 3;
+    // STEP 4 - cut on leptons
+    step = 4;
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = ">= 1 lepton";
     
     int nLep = 0;
+    int nEle = 0;
+    int nMu = 0;
     std::vector<ROOT::Math::XYZTVector> electrons;
     std::vector<ROOT::Math::XYZTVector> muons;
     std::vector<ROOT::Math::XYZTVector> leptons;
@@ -168,7 +174,10 @@ int main(int argc, char** argv)
       leptons.push_back( reader.Get4V("electrons")->at(eleIt) );
       
       if( reader.Get4V("electrons")->at(eleIt).pt() >= lepPtMIN )
+      {
         ++nLep;
+        ++nEle;
+      }
     }
     
     for(unsigned int muIt = 0; muIt < (reader.Get4V("muons")->size()); ++muIt)
@@ -179,10 +188,15 @@ int main(int argc, char** argv)
       leptons.push_back( reader.Get4V("muons")->at(muIt) ); 
       
       if( reader.Get4V("muons")->at(muIt).pt() >= lepPtMIN )
+      {
         ++nLep;
+        ++nMu;
+      }
     }
     
     if( nLep < nLepMIN ) continue;
+    if( nEle < nEleMIN ) continue;
+    if( nMu < nMuMIN ) continue;
     stepEvents[step] += 1;
     
     
@@ -191,7 +205,7 @@ int main(int argc, char** argv)
     
     
     //*********************
-    // STEP 4 - cut on jets
+    // STEP 5 - cut on jets
     step = step+1;
     //std::cout << ">>> step: " << step << std::endl;
     stepName[step] = ">= 2 jets";
@@ -238,6 +252,33 @@ int main(int argc, char** argv)
     
     
     
+    //***********************
+    // STEP 6 - HLT selection
+    step = step+1;
+    //std::cout << ">>> step: " << step << std::endl;
+    stepName[step] = "HLT";
+    
+    bool skipEvent = true;
+    
+    std::vector<std::string> HLT_names = *(reader.GetString("HLT_Names"));
+    int HLT_bit = -1;
+    for(unsigned int HLTIt = 0; HLTIt < HLT_names.size(); ++HLTIt)
+    {
+      if( reader.GetString("HLT_Names")->at(HLTIt) == HLTBitNAME )
+        HLT_bit = HLTIt;
+    }
+    
+    if( HLT_bit == -1 ) continue; 
+    if( reader.GetFloat("HLT_Accept")->at(HLT_bit) == 1 ) skipEvent = false;
+    
+    if( skipEvent == true ) continue;
+    stepEvents[step] += 1;    
+    
+    
+    
+    
+    
+    
     //**************************
     // STEP 5 - run/LS selection
     //step = step+1;
@@ -256,43 +297,6 @@ int main(int argc, char** argv)
     
     
     
-    
-    
-    
-    ////***********************
-    //// STEP 5 - HLT selection
-    //step = step+1;
-    //stepName[step] = "HLT";
-    //
-    //bool skipEvent = true;
-    //
-    //std::vector<std::string> HLT_names = *(reader.GetString("HLT_Names"));
-    //int HLT_Photon10_L1R_bit = -1;
-    //int HLT_Mu9_bit = -1;
-    //for(unsigned int HLTIt = 0; HLTIt < HLT_names.size(); ++HLTIt)
-    //{
-    //  if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Photon10_L1R" )
-    //    HLT_Photon10_L1R_bit = HLTIt;
-    //  if( reader.GetString("HLT_Names")->at(HLTIt) == "HLT_Mu9" )
-    //    HLT_Mu9_bit = HLTIt;
-    //}
-    //
-    ////HLT_Photon10_L1R
-    //if( HLT_Photon10_L1R_bit == -1 ) continue; 
-    //if( reader.GetFloat("HLT_Accept")->at(HLT_Photon10_L1R_bit) == 1 ) skipEvent = false;
-    //
-    ////HLT_Mu9
-    //if( HLT_Mu9_bit == -1 ) continue; 
-    //if( reader.GetFloat("HLT_Accept")->at(HLT_Mu9_bit) == 1 ) skipEvent = false;
-    //
-    //if( skipEvent == true ) continue;
-    //stepEvents[step] += 1;    
-    
-    
-    
-    
-    
-    
     cloneTree -> Fill();
     
     
@@ -304,10 +308,10 @@ int main(int argc, char** argv)
   
   
   // save histograms
-  for(step = 0; step < nStep; ++step)
+  for(step = 1; step <= nStep; ++step)
   {
-    events -> SetBinContent(step+1, stepEvents[step]);
-    events -> GetXaxis() -> SetBinLabel(step+1, stepName[step].c_str());
+    events -> SetBinContent(step, stepEvents[step]);
+    events -> GetXaxis() -> SetBinLabel(step, stepName[step].c_str());
   }
   
   events -> Write();
