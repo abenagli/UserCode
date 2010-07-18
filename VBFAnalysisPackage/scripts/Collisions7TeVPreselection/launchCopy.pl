@@ -54,6 +54,12 @@ while (<LISTOFSamples>)
 {
   chomp($_);
   $sample = $_;
+  $subsample = substr($sample,0,1);
+  if($subsample eq "#")
+  {
+      next;
+  }
+
   print("\n\n\n************** Sample: ".$sample." **************\n") ;  
   
 

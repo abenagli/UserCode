@@ -25,6 +25,7 @@ while (<USERCONFIG>)
 
 $BASEDir          = $VBFANALYSISPKG;
 $JETAlgorithm     = $User_Preferences{"JETAlgorithm"} ;
+$JETType          = $User_Preferences{"JETType"} ;
 $LISTOFSamples    = $User_Preferences{"LISTOFSamples"} ;
 $JOBCfgTemplate   = $User_Preferences{"JOBCfgTemplate"} ;
 $INPUTSAVEPath    = $User_Preferences{"INPUTSAVEPath"} ;
@@ -38,12 +39,13 @@ $JOBCfgTemplate = $BASEDir."/".$JOBCfgTemplate;
 
 print "BASEDir = "          .$BASEDir."\n" ;
 print "JETAlgorithm = "     .$JETAlgorithm."\n" ;
+print "JETType = "          .$JETType."\n" ;
 print "LISTOFSamples = "    .$LISTOFSamples."\n" ;
 print "JOBCfgTemplate = "   .$JOBCfgTemplate."\n" ;
 print "INPUTSAVEPath = "    .$INPUTSAVEPath."\n" ;
 print "OUTPUTSAVEPath = "   .$OUTPUTSAVEPath."\n" ;
 print "OUTPUTFILEName = "   .$OUTPUTFILEName."\n" ;
-print "JOBModulo = "        .$JOBModulo."\n" ;
+print "JOBModulo = "        .$JOBModulo."\n\n" ;
 
 
 
@@ -66,6 +68,12 @@ while (<LISTOFSamples>)
 
   chomp($_);
   $sample = $_;
+  $subsample = substr($sample,0,1);
+  if($subsample eq "#")
+  {
+    next;
+  }
+  
   print("Sample: ".$sample."\n") ;  
   system ("mkdir ".$sample."_".$JETAlgorithm."\n") ;
   
@@ -81,7 +89,7 @@ while (<LISTOFSamples>)
   
   
   $LISTOFFiles = "./list_".$sample.".txt" ;
-  system ("rfdir ".$INPUTSAVEPath.$sample." | grep VBFPreselection | awk '{print \$9}' > ".$LISTOFFiles."\n") ;
+  system ("ls -l ".$INPUTSAVEPath.$sample." | grep VBFPreselection | awk '{print \$9}' > ".$LISTOFFiles."\n") ;
   
   
   
@@ -132,6 +140,7 @@ while (<LISTOFSamples>)
     
     $tempo1 = "./tempo1" ;
     system ("cat ".$JOBCfgTemplate."   | sed -e s%JETALGORITHM%".$JETAlgorithm.
+                                   "%g | sed -e s%JETTYPE%".$JETType.
                                    "%g | sed -e s%JOBIT%".$jobIt.
                                    "%g | sed -e s%OUTPUTFILENAME%".$OUTPUTFILEName.
                                    "%g | sed -e s%OUTPUTROOTFILEPATH%".$OUTPUTSAVEPath."/".$sample."/".
@@ -154,10 +163,10 @@ while (<LISTOFSamples>)
       
       if( ($it >= ($jobIt - 1)*$JOBModulo) && ($it < ($jobIt)*$JOBModulo) )
       { 
-        $command = "rfcp ".$INPUTSAVEPath."/".$sample."/".$file." /grid_mnt/data__DATA/data.polcms/cms/abenagli/tmp/".$sample;
-        system ("echo ".$command." >> ".$tempBjob);
+        #$command = "rfcp ".$INPUTSAVEPath."/".$sample."/".$file." /grid_mnt/data__DATA/data.polcms/cms/abenagli/tmp/".$sample;
+        #system ("echo ".$command." >> ".$tempBjob);
 
-	print JOBLISTOFFiles "/grid_mnt/data__DATA/data.polcms/cms/abenagli/tmp/".$sample."/".$file."\n";
+	print JOBLISTOFFiles $INPUTSAVEPath."/".$sample."/".$file."\n";
       }
       ++$it;
     }
@@ -202,10 +211,11 @@ while (<LISTOFSamples>)
     # submit job
     ############
     
-    print SAMPLEJOBLISTFILE "echo \"*************************".$sample."***************************\"\n";
+    print SAMPLEJOBLISTFILE "echo \" \"\n";
+    print SAMPLEJOBLISTFILE "echo \" \"\n";
+    print SAMPLEJOBLISTFILE "echo \"************************* ".$sample." ***************************\"\n";
+    print SAMPLEJOBLISTFILE "echo \" >>> JOB ".$jobIt." OF ".$jobNumber."\"\n";
     print SAMPLEJOBLISTFILE "source ".$tempBjob."\n";
-    print SAMPLEJOBLISTFILE "echo \"**************************************************\"\n";
-    print SAMPLEJOBLISTFILE "echo \"**************************************************\"\n";
     
     #$command = "qsub -V -q production -d ".$jobDir." ".$tempBjob."\n" ;  
     #print ($command);
