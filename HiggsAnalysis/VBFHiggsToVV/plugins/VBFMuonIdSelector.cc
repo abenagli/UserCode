@@ -96,24 +96,24 @@ void VBFMuonIdSelector::select(edm::Handle<collection> muons,
     
     // selections of GlobalMuonPromptTight
     if( !muonRef->isGlobalMuon() ) isMuIdOk = false;
-    //if( muonRef->globalTrack()->normalizedChi2() > m_normalizedChi2Max ) isMuIdOk = false;
-    //if( muonRef->globalTrack()->hitPattern().numberOfValidMuonHits() < m_numberOfValidMuonHitsMin) isMuIdOk = false;
+    if( muonRef->globalTrack()->normalizedChi2() > m_normalizedChi2Max ) isMuIdOk = false;
+    if( muonRef->globalTrack()->hitPattern().numberOfValidMuonHits() < m_numberOfValidMuonHitsMin) isMuIdOk = false;
     
     // further selections
-    //if( muonRef->globalTrack()->hitPattern().numberOfValidTrackerHits() < m_numberOfValidTrackerHitsMin) isMuIdOk = false;
-    //if( fabs(muonRef->innerTrack()->dxy(PVPoint)) > m_d0Max ) isMuIdOk = false;    
+    if( muonRef->globalTrack()->hitPattern().numberOfValidTrackerHits() < m_numberOfValidTrackerHitsMin) isMuIdOk = false;
+    if( fabs(muonRef->innerTrack()->dxy(PVPoint)) > m_d0Max ) isMuIdOk = false;    
     
     // to remove punch-throughs that end in the first muon wheel
-    //math::XYZPoint outerPosition = muonRef -> globalTrack() -> outerPosition();
-    //float z = outerPosition.z();
-    //float r = outerPosition.r();
+    math::XYZPoint outerPosition = muonRef -> globalTrack() -> outerPosition();
+    float z = outerPosition.z();
+    float r = outerPosition.r();
     
     // barrel region
-    //if( (abs(z) < 660) && (r > 400) && (r < 480) ) isMuIdOk = false;
+    if( (abs(z) < 660) && (r > 400) && (r < 480) ) isMuIdOk = false;
     
     // endcap region
-    //if( (abs(z) > 600) && (abs(z) < 650) && (r < 300) ) isMuIdOk = false;
-    //if( (abs(z) > 680) && (abs(z) < 730) && (r < 480) ) isMuIdOk = false;
+    if( (abs(z) > 600) && (abs(z) < 650) && (r < 300) ) isMuIdOk = false;
+    if( (abs(z) > 680) && (abs(z) < 730) && (r < 480) ) isMuIdOk = false;
     
     
     

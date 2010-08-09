@@ -6,8 +6,8 @@ VBFGetElectronRecHitFlags::VBFGetElectronRecHitFlags(const edm::Event& iEvent, c
   m_topology(0),
   m_seed_flag(""),
   m_seed_severityLevel(""),
-  m_other_flag(""),
-  m_other_severityLevel("")
+  m_all_flag(""),
+  m_all_severityLevel("")
 {
   //calo topology                                                                                                                                                                
   unsigned long long cacheIDTopo = 0;
@@ -67,7 +67,7 @@ VBFGetElectronRecHitFlags::VBFGetElectronRecHitFlags(const edm::Event& iEvent, c
 	bc != electronRef->superCluster()->clustersEnd(); ++bc)
     {
       
-      if( seedCluster == (*bc) ) continue;
+      //if( seedCluster == (*bc) ) continue;
       std::vector<std::pair<DetId, float> > ids = (*bc)->hitsAndFractions();
       
       
@@ -85,7 +85,7 @@ VBFGetElectronRecHitFlags::VBFGetElectronRecHitFlags(const edm::Event& iEvent, c
         
         char name11[3];
         sprintf(name11, "%d,", tempFlag);
-        m_other_flag += name11;
+        m_all_flag += name11;
         
         
         
@@ -94,12 +94,12 @@ VBFGetElectronRecHitFlags::VBFGetElectronRecHitFlags(const edm::Event& iEvent, c
         
         char name22[3];
         sprintf(name22, "%d,", sev);
-        m_other_severityLevel += name22;
+        m_all_severityLevel += name22;
         
       } // loop on rechits
       
-      m_other_flag += " ";
-      m_other_severityLevel += " ";
+      m_all_flag += " ";
+      m_all_severityLevel += " ";
       
     } // Loop on clusters 
     

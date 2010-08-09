@@ -176,8 +176,8 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
     
     NtupleFactory_ -> AddString("electrons_seed_flag");
     NtupleFactory_ -> AddString("electrons_seed_severityLevel");
-    NtupleFactory_ -> AddString("electrons_other_flag");
-    NtupleFactory_ -> AddString("electrons_other_severityLevel");
+    NtupleFactory_ -> AddString("electrons_all_flag");
+    NtupleFactory_ -> AddString("electrons_all_severityLevel");
   }
   
   
@@ -614,8 +614,8 @@ void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup &
     VBFGetElectronRecHitFlags theRecHitFlags(iEvent, iESetup, eleRef);
     NtupleFactory_ -> FillString("electrons_seed_flag", theRecHitFlags.GetSeedFlag());
     NtupleFactory_ -> FillString("electrons_seed_severityLevel", theRecHitFlags.GetSeedSeverityLevel());
-    NtupleFactory_ -> FillString("electrons_other_flag", theRecHitFlags.GetOtherFlag());
-    NtupleFactory_ -> FillString("electrons_other_severityLevel", theRecHitFlags.GetOtherSeverityLevel());
+    NtupleFactory_ -> FillString("electrons_all_flag", theRecHitFlags.GetAllFlag());
+    NtupleFactory_ -> FillString("electrons_all_severityLevel", theRecHitFlags.GetAllSeverityLevel());
     
   } // loop on electrons
   

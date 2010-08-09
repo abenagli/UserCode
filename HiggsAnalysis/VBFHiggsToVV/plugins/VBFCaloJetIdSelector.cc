@@ -69,30 +69,30 @@ void VBFCaloJetIdSelector::select(edm::Handle<collection> jets,
     
     
     
-    //float DRMin = 0.01;
-    //int jMin = -1;
-    //
-    //for(unsigned int j=0; j<JetHandle_forID->size(); ++j)
-    //{
-    //  reco::CaloJetRef jetRef_forID(JetHandle_forID, j);
-    //  
-    //  float DRTemp = ROOT::Math::VectorUtil::DeltaR(jetRef->p4(), jetRef_forID->p4());
-    //  if(DRTemp < DRMin)
-    //  {
-    //    DRMin = DRTemp;
-    //    jMin = j;
-    //  }
-    //}
-    //
-    //
-    //
-    //if(jMin == -1) isJetIdOk = false;
-    //
-    //reco::CaloJetRef jetRef_match(JetHandle_forID, jMin);
-    //
-    //if( (fabs(jetRef->eta()) < 2.6) && (jetRef->emEnergyFraction() < m_EMFMin) ) isJetIdOk = false;
-    //if( ((*jetIDHandle)[jetRef_match]).n90Hits < m_n90Min ) isJetIdOk = false;
-    //if( ((*jetIDHandle)[jetRef_match]).fHPD > m_fHPDMax ) isJetIdOk = false;
+    float DRMin = 0.01;
+    int jMin = -1;
+    
+    for(unsigned int j=0; j<JetHandle_forID->size(); ++j)
+    {
+      reco::CaloJetRef jetRef_forID(JetHandle_forID, j);
+      
+      float DRTemp = ROOT::Math::VectorUtil::DeltaR(jetRef->p4(), jetRef_forID->p4());
+      if(DRTemp < DRMin)
+      {
+        DRMin = DRTemp;
+        jMin = j;
+      }
+    }
+    
+    
+    
+    if(jMin == -1) isJetIdOk = false;
+    
+    reco::CaloJetRef jetRef_match(JetHandle_forID, jMin);
+    
+    if( (fabs(jetRef->eta()) < 2.6) && (jetRef->emEnergyFraction() < m_EMFMin) ) isJetIdOk = false;
+    if( ((*jetIDHandle)[jetRef_match]).n90Hits < m_n90Min ) isJetIdOk = false;
+    if( ((*jetIDHandle)[jetRef_match]).fHPD > m_fHPDMax ) isJetIdOk = false;
     
     
     

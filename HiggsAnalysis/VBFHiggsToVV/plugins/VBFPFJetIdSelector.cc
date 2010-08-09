@@ -62,10 +62,10 @@ void VBFPFJetIdSelector::select(edm::Handle<collection> jets,
     
     
     
-    //if( (fabs(jetRef->eta()) < 2.4) && (jetRef->chargedHadronEnergyFraction() < m_CHFMin) ) continue;
-    //if( jetRef->neutralHadronEnergyFraction() > m_NHFMax ) continue;
-    //if( jetRef->chargedEmEnergyFraction() > m_CEFMax ) continue;
-    //if( jetRef->neutralEmEnergyFraction() > m_NEFMax ) continue;
+    if( (fabs(jetRef->eta()) < 2.4) && (jetRef->chargedHadronEnergyFraction() < m_CHFMin) ) continue;
+    if( jetRef->neutralHadronEnergyFraction() > m_NHFMax ) continue;
+    if( jetRef->chargedEmEnergyFraction() > m_CEFMax ) continue;
+    if( jetRef->neutralEmEnergyFraction() > m_NEFMax ) continue;
     
     
     

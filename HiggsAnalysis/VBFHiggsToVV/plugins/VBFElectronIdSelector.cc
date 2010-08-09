@@ -66,11 +66,11 @@ void VBFElectronIdSelector::select(edm::Handle<collection> electrons,
     bool isEleIdOk = true;
     
     // loose eleId cuts
-    //if( electronRef->fbrem() < m_fbremMIN ) isEleIdOk = false;
-    //if( electronRef->hcalOverEcal() > m_hcalOverEcalMAX ) isEleIdOk = false;
-    //if( fabs(electronRef->deltaPhiSuperClusterTrackAtVtx()) > m_deltaPhiSuperClusterTrackAtVtxMAX ) isEleIdOk = false;
-    //if( fabs(electronRef->deltaEtaSuperClusterTrackAtVtx()) > m_deltaEtaSuperClusterTrackAtVtxMAX ) isEleIdOk = false;
-    //if( electronRef->sigmaIetaIeta() > m_sigmaIetaIetaMAX ) isEleIdOk = false; 
+    if( electronRef->fbrem() < m_fbremMIN ) isEleIdOk = false;
+    if( electronRef->hcalOverEcal() > m_hcalOverEcalMAX ) isEleIdOk = false;
+    if( fabs(electronRef->deltaPhiSuperClusterTrackAtVtx()) > m_deltaPhiSuperClusterTrackAtVtxMAX ) isEleIdOk = false;
+    if( fabs(electronRef->deltaEtaSuperClusterTrackAtVtx()) > m_deltaEtaSuperClusterTrackAtVtxMAX ) isEleIdOk = false;
+    if( electronRef->sigmaIetaIeta() > m_sigmaIetaIetaMAX ) isEleIdOk = false; 
     
     
     

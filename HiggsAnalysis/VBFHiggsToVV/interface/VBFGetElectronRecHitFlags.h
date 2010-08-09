@@ -49,8 +49,8 @@ struct VBFGetElectronRecHitFlags
   //! methods
   std::string GetSeedFlag() { return m_seed_flag; } ;
   std::string GetSeedSeverityLevel() { return m_seed_severityLevel; } ;
-  std::string GetOtherFlag() { return m_other_flag; } ;
-  std::string GetOtherSeverityLevel() { return m_other_severityLevel; } ;
+  std::string GetAllFlag() { return m_all_flag; } ;
+  std::string GetAllSeverityLevel() { return m_all_severityLevel; } ;
   
   
  private:
@@ -61,8 +61,8 @@ struct VBFGetElectronRecHitFlags
   
   std::string m_seed_flag;
   std::string m_seed_severityLevel;
-  std::string m_other_flag;
-  std::string m_other_severityLevel;  
+  std::string m_all_flag;
+  std::string m_all_severityLevel;  
   
 };
 
