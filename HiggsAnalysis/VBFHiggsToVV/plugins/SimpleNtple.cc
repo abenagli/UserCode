@@ -431,7 +431,7 @@ void SimpleNtple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 ///---- HLT ----
 void SimpleNtple::fillHLTInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup) 
 {
-  //std::cout << "SimpleNtple::fillHLTInfo::begin" << std::endl;
+  std::cout << "SimpleNtple::fillHLTInfo::begin" << std::endl;
   
   edm::Handle<edm::TriggerResults> triggerResultsHandle;
   iEvent.getByLabel(HLTTag_, triggerResultsHandle);
@@ -464,7 +464,7 @@ void SimpleNtple::fillHLTInfo(const edm::Event & iEvent, const edm::EventSetup &
     NtupleFactory_ -> FillString("HLT_Names", triggerNames.triggerName(iHLT));
   }
   
-  //std::cout << "SimpleNtple::fillHLTInfo::end" << std::endl;
+  std::cout << "SimpleNtple::fillHLTInfo::end" << std::endl;
 }
 
 
@@ -475,7 +475,7 @@ void SimpleNtple::fillHLTInfo(const edm::Event & iEvent, const edm::EventSetup &
 ///---- primary vertex ----
 void SimpleNtple::fillPVInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup) 
 {
-  //std::cout << "SimpleNtple::fillPVInfo::begin" << std::endl;
+  std::cout << "SimpleNtple::fillPVInfo::begin" << std::endl;
   
   edm::Handle<reco::VertexCollection> vertexes;
   iEvent.getByLabel(PVTag_, vertexes);
@@ -513,7 +513,7 @@ void SimpleNtple::fillPVInfo(const edm::Event & iEvent, const edm::EventSetup & 
   math::XYZPoint PVPoint(PV.position().x(), PV.position().y(), PV.position().z());
   PVPoint_ = PVPoint;
   
-  //std::cout << "SimpleNtple::fillPVInfo::end" << std::endl;
+  std::cout << "SimpleNtple::fillPVInfo::end" << std::endl;
 }
 
 
@@ -524,7 +524,7 @@ void SimpleNtple::fillPVInfo(const edm::Event & iEvent, const edm::EventSetup & 
 ///---- tracks ----
 void SimpleNtple::fillTrackInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup) 
 {
-  //std::cout << "SimpleNtple::fillTrackInfo::begin" << std::endl;
+  std::cout << "SimpleNtple::fillTrackInfo::begin" << std::endl;
   
   edm::Handle<edm::View<reco::Track> > TracksHandle ;
   iEvent.getByLabel (TracksTag_, TracksHandle) ;
@@ -534,7 +534,7 @@ void SimpleNtple::fillTrackInfo(const edm::Event & iEvent, const edm::EventSetup
     NtupleFactory_ -> Fill3V("tracks_out",(*tkIt).outerMomentum ());
   }
   
-  //std::cout << "SimpleNtple::fillTrackInfo::end" << std::endl;
+  std::cout << "SimpleNtple::fillTrackInfo::end" << std::endl;
 }
 
 
@@ -551,7 +551,7 @@ void SimpleNtple::fillTrackInfo(const edm::Event & iEvent, const edm::EventSetup
 ///---- electrons ----
 void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup)
 {
-  //std::cout << "SimpleNtple::fillEleInfo::begin" << std::endl;
+  std::cout << "SimpleNtple::fillEleInfo::begin" << std::endl;
   
   edm::Handle<reco::GsfElectronCollection> EleHandle ;
   iEvent.getByLabel (EleTag_,EleHandle);
@@ -629,7 +629,7 @@ void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup &
     
   } // loop on electrons
   
-   //std::cout << "SimpleNtple::fillEleInfo::end" << std::endl;
+   std::cout << "SimpleNtple::fillEleInfo::end" << std::endl;
 }
 
 
@@ -640,7 +640,7 @@ void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup &
 ///---- muons ----
 void SimpleNtple::fillMuInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup) 
 {
-  //std::cout << "SimpleNtple::fillMuInfo::begin" << std::endl;
+  std::cout << "SimpleNtple::fillMuInfo::begin" << std::endl;
   
   edm::Handle<reco::MuonCollection> MuHandle ;
   iEvent.getByLabel (MuTag_,MuHandle);
@@ -670,6 +670,8 @@ void SimpleNtple::fillMuInfo(const edm::Event & iEvent, const edm::EventSetup & 
         isMuRefCheckOk = false;
     
     if(!isMuRefCheckOk) continue;
+    
+    if(!muRef->isGlobalMuon()) continue;
     
     
     
