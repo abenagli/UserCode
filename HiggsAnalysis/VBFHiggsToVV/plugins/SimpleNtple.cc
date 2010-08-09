@@ -131,8 +131,8 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
     NtupleFactory_ -> AddFloat("PV_normalizedChi2"); 
     NtupleFactory_ -> AddInt  ("PV_ndof"); 
     NtupleFactory_ -> AddInt  ("PV_nTracks"); 
-    NtupleFactory_ -> AddInt  ("PV_z"); 
-    NtupleFactory_ -> AddInt  ("PV_d0"); 
+    NtupleFactory_ -> AddFloat("PV_z"); 
+    NtupleFactory_ -> AddFloat("PV_d0"); 
   }
   
   if(saveTrack_)
@@ -493,10 +493,10 @@ void SimpleNtple::fillPVInfo(const edm::Event & iEvent, const edm::EventSetup & 
     PV = sortedVertices.front();
     
     NtupleFactory_->FillFloat("PV_normalizedChi2", PV.normalizedChi2());
-    NtupleFactory_->FillFloat("PV_ndof", PV.ndof());
+    NtupleFactory_->FillInt("PV_ndof", PV.ndof());
     NtupleFactory_->FillInt("PV_nTracks", PV.tracksSize());
-    NtupleFactory_->FillInt("PV_z", PV.z());
-    NtupleFactory_->FillInt("PV_d0", PV.position().Rho());
+    NtupleFactory_->FillFloat("PV_z", PV.z());
+    NtupleFactory_->FillFloat("PV_d0", PV.position().Rho());
   }
   
   else
