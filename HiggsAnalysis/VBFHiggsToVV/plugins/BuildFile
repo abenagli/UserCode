@@ -1,0 +1,16 @@
+<use name=RecoMuon/MuonIdentification>
+<use name=DataFormats/EgammaCandidates>
+<use name=RecoEcal/EgammaCoreTools>
+<use name=DataFormats/JetReco>
+<use name=MagneticField/Engine>
+<use name=MagneticField/Records>
+<use name=CommonTools/UtilAlgos>
+<use name=RecoVertex/PrimaryVertexProducer>
+<use name=TrackingTools/IPTools>
+<use name=CondFormats/EcalObjects>
+<use name=root>
+
+<library file="*.cc" name=HiggsAnalysisVBFHiggsToVVPlugins>
+    <flags EDM_PLUGIN=1>
+    <use name=HiggsAnalysis/VBFHiggsToVV>
+</library>
