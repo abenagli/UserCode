@@ -102,12 +102,12 @@ public:
   edm::InputTag TracksTag_;
   edm::InputTag EleTag_;
   edm::InputTag Ele3DipSignificanceTag_;
-  edm::InputTag EleTipSignificanceTag_;
-  edm::InputTag EleLipSignificanceTag_;
+  //edm::InputTag EleTipSignificanceTag_;
+  //edm::InputTag EleLipSignificanceTag_;
   edm::InputTag MuTag_;
   edm::InputTag Mu3DipSignificanceTag_;
-  edm::InputTag MuTipSignificanceTag_;
-  edm::InputTag MuLipSignificanceTag_;
+  //edm::InputTag MuTipSignificanceTag_;
+  //edm::InputTag MuLipSignificanceTag_;
   edm::InputTag MetTag_;
   edm::InputTag Type1MetTag_;
   edm::InputTag PFMetTag_;
@@ -118,11 +118,6 @@ public:
   edm::InputTag genJetTag_;
   edm::InputTag genMetTag_;
   
-  edm::InputTag eleIDCut_LooseInputTag_ ;
-  edm::InputTag eleIDCut_RLooseInputTag_ ;
-  edm::InputTag eleIDCut_TightInputTag_ ;
-  edm::InputTag eleIDCut_RTightInputTag_ ;
-  
   edm::InputTag jetIDTag_ ;
   
   bool doEleRefCheck_;
@@ -132,7 +127,6 @@ public:
   bool doJetRefCheck_;
   edm::InputTag JetRefTag_;
 
-//   std::vector<std::string>  hlNames_;  // name of each HLT algorithm
   bool saveHLT_ ;
   bool savePV_ ;
   bool saveMu_ ;

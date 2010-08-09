@@ -41,13 +41,13 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
   
   EleTag_ = iConfig.getParameter<edm::InputTag>("EleTag");
   Ele3DipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("Ele3DipSignificanceTag");
-  EleTipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("EleTipSignificanceTag");
-  EleLipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("EleLipSignificanceTag");
+  //EleTipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("EleTipSignificanceTag");
+  //EleLipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("EleLipSignificanceTag");
   
   MuTag_ = iConfig.getParameter<edm::InputTag>("MuTag");
   Mu3DipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("Mu3DipSignificanceTag");
-  MuTipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("MuTipSignificanceTag");
-  MuLipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("MuLipSignificanceTag");
+  //MuTipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("MuTipSignificanceTag");
+  //MuLipSignificanceTag_ = iConfig.getParameter<edm::InputTag>("MuLipSignificanceTag");
  
   MetTag_ = iConfig.getParameter<edm::InputTag>("MetTag");
   Type1MetTag_ = iConfig.getParameter<edm::InputTag>("Type1MetTag");
@@ -120,16 +120,19 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
   
   if(saveHLT_)
   {
-    NtupleFactory_ -> AddFloat("HLT_WasRun"); 
-    NtupleFactory_ -> AddFloat("HLT_Accept"); 
-    NtupleFactory_ -> AddFloat("HLT_Error"); 
+    NtupleFactory_ -> AddFloat ("HLT_WasRun"); 
+    NtupleFactory_ -> AddFloat ("HLT_Accept"); 
+    NtupleFactory_ -> AddFloat ("HLT_Error"); 
     NtupleFactory_ -> AddString("HLT_Names"); 
   }
   
   if(savePV_)
   {
     NtupleFactory_ -> AddFloat("PV_normalizedChi2"); 
-    NtupleFactory_ -> AddInt("PV_nTracks"); 
+    NtupleFactory_ -> AddInt  ("PV_ndof"); 
+    NtupleFactory_ -> AddInt  ("PV_nTracks"); 
+    NtupleFactory_ -> AddInt  ("PV_z"); 
+    NtupleFactory_ -> AddInt  ("PV_d0"); 
   }
   
   if(saveTrack_)
@@ -227,26 +230,29 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
     
     NtupleFactory_->AddFloat("jets_trackCountingHighEffBJetTags");   
     NtupleFactory_->AddFloat("jets_trackCountingHighPurBJetTags");   
-    //NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighEffBJetTags");   
-    //NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighPurBJetTags");   
-    //NtupleFactory_->AddFloat("jets_combinedSecondaryVertexBJetTags");   
-    //NtupleFactory_->AddFloat("jets_combinedSecondaryVertexMVABJetTags");   
-    //NtupleFactory_->AddFloat("jets_jetProbabilityBJetTags");   
-    //NtupleFactory_->AddFloat("jets_jetBProbabilityBJetTags");   
-    NtupleFactory_->AddFloat("jets_emEnergyFraction");   
+    NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighEffBJetTags");   
+    NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighPurBJetTags");   
+    NtupleFactory_->AddFloat("jets_combinedSecondaryVertexBJetTags");   
+    NtupleFactory_->AddFloat("jets_combinedSecondaryVertexMVABJetTags");   
+    NtupleFactory_->AddFloat("jets_jetProbabilityBJetTags");   
+    NtupleFactory_->AddFloat("jets_jetBProbabilityBJetTags");   
 
+    NtupleFactory_->AddFloat("jets_etaetaMoment");   
+    NtupleFactory_->AddFloat("jets_phiphiMoment");   
+    NtupleFactory_->AddFloat("jets_etaphiMoment");   
+    NtupleFactory_->AddFloat("jets_jetArea");   
+    
+    
     if(saveJet_)
     {
-      NtupleFactory_->AddFloat("jets_etaetaMoment");   
-      NtupleFactory_->AddFloat("jets_phiphiMoment");   
-      NtupleFactory_->AddFloat("jets_etaphiMoment");   
-      NtupleFactory_->AddFloat("jets_jetArea");   
+      NtupleFactory_->AddFloat("jets_emEnergyFraction");   
       NtupleFactory_->AddFloat("jets_fHPD");   
       NtupleFactory_->AddFloat("jets_fRBX");   
       NtupleFactory_->AddFloat("jets_n90Hits");   
       NtupleFactory_->AddFloat("jets_nHCALTowers");   
       NtupleFactory_->AddFloat("jets_nECALTowers");   
     }
+    
     
     if(savePFJet_)
     {
@@ -487,8 +493,12 @@ void SimpleNtple::fillPVInfo(const edm::Event & iEvent, const edm::EventSetup & 
     PV = sortedVertices.front();
     
     NtupleFactory_->FillFloat("PV_normalizedChi2", PV.normalizedChi2());
+    NtupleFactory_->FillFloat("PV_ndof", PV.ndof());
     NtupleFactory_->FillInt("PV_nTracks", PV.tracksSize());
+    NtupleFactory_->FillInt("PV_z", PV.z());
+    NtupleFactory_->FillInt("PV_d0", PV.position().Rho());
   }
+  
   else
   {
     //creating a dummy PV                                                                                                                                                        
@@ -548,10 +558,10 @@ void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup &
   
   edm::Handle<eleMap> Ele3DipSignificanceHandle ;
   iEvent.getByLabel (Ele3DipSignificanceTag_,Ele3DipSignificanceHandle);
-  edm::Handle<eleMap> EleTipSignificanceHandle ;
-  iEvent.getByLabel (EleTipSignificanceTag_,EleTipSignificanceHandle);
-  edm::Handle<eleMap> EleLipSignificanceHandle ;
-  iEvent.getByLabel (EleLipSignificanceTag_,EleLipSignificanceHandle);
+  //edm::Handle<eleMap> EleTipSignificanceHandle ;
+  //iEvent.getByLabel (EleTipSignificanceTag_,EleTipSignificanceHandle);
+  //edm::Handle<eleMap> EleLipSignificanceHandle ;
+  //iEvent.getByLabel (EleLipSignificanceTag_,EleLipSignificanceHandle);
   
   edm::Handle<edm::RefVector<reco::GsfElectronCollection> > EleRefHandle;
   if(doEleRefCheck_)
@@ -579,8 +589,8 @@ void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup &
     NtupleFactory_ -> FillFloat("electrons_dxy",(eleRef->gsfTrack())->dxy(PVPoint_));
     NtupleFactory_ -> FillFloat("electrons_dz",(eleRef->gsfTrack())->dz(PVPoint_));
     NtupleFactory_ -> FillFloat("electrons_3DipSignificance",((*Ele3DipSignificanceHandle)[eleRef]));
-    NtupleFactory_ -> FillFloat("electrons_tipSignificance",((*EleTipSignificanceHandle)[eleRef]));
-    NtupleFactory_ -> FillFloat("electrons_lipSignificance",((*EleLipSignificanceHandle)[eleRef]));
+    //NtupleFactory_ -> FillFloat("electrons_tipSignificance",((*EleTipSignificanceHandle)[eleRef]));
+    //NtupleFactory_ -> FillFloat("electrons_lipSignificance",((*EleLipSignificanceHandle)[eleRef]));
     
     NtupleFactory_ -> FillFloat("electrons_tkIsoR03",eleRef->dr03TkSumPt());
     NtupleFactory_ -> FillFloat("electrons_tkIsoR04",eleRef->dr04TkSumPt());
@@ -637,10 +647,10 @@ void SimpleNtple::fillMuInfo(const edm::Event & iEvent, const edm::EventSetup & 
   
   edm::Handle<muMap> Mu3DipSignificanceHandle ;
   iEvent.getByLabel (Mu3DipSignificanceTag_,Mu3DipSignificanceHandle);
-  edm::Handle<muMap> MuTipSignificanceHandle ;
-  iEvent.getByLabel (MuTipSignificanceTag_,MuTipSignificanceHandle);
-  edm::Handle<muMap> MuLipSignificanceHandle ;
-  iEvent.getByLabel (MuLipSignificanceTag_,MuLipSignificanceHandle);
+  //edm::Handle<muMap> MuTipSignificanceHandle ;
+  //iEvent.getByLabel (MuTipSignificanceTag_,MuTipSignificanceHandle);
+  //edm::Handle<muMap> MuLipSignificanceHandle ;
+  //iEvent.getByLabel (MuLipSignificanceTag_,MuLipSignificanceHandle);
   
   edm::Handle<edm::RefVector<reco::MuonCollection> > MuRefHandle;
   if(doMuRefCheck_)
@@ -668,8 +678,8 @@ void SimpleNtple::fillMuInfo(const edm::Event & iEvent, const edm::EventSetup & 
     NtupleFactory_ -> FillFloat("muons_dxy",(muRef->globalTrack())->dxy(PVPoint_));
     NtupleFactory_ -> FillFloat("muons_dz",(muRef->globalTrack())->dz(PVPoint_));
     NtupleFactory_ -> FillFloat("muons_3DipSignificance",((*Mu3DipSignificanceHandle)[muRef]));
-    NtupleFactory_ -> FillFloat("muons_tipSignificance",((*MuTipSignificanceHandle)[muRef]));
-    NtupleFactory_ -> FillFloat("muons_lipSignificance",((*MuLipSignificanceHandle)[muRef]));
+    //NtupleFactory_ -> FillFloat("muons_tipSignificance",((*MuTipSignificanceHandle)[muRef]));
+    //NtupleFactory_ -> FillFloat("muons_lipSignificance",((*MuLipSignificanceHandle)[muRef]));
     
     NtupleFactory_ -> FillFloat("muons_nTkIsoR03",(muRef->isolationR03()).nTracks);    
     NtupleFactory_ -> FillFloat("muons_nTkIsoR05",(muRef->isolationR05()).nTracks);    
@@ -863,7 +873,12 @@ void SimpleNtple::fillPFJetInfo (const edm::Event & iEvent, const edm::EventSetu
     
     
     NtupleFactory_ -> Fill4V   ("jets",jetRef->p4());
-    NtupleFactory_ -> FillFloat("jets_emEnergyFraction",jetRef->neutralHadronEnergyFraction()); 
+
+    NtupleFactory_ -> FillFloat("jets_etaetaMoment",jetRef->etaetaMoment());
+    NtupleFactory_ -> FillFloat("jets_phiphiMoment",jetRef->phiphiMoment());
+    NtupleFactory_ -> FillFloat("jets_etaphiMoment",jetRef->etaphiMoment());
+    NtupleFactory_ -> FillFloat("jets_jetArea",jetRef->jetArea());
+    
     NtupleFactory_ -> FillFloat("jets_chargedHadronEnergy",jetRef->chargedHadronEnergy()); 
     NtupleFactory_ -> FillFloat("jets_chargedHadronEnergyFraction",jetRef->chargedHadronEnergyFraction()); 
     NtupleFactory_ -> FillFloat("jets_neutralHadronEnergy",jetRef->neutralHadronEnergy()); 
@@ -903,23 +918,23 @@ void SimpleNtple::fillJetBTaggingInfo(const edm::Event & iEvent, const edm::Even
   edm::Handle<reco::JetTagCollection> bTagHandle_trackCountingHighPur;
   iEvent.getByLabel("trackCountingHighPurBJetTags", bTagHandle_trackCountingHighPur);  
   
-  //edm::Handle<reco::JetTagCollection> bTagHandle_simpleSecondaryVertexHighEff;
-  //iEvent.getByLabel("simpleSecondaryVertexHighEffBJetTags", bTagHandle_simpleSecondaryVertexHighEff);
+  edm::Handle<reco::JetTagCollection> bTagHandle_simpleSecondaryVertexHighEff;
+  iEvent.getByLabel("simpleSecondaryVertexHighEffBJetTags", bTagHandle_simpleSecondaryVertexHighEff);
   
-  //edm::Handle<reco::JetTagCollection> bTagHandle_simpleSecondaryVertexHighPur;
-  //iEvent.getByLabel("simpleSecondaryVertexHighPurBJetTags", bTagHandle_simpleSecondaryVertexHighPur);
+  edm::Handle<reco::JetTagCollection> bTagHandle_simpleSecondaryVertexHighPur;
+  iEvent.getByLabel("simpleSecondaryVertexHighPurBJetTags", bTagHandle_simpleSecondaryVertexHighPur);
   
-  //edm::Handle<reco::JetTagCollection> bTagHandle_combinedSecondaryVertex;
-  //iEvent.getByLabel("combinedSecondaryVertexBJetTags", bTagHandle_combinedSecondaryVertex);
+  edm::Handle<reco::JetTagCollection> bTagHandle_combinedSecondaryVertex;
+  iEvent.getByLabel("combinedSecondaryVertexBJetTags", bTagHandle_combinedSecondaryVertex);
   
-  //edm::Handle<reco::JetTagCollection> bTagHandle_combinedSecondaryVertexMVA;
-  //iEvent.getByLabel("combinedSecondaryVertexMVABJetTags", bTagHandle_combinedSecondaryVertexMVA);  
+  edm::Handle<reco::JetTagCollection> bTagHandle_combinedSecondaryVertexMVA;
+  iEvent.getByLabel("combinedSecondaryVertexMVABJetTags", bTagHandle_combinedSecondaryVertexMVA);  
   
-  //edm::Handle<reco::JetTagCollection> bTagHandle_jetProbability;
-  //iEvent.getByLabel("jetProbabilityBJetTags", bTagHandle_jetProbability);
+  edm::Handle<reco::JetTagCollection> bTagHandle_jetProbability;
+  iEvent.getByLabel("jetProbabilityBJetTags", bTagHandle_jetProbability);
   
-  //edm::Handle<reco::JetTagCollection> bTagHandle_jetBProbability;
-  //iEvent.getByLabel("jetBProbabilityBJetTags", bTagHandle_jetBProbability);
+  edm::Handle<reco::JetTagCollection> bTagHandle_jetBProbability;
+  iEvent.getByLabel("jetBProbabilityBJetTags", bTagHandle_jetBProbability);
   
   
   
@@ -961,7 +976,7 @@ void SimpleNtple::fillJetBTaggingInfo(const edm::Event & iEvent, const edm::Even
   
   
   
-  /*// simpleSecondaryVertexHighEff 
+  // simpleSecondaryVertexHighEff 
   DRMin = 0.01;
   jMin = -1;
   
@@ -1071,7 +1086,7 @@ void SimpleNtple::fillJetBTaggingInfo(const edm::Event & iEvent, const edm::Even
   }
   
   if(jMin != -1) NtupleFactory_->FillFloat("jets_jetBProbabilityBJetTags", (*bTagHandle_jetBProbability)[jMin].second);
-  else           NtupleFactory_->FillFloat("jets_jetBProbabilityBJetTags", -999999.);*/
+  else           NtupleFactory_->FillFloat("jets_jetBProbabilityBJetTags", -999999.);
   
   //std::cout << "SimpleNtple::fillJetBTaggingInfo::end" << std::endl;
 }  

@@ -80,17 +80,16 @@ process.source = cms.Source(
 process.load('HiggsAnalysis.VBFHiggsToVV.VBFAllPassFilter_cfi')
 
 process.VBFAllPassFilterBegin = process.VBFAllPassFilter.clone()
-process.VBFAllPassFilterGoodVertex = process.VBFAllPassFilter.clone()
 
 
 
 
 
-# --- ======== --- --- --- --- --- --- --- --- --- --- --- 
-# --- GOODCOLL  --- --- --- --- --- --- --- --- --- --- --- 
-# --- ======== --- --- --- --- --- --- --- --- --- --- ---
+## --- ======== --- --- --- --- --- --- --- --- --- --- --- 
+## --- GOODCOLL  --- --- --- --- --- --- --- --- --- --- --- 
+## --- ======== --- --- --- --- --- --- --- --- --- --- ---
 
-# Technical trigger bit filter
+## Technical trigger bit filter
 #process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 #process.load('HLTrigger/HLTfilters/hltLevel1GTSeed_cfi')
 #process.L1T1coll = process.hltLevel1GTSeed.clone()
@@ -98,24 +97,24 @@ process.VBFAllPassFilterGoodVertex = process.VBFAllPassFilter.clone()
 #process.L1T1coll.L1SeedsLogicalExpression = cms.string('0 AND (40 OR 41) AND NOT (36 OR 37 OR 38 OR 39) AND NOT ((42 AND NOT 43) OR (43 AND NOT 42))')
 #process.l1tcollpath = cms.Sequence(process.L1T1coll)
 
-# Good vertex filter
-process.primaryVertexFilter = cms.EDFilter(
-    "VertexSelector",
-    src = cms.InputTag("offlinePrimaryVertices"),
-    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"), # tracksSize() > 3 for the older cut
-    filter = cms.bool(True),                                                      # otherwise it won't filter the events, just produce an empty vertex collection.
-    )
+## Good vertex filter
+#process.primaryVertexFilter = cms.EDFilter(
+#    "VertexSelector",
+#    src = cms.InputTag("offlinePrimaryVertices"),
+#    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"), # tracksSize() > 3 for the older cut
+#    filter = cms.bool(True),                                                      # otherwise it won't filter the events, just produce an empty vertex collection.
+#    )
 
-# No scraping filter
-process.noscraping = cms.EDFilter(
-    "FilterOutScraping",
-    applyfilter = cms.untracked.bool(True),
-    debugOn = cms.untracked.bool(False),
-    numtrack = cms.untracked.uint32(10),
-    thresh = cms.untracked.double(0.25)
-    )
-
-process.goodvertex = cms.Sequence(process.primaryVertexFilter*process.noscraping)
+## No scraping filter
+#process.noscraping = cms.EDFilter(
+#    "FilterOutScraping",
+#    applyfilter = cms.untracked.bool(True),
+#    debugOn = cms.untracked.bool(False),
+#    numtrack = cms.untracked.uint32(10),
+#    thresh = cms.untracked.double(0.25)
+#    )
+#
+#process.goodvertex = cms.Sequence(process.primaryVertexFilter*process.noscraping)
 
 #process.goodcoll = cms.Sequence(process.l1tcollpath + process.goodvertex)
 
@@ -128,15 +127,15 @@ process.goodvertex = cms.Sequence(process.primaryVertexFilter*process.noscraping
 # --- PRESELECTION  --- --- --- --- --- --- --- --- --- --- --- 
 # --- ====== --- --- --- --- --- --- --- --- --- --- ---
 
-process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_all_DATA_cff")
+process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_all_cff")
+
 
 
 # --- ====== --- --- --- --- --- --- --- --- --- --- ---
 # ak5CaloJets
 # --- ====== --- --- --- --- --- --- --- --- --- --- ---
 
-process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_ak5CaloJets_DATA_cff")
-process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_L2L3Ak5CaloJets_DATA_cff")
+process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_L2L3Ak5CaloJets_cff")
 
 
 
@@ -144,8 +143,7 @@ process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_L2L3Ak5CaloJets_DATA_cf
 # ak5PFJets
 # --- ====== --- --- --- --- --- --- --- --- --- --- ---
 
-process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_ak5PFJets_DATA_cff")
-process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_L2L3Ak5PFJets_DATA_cff")
+process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_L2L3Ak5PFJets_cff")
 
 
 
@@ -176,30 +174,14 @@ process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_L2L3Ak5PFJets_DATA_cff"
 # --- PATHS  --- --- --- --- --- --- --- --- --- --- --- 
 # --- ====== --- --- --- --- --- --- --- --- --- --- --- 
                                
-#process.p1 = cms.Path(
-#    process.VBFAllPassFilter*
-#    process.goodcoll*
-#    process.VBFPreselectionSequenceAk5CaloJets
-#    )
-
-process.p2 = cms.Path(
+process.p1 = cms.Path(
     process.VBFAllPassFilterBegin*
-    process.goodvertex*    
-    process.VBFAllPassFilterGoodVertex*
     process.VBFPreselectionSequenceL2L3Ak5CaloJets
     )
 
 
-#process.p3 = cms.Path(
-#    process.VBFAllPassFilter*
-#    process.goodcoll*    
-#    process.VBFPreselectionSequenceAk5PFJets
-#    )
-
-process.p4 = cms.Path(
+process.p2 = cms.Path(
     process.VBFAllPassFilterBegin*
-    process.goodvertex*    
-    process.VBFAllPassFilterGoodVertex*
     process.VBFPreselectionSequenceL2L3Ak5PFJets
     )
 
