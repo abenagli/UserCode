@@ -15,7 +15,8 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
 process.load("RecoTracker.TrackProducer.TrackRefitters_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = "GR_R_36X_V11A::All"
+process.GlobalTag.globaltag = "GR_R_36X_V12::All"
+#process.GlobalTag.globaltag = "GR10_P_V7::All"
 
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load('Configuration/StandardSequences/Services_cff')
@@ -61,10 +62,7 @@ process.source = cms.Source(
     #debugVebosity = cms.untracked.uint32(1),
     duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
     fileNames = cms.untracked.vstring(
-        #'file:/data/NTUPLES/VBF/qqHWW_lnujj/H200/CMSSWfile_10.root',
-        #'file:/gwtera5/users/data/NTUPLES/VBF/CMSSWfile_3_1_X.root'
-        #'file:/tmp/amassiro/0C5ECFC1-C445-DF11-8133-E0CB4E19F99B.root'
-        '/store/data/Run2010A/EG/RECO/May27thReReco_v1/0000/129A8471-A469-DF11-A727-003048D43656.root'
+        'file:/gwtera5/users/data/NTUPLES/VBF/DATA_361p4.root'
         )
     )
 

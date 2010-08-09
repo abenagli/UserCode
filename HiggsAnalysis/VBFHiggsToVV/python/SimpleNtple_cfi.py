@@ -9,17 +9,13 @@ SimpleNtple = cms.EDAnalyzer(
      
      MuTag           = cms.InputTag("muons"),
      Mu3DipSignificanceTag = cms.InputTag("VBFLepton3DipProducer:Mu3DipSignificanceMap"),
-     MuTipSignificanceTag = cms.InputTag("VBFLeptonTipLipProducer:MuTipSignificanceMap"),
-     MuLipSignificanceTag = cms.InputTag("VBFLeptonTipLipProducer:MuLipSignificanceMap"),
+     #MuTipSignificanceTag = cms.InputTag("VBFLeptonTipLipProducer:MuTipSignificanceMap"),
+     #MuLipSignificanceTag = cms.InputTag("VBFLeptonTipLipProducer:MuLipSignificanceMap"),
      
      EleTag          = cms.InputTag("gsfElectrons"),
      Ele3DipSignificanceTag = cms.InputTag("VBFLepton3DipProducer:Ele3DipSignificanceMap"),
-     EleTipSignificanceTag = cms.InputTag("VBFLeptonTipLipProducer:EleTipSignificanceMap"),
-     EleLipSignificanceTag = cms.InputTag("VBFLeptonTipLipProducer:EleLipSignificanceMap"),
-     eleIDCut_LooseInputTag  = cms.InputTag("eidLoose"),
-     eleIDCut_RLooseInputTag = cms.InputTag("eidRobustLoose"),
-     eleIDCut_TightInputTag  = cms.InputTag("eidTight"), 
-     eleIDCut_RTightInputTag = cms.InputTag("eidRobustTight"),
+     #EleTipSignificanceTag = cms.InputTag("VBFLeptonTipLipProducer:EleTipSignificanceMap"),
+     #EleLipSignificanceTag = cms.InputTag("VBFLeptonTipLipProducer:EleLipSignificanceMap"),
      
      TracksTag       = cms.InputTag("generalTracks"),
 
@@ -45,8 +41,8 @@ SimpleNtple = cms.EDAnalyzer(
 
      saveHLT          = cms.untracked.bool (True),
      savePV           = cms.untracked.bool (True),     
-     saveMu           = cms.untracked.bool (True),
      saveTrack        = cms.untracked.bool (True), 
+     saveMu           = cms.untracked.bool (True),
      saveEle          = cms.untracked.bool (True),
      saveJet          = cms.untracked.bool (True),
      savePFJet        = cms.untracked.bool (False),
