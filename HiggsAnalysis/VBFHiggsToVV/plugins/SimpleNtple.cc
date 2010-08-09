@@ -551,7 +551,7 @@ void SimpleNtple::fillTrackInfo(const edm::Event & iEvent, const edm::EventSetup
 ///---- electrons ----
 void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup)
 {
-  std::cout << "SimpleNtple::fillEleInfo::begin" << std::endl;
+  //std::cout << "SimpleNtple::fillEleInfo::begin" << std::endl;
   
   edm::Handle<reco::GsfElectronCollection> EleHandle ;
   iEvent.getByLabel (EleTag_,EleHandle);
@@ -629,7 +629,7 @@ void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup &
     
   } // loop on electrons
   
-   std::cout << "SimpleNtple::fillEleInfo::end" << std::endl;
+   //std::cout << "SimpleNtple::fillEleInfo::end" << std::endl;
 }
 
 
@@ -640,7 +640,7 @@ void SimpleNtple::fillEleInfo(const edm::Event & iEvent, const edm::EventSetup &
 ///---- muons ----
 void SimpleNtple::fillMuInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup) 
 {
-  std::cout << "SimpleNtple::fillMuInfo::begin" << std::endl;
+  //std::cout << "SimpleNtple::fillMuInfo::begin" << std::endl;
   
   edm::Handle<reco::MuonCollection> MuHandle ;
   iEvent.getByLabel (MuTag_,MuHandle);

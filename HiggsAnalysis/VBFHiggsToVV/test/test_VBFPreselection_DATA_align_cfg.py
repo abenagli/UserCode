@@ -162,6 +162,20 @@ process.VBFLepton3DipProducerAll.srcElectrons = cms.InputTag("gsfElectrons::TEST
 process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_L2L3Ak5CaloJets_cff")
 process.VBFNtupleL2L3Ak5CaloJets.EleTag = cms.InputTag("gsfElectrons::TEST")
 
+process.VBFSelectedElectronsAll.src = cms.InputTag("gsfElectrons::TEST")
+process.VBFSelectedElectronsRefAll.src = cms.InputTag("gsfElectrons::TEST")
+
+#process.VBFIsolatedElectronsAll.src = cms.InputTag("gsfElectrons::TEST")
+#process.VBFIsolatedElectronsRefAll.src = cms.InputTag("gsfElectrons::TEST")
+
+#process.VBFIdSelectedElectronsAll.src = cms.InputTag("gsfElectrons::TEST")
+#process.VBFIdSelectedElectronsRefAll.src = cms.InputTag("gsfElectrons::TEST")
+
+process.VBFConversionRemovalSelectedElectronsAll.src = cms.InputTag("gsfElectrons::TEST")
+process.VBFConversionRemovalSelectedElectronsRefAll.src = cms.InputTag("gsfElectrons::TEST")
+
+#process.VBFLeptonTipLipProducerAll.srcElectrons = cms.InputTag("gsfElectrons::TEST")
+process.VBFLepton3DipProducerAll.srcElectrons = cms.InputTag("gsfElectrons::TEST")
 
 
 # --- ====== --- --- --- --- --- --- --- --- --- --- ---
