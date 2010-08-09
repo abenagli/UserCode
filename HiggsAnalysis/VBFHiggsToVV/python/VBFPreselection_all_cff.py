@@ -148,10 +148,10 @@ VBFPtMinLeptonCountFilterAll.minNumber = cms.int32(1)
 
 # --- Tip/Lip/3Dip producer --- --- --- --- --- --- --- --- --- --- ---
 
-from HiggsAnalysis.VBFHiggsToVV.VBFLeptonTipLipProducer_cfi import *
+#from HiggsAnalysis.VBFHiggsToVV.VBFLeptonTipLipProducer_cfi import *
 from HiggsAnalysis.VBFHiggsToVV.VBFLepton3DipProducer_cfi import *
 
-VBFLeptonTipLipProducerAll = VBFLeptonTipLipProducer.clone()
+#VBFLeptonTipLipProducerAll = VBFLeptonTipLipProducer.clone()
 VBFLepton3DipProducerAll = VBFLepton3DipProducer.clone()
 
 
@@ -203,7 +203,7 @@ VBFPreselectionSequenceAll = cms.Sequence(
 
     
     # impact parameter producers
-    VBFLeptonTipLipProducerAll +
+    #VBFLeptonTipLipProducerAll +
     VBFLepton3DipProducerAll 
     )
 
