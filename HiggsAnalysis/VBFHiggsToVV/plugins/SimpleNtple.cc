@@ -63,6 +63,8 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
   JetProbabilityBJetTagsTag_       = iConfig.getParameter<edm::InputTag>("JetProbabilityBJetTagsTag");
   JetBProbabilityBJetTagsTag_      = iConfig.getParameter<edm::InputTag>("JetBProbabilityBJetTagsTag");
   
+  JetChargeTag_ = iConfig.getParameter<edm::InputTag> ("JetChargeTag");
+
   MCtruthTag_ = iConfig.getParameter<edm::InputTag>("MCtruthTag");
   genJetTag_ = iConfig.getParameter<edm::InputTag>("genJetTag");
   genMetTag_ = iConfig.getParameter<edm::InputTag>("genMetTag");
@@ -85,9 +87,7 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
   saveHLT_ =iConfig.getUntrackedParameter<bool> ("saveHLT", true);
   savePV_ =iConfig.getUntrackedParameter<bool> ("savePV", true);
   saveTrack_ = iConfig.getUntrackedParameter<bool> ("saveTrack", true);
-  
   saveEle_ = iConfig.getUntrackedParameter<bool> ("saveEle", true);
-  
   saveMu_ =iConfig.getUntrackedParameter<bool> ("saveMu", true);
 
   saveMet_ = iConfig.getUntrackedParameter<bool> ("saveMet", true);
@@ -145,6 +145,7 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
     NtupleFactory_ -> Add3V("tracks_in");
     NtupleFactory_ -> Add3V("tracks_out");   
   }
+
   
   
   
@@ -241,8 +242,10 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
     //NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighPurBJetTags");   
     //NtupleFactory_->AddFloat("jets_combinedSecondaryVertexBJetTags");   
     //NtupleFactory_->AddFloat("jets_combinedSecondaryVertexMVABJetTags");   
+    
+    NtupleFactory_->AddFloat("jets_charge");   
 
-    NtupleFactory_->AddFloat("jets_etaetaMoment");   
+    NtupleFactory_->AddFloat("jets_etaetaMoment");
     NtupleFactory_->AddFloat("jets_phiphiMoment");   
     NtupleFactory_->AddFloat("jets_etaphiMoment");   
     NtupleFactory_->AddFloat("jets_jetArea");   
@@ -529,7 +532,7 @@ void SimpleNtple::fillPVInfo(const edm::Event & iEvent, const edm::EventSetup & 
 ///---- tracks ----
 void SimpleNtple::fillTrackInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup) 
 {
-  std::cout << "SimpleNtple::fillTrackInfo::begin" << std::endl;
+  //std::cout << "SimpleNtple::fillTrackInfo::begin" << std::endl;
   
   edm::Handle<edm::View<reco::Track> > TracksHandle ;
   iEvent.getByLabel (TracksTag_, TracksHandle) ;
@@ -539,7 +542,7 @@ void SimpleNtple::fillTrackInfo(const edm::Event & iEvent, const edm::EventSetup
     NtupleFactory_ -> Fill3V("tracks_out",(*tkIt).outerMomentum ());
   }
   
-  std::cout << "SimpleNtple::fillTrackInfo::end" << std::endl;
+  //std::cout << "SimpleNtple::fillTrackInfo::end" << std::endl;
 }
 
 
@@ -771,17 +774,20 @@ void SimpleNtple::fillJetInfo(const edm::Event & iEvent, const edm::EventSetup &
   //std::cout << "SimpleNtple::fillJetInfo::begin" << std::endl;
   
   edm::Handle<reco::CaloJetCollection> JetHandle ;
-  iEvent.getByLabel (JetTag_,JetHandle);
+  iEvent.getByLabel(JetTag_,JetHandle);
   
   edm::Handle<reco::CaloJetCollection> JetHandle_forID ;
-  iEvent.getByLabel (JetTag_forID_,JetHandle_forID);
+  iEvent.getByLabel(JetTag_forID_,JetHandle_forID);
   
   edm::Handle<edm::RefVector<reco::CaloJetCollection> > JetRefHandle;
   if(doJetRefCheck_)
    iEvent.getByLabel(JetRefTag_, JetRefHandle);
   
   edm::Handle<reco::JetIDValueMap> jetIDHandle;
-  iEvent.getByLabel (JetIDTag_, jetIDHandle) ;
+  iEvent.getByLabel(JetIDTag_, jetIDHandle) ;
+  
+  edm::Handle<reco::JetFloatAssociation::Container> jetChargeHandle;
+  iEvent.getByLabel(JetChargeTag_, jetChargeHandle) ;
   
   
   
@@ -809,6 +815,7 @@ void SimpleNtple::fillJetInfo(const edm::Event & iEvent, const edm::EventSetup &
     
     
     
+    // jet ID
     float DRMin = 0.01;
     int jMin = -1;
     
@@ -837,6 +844,30 @@ void SimpleNtple::fillJetInfo(const edm::Event & iEvent, const edm::EventSetup &
     
     
     
+    // jet charge
+    DRMin = 0.01;
+    jMin = -1;
+    
+    for(unsigned int j=0; j<jetChargeHandle->size(); ++j)
+    {
+      reco::Jet jet_forCharge = *(jetChargeHandle->key(j));
+      
+      float DRTemp = ROOT::Math::VectorUtil::DeltaR(jetRef->p4(), jet_forCharge.p4());
+      if(DRTemp < DRMin)
+      {
+        DRMin = DRTemp;
+        jMin = j;
+      }
+    }
+    
+    if(jMin != -1)
+    {
+      NtupleFactory_ -> FillFloat("jets_charge",(jetChargeHandle->value(jMin)));
+    }
+    
+    
+    
+    // jet b tagging
     if(saveJetBTagging_)
       fillJetBTaggingInfo(iEvent, iESetup, jetRef->p4());
     
@@ -861,9 +892,12 @@ void SimpleNtple::fillPFJetInfo (const edm::Event & iEvent, const edm::EventSetu
   edm::Handle<edm::RefVector<reco::PFJetCollection> > JetRefHandle;
   if(doJetRefCheck_)
     iEvent.getByLabel(JetRefTag_, JetRefHandle);
+
+  edm::Handle<reco::JetFloatAssociation::Container> jetChargeHandle;
+  iEvent.getByLabel(JetChargeTag_, jetChargeHandle) ;  
   
   
- 
+  
   // loop on jets
   for(unsigned int i=0; i<JetHandle->size(); ++i) 
   { 
@@ -900,6 +934,32 @@ void SimpleNtple::fillPFJetInfo (const edm::Event & iEvent, const edm::EventSetu
     NtupleFactory_ -> FillInt  ("jets_neutralMultiplicity",jetRef->neutralMultiplicity()); 
     NtupleFactory_ -> FillInt  ("jets_muonMultiplicity",jetRef->muonMultiplicity()); 
     
+    
+    
+    // jet charge
+    float DRMin = 0.01;
+    float jMin = -1;
+    
+    for(unsigned int j=0; j<jetChargeHandle->size(); ++j)
+    {
+      reco::Jet jet_forCharge = *(jetChargeHandle->key(j));
+      
+      float DRTemp = ROOT::Math::VectorUtil::DeltaR(jetRef->p4(), jet_forCharge.p4());
+      if(DRTemp < DRMin)
+      {
+        DRMin = DRTemp;
+        jMin = j;
+      }
+    }
+    
+    if(jMin != -1)
+    {
+      NtupleFactory_ -> FillFloat("jets_charge",(jetChargeHandle->value(jMin)));
+    }
+    
+    
+    
+    // jet b-tagging
     if(saveJetBTagging_)
       fillJetBTaggingInfo(iEvent, iESetup, jetRef->p4());
     

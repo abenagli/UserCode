@@ -20,11 +20,13 @@
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
+#include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/JetReco/interface/JetID.h"
+#include "DataFormats/JetReco/interface/JetFloatAssociation.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/METReco/interface/CaloMETFwd.h"
@@ -123,6 +125,7 @@ public:
   edm::InputTag TrackCountingHighPurBJetTagsTag_;
   edm::InputTag JetProbabilityBJetTagsTag_;
   edm::InputTag JetBProbabilityBJetTagsTag_;
+  edm::InputTag JetChargeTag_;
   
   
   
@@ -135,8 +138,8 @@ public:
 
   bool saveHLT_ ;
   bool savePV_ ;
-  bool saveMu_ ;
   bool saveTrack_ ;
+  bool saveMu_ ;
   bool saveEle_ ;
   bool saveJet_ ;
   bool savePFJet_ ;

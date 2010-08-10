@@ -28,7 +28,9 @@ SimpleNtple = cms.EDAnalyzer(
      TrackCountingHighPurBJetTagsTag = cms.InputTag("trackCountingHighPurBJetTags"),
      JetProbabilityBJetTagsTag       = cms.InputTag("jetProbabilityBJetTags"),
      JetBProbabilityBJetTagsTag      = cms.InputTag("jetBProbabilityBJetTags"),
-     
+
+     JetChargeTag = cms.InputTag("VBFCaloJetsCharge"),
+
      MetTag          = cms.InputTag("corMetGlobalMuons"),
      Type1MetTag     = cms.InputTag("VBFType1Ak5CaloMet"),
      TcMetTag        = cms.InputTag("tcMet"),         
