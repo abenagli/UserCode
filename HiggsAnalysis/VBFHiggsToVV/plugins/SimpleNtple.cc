@@ -56,7 +56,12 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
   
   JetTag_ = iConfig.getParameter<edm::InputTag>("JetTag");
   JetTag_forID_ = iConfig.getParameter<edm::InputTag>("JetTag_forID");
-  jetIDTag_ = iConfig.getParameter<edm::InputTag> ("JetIDTag");
+  JetIDTag_ = iConfig.getParameter<edm::InputTag> ("JetIDTag");
+  
+  TrackCountingHighEffBJetTagsTag_ = iConfig.getParameter<edm::InputTag>("TrackCountingHighEffBJetTagsTag");
+  TrackCountingHighPurBJetTagsTag_ = iConfig.getParameter<edm::InputTag>("TrackCountingHighPurBJetTagsTag");
+  JetProbabilityBJetTagsTag_       = iConfig.getParameter<edm::InputTag>("JetProbabilityBJetTagsTag");
+  JetBProbabilityBJetTagsTag_      = iConfig.getParameter<edm::InputTag>("JetBProbabilityBJetTagsTag");
   
   MCtruthTag_ = iConfig.getParameter<edm::InputTag>("MCtruthTag");
   genJetTag_ = iConfig.getParameter<edm::InputTag>("genJetTag");
@@ -230,12 +235,12 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig)
     
     NtupleFactory_->AddFloat("jets_trackCountingHighEffBJetTags");   
     NtupleFactory_->AddFloat("jets_trackCountingHighPurBJetTags");   
-    NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighEffBJetTags");   
-    NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighPurBJetTags");   
-    NtupleFactory_->AddFloat("jets_combinedSecondaryVertexBJetTags");   
-    NtupleFactory_->AddFloat("jets_combinedSecondaryVertexMVABJetTags");   
     NtupleFactory_->AddFloat("jets_jetProbabilityBJetTags");   
     NtupleFactory_->AddFloat("jets_jetBProbabilityBJetTags");   
+    //NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighEffBJetTags");   
+    //NtupleFactory_->AddFloat("jets_simpleSecondaryVertexHighPurBJetTags");   
+    //NtupleFactory_->AddFloat("jets_combinedSecondaryVertexBJetTags");   
+    //NtupleFactory_->AddFloat("jets_combinedSecondaryVertexMVABJetTags");   
 
     NtupleFactory_->AddFloat("jets_etaetaMoment");   
     NtupleFactory_->AddFloat("jets_phiphiMoment");   
@@ -431,7 +436,7 @@ void SimpleNtple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 ///---- HLT ----
 void SimpleNtple::fillHLTInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup) 
 {
-  std::cout << "SimpleNtple::fillHLTInfo::begin" << std::endl;
+  //std::cout << "SimpleNtple::fillHLTInfo::begin" << std::endl;
   
   edm::Handle<edm::TriggerResults> triggerResultsHandle;
   iEvent.getByLabel(HLTTag_, triggerResultsHandle);
@@ -464,7 +469,7 @@ void SimpleNtple::fillHLTInfo(const edm::Event & iEvent, const edm::EventSetup &
     NtupleFactory_ -> FillString("HLT_Names", triggerNames.triggerName(iHLT));
   }
   
-  std::cout << "SimpleNtple::fillHLTInfo::end" << std::endl;
+  //std::cout << "SimpleNtple::fillHLTInfo::end" << std::endl;
 }
 
 
@@ -475,7 +480,7 @@ void SimpleNtple::fillHLTInfo(const edm::Event & iEvent, const edm::EventSetup &
 ///---- primary vertex ----
 void SimpleNtple::fillPVInfo(const edm::Event & iEvent, const edm::EventSetup & iESetup) 
 {
-  std::cout << "SimpleNtple::fillPVInfo::begin" << std::endl;
+  //std::cout << "SimpleNtple::fillPVInfo::begin" << std::endl;
   
   edm::Handle<reco::VertexCollection> vertexes;
   iEvent.getByLabel(PVTag_, vertexes);
@@ -513,7 +518,7 @@ void SimpleNtple::fillPVInfo(const edm::Event & iEvent, const edm::EventSetup & 
   math::XYZPoint PVPoint(PV.position().x(), PV.position().y(), PV.position().z());
   PVPoint_ = PVPoint;
   
-  std::cout << "SimpleNtple::fillPVInfo::end" << std::endl;
+  //std::cout << "SimpleNtple::fillPVInfo::end" << std::endl;
 }
 
 
@@ -776,7 +781,7 @@ void SimpleNtple::fillJetInfo(const edm::Event & iEvent, const edm::EventSetup &
    iEvent.getByLabel(JetRefTag_, JetRefHandle);
   
   edm::Handle<reco::JetIDValueMap> jetIDHandle;
-  iEvent.getByLabel (jetIDTag_, jetIDHandle) ;
+  iEvent.getByLabel (JetIDTag_, jetIDHandle) ;
   
   
   
@@ -915,28 +920,29 @@ void SimpleNtple::fillJetBTaggingInfo(const edm::Event & iEvent, const edm::Even
   //std::cout << "SimpleNtple::fillJetBTaggingInfo::begin" << std::endl;
   
   edm::Handle<reco::JetTagCollection> bTagHandle_trackCountingHighEff;
-  iEvent.getByLabel("trackCountingHighEffBJetTags", bTagHandle_trackCountingHighEff);  
+  iEvent.getByLabel(TrackCountingHighEffBJetTagsTag_, bTagHandle_trackCountingHighEff);  
   
   edm::Handle<reco::JetTagCollection> bTagHandle_trackCountingHighPur;
-  iEvent.getByLabel("trackCountingHighPurBJetTags", bTagHandle_trackCountingHighPur);  
-  
-  edm::Handle<reco::JetTagCollection> bTagHandle_simpleSecondaryVertexHighEff;
-  iEvent.getByLabel("simpleSecondaryVertexHighEffBJetTags", bTagHandle_simpleSecondaryVertexHighEff);
-  
-  edm::Handle<reco::JetTagCollection> bTagHandle_simpleSecondaryVertexHighPur;
-  iEvent.getByLabel("simpleSecondaryVertexHighPurBJetTags", bTagHandle_simpleSecondaryVertexHighPur);
-  
-  edm::Handle<reco::JetTagCollection> bTagHandle_combinedSecondaryVertex;
-  iEvent.getByLabel("combinedSecondaryVertexBJetTags", bTagHandle_combinedSecondaryVertex);
-  
-  edm::Handle<reco::JetTagCollection> bTagHandle_combinedSecondaryVertexMVA;
-  iEvent.getByLabel("combinedSecondaryVertexMVABJetTags", bTagHandle_combinedSecondaryVertexMVA);  
+  iEvent.getByLabel(TrackCountingHighPurBJetTagsTag_, bTagHandle_trackCountingHighPur);  
   
   edm::Handle<reco::JetTagCollection> bTagHandle_jetProbability;
-  iEvent.getByLabel("jetProbabilityBJetTags", bTagHandle_jetProbability);
+  iEvent.getByLabel(JetProbabilityBJetTagsTag_, bTagHandle_jetProbability);
   
   edm::Handle<reco::JetTagCollection> bTagHandle_jetBProbability;
-  iEvent.getByLabel("jetBProbabilityBJetTags", bTagHandle_jetBProbability);
+  iEvent.getByLabel(JetBProbabilityBJetTagsTag_, bTagHandle_jetBProbability);
+  
+  //edm::Handle<reco::JetTagCollection> bTagHandle_simpleSecondaryVertexHighEff;
+  //iEvent.getByLabel("simpleSecondaryVertexHighEffBJetTags", bTagHandle_simpleSecondaryVertexHighEff);
+  //
+  //edm::Handle<reco::JetTagCollection> bTagHandle_simpleSecondaryVertexHighPur;
+  //iEvent.getByLabel("simpleSecondaryVertexHighPurBJetTags", bTagHandle_simpleSecondaryVertexHighPur);
+  //
+  //edm::Handle<reco::JetTagCollection> bTagHandle_combinedSecondaryVertex;
+  //iEvent.getByLabel("combinedSecondaryVertexBJetTags", bTagHandle_combinedSecondaryVertex);
+  //
+  //edm::Handle<reco::JetTagCollection> bTagHandle_combinedSecondaryVertexMVA;
+  //iEvent.getByLabel("combinedSecondaryVertexMVABJetTags", bTagHandle_combinedSecondaryVertexMVA);  
+  
   
   
   
@@ -978,82 +984,6 @@ void SimpleNtple::fillJetBTaggingInfo(const edm::Event & iEvent, const edm::Even
   
   
   
-  // simpleSecondaryVertexHighEff 
-  DRMin = 0.01;
-  jMin = -1;
-  
-  for(unsigned int j = 0; j < bTagHandle_simpleSecondaryVertexHighEff->size(); ++j)
-  {
-    float DRTemp = ROOT::Math::VectorUtil::DeltaR(v1, (*bTagHandle_simpleSecondaryVertexHighEff)[j].first->p4());
-    if(DRTemp < DRMin)
-    {
-      DRMin = DRTemp;
-      jMin = j;
-    }
-  }
-  
-  if(jMin != -1) NtupleFactory_->FillFloat("jets_simpleSecondaryVertexHighEffBJetTags", (*bTagHandle_simpleSecondaryVertexHighEff)[jMin].second);
-  else           NtupleFactory_->FillFloat("jets_simpleSecondaryVertexHighEffBJetTags", -999999.);
-  
-  
-  
-  // simpleSecondaryVertexHighPur 
-  DRMin = 0.01;
-  jMin = -1;
-  
-  for(unsigned int j = 0; j < bTagHandle_simpleSecondaryVertexHighPur->size(); ++j)
-  {
-    float DRTemp = ROOT::Math::VectorUtil::DeltaR(v1, (*bTagHandle_simpleSecondaryVertexHighPur)[j].first->p4());
-    if(DRTemp < DRMin)
-    {
-      DRMin = DRTemp;
-      jMin = j;
-    }
-  }
-  
-  if(jMin != -1) NtupleFactory_->FillFloat("jets_simpleSecondaryVertexHighPurBJetTags", (*bTagHandle_simpleSecondaryVertexHighPur)[jMin].second);
-  else           NtupleFactory_->FillFloat("jets_simpleSecondaryVertexHighPurBJetTags", -999999.);
-  
-  
-  
-  // combinedSecondaryVertex
-  DRMin = 0.01;
-  jMin = -1;
-  
-  for(unsigned int j = 0; j < bTagHandle_combinedSecondaryVertex->size(); ++j)
-  {
-    float DRTemp = ROOT::Math::VectorUtil::DeltaR(v1, (*bTagHandle_combinedSecondaryVertex)[j].first->p4());
-    if(DRTemp < DRMin)
-    {
-      DRMin = DRTemp;
-      jMin = j;
-    }
-  }
-  
-  if(jMin != -1) NtupleFactory_->FillFloat("jets_combinedSecondaryVertexBJetTags", (*bTagHandle_combinedSecondaryVertex)[jMin].second);
-  else           NtupleFactory_->FillFloat("jets_combinedSecondaryVertexBJetTags", -999999.);
-  
-  
-  
-  // combinedSecondaryVertexMVA
-  DRMin = 0.01;
-  jMin = -1;
-  
-  for(unsigned int j = 0; j < bTagHandle_combinedSecondaryVertexMVA->size(); ++j)
-  {
-    float DRTemp = ROOT::Math::VectorUtil::DeltaR(v1, (*bTagHandle_combinedSecondaryVertexMVA)[j].first->p4());
-    if(DRTemp < DRMin)
-    {
-      DRMin = DRTemp;
-      jMin = j;
-    }
-  }
-  
-  if(jMin != -1) NtupleFactory_->FillFloat("jets_combinedSecondaryVertexMVABJetTags", (*bTagHandle_combinedSecondaryVertexMVA)[jMin].second);
-  else           NtupleFactory_->FillFloat("jets_combinedSecondaryVertexMVABJetTags", -999999.);
-  
-  
-  
   // jetProbability
   DRMin = 0.01;
   jMin = -1;
@@ -1089,6 +1019,84 @@ void SimpleNtple::fillJetBTaggingInfo(const edm::Event & iEvent, const edm::Even
   
   if(jMin != -1) NtupleFactory_->FillFloat("jets_jetBProbabilityBJetTags", (*bTagHandle_jetBProbability)[jMin].second);
   else           NtupleFactory_->FillFloat("jets_jetBProbabilityBJetTags", -999999.);
+  
+  
+
+  //// simpleSecondaryVertexHighEff 
+  //DRMin = 0.01;
+  //jMin = -1;
+  //
+  //for(unsigned int j = 0; j < bTagHandle_simpleSecondaryVertexHighEff->size(); ++j)
+  //{
+  //  float DRTemp = ROOT::Math::VectorUtil::DeltaR(v1, (*bTagHandle_simpleSecondaryVertexHighEff)[j].first->p4());
+  //  if(DRTemp < DRMin)
+  //  {
+  //    DRMin = DRTemp;
+  //    jMin = j;
+  //  }
+  //}
+  //
+  //if(jMin != -1) NtupleFactory_->FillFloat("jets_simpleSecondaryVertexHighEffBJetTags", (*bTagHandle_simpleSecondaryVertexHighEff)[jMin].second);
+  //else           NtupleFactory_->FillFloat("jets_simpleSecondaryVertexHighEffBJetTags", -999999.);
+  
+  
+  
+  //// simpleSecondaryVertexHighPur 
+  //DRMin = 0.01;
+  //jMin = -1;
+  //
+  //for(unsigned int j = 0; j < bTagHandle_simpleSecondaryVertexHighPur->size(); ++j)
+  //{
+  //  float DRTemp = ROOT::Math::VectorUtil::DeltaR(v1, (*bTagHandle_simpleSecondaryVertexHighPur)[j].first->p4());
+  //  if(DRTemp < DRMin)
+  //  {
+  //    DRMin = DRTemp;
+  //    jMin = j;
+  //  }
+  //}
+  
+  //if(jMin != -1) NtupleFactory_->FillFloat("jets_simpleSecondaryVertexHighPurBJetTags", (*bTagHandle_simpleSecondaryVertexHighPur)[jMin].second);
+  //else           NtupleFactory_->FillFloat("jets_simpleSecondaryVertexHighPurBJetTags", -999999.);
+  
+  
+  
+  //// combinedSecondaryVertex
+  //DRMin = 0.01;
+  //jMin = -1;
+  //
+  //for(unsigned int j = 0; j < bTagHandle_combinedSecondaryVertex->size(); ++j)
+  //{
+  //  float DRTemp = ROOT::Math::VectorUtil::DeltaR(v1, (*bTagHandle_combinedSecondaryVertex)[j].first->p4());
+  //  if(DRTemp < DRMin)
+  //  {
+  //    DRMin = DRTemp;
+  //    jMin = j;
+  //  }
+  //}
+  
+  //if(jMin != -1) NtupleFactory_->FillFloat("jets_combinedSecondaryVertexBJetTags", (*bTagHandle_combinedSecondaryVertex)[jMin].second);
+  //else           NtupleFactory_->FillFloat("jets_combinedSecondaryVertexBJetTags", -999999.);
+  
+  
+  
+  //// combinedSecondaryVertexMVA
+  //DRMin = 0.01;
+  //jMin = -1;
+  //
+  //for(unsigned int j = 0; j < bTagHandle_combinedSecondaryVertexMVA->size(); ++j)
+  //{
+  //  float DRTemp = ROOT::Math::VectorUtil::DeltaR(v1, (*bTagHandle_combinedSecondaryVertexMVA)[j].first->p4());
+  //  if(DRTemp < DRMin)
+  //  {
+  //    DRMin = DRTemp;
+  //    jMin = j;
+  //  }
+  //}
+  //
+  //if(jMin != -1) NtupleFactory_->FillFloat("jets_combinedSecondaryVertexMVABJetTags", (*bTagHandle_combinedSecondaryVertexMVA)[jMin].second);
+  //else           NtupleFactory_->FillFloat("jets_combinedSecondaryVertexMVABJetTags", -999999.);
+  
+  
   
   //std::cout << "SimpleNtple::fillJetBTaggingInfo::end" << std::endl;
 }  

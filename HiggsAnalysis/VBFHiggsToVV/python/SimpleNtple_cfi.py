@@ -24,6 +24,11 @@ SimpleNtple = cms.EDAnalyzer(
      JetIDTag        = cms.InputTag("ak5JetID"),
      genJetTag       = cms.InputTag("ak5GenJets"),
 
+     TrackCountingHighEffBJetTagsTag = cms.InputTag("trackCountingHighEffBJetTags"),
+     TrackCountingHighPurBJetTagsTag = cms.InputTag("trackCountingHighPurBJetTags"),
+     JetProbabilityBJetTagsTag       = cms.InputTag("jetProbabilityBJetTags"),
+     JetBProbabilityBJetTagsTag      = cms.InputTag("jetBProbabilityBJetTags"),
+     
      MetTag          = cms.InputTag("corMetGlobalMuons"),
      Type1MetTag     = cms.InputTag("VBFType1Ak5CaloMet"),
      TcMetTag        = cms.InputTag("tcMet"),         

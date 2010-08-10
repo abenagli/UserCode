@@ -40,6 +40,12 @@ VBFL2L3Ak5CaloJetID = cms.EDProducer(
 
 
 
+# --- THE B-TAGGING --- --- --- --- --- --- --- --- --- --- ---
+
+from HiggsAnalysis.VBFHiggsToVV.VBFJetBTagging_cff import *
+
+
+
 # --- THE JET CLEANER --- --- --- --- --- --- --- --- --- --- ---
 #
 #from HiggsAnalysis.VBFHiggsToVV.VBFJetCleaner_cfi import *
@@ -133,6 +139,11 @@ VBFNtupleL2L3Ak5CaloJets.JetRefTag = cms.InputTag("VBFSelectedCaloJetsRefL2L3Ak5
 
 VBFNtupleL2L3Ak5CaloJets.JetIDTag = cms.InputTag("VBFL2L3Ak5CaloJetID")
 
+VBFNtupleL2L3Ak5CaloJets.TrackCountingHighEffBJetTagsTag = cms.InputTag("VBFL2L3Ak5CaloJetsTrackCountingHighEffBJetTags")
+VBFNtupleL2L3Ak5CaloJets.TrackCountingHighPurBJetTagsTag = cms.InputTag("VBFL2L3Ak5CaloJetsTrackCountingHighPurBJetTags")
+VBFNtupleL2L3Ak5CaloJets.JetProbabilityBJetTagsTag       = cms.InputTag("VBFL2L3Ak5CaloJetsJetProbabilityBJetTags")
+VBFNtupleL2L3Ak5CaloJets.JetBProbabilityBJetTagsTag      = cms.InputTag("VBFL2L3Ak5CaloJetsJetBProbabilityBJetTags")
+               
 VBFNtupleL2L3Ak5CaloJets.Type1MetTag = cms.InputTag("VBFType1Ak5CaloMet")
 
 VBFNtupleL2L3Ak5CaloJets.eventType       = cms.untracked.int32(1)
@@ -162,6 +173,9 @@ VBFPreselectionSequenceL2L3Ak5CaloJets = cms.Sequence(
     VBFType1Ak5CaloMetSequence +
 
     VBFL2L3Ak5CaloJetID +
+
+    VBFL2L3Ak5CaloJetsJetTracksAssociator +
+    VBFL2L3Ak5CaloJetsJetBtaggingIP +
     
     #VBFCleanedCaloJetsL2L3Ak5CaloJets +
     #VBFCleanedCaloJetsRefL2L3Ak5CaloJets +

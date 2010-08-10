@@ -118,7 +118,13 @@ public:
   edm::InputTag genJetTag_;
   edm::InputTag genMetTag_;
   
-  edm::InputTag jetIDTag_ ;
+  edm::InputTag JetIDTag_ ;
+  edm::InputTag TrackCountingHighEffBJetTagsTag_;
+  edm::InputTag TrackCountingHighPurBJetTagsTag_;
+  edm::InputTag JetProbabilityBJetTagsTag_;
+  edm::InputTag JetBProbabilityBJetTagsTag_;
+  
+  
   
   bool doEleRefCheck_;
   edm::InputTag EleRefTag_;
