@@ -200,7 +200,7 @@ process.VBFNtupleL2L3Ak5PFJets.EleTag = cms.InputTag("gsfElectrons::TEST")
 #    "PoolOutputModule",
 #    process.AODSIMEventContent,
 #    verbose = cms.untracked.bool(True),
-#    fileName = cms.untracked.string('VBFPreselection_DATA.root'),
+#    fileName = cms.untracked.string('VBFPreselection_EDM.root'),
 #    )
 #
 #process.out.outputCommands.extend(cms.untracked.vstring('keep *_*_*_TEST'))

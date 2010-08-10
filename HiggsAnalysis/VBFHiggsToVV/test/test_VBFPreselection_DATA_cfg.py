@@ -158,7 +158,7 @@ process.load("HiggsAnalysis.VBFHiggsToVV.VBFPreselection_L2L3Ak5PFJets_cff")
 #    "PoolOutputModule",
 #    process.AODSIMEventContent,
 #    verbose = cms.untracked.bool(True),
-#    fileName = cms.untracked.string('VBFPreselection_DATA.root'),
+#    fileName = cms.untracked.string('VBFPreselection_EDM.root'),
 #    )
 #
 #process.out.outputCommands.extend(cms.untracked.vstring('keep *_*_*_TEST'))
