@@ -8,6 +8,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 
 
 

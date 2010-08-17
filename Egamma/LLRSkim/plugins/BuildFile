@@ -3,4 +3,5 @@
     <use name=Egamma/LLRSkim>
     <use name=FWCore/Framework>
     <use name=clhep>
+    <use name=DataFormats/JetReco>
 </library>
