@@ -34,7 +34,7 @@ process.out = cms.OutputModule(
     verbose = cms.untracked.bool(True),
     outputCommands = cms.untracked.vstring('keep *_*_*_*'),
     fileName = cms.untracked.string('runRUNID_evtEVTID.root'),
-    Selectevents = cms.untracked.PSet(
+    SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('p')
         )
     )
