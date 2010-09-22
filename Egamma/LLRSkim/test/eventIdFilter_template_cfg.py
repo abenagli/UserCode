@@ -33,7 +33,7 @@ process.out = cms.OutputModule(
     "PoolOutputModule",
     verbose = cms.untracked.bool(True),
     outputCommands = cms.untracked.vstring('keep *_*_*_*'),
-    fileName = cms.untracked.string('runRUNID_evtEVTID.root'),
+    fileName = cms.untracked.string('JOBDIR/runRUNID_evtEVTID.root'),
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('p')
         )

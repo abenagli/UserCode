@@ -72,6 +72,7 @@ while (<USERCONFIG>)
   system ("cat ".$CMSSWCfgTemplate."   | sed -e s%RUNID%".$RUNId.
                                    "%g | sed -e s%LSID%".$LSId.
                                    "%g | sed -e s%EVTID%".$EVTId.
+                                   "%g | sed -e s%JOBDIR%".$JOBDir.
                                    "%g | sed -e s%LISTOFFILES%".$listOfFiles.
                                    "%g | sed -e s%APICE%\\'%g > ".$CMSSWCfgFile);
 
