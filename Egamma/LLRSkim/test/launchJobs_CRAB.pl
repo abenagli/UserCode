@@ -23,10 +23,11 @@ while (<USERCONFIG>)
   s/^\s+//;               # no leading white
   s/\s+$//;               # no trailing white
   
+  my $DATASETPath;
   my $RUNId;
   my $LSId;
   my $EVTId;
-  ($RUNId,$LSId,$EVTId) = split(" ");
+  ($DATASETPath,$RUNId,$LSId,$EVTId) = split(" ");
   
   print("\n\n\n");
   print("-------------------------------------------------------------------------\n");
@@ -36,7 +37,7 @@ while (<USERCONFIG>)
   
   
   my $BASEDir = getcwd;
-  my $JOBDir = $BASEDir."/run".$RUNId."_evt".$EVTId;
+  my $JOBDir = $BASEDir."/run".$RUNId."_evt".$EVTId."_CRAB";
   
   my $command = "mkdir ".$JOBDir;
   system($command);
@@ -71,6 +72,7 @@ while (<USERCONFIG>)
   system ("cat ".$CRABTemplate."   | sed -e s%RUNID%".$RUNId.
                                "%g | sed -e s%LSID%".$LSId.
                                "%g | sed -e s%EVTID%".$EVTId.
+                               "%g | sed -e s%DATASETPATH%".$DATASETPath.
                                "%g | sed -e s%CMSSWCFGFILE%".$CMSSWCfgFile.
                                "%g | sed -e s%JSONFILE%".$JSONFile.
                                "%g | sed -e s%WORKINGDIR%".$JOBDir."/"."CRAB".

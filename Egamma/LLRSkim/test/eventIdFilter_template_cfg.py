@@ -19,7 +19,7 @@ process.L2L3Ak5PFJets = process.ak5PFJetsL2L3.clone()
 process.source = cms.Source(
     "PoolSource",
     skipEvents = cms.untracked.uint32(0),                       
-    fileNames = cms.untracked.vstring()
+    fileNames = cms.untracked.vstring(LISTOFFILES)
 )
 
 process.maxEvents = cms.untracked.PSet(
