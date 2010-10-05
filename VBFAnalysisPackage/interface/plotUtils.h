@@ -17,6 +17,8 @@
 #include "THStack.h"
 #include "TLegend.h"
 #include "TAxis.h"
+#include "TF1.h"
+#include "TLatex.h"
 
 
 
@@ -43,6 +45,7 @@ class drawTStack
             const float& lumi, const int& step,
             const int& rebin, const bool& logy);
   void DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy);
+  void DrawEventRatio_nJets(const std::string& histoName, const float& lumi, const int& step, const bool& logy);
   
   void SetXaxisRange(const double& xMin, const double& xMax);
   void SetXaxisTitle(const std::string& xTitle);
@@ -53,6 +56,9 @@ class drawTStack
   void SetDrawLegend(const bool& drawLegend);
   void SetXLegend(const double& xLow, const double& xHigh);
   void SetYLegend(const double& yLow, const double& yHigh);
+
+  void SetUnit(const std::string& unit);  
+  
   
   
  private:
@@ -79,6 +85,7 @@ class drawTStack
   double m_yRangeMax;
   bool m_yAxisTitle;
   std::string m_yTitle;
+  std::string m_unit;
   
   bool m_drawLegend;
   double m_xLowLegend;
@@ -87,6 +94,7 @@ class drawTStack
   double m_yHighLegend;
   
   TCanvas* c1;
+  TCanvas* c2;
 };
 
 #endif
