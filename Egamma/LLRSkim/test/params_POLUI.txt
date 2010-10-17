@@ -1,1 +1,1 @@
-/EG/Run2010A-PromptReco-v4/RECO   143959   23   25765435
+/Electron/Run2010B-PromptReco-v2/RECO   146804   841   810240907
