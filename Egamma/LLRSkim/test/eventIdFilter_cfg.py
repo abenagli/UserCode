@@ -1,5 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 
+from PhysicsTools.PatAlgos.tools.metTools import *
+from PhysicsTools.PatAlgos.tools.jetTools import *
+from PhysicsTools.PatAlgos.tools.coreTools import *
+from PhysicsTools.PatAlgos.tools.pfTools import *
+
+
+
 process = cms.Process("EventIdFilter")
 
 
@@ -73,8 +80,20 @@ process.myEventIdFilter.runId = cms.int32(132959)
 process.myEventIdFilter.eventId = cms.int32(346686)
 
 
+
+# Pat sequences
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
+process.load("PhysicsTools.PatAlgos.tools.pfTools")
+postfix = "PFlow"
+usePF2PAT(process, runPF2PAT=True, jetAlgo='AK5', runOnMC=False, postfix=postfix)
+removeMCMatching(process, ['All'])
+process.patJets.addTagInfos = cms.bool(False)
+
+
+
 # Paths
-process.p = cms.Path(process.myEventIdFilter)
+process.p = cms.Path(process.myEventIdFilter*
+                     getattr(process,"patPF2PATSequence"+postfix))
 
 process.o = cms.EndPath(process.out)
 

@@ -1,18 +1,24 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("EventIdFilter")
+from PhysicsTools.PatAlgos.tools.metTools import *
+from PhysicsTools.PatAlgos.tools.jetTools import *
+from PhysicsTools.PatAlgos.tools.coreTools import *
+from PhysicsTools.PatAlgos.tools.pfTools import *
 
+
+
+process = cms.Process("EventIdFilter")
 
 # initialize MessageLogger and output report
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
 process.MessageLogger.cerr.threshold = 'INFO'
+process.load('Configuration.StandardSequences.GeometryExtended_cff')
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.GlobalTag.globaltag = "GR10_P_V9::All"
 
 
-# jet corrector
-process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
-process.L2L3Ak5CaloJets = process.ak5CaloJetsL2L3.clone()
-process.L2L3Ak5PFJets = process.ak5PFJetsL2L3.clone()
 
 
 # source
@@ -27,7 +33,6 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 
-
 # output
 process.out = cms.OutputModule(
     "PoolOutputModule",
@@ -40,6 +45,8 @@ process.out = cms.OutputModule(
     )
 
 
+
+
 # Event id filter
 from Egamma.LLRSkim.eventIdFilter_cfi import *
 process.myEventIdFilter = eventIdFilter.clone()
@@ -47,9 +54,23 @@ process.myEventIdFilter.runId   = cms.int32(RUNID)
 process.myEventIdFilter.eventId = cms.int32(EVTID)
 
 
-# Paths
-process.p = cms.Path(process.L2L3Ak5CaloJets +
-                     process.L2L3Ak5PFJets +
-                     process.myEventIdFilter)
 
+
+# Pat sequences
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
+process.load("PhysicsTools.PatAlgos.tools.pfTools")
+postfix = "PFlow"
+usePF2PAT(process, runPF2PAT=True, jetAlgo='AK5', runOnMC=False, postfix=postfix)
+removeMCMatching(process, ['All'])
+process.patJets.addTagInfos = cms.bool(False)
+
+
+
+
+# Paths
+process.p = cms.Path(process.myEventIdFilter *
+                     getattr(process,"patPF2PATSequence"+postfix)
+                     )
+
+process.out.outputCommands = cms.untracked.vstring( 'keep *' )
 process.o = cms.EndPath(process.out)
