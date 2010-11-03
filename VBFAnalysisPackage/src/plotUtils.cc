@@ -25,7 +25,7 @@ drawTStack::drawTStack(const std::string& inputDir,
  m_yAxisTitle(false),
  m_yTitle(""),
  m_drawLegend(true),
- m_xLowLegend(0.75),
+ m_xLowLegend(0.76),
  m_yLowLegend(0.78),
  m_xHighLegend(0.99),
  m_yHighLegend(0.99),
@@ -304,35 +304,50 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   double globalMaximum = 0.;
   double globalMinimum = 999999999999.;
   
-  char lumiBuffer[50];
-  sprintf(lumiBuffer, "#intLdt = %.3f pb^{-1}", lumi);
-  
   char binWidthBuffer[50];
   
   TLegend legend(m_xLowLegend, m_yLowLegend, m_xHighLegend, m_yHighLegend);
   legend.SetFillColor(kWhite);
   legend.SetFillStyle(4000);
   
-  TLatex *latex; 
+  char lumiBuffer[50];
+  sprintf(lumiBuffer, "CMS Preliminary 2010");
+  
+  char lumiBuffer2[50];
+  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.3f pb^{-1}", lumi);
+
+  TLatex *latex = new TLatex(0.76, 0.91, lumiBuffer); 
+  TLatex *latex2;
   if( mode == "eventsScaled" )
-    latex = new TLatex(0.77, 0.50, lumiBuffer);
+    latex2 = new TLatex(0.76, 0.88, lumiBuffer2);
   if( mode == "sameAreaStack" )
-    latex = new TLatex(0.77, 0.50, "norm. to same area");
+    latex2 = new TLatex(0.76, 0.88, "norm. to same area");
   if( mode == "sameAreaNoStack" )
-    latex = new TLatex(0.77, 0.50, "#splitline{each histo norm.}{to unit area}");
+    latex2 = new TLatex(0.76, 0.88, "#splitline{each histo norm.}{to unit area}");
+  //if( mode == "eventsScaled" )
+  //  latex = new TLatex(0.76, 0.50, lumiBuffer);
+  //if( mode == "sameAreaStack" )
+  //  latex = new TLatex(0.76, 0.50, "norm. to same area");
+  //if( mode == "sameAreaNoStack" )
+  //  latex = new TLatex(0.76, 0.50, "#splitline{each histo norm.}{to unit area}");
+  
   latex->SetNDC();
   latex->SetTextFont(42);
-  latex->SetTextSize(0.04);
+  latex->SetTextSize(0.03);
+  latex2->SetNDC();
+  latex2->SetTextFont(42);
+  latex2->SetTextSize(0.03);
   
-
   
   
   // loop over summed histograms
   i = 0;
+  int colorIt = -1;
   isFirstSample = true;
   for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
       mapIt != crossSection_summed.end(); ++mapIt)
   {    
+    ++colorIt;
     TH1F* globalHisto = histo_summed[mapIt->first];
     if(globalHisto -> GetEntries() == 0) continue;
     
@@ -341,7 +356,7 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     if(m_xAxisRange)
       globalHisto->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
     
-    sprintf(binWidthBuffer, "%.3f", globalHisto->GetBinWidth(1));
+    sprintf(binWidthBuffer, "%.2e", globalHisto->GetBinWidth(1));
     
     
     
@@ -359,8 +374,8 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     if( (mode == "eventsScaled") && (dataFlag_summed[mapIt->first] != 1) )
     {
       globalHisto -> Scale(1. * lumi);
-      globalHisto -> SetLineColor(getColor(i));
-      globalHisto -> SetFillColor(getColor(i));
+      globalHisto -> SetLineColor(getColor(colorIt));
+      globalHisto -> SetFillColor(getColor(colorIt));
       globalHisto -> SetFillStyle(3003);
       globalHisto -> SetLineWidth(2);
       
@@ -401,8 +416,8 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     if( (mode == "sameAreaStack") && (dataFlag_summed[mapIt->first] != 1) )
     {
       globalHisto -> Scale(dataGlobalGlobalIntegral/globalGlobalIntegral);
-      globalHisto -> SetLineColor(getColor(i));
-      globalHisto -> SetFillColor(getColor(i));
+      globalHisto -> SetLineColor(getColor(colorIt));
+      globalHisto -> SetFillColor(getColor(colorIt));
       globalHisto -> SetFillStyle(3003);
       globalHisto -> SetLineWidth(2);
       
@@ -490,10 +505,50 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   
   if( mode == "eventsScaled" )
   {
+    delete c1;
+    c1 = new TCanvas("c1","c1",800,800);
+    c1 -> cd();
+        
+    TPad* p1 = new TPad("p1","p1",0., 0.25, 1., 1.);
+    TPad* p2 = new TPad("p2","p2",0., 0., 1., 0.25);
+    p1 -> Draw();
+    p2 -> Draw();
+    
+    
+    p1 -> cd();
+    p1 -> SetGridx();
+    p1 -> SetGridy();
+    if(logy) p1 -> SetLogy();
+    
     hs -> Draw("HISTO");
     if(dataGlobalGlobalHisto != NULL) dataGlobalGlobalHisto -> Draw("P,same");
     
     hs->GetYaxis()->SetTitle(("events /" + std::string(binWidthBuffer)+" "+m_unit).c_str());
+    
+    if(dataGlobalGlobalHisto != NULL)
+    {
+      TH1F* ratioHisto = (TH1F*)(dataGlobalGlobalHisto -> Clone());
+      for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
+      {
+        if(globalGlobalHisto->GetBinContent(bin) == 0.) continue;
+        ratioHisto -> SetBinContent(bin, 1.*dataGlobalGlobalHisto->GetBinContent(bin)/globalGlobalHisto->GetBinContent(bin));
+        ratioHisto -> SetBinError(bin, 1.*dataGlobalGlobalHisto->GetBinError(bin)/globalGlobalHisto->GetBinContent(bin));
+      }
+      
+      p2 -> cd();
+      p2 -> SetGridx();
+      p2 -> SetGridy();
+      
+      ratioHisto -> GetYaxis() -> SetRangeUser(0., 2.);
+      ratioHisto -> Draw("P");
+      
+      TF1* line = new TF1("line", "1.", -1000000., 1000000.);
+      line -> SetLineWidth(2.);
+      line -> SetLineColor(kRed);
+      line -> Draw("same");
+    }
+    
+    p1 -> cd();
   }
 
   if( mode == "sameAreaNoStack" )
@@ -520,8 +575,11 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   
   if(m_drawLegend == true)
   {
+    legend.SetTextFont(42);  
+    legend.SetTextSize(0.025);
     legend.Draw("same");
     latex->Draw("same");
+    latex2->Draw("same");
   }
   
   
@@ -541,9 +599,7 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   hs -> GetXaxis() -> SetTitleSize(0.04);
   hs -> GetXaxis() -> SetLabelSize(0.03);
   hs -> GetXaxis() -> SetTitleOffset(1.25);
-
   if(m_xAxisRange) hs->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
-  
   
   
   // set y-axis properties
@@ -554,7 +610,7 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   
   hs->SetMinimum(0.);
   hs->SetMaximum(globalMaximum+0.1*globalMaximum);
-
+  
   if(logy)
   {
     hs->SetMinimum(pow(10., log10(globalMinimum) - 0.1));
@@ -581,7 +637,6 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   }
   //c1->Print((m_outputDir+fullTitle+".eps").c_str(), "eps");
   c1->Print((m_outputDir+fullTitle+".png").c_str(), "png");
-  
   
   
   // close root files
@@ -624,12 +679,19 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   legend.SetFillStyle(4000);
   
   char lumiBuffer[50];
-  sprintf(lumiBuffer, "#intLdt = %.3f pb^{-1}", lumi);
+  sprintf(lumiBuffer, "CMS Preliminary 2010");
+
+  char lumiBuffer2[100];
+  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.3f pb^{-1}", lumi);
   
-  TLatex *latex = new TLatex(0.77, 0.50, lumiBuffer);
+  TLatex* latex = new TLatex(0.76, 0.91, lumiBuffer);
+  TLatex* latex2 = new TLatex(0.76, 0.88, lumiBuffer2);
   latex->SetNDC();
   latex->SetTextFont(42);
-  latex->SetTextSize(0.04);
+  latex->SetTextSize(0.03);
+  latex2->SetNDC();
+  latex2->SetTextFont(42);
+  latex2->SetTextSize(0.03);
   
   double globalMaximum = 0.;
   double globalMinimum = 1.;
@@ -736,11 +798,19 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   
   
   std::ofstream* outFile = NULL;
+  std::ofstream* outFile_CoLeMIB = NULL;
+  std::ofstream* outFile_CoLeMIB_err = NULL;
 
   if(mode == "events")
+  {
     outFile = new std::ofstream((m_outputDir+"events.txt").c_str(), std::ios::out);  
+    outFile_CoLeMIB_err = new std::ofstream((m_outputDir+"events_CoLeMIB_err.txt").c_str(), std::ios::out);
+  }
   if(mode == "eventsScaled")
+  {
     outFile = new std::ofstream((m_outputDir+"eventsScaled.txt").c_str(), std::ios::out);
+    outFile_CoLeMIB = new std::ofstream((m_outputDir+"events_CoLeMIB.txt").c_str(), std::ios::out);
+  }
   if(mode == "eventsScaledStack")
     outFile = new std::ofstream((m_outputDir+"eventsScaledStack.txt").c_str(), std::ios::out);
   if(mode == "efficiencies")
@@ -875,8 +945,19 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       
       (*outFile) << "\n";
     }
-  
     
+    
+    
+    if(outFile_CoLeMIB)
+    {
+      (*outFile_CoLeMIB) << mapIt->first << ": "<< 1.*globalHisto -> GetBinContent(step) << ",   ";
+    }
+    
+    if(outFile_CoLeMIB_err)
+    {
+      double scale = lumi*mapIt->second/globalHisto->GetBinContent(1);
+      (*outFile_CoLeMIB_err) << mapIt->first << ": "<< 1.*sqrt(globalHisto -> GetBinContent(step)) * scale << ",   ";
+    }
     
     ++i;
   }
@@ -890,6 +971,10 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   c1 -> cd();
   c1 -> SetGridx();
   c1 -> SetGridy();
+  TPad* p1;
+  TPad* p2;
+  
+  
   
   if(mode != "eventsScaledStack")
   {
@@ -898,18 +983,36 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   }
   else
   {
+    delete c1;
+    c1 = new TCanvas("c1","c1",800,800);
+    c1 -> cd();
+        
+    p1 = new TPad("p1","p1",0., 0.25, 1., 1.);
+    p2 = new TPad("p2","p2",0., 0., 1., 0.25);
+    p1 -> Draw();
+    p2 -> Draw();
+    
+    p1 -> cd();
+    p1 -> SetGridx();
+    p1 -> SetGridy();
+    if(logy) p1 -> SetLogy();
+    
     if( hs->GetHists()->GetEntries() > 0 )
       hs -> Draw("HISTO");
   }
-  
+
+  legend.SetTextFont(42);  
+  legend.SetTextSize(0.025);
   legend.Draw("same");
   
   
   if(logy)
     c1 -> SetLogy();
   if(logy && nHists > 0)
-    hs->GetYaxis()->SetRangeUser(globalMinimum - 0.1*globalMinimum,
-                                 globalMaximum + 0.1*globalMaximum);
+  {
+    hs->SetMinimum(globalMinimum - 0.1*globalMinimum);
+    hs->SetMaximum(globalMaximum - 0.1*globalMaximum);
+  }
   
   if(nHists > 0)
   {
@@ -954,10 +1057,11 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   if(mode == "eventsScaled")
   {
     if(nHists > 0)
-      hs->GetYaxis()->SetTitle("events");
-    stepHisto->GetYaxis()->SetTitle("events");
+      hs->GetYaxis()->SetTitle("events scaled");
+    stepHisto->GetYaxis()->SetTitle("events scaled");
     
     latex->Draw("same");
+    latex2->Draw("same");
     
     if(histoData != NULL)
     {
@@ -977,14 +1081,17 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     
     c1->Print((m_outputDir+"eventsScaled.png").c_str(), "png");
   }
-
+  
+  
+  
   if(mode == "eventsScaledStack")
   {
     if(nHists > 0)
-      hs->GetYaxis()->SetTitle("events");
-    stepHisto->GetYaxis()->SetTitle("events");
+      hs->GetYaxis()->SetTitle("events scaled & stacked");
+    stepHisto->GetYaxis()->SetTitle("events scaled & stacked");
     
     latex->Draw("same");
+    latex2->Draw("same");
     
     if(histoData != NULL)
     {
@@ -994,7 +1101,33 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
         histoData->SetBinError(bin, sqrt(histoData->GetBinContent(bin)));
       
       histoData -> Draw("P,same");
+      
+      
+      
+      TH1F* ratioHisto = (TH1F*)(histoData -> Clone());
+      for(int bin = 1; bin <= histoData->GetNbinsX(); ++bin)
+      {
+        if(globalGlobalHisto->GetBinContent(bin) == 0.) continue;
+        ratioHisto -> SetBinContent(bin, 1.*histoData->GetBinContent(bin)/globalGlobalHisto->GetBinContent(bin));
+        ratioHisto -> SetBinError(bin, 1.*histoData->GetBinError(bin)/globalGlobalHisto->GetBinContent(bin));
+      }
+      
+      p2 -> cd();
+      p2 -> SetGridx();
+      p2 -> SetGridy();
+      
+      ratioHisto -> GetYaxis() -> SetRangeUser(0., 2.);
+      ratioHisto -> Draw("P");
+      
+      TF1* line = new TF1("line", "1.", -1000000., 1000000.);
+      line -> SetLineWidth(2.);
+      line -> SetLineColor(kRed);
+      line -> Draw("same");
+      
+      p1 -> cd();
     }
+    
+    
     
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
@@ -1004,38 +1137,9 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     }
     
     c1->Print((m_outputDir+"eventsScaledStack.png").c_str(), "png");
-    
-    
-    
-    if(histoData != NULL)
-    {
-      TCanvas* c2 = new TCanvas();
-      histoData -> SetBinContent(1, 1.);
-      histoData -> SetBinError(1, 0.);
-      for(int bin = 2; bin <= histoData->GetNbinsX(); ++bin)
-      {
-        histoData -> SetBinContent(bin, histoData->GetBinContent(bin)/globalGlobalHisto->GetBinContent(bin));
-        histoData -> SetBinError(bin, histoData->GetBinError(bin)/globalGlobalHisto->GetBinContent(bin));
-      }
-      
-      c2 -> cd();
-      c2 -> SetGridx();
-      c2 -> SetGridy();
-      histoData -> Draw("P");
-      c2->Print((m_outputDir+"eventsScaledStack_ratio.png").c_str(), "png");
-      
-      delete c2;
   }
-    
-    
-    // save root file
-    TFile* outRootFile = new TFile((m_outputDir+"eventsScaledStack_ratio.root").c_str(), "RECREATE");
-    outRootFile -> cd();
-    if(histoData != NULL) histoData -> Write();
-    outRootFile -> Close();
-    delete outRootFile;
-    
-  }
+  
+  
     
   if(mode == "efficiencies")
   {
@@ -1051,6 +1155,8 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     }
     c1->Print((m_outputDir+"efficiencies.png").c_str(), "png");
   }
+  
+  
   
   if(mode == "efficienciesRelative")
   {
@@ -1135,6 +1241,10 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   // close root files
   if(outFile)
     outFile -> close();
+  if(outFile_CoLeMIB)
+    outFile_CoLeMIB -> close();
+  if(outFile_CoLeMIB_err)
+    outFile_CoLeMIB_err -> close();
   
   for(unsigned int i = 0; i < rootFiles.size(); ++i)
   {
@@ -1324,7 +1434,7 @@ void drawTStack::DrawEventRatio_nJets(const std::string& histoName, const float&
       ++nHists;
     }
     
-    legend.AddEntry(globalHisto_ratio, (mapIt->first).c_str(), "L");
+    legend.AddEntry(globalHisto_ratio, (mapIt->first).c_str(), "F");
     
     
     
@@ -1379,7 +1489,11 @@ void drawTStack::DrawEventRatio_nJets(const std::string& histoName, const float&
     hs -> Draw("nostack");
   
   if(m_drawLegend == true)
+  {
+    legend.SetTextFont(42);
+    legend.SetTextSize(0.025);
     legend.Draw("same");
+  }
   
   
   if(logy)
