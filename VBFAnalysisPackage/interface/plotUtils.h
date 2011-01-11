@@ -9,17 +9,17 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
-#include <sys/stat.h> 
+#include <sys/stat.h>
 
 #include "TCanvas.h"
 #include "TFile.h"
 #include "TH1F.h"
+#include "TTree.h"
 #include "THStack.h"
 #include "TLegend.h"
 #include "TAxis.h"
-#include "TF1.h"
+//#include "TF1.h"
 #include "TLatex.h"
-
 
 
 double MyGetMinimum(const TH1F* histo, const double& minval, int binMin=-1, int binMax=-1);
@@ -41,9 +41,11 @@ class drawTStack
   
   
   //! methods
-  void Draw(const std::vector<std::string>& histoNames, const std::string& mode,
+  void Draw(std::vector<std::string>& variableNames, const std::string& histoName,
+            const std::string& mode,
             const float& lumi, const int& step,
-            const int& rebin, const bool& logy);
+            const int& nBins, const bool& logy,
+            std::vector<std::string>* cut = NULL);
   void DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy);
   void DrawEventRatio_nJets(const std::string& histoName, const float& lumi, const int& step, const bool& logy);
   
@@ -98,4 +100,3 @@ class drawTStack
 };
 
 #endif
-

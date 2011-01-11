@@ -1,3 +1,4 @@
+#include "TF1.h"
 #include "plotUtils.h"
 #include "setTDRStyle.h"
 
@@ -24,12 +25,12 @@ drawTStack::drawTStack(const std::string& inputDir,
  m_yRangeMax(1.),
  m_yAxisTitle(false),
  m_yTitle(""),
+ m_unit(""),
  m_drawLegend(true),
  m_xLowLegend(0.76),
  m_yLowLegend(0.78),
  m_xHighLegend(0.99),
  m_yHighLegend(0.99),
- m_unit(""),
  c1(NULL),
  c2(NULL)
 {
@@ -41,11 +42,11 @@ drawTStack::drawTStack(const std::string& inputDir,
   std::ifstream listFile( listFullFileName.c_str() );
   if(!listFile.is_open())
   {
-    std::cout << "\n>>>plotUtils::drawTStack::Error opening file " << listFullFileName << std::endl;
+    std::cout << "\n>>>plotUtils::drawTStack::Error opening file " << listFullFileName;
     exit(-1);
   }
   else
-    std::cout << "\n>>>plotUtils::drawTStack::Opening file " << listFullFileName << std::endl;
+    std::cout << "\n>>>plotUtils::drawTStack::Opening file " << listFullFileName;
   
   
   
@@ -57,9 +58,10 @@ drawTStack::drawTStack(const std::string& inputDir,
     int dataFlag;
     double mH;
     double crossSection;
+    double scaleFactor;
     std::string jetAlgorithm;
     
-    listFile >> sample >> sumName >> dataFlag >> mH >> crossSection >> jetAlgorithm;
+    listFile >> sample >> sumName >> dataFlag >> mH >> crossSection >> scaleFactor >> jetAlgorithm;
 
     if(sample.size() == 0)
       continue;
@@ -76,6 +78,7 @@ drawTStack::drawTStack(const std::string& inputDir,
               << mH << "\t"
               << std::setw(10)
               << crossSection << "\t" 
+              << scaleFactor << "\t" 
               << jetAlgorithm << "\t" 
               << std::endl;
     
@@ -83,7 +86,7 @@ drawTStack::drawTStack(const std::string& inputDir,
     m_list.push_back(dummyPair);
     m_dataFlag[sample] = dataFlag;
     m_mH[sample] = mH;
-    m_crossSection[sample] = crossSection;
+    m_crossSection[sample] = crossSection*scaleFactor;
     
     std::pair<std::string, std::string> dummyPair2(sample, jetAlgorithm);
     m_jetAlgorithm.push_back(dummyPair2);
@@ -101,10 +104,6 @@ drawTStack::drawTStack(const std::string& inputDir,
 
 drawTStack::~drawTStack()
 {
-  if( c1 != NULL)
-    delete c1;
-  if( c2 != NULL)
-    delete c2;
 }
 
 
@@ -112,12 +111,13 @@ drawTStack::~drawTStack()
 
 
 
-void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::string& mode,
+void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string& histoName,
+                      const std::string& mode,
                       const float& lumi, const int& step,
-                      const int& rebin, const bool& logy)
+                      const int& nBins, const bool& logy,
+                      std::vector<std::string>* cut)
 { 
-  std::cout << "\n>>>plotUtils::Draw::Drawing histogram " << histoNames.at(0);
-  for(unsigned int j = 1; j < histoNames.size(); ++j) std::cout << " + " << histoNames.at(j);
+  std::cout << "\n>>>plotUtils::Draw::Drawing histogram " << histoName;
   
   
   
@@ -145,11 +145,17 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   //--------------------------------
   // Draw::loop over all the samples
   //--------------------------------
+  c1 = new TCanvas();
+  c1 -> cd();
+  c1 -> SetGridx();
+  c1 -> SetGridy();
   
+   
   int binMin = -1;
   int binMax = -1;
   int i = 0;
   std::vector<TFile*> rootFiles;
+  std::vector<TTree*> trees;
   for(std::vector<std::pair<std::string, std::string> >::const_iterator vecIt = m_list.begin();
       vecIt != m_list.end(); ++vecIt)
   {
@@ -160,28 +166,26 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     if(!(rootFiles.at(i))->IsOpen()) exit(-1);
     
     
-    // Draw::get histogram
-    TH1F* histo = NULL;
-    for(unsigned int j = 0; j < histoNames.size(); ++j)
+    // Draw::get tree
+    TTree* tree;
+    char treeName[50];
+    sprintf(treeName, "ntu_%d", step);
+    rootFiles.at(i) -> GetObject(treeName, tree);
+    trees.push_back(tree);
+    
+    
+    // Draw:: dump tree into histogram
+    TH1F* histo = new TH1F(histoName.c_str(), "", nBins, m_xRangeMin, m_xRangeMax);    
+    for(unsigned int jj = 0; jj < variableNames.size(); ++jj)
     {
-      char buffer[10];
-      sprintf(buffer, "%d", step);
-      std::string fullHistoName = histoNames.at(j) + "/" + "h_" + buffer + "_" + histoNames.at(j);
-      //std::cout << "getting histogram " << fullHistoName << std::endl;
-      
-      TH1F* tempHisto = NULL;
-      rootFiles.at(i) -> GetObject(fullHistoName.c_str(), tempHisto);
-      if(tempHisto == NULL)
-      {
-        std::cout << ">>>plotUtils::Error in getting object " << fullHistoName << std::endl;
-        exit(-1);
-      }
-      
-      if(histo != NULL) histo -> Add(tempHisto);
-      else histo = tempHisto;
+      //std::cout << "Draw::Dumping tree variable " << (variableNames.at(jj)+">>"+histoName).c_str() << std::endl;
+      if(cut != NULL)
+        tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), (cut->at(jj)).c_str() );
+      else
+        tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str());
     }
     
-
+    
     // Draw::get event histogram
     std::string eventsHistoName = "events";
     //std::cout << "getting histogram " << eventsHistoName << std::endl;
@@ -190,7 +194,7 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     rootFiles.at(i) -> GetObject(eventsHistoName.c_str(), eventsHisto);
     if(eventsHisto == NULL)
     {
-      std::cout << ">>>plotUtils::Error in getting object " << eventsHistoName << std::endl;
+      std::cout << ">>>plotUtils::Error in getting object " << eventsHistoName;
       exit(-1);
     }
     
@@ -199,7 +203,6 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     // Draw::scale histograms normalizing to lumi (1. pb^-1)
     // Draw::if data do not apply any scale factor
     histo -> Sumw2();
-    histo -> Rebin(rebin);
     dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
     
     if( (histo->GetEntries() > 0.) && (m_dataFlag[vecIt->first] != 1) )
@@ -317,7 +320,7 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.3f pb^{-1}", lumi);
 
   TLatex *latex = new TLatex(0.76, 0.91, lumiBuffer); 
-  TLatex *latex2;
+  TLatex *latex2 = NULL;
   if( mode == "eventsScaled" )
     latex2 = new TLatex(0.76, 0.88, lumiBuffer2);
   if( mode == "sameAreaStack" )
@@ -428,6 +431,12 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     
     
     
+    // global minimum
+   if(MyGetMinimum(globalHisto, 1.E-15, binMin, binMax) < globalMinimum)
+      globalMinimum = MyGetMinimum(globalHisto, 1.E-15, binMin, binMax);
+    
+    
+    
     // MC
     if( (globalGlobalHisto != 0) && (dataFlag_summed[mapIt->first] != 1) )
       globalGlobalHisto -> Add(globalHisto);
@@ -451,8 +460,8 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   {
     if(globalGlobalHisto->GetMaximum() > globalMaximum)
       globalMaximum = globalGlobalHisto -> GetMaximum();
-    if(MyGetMinimum(globalGlobalHisto, 1.E-15, binMin, binMax) < globalMinimum)
-      globalMinimum = MyGetMinimum(globalGlobalHisto, 1.E-15, binMin, binMax);
+    //if(MyGetMinimum(globalGlobalHisto, 1.E-15, binMin, binMax) < globalMinimum)
+    //  globalMinimum = MyGetMinimum(globalGlobalHisto, 1.E-15, binMin, binMax);
   }
   
   if( (dataGlobalGlobalHisto != NULL) && (mode != "sameAreaNoStack") )
@@ -462,9 +471,6 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     if(MyGetMinimum(dataGlobalGlobalHisto, 1.E-15, binMin, binMax) < globalMinimum)
       globalMinimum = MyGetMinimum(dataGlobalGlobalHisto, 1.E-15, binMin, binMax);
   } 
-
-  
-  
   
   
   
@@ -474,7 +480,7 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   // if no histograms had entries, return
   if(i == 0)
   {
-    std::cout << ">>>plotUtils::Draw::Error, histograms empty" << std::endl;
+    std::cout << ">>>plotUtils::Draw::Error, histograms empty";
 
     // close root files
     for(unsigned int i = 0; i < rootFiles.size(); ++i)
@@ -491,19 +497,11 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   
   
   // draw the stack and save file
-  c1 = new TCanvas();
-  c1 -> cd();
-  c1 -> SetGridx();
-  c1 -> SetGridy();
-  if(logy) c1 -> SetLogy();
-  
-  
-  
   if( (nHists == 0) && (dataGlobalGlobalHisto != NULL) )
     hs -> Add(dataGlobalGlobalHisto);
   
   
-  if( mode == "eventsScaled" )
+  if( (mode == "eventsScaled") || (mode == "sameAreaStack") )
   {
     delete c1;
     c1 = new TCanvas("c1","c1",800,800);
@@ -513,8 +511,9 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     TPad* p2 = new TPad("p2","p2",0., 0., 1., 0.25);
     p1 -> Draw();
     p2 -> Draw();
-    
-    
+
+
+
     p1 -> cd();
     p1 -> SetGridx();
     p1 -> SetGridy();
@@ -543,12 +542,12 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
       ratioHisto -> Draw("P");
       
       TF1* line = new TF1("line", "1.", -1000000., 1000000.);
-      line -> SetLineWidth(2.);
+      line -> SetLineWidth(2);
       line -> SetLineColor(kRed);
       line -> Draw("same");
     }
-    
     p1 -> cd();
+    
   }
 
   if( mode == "sameAreaNoStack" )
@@ -559,14 +558,6 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
       dataGlobalGlobalHisto -> Scale(1./dataGlobalGlobalHisto->Integral(1, dataGlobalGlobalHisto->GetNbinsX()));
       dataGlobalGlobalHisto -> Draw("P,same");
     }
-    
-    hs->GetYaxis()->SetTitle("event fraction");
-  }
-  
-  if( mode == "sameAreaStack" )
-  {
-    hs -> Draw("HISTO");
-    if(dataGlobalGlobalHisto != NULL) dataGlobalGlobalHisto -> Draw("P,same");
     
     hs->GetYaxis()->SetTitle("event fraction");
   }
@@ -584,13 +575,8 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   
   
   
-  
-  
-  
   // set x-axis properties
-  std::string fullTitle = histoNames.at(0);
-  for(unsigned int j = 1; j < histoNames.size(); ++j)
-    fullTitle += "+" + histoNames.at(j); 
+  std::string fullTitle = histoName;
   char stepTitle[50];
   sprintf(stepTitle, "_%d", step);
   //fullTitle += std::string(stepTitle);
@@ -610,12 +596,11 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   
   hs->SetMinimum(0.);
   hs->SetMaximum(globalMaximum+0.1*globalMaximum);
-  
   if(logy)
   {
     hs->SetMinimum(pow(10., log10(globalMinimum) - 0.1));
     hs->SetMaximum(pow(10., log10(globalMaximum) + 0.1));
-  } 
+  }
   
   if(m_yAxisRange)
   {
@@ -625,18 +610,121 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
   
   
   
-  
-  
-  
   // write plots
   struct stat st;
   if(stat(m_outputDir.c_str(), &st) != 0)
   {
-    std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+    std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
     exit(-1);
   }
   //c1->Print((m_outputDir+fullTitle+".eps").c_str(), "eps");
   c1->Print((m_outputDir+fullTitle+".png").c_str(), "png");
+  
+  
+  
+  
+  
+  
+  c2 = new TCanvas("c2", "c2");
+  c2 -> cd();
+  c2 -> SetGridx();
+  c2 -> SetGridy();
+  c2 -> SetLogy();
+  
+  if( (mode == "eventsScaled") || (mode == "sameAreaStack") )
+  {
+    delete c2;
+    c2 = new TCanvas("c2","c2",800,800);
+    c2 -> cd();
+        
+    TPad* p3 = new TPad("p3","p3",0., 0.25, 1., 1.);
+    TPad* p4 = new TPad("p4","p4",0., 0., 1., 0.25);
+    p3 -> Draw();
+    p4 -> Draw();
+
+
+
+    p3 -> cd();
+    p3 -> SetGridx();
+    p3 -> SetGridy();
+    p3 -> SetLogy();
+    
+    hs -> Draw("HISTO");
+    if(dataGlobalGlobalHisto != NULL) dataGlobalGlobalHisto -> Draw("P,same");
+    
+    if(dataGlobalGlobalHisto != NULL)
+    {
+      TH1F* ratioHisto = (TH1F*)(dataGlobalGlobalHisto -> Clone());
+      for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
+      {
+        if(globalGlobalHisto->GetBinContent(bin) == 0.) continue;
+        ratioHisto -> SetBinContent(bin, 1.*dataGlobalGlobalHisto->GetBinContent(bin)/globalGlobalHisto->GetBinContent(bin));
+        ratioHisto -> SetBinError(bin, 1.*dataGlobalGlobalHisto->GetBinError(bin)/globalGlobalHisto->GetBinContent(bin));
+      }
+      
+      p4 -> cd();
+      p4 -> SetGridx();
+      p4 -> SetGridy();
+      
+      ratioHisto -> GetYaxis() -> SetRangeUser(0., 2.);
+      ratioHisto -> Draw("P");
+      
+      TF1* line = new TF1("line", "1.", -1000000., 1000000.);
+      line -> SetLineWidth(2);
+      line -> SetLineColor(kRed);
+      line -> Draw("same");
+    }
+    p3 -> cd();
+    
+  }
+  
+  if( mode == "sameAreaNoStack" )
+  {
+    hs -> Draw("nostack,HISTO");
+    if(dataGlobalGlobalHisto != NULL)
+    {
+      dataGlobalGlobalHisto -> Scale(1./dataGlobalGlobalHisto->Integral(1, dataGlobalGlobalHisto->GetNbinsX()));
+      dataGlobalGlobalHisto -> Draw("P,same");
+    }
+    
+    hs->GetYaxis()->SetTitle("event fraction");
+  }
+  
+  
+  
+  if(m_drawLegend == true)
+  {
+    legend.SetTextFont(42);  
+    legend.SetTextSize(0.025);
+    legend.Draw("same");
+    latex->Draw("same");
+    latex2->Draw("same");
+  }
+  
+  
+  
+  hs->SetMinimum(pow(10., log10(globalMinimum) - 0.1));
+  hs->SetMaximum(pow(10., log10(globalMaximum) + 0.1));
+  
+  if(m_yAxisRange)
+  {
+    hs->SetMinimum(m_yRangeMin);
+    hs->SetMaximum(m_yRangeMax);
+  }
+  
+  
+  
+  // write plots
+  if(stat(m_outputDir.c_str(), &st) != 0)
+  {
+    std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
+    exit(-1);
+  }
+  //c2->Print(("log_"+m_outputDir+fullTitle+".eps").c_str(), "eps");
+  c2->Print((m_outputDir+"log_"+fullTitle+".png").c_str(), "png");
+  
+  
+  
   
   
   // close root files
@@ -645,14 +733,15 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
     rootFiles.at(i) -> Close();
     delete rootFiles.at(i);
   }
-  
+
   m_xAxisRange = false;
   m_xAxisTitle = false;
   m_yAxisRange = false;
   m_yAxisTitle = false;
   
-  delete c1;
   delete hs;
+  delete c1;
+  delete c2;
 }
 
 
@@ -668,7 +757,7 @@ void drawTStack::Draw(const std::vector<std::string>& histoNames, const std::str
 
 void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy)
 { 
-  std::cout << "\n>>>plotUtils::Drawing " << mode << std::endl;
+  std::cout << "\n>>>plotUtils::Drawing " << mode;
   
   
   
@@ -743,7 +832,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     rootFiles.at(i) -> GetObject(fullHistoName.c_str(), histo);
     if(histo == NULL)
     {
-      std::cout << ">>>plotUtils::Error in getting object " << fullHistoName << std::endl;
+      std::cout << ">>>plotUtils::Error in getting object " << fullHistoName;
       exit(-1);
     }
     
@@ -804,12 +893,12 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   if(mode == "events")
   {
     outFile = new std::ofstream((m_outputDir+"events.txt").c_str(), std::ios::out);  
-    outFile_CoLeMIB_err = new std::ofstream((m_outputDir+"events_CoLeMIB_err.txt").c_str(), std::ios::out);
+    outFile_CoLeMIB_err = new std::ofstream((m_outputDir+"events_CoLeMIB_err.csv").c_str(), std::ios::out);
   }
   if(mode == "eventsScaled")
   {
     outFile = new std::ofstream((m_outputDir+"eventsScaled.txt").c_str(), std::ios::out);
-    outFile_CoLeMIB = new std::ofstream((m_outputDir+"events_CoLeMIB.txt").c_str(), std::ios::out);
+    outFile_CoLeMIB = new std::ofstream((m_outputDir+"events_CoLeMIB.csv").c_str(), std::ios::out);
   }
   if(mode == "eventsScaledStack")
     outFile = new std::ofstream((m_outputDir+"eventsScaledStack.txt").c_str(), std::ios::out);
@@ -950,13 +1039,13 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     
     if(outFile_CoLeMIB)
     {
-      (*outFile_CoLeMIB) << mapIt->first << ": "<< 1.*globalHisto -> GetBinContent(step) << ",   ";
+      (*outFile_CoLeMIB) << mapIt->first << ",\t\t\t"<< 1.*globalHisto -> GetBinContent(step) << std::endl;
     }
     
     if(outFile_CoLeMIB_err)
     {
       double scale = lumi*mapIt->second/globalHisto->GetBinContent(1);
-      (*outFile_CoLeMIB_err) << mapIt->first << ": "<< 1.*sqrt(globalHisto -> GetBinContent(step)) * scale << ",   ";
+      (*outFile_CoLeMIB_err) << mapIt->first << ",\t\t\t"<< 1.*sqrt(globalHisto -> GetBinContent(step)) * scale << std::endl;
     }
     
     ++i;
@@ -967,12 +1056,12 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   
   
   // draw the stack and save file
-  TCanvas* c1 = new TCanvas();
+  c1 = new TCanvas();
   c1 -> cd();
   c1 -> SetGridx();
   c1 -> SetGridy();
-  TPad* p1;
-  TPad* p2;
+  TPad* p1 = NULL;
+  TPad* p2 = NULL;
   
   
   
@@ -1048,7 +1137,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
-      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
     c1->Print((m_outputDir+"events.png").c_str(), "png");
@@ -1075,7 +1164,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
-      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
     
@@ -1120,7 +1209,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       ratioHisto -> Draw("P");
       
       TF1* line = new TF1("line", "1.", -1000000., 1000000.);
-      line -> SetLineWidth(2.);
+      line -> SetLineWidth(2);
       line -> SetLineColor(kRed);
       line -> Draw("same");
       
@@ -1132,7 +1221,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
-      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
     
@@ -1150,7 +1239,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
-      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
     c1->Print((m_outputDir+"efficiencies.png").c_str(), "png");
@@ -1167,7 +1256,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
-      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
     c1->Print((m_outputDir+"efficienciesRelative.png").c_str(), "png");  
@@ -1181,7 +1270,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
-      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+      std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
     c1->Print((m_outputDir+"significance.png").c_str(), "png");
@@ -1219,7 +1308,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   struct stat st;
   if(stat(m_outputDir.c_str(), &st) != 0)
   {
-    std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+    std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
     exit(-1);
   }
   c1->Print( (m_outputDir+mode+"_step.png").c_str(), "png");
@@ -1258,7 +1347,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
 
 
 
-
+/*
 void drawTStack::DrawEventRatio_nJets(const std::string& histoName, const float& lumi, const int& step, const bool& logy)
 { 
   std::cout << "\n>>>plotUtils::Drawing event ratio" << std::endl;
@@ -1327,7 +1416,7 @@ void drawTStack::DrawEventRatio_nJets(const std::string& histoName, const float&
     rootFiles.at(i) -> GetObject(fullHistoName_minus.c_str(), histo_minus);
     if( (histo_plus == NULL) || (histo_minus == NULL) )
     {
-      std::cout << ">>>plotUtils::Error in getting object " << fullHistoName_plus << " and " << fullHistoName_minus << std::endl;
+      std::cout << ">>>plotUtils::Error in getting object " << fullHistoName_plus << " and " << fullHistoName_minus;
       exit(-1);
     }
     
@@ -1548,7 +1637,7 @@ void drawTStack::DrawEventRatio_nJets(const std::string& histoName, const float&
   struct stat st;
   if(stat(m_outputDir.c_str(), &st) != 0)
   {
-    std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir << std::endl;
+    std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
     exit(-1);
   }
     
@@ -1575,7 +1664,7 @@ void drawTStack::DrawEventRatio_nJets(const std::string& histoName, const float&
   }
     
 }
-
+*/
 
 
 
