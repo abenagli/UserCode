@@ -44,7 +44,7 @@ int main(int argc, char** argv)
   int entryFIRST  = gConfigParser -> readIntOption("Options::entryFIRST");
   int entryMAX    = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
-  int dataFlag       = gConfigParser -> readFloatOption("Options::dataFlag");
+  int dataFlag       = gConfigParser -> readIntOption("Options::dataFlag");
   float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   
   int nJetMIN = gConfigParser -> readIntOption("Cuts::nJetMIN");
@@ -54,7 +54,6 @@ int main(int argc, char** argv)
     
   int nLepMIN = gConfigParser -> readIntOption("Cuts::nLepMIN");
   int nLepMAX = gConfigParser -> readIntOption("Cuts::nLepMAX");
-  float lepPtMIN = gConfigParser -> readFloatOption("Cuts::lepPtMIN");
   
   std::string leptonFLAVOUR = gConfigParser -> readStringOption("Cuts::leptonFLAVOUR");  
   
