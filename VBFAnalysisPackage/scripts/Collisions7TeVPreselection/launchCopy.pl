@@ -53,7 +53,8 @@ open (LISTOFSamples,$LISTOFSamples) ;
 while (<LISTOFSamples>)
 {
   chomp($_);
-  $sample = $_;
+  
+  ($sample,$dummy,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
   $subsample = substr($sample,0,1);
   if($subsample eq "#")
   {

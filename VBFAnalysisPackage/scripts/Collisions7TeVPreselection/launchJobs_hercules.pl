@@ -67,7 +67,8 @@ while (<LISTOFSamples>)
   system("cd ".$BASEDir."\n");
 
   chomp($_);
-  $sample = $_;
+
+  ($sample,$dummy,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
   $subsample = substr($sample,0,1);
   if($subsample eq "#")
   {
@@ -206,7 +207,7 @@ while (<LISTOFSamples>)
     $command = "qsub -V -q production -d ".$jobDir." ".$tempBjob."\n" ;  
     print SAMPLEJOBLISTFILE $command."\n";
     
-    print "\n" ;
+    #print "\n" ;
   }
 
   system ("rm ".$LISTOFFiles) ;
