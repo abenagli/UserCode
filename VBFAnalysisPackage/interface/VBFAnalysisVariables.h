@@ -104,6 +104,9 @@ struct VBFAnalysisVariables
   int nJets_btw;
   float jets_bTag1;
   float jets_bTag2;
+  float HT;
+  float HT_cnt;
+  float HT_fwd;
   
   ROOT::Math::XYZTVector* p_leadingJ;
   ROOT::Math::XYZTVector leadingJ;
@@ -119,6 +122,9 @@ struct VBFAnalysisVariables
   
   ROOT::Math::XYZTVector* p_WJ2;
   ROOT::Math::XYZTVector WJ2;
+  
+  ROOT::Math::XYZTVector* p_WJ12;
+  ROOT::Math::XYZTVector WJ12;
   
   float WJ1_charge;
   float WJ2_charge;
@@ -149,6 +155,15 @@ struct VBFAnalysisVariables
   float tagJ2_charge;
   float tagJ1_bTag;
   float tagJ2_bTag;  
+  
+  
+  
+  // third jet variables
+  ROOT::Math::XYZTVector thirdJ;
+  ROOT::Math::XYZTVector* p_thirdJ;
+  
+  float thirdJ_charge;
+  float thirdJ_bTag;
 };
 
 

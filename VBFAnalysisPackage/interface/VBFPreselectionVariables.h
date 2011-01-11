@@ -40,7 +40,9 @@ struct VBFPreselectionVariables
   // lepton variables
   std::vector<ROOT::Math::XYZTVector> leptons;
   std::vector<ROOT::Math::XYZTVector> electrons;
+  std::vector<ROOT::Math::XYZTVector> electrons_loose;
   std::vector<ROOT::Math::XYZTVector> muons;
+  std::vector<ROOT::Math::XYZTVector> muons_loose;
   std::vector<float> leptonCharges;
   std::vector<std::string> leptonFlavours;    
   std::vector<float> leptons_dxy;
@@ -138,6 +140,9 @@ struct VBFPreselectionVariables
   int nJets_btw;
   float jets_bTag1;
   float jets_bTag2;
+  float HT;
+  float HT_cnt;
+  float HT_fwd;
   
   int selectIt_leadingJet;
   
@@ -158,6 +163,7 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector* p_WJ2;
   
   ROOT::Math::XYZTVector WJ12;
+  ROOT::Math::XYZTVector* p_WJ12;
   
   float WJ1_charge;
   float WJ2_charge;
@@ -195,6 +201,17 @@ struct VBFPreselectionVariables
   float tagJ2_charge;
   float tagJ1_bTag;
   float tagJ2_bTag;  
+  
+  
+  
+  // third jet variables
+  int selectIt_thirdJet;
+  
+  ROOT::Math::XYZTVector thirdJ;
+  ROOT::Math::XYZTVector* p_thirdJ;
+  
+  float thirdJ_charge;
+  float thirdJ_bTag;
 };
 
 
@@ -214,4 +231,5 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
 void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT);
 void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
+void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader);

@@ -66,7 +66,10 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("nJets_fwd",  &vars.nJets_fwd,   "nJets_fwd/I");
   vars.m_reducedTree -> Branch("nJets_btw",  &vars.nJets_btw,   "nJets_btw/I"); 
   vars.m_reducedTree -> Branch("jets_bTag1", &vars.jets_bTag1, "jets_bTag1/F"); 
-  vars.m_reducedTree -> Branch("jets_bTag2", &vars.jets_bTag1, "jets_bTag2/F"); 
+  vars.m_reducedTree -> Branch("jets_bTag2", &vars.jets_bTag2, "jets_bTag2/F"); 
+  vars.m_reducedTree -> Branch("HT",         &vars.HT,                 "HT/F"); 
+  vars.m_reducedTree -> Branch("HT_cnt",     &vars.HT_cnt,         "HT_cnt/F"); 
+  vars.m_reducedTree -> Branch("HT_fwd",     &vars.HT_fwd,         "HT_fwd/F"); 
   
   
   // leading jet variables
@@ -76,8 +79,9 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   
   // W-jet variables
-  vars.m_reducedTree -> Branch("WJ1", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1);
-  vars.m_reducedTree -> Branch("WJ2", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2);
+  vars.m_reducedTree -> Branch("WJ1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1);
+  vars.m_reducedTree -> Branch("WJ2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2);
+  vars.m_reducedTree -> Branch("WJ12", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ12);
   vars.m_reducedTree -> Branch("WJ1_charge", &vars.WJ1_charge, "WJ1_charge/F");
   vars.m_reducedTree -> Branch("WJ2_charge", &vars.WJ2_charge, "WJ2_charge/F");
   vars.m_reducedTree -> Branch("WJ1_bTag",   &vars.WJ1_bTag,     "WJ1_bTag/F");
@@ -101,6 +105,12 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("tagJ2_charge", &vars.tagJ2_charge, "tagJ2_charge/F");
   vars.m_reducedTree -> Branch("tagJ1_bTag",   &vars.tagJ1_bTag,     "tagJ1_bTag/F");
   vars.m_reducedTree -> Branch("tagJ2_bTag",   &vars.tagJ2_bTag,     "tagJ2_bTag/F");
+  
+  
+  // third jet variables
+  vars.m_reducedTree -> Branch("thirdJ", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_thirdJ);
+  vars.m_reducedTree -> Branch("thirdJ_charge", &vars.thirdJ_charge, "thirdJ_charge/F");
+  vars.m_reducedTree -> Branch("thirdJ_bTag",   &vars.thirdJ_bTag,     "thirdJ_bTag/F");
 }
 
 
@@ -129,7 +139,9 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   // lepton variables
   vars.leptons.clear();
   vars.electrons.clear();
+  vars.electrons_loose.clear();
   vars.muons.clear();
+  vars.muons_loose.clear();
   vars.leptonCharges.clear();
   vars.leptonFlavours.clear();    
   vars.leptons_dxy.clear();
@@ -227,6 +239,9 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.nJets_btw = 0;
   vars.jets_bTag1 = -99.;
   vars.jets_bTag2 = -99.;
+  vars.HT = 0.;
+  vars.HT_cnt = 0.;
+  vars.HT_fwd = 0.;
   
   vars.selectIt_leadingJet = -1;
   
@@ -247,6 +262,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.p_WJ2 = NULL;
   
   vars.WJ12 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_WJ12 = NULL;
   
   vars.WJ1_charge = -99.;
   vars.WJ2_charge = -99.;
@@ -284,6 +300,17 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.tagJ2_charge = -99.;
   vars.tagJ1_bTag = -99.;
   vars.tagJ2_bTag = -99.;
+  
+  
+  
+  // third jet variables
+  vars.selectIt_thirdJet = -1;
+  
+  vars.thirdJ = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_thirdJ = NULL;
+  
+  vars.thirdJ_charge = -99.;
+  vars.thirdJ_bTag = -99.;
 }
 
 
@@ -442,9 +469,20 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
   ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);  
 
   vars.jets.push_back( reader.Get4V("jets")->at(jetIt) );
-  if( fabs(jet.eta()) < jetEtaCNT )  vars.jets_cnt.push_back( reader.Get4V("jets")->at(jetIt) );
-  if( fabs(jet.eta()) >= jetEtaFWD ) vars.jets_fwd.push_back( reader.Get4V("jets")->at(jetIt) );
-
+  vars.HT += jet.Et();
+  
+  if( fabs(jet.eta()) < jetEtaCNT )
+  { 
+    vars.jets_cnt.push_back( reader.Get4V("jets")->at(jetIt) );
+    vars.HT_cnt += jet.Et();
+  }
+  
+  if( fabs(jet.eta()) >= jetEtaFWD )
+  {
+    vars.jets_fwd.push_back( reader.Get4V("jets")->at(jetIt) );
+    vars.HT_fwd += jet.Et();
+  }
+  
   vars.jets_charge.push_back( reader.GetFloat("jets_charge")->at(jetIt) );
   vars.jets_etaEtaMoment.push_back( reader.GetFloat("jets_etaetaMoment")->at(jetIt) );
   vars.jets_phiPhiMoment.push_back( reader.GetFloat("jets_phiphiMoment")->at(jetIt) );
@@ -510,6 +548,8 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.p_WJ2 = &vars.WJ2;
 
   vars.WJ12 = vars.WJ1 + vars.WJ2;
+  vars.p_WJ12 = &vars.WJ12;
+  
   vars.lepW = vars.lep + vars.WJ12;
   
   vars.WJ1_charge = vars.jets_charge.at(vars.selectIt_W.at(0));
@@ -524,6 +564,47 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lepWJJ_pt1 = vars.lepWJJ_ptOrdered.at(0);
   vars.lepWJJ_pt2 = vars.lepWJJ_ptOrdered.at(1);
   vars.lepWJJ_pt3 = vars.lepWJJ_ptOrdered.at(2);
+}
+
+
+
+
+
+
+void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
+{
+  vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
+  vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJ12.phi());
+  
+  
+  // neutrino
+  float alpha = vars.lep.px()*vars.met.px() + vars.lep.py()*vars.met.py();
+  
+  float delta = (alpha + 0.5*80.399*80.399)*(alpha + 0.5*80.399*80.399) -
+    vars.lep.pt()*vars.lep.pt()*vars.met.pt()*vars.met.pt();
+  
+  if( alpha - vars.lep.pt()*vars.met.pt() + 0.5*80.399*80.399 < 0 )
+    delta = 0.;
+  
+  float pz1 = ( vars.lep.pz()*(alpha + 0.5*80.399*80.399) + vars.lep.energy()*sqrt(delta) ) / vars.lep.pt() / vars.lep.pt();
+  float pz2 = ( vars.lep.pz()*(alpha + 0.5*80.399*80.399) - vars.lep.energy()*sqrt(delta) ) / vars.lep.pt() / vars.lep.pt();
+  
+  ROOT::Math::XYZTVector nu1(vars.met.px(), vars.met.py(), pz1, sqrt(vars.met.px()*vars.met.px() + vars.met.py()*vars.met.py() + pz1*pz1));
+  ROOT::Math::XYZTVector nu2(vars.met.px(), vars.met.py(), pz2, sqrt(vars.met.px()*vars.met.px() + vars.met.py()*vars.met.py() + pz2*pz2));
+  
+  //std::cout<< "delta = " << delta << "   mass = " << (nu1+vars.lepton).mass() << std::endl;
+  
+  
+  
+  if( fabs(vars.mH - (vars.lepW + nu1).mass()) < fabs(vars.mH - (vars.lepW + nu2).mass()) )
+    vars.neutrino = nu1;
+  else
+    vars.neutrino = nu2;
+
+  vars.lepNuW = vars.lepW + vars.neutrino;
+  vars.lepNuW_m = vars.lepNuW.mass();
+  
+  //std::cout << "Higgs mt = " << vars.lepMetW_mt << "   Higgs m = " << vars.lepNuW_m << std::endl;
 }
 
 
@@ -590,38 +671,28 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 
 
-void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
-  vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
-  vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJ12.phi());
+  float jetEtMAX = -9999.;
+  for(unsigned int jetIt = 0; jetIt < vars.jets.size(); ++jetIt)
+  {
+    if( ( (vars.jets.at(jetIt)).Et() > jetEtMAX ) &&
+        ( jetIt != vars.selectIt_W.at(0) ) &&
+        ( jetIt != vars.selectIt_W.at(1) ) &&
+        ( jetIt != vars.selectIt_tag.at(0) ) &&
+        ( jetIt != vars.selectIt_tag.at(1) ) )
+    {
+      vars.selectIt_thirdJet = jetIt;
+      jetEtMAX = (vars.jets.at(jetIt)).Et();
+    }
+  }
   
   
-  // neutrino
-  float alpha = vars.lep.px()*vars.met.px() + vars.lep.py()*vars.met.py();
+  if( vars.selectIt_thirdJet == -1 ) return;
   
-  float delta = (alpha + 0.5*80.399*80.399)*(alpha + 0.5*80.399*80.399) -
-    vars.lep.pt()*vars.lep.pt()*vars.met.pt()*vars.met.pt();
+  vars.thirdJ = vars.jets.at(vars.selectIt_thirdJet);
+  vars.p_thirdJ = &vars.thirdJ;
   
-  if( alpha - vars.lep.pt()*vars.met.pt() + 0.5*80.399*80.399 < 0 )
-    delta = 0.;
-  
-  float pz1 = ( vars.lep.pz()*(alpha + 0.5*80.399*80.399) + vars.lep.energy()*sqrt(delta) ) / vars.lep.pt() / vars.lep.pt();
-  float pz2 = ( vars.lep.pz()*(alpha + 0.5*80.399*80.399) - vars.lep.energy()*sqrt(delta) ) / vars.lep.pt() / vars.lep.pt();
-  
-  ROOT::Math::XYZTVector nu1(vars.met.px(), vars.met.py(), pz1, sqrt(vars.met.px()*vars.met.px() + vars.met.py()*vars.met.py() + pz1*pz1));
-  ROOT::Math::XYZTVector nu2(vars.met.px(), vars.met.py(), pz2, sqrt(vars.met.px()*vars.met.px() + vars.met.py()*vars.met.py() + pz2*pz2));
-  
-  //std::cout<< "delta = " << delta << "   mass = " << (nu1+vars.lepton).mass() << std::endl;
-  
-  
-  
-  if( fabs(vars.mH - (vars.lepW + nu1).mass()) < fabs(vars.mH - (vars.lepW + nu2).mass()) )
-    vars.neutrino = nu1;
-  else
-    vars.neutrino = nu2;
-
-  vars.lepNuW = vars.lepW + vars.neutrino;
-  vars.lepNuW_m = vars.lepNuW.mass();
-  
-  //std::cout << "Higgs mt = " << vars.lepMetW_mt << "   Higgs m = " << vars.lepNuW_m << std::endl;
+  vars.thirdJ_charge = vars.jets_charge.at(vars.selectIt_thirdJet);
+  vars.thirdJ_bTag = vars.jets_bTag.at(vars.selectIt_thirdJet);
 }
