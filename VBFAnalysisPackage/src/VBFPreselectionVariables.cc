@@ -674,7 +674,7 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
   float jetEtMAX = -9999.;
-  for(unsigned int jetIt = 0; jetIt < vars.jets.size(); ++jetIt)
+  for(int jetIt = 0; jetIt < (int)vars.jets.size(); ++jetIt)
   {
     if( ( (vars.jets.at(jetIt)).Et() > jetEtMAX ) &&
         ( jetIt != vars.selectIt_W.at(0) ) &&
