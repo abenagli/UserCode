@@ -10,7 +10,7 @@ void setTDRStyle()
   tdrStyle->SetCanvasBorderMode(0);
   tdrStyle->SetCanvasColor(kWhite);
   tdrStyle->SetCanvasDefH(600); //Height of canvas
-  tdrStyle->SetCanvasDefW(600); //Width of canvas
+  tdrStyle->SetCanvasDefW(800); //Width of canvas
   tdrStyle->SetCanvasDefX(0);   //POsition on screen
   tdrStyle->SetCanvasDefY(0);
 
@@ -79,7 +79,7 @@ void setTDRStyle()
   tdrStyle->SetPadTopMargin(0.05);
   tdrStyle->SetPadBottomMargin(0.13);
   tdrStyle->SetPadLeftMargin(0.13);
-  tdrStyle->SetPadRightMargin(0.05);
+  tdrStyle->SetPadRightMargin(0.25);
 
   // For the Global title:
   tdrStyle->SetOptTitle(0);
