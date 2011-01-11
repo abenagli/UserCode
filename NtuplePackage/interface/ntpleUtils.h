@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <map>
 #include <cmath>
 #include <algorithm>
@@ -176,6 +177,12 @@ int SelectLepton(std::vector<ROOT::Math::XYZTVector>& leptons,
                  const double& ptMin,
                  const std::vector<int>* blacklist = 0);
 
+/** select tag jet */
+double SelectTagJet(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
+                     const double& etMin,
+                     const double& etaMIN,
+                     const std::vector<int>* blacklist = 0);
+
 /** select tag jets */
 double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                      const double& etMin,
@@ -185,11 +192,21 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
 
 /** select W jets */
 double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
+                   const std::string& method,
                    const double& etMin,
+                   const double& etaMAX,
                    const double& DetaMAX,
                    const double& mjjMAX,                     
                    const std::vector<int>* blacklist = 0);
 
+/** select 4 jets */
+double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
+                   std::vector<ROOT::Math::XYZTVector>& jets,
+                   const std::string& method,
+                   const double& etMin,
+                   const double& etaMAX,
+                   const double& DetaMAX,
+                   const double& mjjMAX);
 
 /** build combinations of n jets */
 int Build4JetCombinations(std::vector<std::vector<int> >& comb, const int& nJets);
@@ -201,5 +218,11 @@ void Print4JetCombination(const std::vector<int>& combination);
 
 /** print 4-vector */
 void Print4V(const ROOT::Math::XYZTVector& p);
+
+
+
+/** get electorn flag/severity level */
+bool GetElectronFlag(const std::string& flag);
+bool GetElectronSeverityLevel(const std::string& SeverityLevel);
 
 #endif
