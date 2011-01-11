@@ -32,7 +32,7 @@ class readEvents
   
   //! methods
   std::vector<std::pair<std::string, std::string> > GetSamples() { return m_list; } ;
-  std::vector<std::pair<std::string, std::map<int, int> > > GetEvents() { return m_events; } ;
+  std::vector<std::pair<std::string, std::map<int, double> > > GetEvents() { return m_events; } ;
   std::map<std::string, double> GetCrossSections() { return m_crossSection; } ;
   
   
@@ -44,7 +44,7 @@ class readEvents
   std::string m_histoName;
   
   std::vector<std::pair<std::string, std::string> > m_list;
-  std::vector<std::pair<std::string, std::map<int, int> > > m_events;
+  std::vector<std::pair<std::string, std::map<int, double> > > m_events;
   std::map<std::string, int> m_dataFlag;
   std::map<std::string, double> m_mH;
   std::map<std::string, double> m_crossSection;

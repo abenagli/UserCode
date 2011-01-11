@@ -98,12 +98,12 @@ readEvents::readEvents(const std::string& inputDir,
     
     
     // buil event map
-    std::map<int, int> eventMap;
+    std::map<int, double> eventMap;
     for(int bin = 1; bin <= histo->GetNbinsX(); ++bin)
       eventMap[bin] = histo -> GetBinContent(bin);
       
     // build event pair
-    std::pair<std::string, std::map<int, int> > eventPair(vecIt->first, eventMap);
+    std::pair<std::string, std::map<int, double> > eventPair(vecIt->first, eventMap);
     
     // fill vector
     m_events.push_back(eventPair);
