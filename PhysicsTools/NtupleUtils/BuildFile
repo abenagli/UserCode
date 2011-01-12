@@ -1,7 +1,0 @@
-<use name=root>
-<use name=rootmath>
-<use name=clhep>
-<use name=DataFormats/EgammaCandidates>
-<export>
-   <lib name=PhysicsToolsNtupleUtils>
-</export>

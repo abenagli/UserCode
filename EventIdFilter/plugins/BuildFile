@@ -1,5 +1,0 @@
-<library file="*.cc" name=CommonToolsEventIdFilterPlugins>
-    <flags EDM_PLUGIN=1>
-    <use name=CommonTools/EventIdFilter>
-    <use name = FWCore/Framework>
-</library>

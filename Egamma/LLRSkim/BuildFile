@@ -1,5 +1,0 @@
-<use name=clhep>
-<use name=CondFormats/DataRecord>
-<use name=Geometry/CaloGeometry>
-<export>
-</export>
