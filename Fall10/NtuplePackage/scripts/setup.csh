@@ -4,7 +4,10 @@ else
 setenv THISDIR `pwd`
 
 setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${THISDIR}/lib
+
+if (${?DYLD_LIBRARY_PATH}) then
 setenv DYLD_LIBRARY_PATH ${DYLD_LIBRARY_PATH}:${THISDIR}/lib
+endif
 
 setenv PATH ${PATH}:${THISDIR}/bin
 
