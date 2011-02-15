@@ -1,0 +1,1 @@
+VBF_HToWWToLNuQQ_M-170_7TeV-powheg-pythia6_Fall10-START38_V12-v1     1_H170               0          -1.              0.079   1.0               L2L3Ak5PFJets
