@@ -88,11 +88,11 @@ while(<SAMPLESListFile>)
   $sampleDir = $OUTPUTSaveDir.$sample."/";
   
   $command = "rm -rf ".$sampleDir;
-  print($command."\n");
+  #print($command."\n");
   system($command);
   
   $command = "mkdir ".$sampleDir;
-  print($command."\n");
+  #print($command."\n");
   system($command);
   
   
