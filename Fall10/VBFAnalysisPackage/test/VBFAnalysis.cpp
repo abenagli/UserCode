@@ -55,9 +55,6 @@ int main(int argc, char** argv)
   
   int jetNMIN = gConfigParser -> readIntOption("Cuts::jetNMIN");
   int jetNMAX = gConfigParser -> readIntOption("Cuts::jetNMAX");
-  float jetEtMIN = gConfigParser -> readFloatOption("Cuts::jetEtMIN");
-  float jetEtaCNT = gConfigParser -> readFloatOption("Cuts::jetEtaCNT");
-  float jetEtaFWD = gConfigParser -> readFloatOption("Cuts::jetEtaFWD");
 
   float lepPtMIN = gConfigParser -> readFloatOption("Cuts::lepPtMIN");
   float lepPtMAX = gConfigParser -> readFloatOption("Cuts::lepPtMAX");
@@ -220,8 +217,8 @@ int main(int argc, char** argv)
   
   
   
-  //**********************                                                                                                                                                        
-  // STEP 2 - preselection
+  //******************
+  // STEP 2 - GOODCOLL
   step = 2;
   stepEvents[step] = totalEvents[3];
   stepEvents_plus_int[step] = totalEvents[3];
@@ -231,40 +228,40 @@ int main(int argc, char** argv)
     (stepEvents_plus[njetBin])[step] = totalEvents[3];
     (stepEvents_minus[njetBin])[step] = totalEvents[3];
   }
-  stepNames[step] = "2) Preselection";
+  stepNames[step] = "2) Preselection - Good collision";
   
   
   
-  //*************                                                                                                                                                        
-  // STEP 3 - HLT
+  //*************************
+  // STEP 3 - 1 lepton 2 jets
   step = 3;
-  stepEvents[step] = totalEvents[4];
-  stepEvents_plus_int[step] = totalEvents[4];
-  stepEvents_minus_int[step] = totalEvents[4];
+  stepEvents[step] = totalEvents[5];
+  stepEvents_plus_int[step] = totalEvents[5];
+  stepEvents_minus_int[step] = totalEvents[5];
   for(int njetBin = jetNMIN; njetBin <= jetNMAX; ++njetBin)
   {
-    (stepEvents_plus[njetBin])[step] = totalEvents[4];
-    (stepEvents_minus[njetBin])[step] = totalEvents[4];
+    (stepEvents_plus[njetBin])[step] = totalEvents[5];
+    (stepEvents_minus[njetBin])[step] = totalEvents[5];
   }
-  stepNames[step] = "3) HLT";
+  stepNames[step] = "3) Preselection - 1 lep & 2 jets";
   
   
   
-   
   
   
-  //*******************                                                                                                                                                        
-  // STEP 4 - 1! lepton
+  
+  //******************************
+  // STEP 4 - 1! lepton 2 cnt jets
   step = 4;
-  stepEvents[step] = totalEvents[7];
-  stepEvents_plus_int[step] = totalEvents[7];
-  stepEvents_minus_int[step] = totalEvents[7];
+  stepEvents[step] = totalEvents[10];
+  stepEvents_plus_int[step] = totalEvents[10];
+  stepEvents_minus_int[step] = totalEvents[10];
   for(int njetBin = jetNMIN; njetBin <= jetNMAX; ++njetBin)
   {
-    (stepEvents_plus[njetBin])[step] = totalEvents[7];
-    (stepEvents_minus[njetBin])[step] = totalEvents[7];
+    (stepEvents_plus[njetBin])[step] = totalEvents[10];
+    (stepEvents_minus[njetBin])[step] = totalEvents[10];
   }
-  stepNames[step] = "4) 1! lep & >= 1 cnt jet";
+  stepNames[step] = "4) 1! lep & 2 cnt jets";
   
   
   
