@@ -517,12 +517,12 @@ int main(int argc, char** argv)
     
     if( vars.lep_flavour == 11 )
     {
-      if( fabs(vars.lep_3DipSig) > ele3DipMAX ) is3DIP = false;
+      if( fabs(vars.lep_dB/vars.lep_edB) > ele3DipMAX ) is3DIP = false;
     }
     
     if( vars.lep_flavour == 13 )
     {
-      if( fabs(vars.lep_3DipSig) > mu3DipMAX ) is3DIP = false;
+      if( fabs(vars.lep_dB/vars.lep_edB) > mu3DipMAX ) is3DIP = false;
     }    
     
     

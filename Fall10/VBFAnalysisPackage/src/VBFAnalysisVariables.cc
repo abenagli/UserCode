@@ -27,7 +27,8 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lep_flavour", &vars.lep_flavour);
   reducedTree -> SetBranchAddress("lep_dxy",     &vars.lep_dxy);
   reducedTree -> SetBranchAddress("lep_dz",      &vars.lep_dz);
-  reducedTree -> SetBranchAddress("lep_3DipSig", &vars.lep_3DipSig);
+  reducedTree -> SetBranchAddress("lep_dB",      &vars.lep_dB);
+  reducedTree -> SetBranchAddress("lep_edB",     &vars.lep_edB);
   reducedTree -> SetBranchAddress("lep_tkIso",   &vars.lep_tkIso);
   reducedTree -> SetBranchAddress("lep_emIso",   &vars.lep_emIso);
   reducedTree -> SetBranchAddress("lep_hadIso",  &vars.lep_hadIso);

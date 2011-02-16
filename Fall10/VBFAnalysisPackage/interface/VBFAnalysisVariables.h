@@ -70,7 +70,8 @@ struct VBFAnalysisVariables
   int lep_flavour;
   float lep_dxy;
   float lep_dz;
-  float lep_3DipSig;
+  float lep_dB;
+  float lep_edB;
   float lep_tkIso;
   float lep_emIso;
   float lep_hadIso;
