@@ -84,12 +84,8 @@ while(<SAMPLESListFile>)
     next;
   }
   
-  print("Sample: ".$sample."\n") ;
-  
   print("sample = ".$sample."   name = ".$sampleName."   crossSection = ".$crossSection."\n");
   $sampleDir = $OUTPUTSaveDir.$sample."/";
-  
-  print("Analysing sample <".$sample.">\n");
   
   $command = "rm -rf ".$sampleDir;
   print($command."\n");
@@ -108,11 +104,11 @@ while(<SAMPLESListFile>)
   
   
   print INPUTFILELIST $SAMPLESDir.$sample."/".$INPUTFILEName."_all_".$JETAlgorithm.".root\n";
-  print("inputFileList = ".$inputFileList."\n");
+  #print("inputFileList = ".$inputFileList."\n");
   
   
   $selectionsCfgFile = $sampleDir."/selections.cfg" ;
-  print("selectionsCfgFile = ".$selectionsCfgFile."\n");
+  #print("selectionsCfgFile = ".$selectionsCfgFile."\n");
   system("cat ".$SELECTIONSCfgTemplate."   | sed -e s%INPUTFILELIST%".$inputFileList.
                                        "%g | sed -e s%BASEDIR%".$BASEDir.
                                        "%g | sed -e s%OUTPUTSAVEPATH%".$sampleDir.
@@ -147,7 +143,7 @@ while(<SAMPLESListFile>)
   
   
   $command = "chmod 755 ".$sampleJobFile;
-  print($command."\n\n\n");
+  #print($command."\n\n\n");
   system($command);
   
   print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\n";
