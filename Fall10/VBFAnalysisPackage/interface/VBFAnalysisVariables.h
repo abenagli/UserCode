@@ -173,15 +173,3 @@ void SetVBFAnalysisHistograms(VBFAnalysisVariables&, const std::string&, const i
 
 void InitialiseVBFAnalysisTree(VBFAnalysisVariables& vars, TFile* outputRootFile, const int& nStep, const int& firstStep);
 void FillVBFAnalysisTree(VBFAnalysisVariables& vars, const int& step);
-
-void DeleteVBFAnalysisVariables(VBFAnalysisVariables& vars, const int& nStep, const int& firstStep);
-
-//void FillAllHistograms(VBFAnalysisVariables& vars, const int& step, const int& verbosity);
-//void FillPVHistograms(VBFAnalysisVariables& vars, const int& step);
-//void FillLeptonHistograms(VBFAnalysisVariables& vars, const int& step);
-//void FillMetHistograms(VBFAnalysisVariables& vars, const int& step);
-//void FillJetHistograms(VBFAnalysisVariables& vars, const int& step);
-//void FillWJJHistograms(VBFAnalysisVariables& vars, const int& step);
-//void FillHiggsHistograms(VBFAnalysisVariables& vars, const int& step);
-//void FillTagJJHistograms(VBFAnalysisVariables& vars, const int& step);
-//void FillMVAHistograms(VBFAnalysisVariables& vars, const int& step);
