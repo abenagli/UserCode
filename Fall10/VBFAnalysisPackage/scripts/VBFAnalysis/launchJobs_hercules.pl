@@ -54,7 +54,7 @@ print "OUTPUTSaveDir = ".$OUTPUTSaveDir."\n";
 
 
 $command = "mkdir ".$OUTPUTSaveDir;
-print($command."\n");
+print("\n".$command."\n");
 system($command);
 
 
@@ -77,14 +77,14 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$dataFlag,$mH,$scale,$crossSection,$jetalgo) = split(" ") ;
+  ($sample,$sampleName,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
     next;
   }
   
-  print("\nsample = ".$sample."   name = ".$sampleName."   crossSection = ".$crossSection."\n");
+  print("sample = ".$sample."   name = ".$sampleName."   crossSection = ".$crossSection."\n");
   $sampleDir = $OUTPUTSaveDir.$sample."/";
   
   $command = "rm -rf ".$sampleDir;
