@@ -84,7 +84,7 @@ while(<SAMPLESListFile>)
     next;
   }
   
-  print("sample = ".$sample."   name = ".$sampleName."   crossSection = ".$crossSection."\n");
+  print("\nsample = ".$sample."   name = ".$sampleName."   crossSection = ".$crossSection."\n");
   $sampleDir = $OUTPUTSaveDir.$sample."/";
   
   $command = "rm -rf ".$sampleDir;
