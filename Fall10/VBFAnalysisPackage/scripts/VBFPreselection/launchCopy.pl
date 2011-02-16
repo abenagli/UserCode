@@ -54,7 +54,7 @@ while (<LISTOFSamples>)
 {
   chomp($_);
   
-  ($sample,$dummy,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
+  ($sample,$dummy,$color,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
   $subsample = substr($sample,0,1);
   if($subsample eq "#")
   {

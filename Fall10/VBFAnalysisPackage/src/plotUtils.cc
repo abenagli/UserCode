@@ -55,13 +55,14 @@ drawTStack::drawTStack(const std::string& inputDir,
   {
     std::string sample;
     std::string sumName;
+    int color;
     int dataFlag;
     double mH;
     double crossSection;
     double scaleFactor;
     std::string jetAlgorithm;
     
-    listFile >> sample >> sumName >> dataFlag >> mH >> crossSection >> scaleFactor >> jetAlgorithm;
+    listFile >> sample >> sumName >> color >> dataFlag >> mH >> crossSection >> scaleFactor >> jetAlgorithm;
 
     if(sample.size() == 0)
       continue;
@@ -72,6 +73,8 @@ drawTStack::drawTStack(const std::string& inputDir,
               << sample << "\t"
               << std::setw(20)
               << sumName << "\t"
+              << std::setw(3)
+              << color << "\t"
               << std::setw(3)
               << dataFlag << "\t"
               << std::setw(6)
@@ -84,6 +87,7 @@ drawTStack::drawTStack(const std::string& inputDir,
     
     std::pair<std::string, std::string> dummyPair(sample, sumName);
     m_list.push_back(dummyPair);
+    m_color[sample] = color;
     m_dataFlag[sample] = dataFlag;
     m_mH[sample] = mH;
     m_crossSection[sample] = crossSection*scaleFactor;
@@ -127,6 +131,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   
   std::map<std::string, double> crossSection_summed;
   std::map<std::string, bool> isFirstSample_summed;
+  std::map<std::string, int> color_summed;
   std::map<std::string, int> dataFlag_summed;
   std::map<std::string, TH1F*> histo_summed;
   
@@ -136,7 +141,8 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   {
     crossSection_summed[vecIt->second] = 0.;
     isFirstSample_summed[vecIt->second] = true;
-    dataFlag_summed[vecIt->second] = false;
+    color_summed[vecIt->second] = -1;
+    dataFlag_summed[vecIt->second] = -1;
     histo_summed[vecIt->second] = NULL;
   }
   
@@ -203,6 +209,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     // Draw::scale histograms normalizing to lumi (1. pb^-1)
     // Draw::if data do not apply any scale factor
     histo -> Sumw2();
+    color_summed[vecIt->second] = m_color[vecIt->first];
     dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
     
     if( (histo->GetEntries() > 0.) && (m_dataFlag[vecIt->first] != 1) )
@@ -345,12 +352,10 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   
   // loop over summed histograms
   i = 0;
-  int colorIt = -1;
   isFirstSample = true;
   for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
       mapIt != crossSection_summed.end(); ++mapIt)
   {    
-    ++colorIt;
     TH1F* globalHisto = histo_summed[mapIt->first];
     if(globalHisto -> GetEntries() == 0) continue;
     
@@ -377,8 +382,8 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     if( (mode == "eventsScaled") && (dataFlag_summed[mapIt->first] != 1) )
     {
       globalHisto -> Scale(1. * lumi);
-      globalHisto -> SetLineColor(getColor(colorIt));
-      globalHisto -> SetFillColor(getColor(colorIt));
+      globalHisto -> SetLineColor(color_summed[mapIt->first]);
+      globalHisto -> SetFillColor(color_summed[mapIt->first]);
       globalHisto -> SetFillStyle(3003);
       globalHisto -> SetLineWidth(2);
       
@@ -392,7 +397,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     if( (mode == "sameAreaNoStack") )
     {
       globalHisto -> Scale(1./globalHisto->Integral(1, globalHisto->GetNbinsX()));
-      globalHisto -> SetLineColor(getColor(i));
+      globalHisto -> SetLineColor(color_summed[mapIt->first]);
       globalHisto -> SetLineWidth(4);
       
       if(globalHisto->GetMaximum() > globalMaximum)
@@ -419,8 +424,8 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     if( (mode == "sameAreaStack") && (dataFlag_summed[mapIt->first] != 1) )
     {
       globalHisto -> Scale(dataGlobalGlobalIntegral/globalGlobalIntegral);
-      globalHisto -> SetLineColor(getColor(colorIt));
-      globalHisto -> SetFillColor(getColor(colorIt));
+      globalHisto -> SetLineColor(color_summed[mapIt->first]);
+      globalHisto -> SetFillColor(color_summed[mapIt->first]);
       globalHisto -> SetFillStyle(3003);
       globalHisto -> SetLineWidth(2);
       
@@ -522,7 +527,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     hs -> Draw("HISTO");
     if(dataGlobalGlobalHisto != NULL) dataGlobalGlobalHisto -> Draw("P,same");
     
-    hs->GetYaxis()->SetTitle(("events /" + std::string(binWidthBuffer)+" "+m_unit).c_str());
+    hs->GetYaxis()->SetTitle(("events / " + std::string(binWidthBuffer)+" "+m_unit).c_str());
     
     if(dataGlobalGlobalHisto != NULL)
     {
@@ -559,7 +564,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       dataGlobalGlobalHisto -> Draw("P,same");
     }
     
-    hs->GetYaxis()->SetTitle("event fraction");
+    hs->GetYaxis()->SetTitle(("event fraction / " + std::string(binWidthBuffer)+" "+m_unit).c_str());
   }
   
   
@@ -617,8 +622,8 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
     exit(-1);
   }
-  //c1->Print((m_outputDir+fullTitle+".eps").c_str(), "eps");
-  c1->Print((m_outputDir+fullTitle+".png").c_str(), "png");
+  //c1->Print((m_outputDir+"lin_"+fullTitle+".eps").c_str(), "eps");
+  c1->Print((m_outputDir+"lin_"+fullTitle+".png").c_str(), "png");
   
   
   
@@ -687,7 +692,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       dataGlobalGlobalHisto -> Draw("P,same");
     }
     
-    hs->GetYaxis()->SetTitle("event fraction");
+    hs->GetYaxis()->SetTitle(("event fraction / " + std::string(binWidthBuffer)+" "+m_unit).c_str());
   }
   
   
@@ -793,6 +798,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
  
   std::map<std::string, double> crossSection_summed;
   std::map<std::string, bool> isFirstSample_summed;
+  std::map<std::string, int> color_summed;
   std::map<std::string, int> dataFlag_summed;
   std::map<std::string, bool> isSignal_summed;
   std::map<std::string, TH1F*> histo_summed;
@@ -802,6 +808,8 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   {
     histo_summed[vecIt->second] = NULL;
     isFirstSample_summed[vecIt->second] = true;
+    color_summed[vecIt->second] = -1;
+    dataFlag_summed[vecIt->second] = -1;
     isSignal_summed[vecIt->second] = false;
   }
   
@@ -836,6 +844,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       exit(-1);
     }
     
+    color_summed[vecIt->second] = m_color[vecIt->first];
     dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
     crossSection_summed[vecIt->second] += m_crossSection[vecIt->first];
     if(m_mH[vecIt->first] > 0)
@@ -976,7 +985,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     }
     
     
-    globalHisto -> SetLineColor(getColor(i));
+    globalHisto -> SetLineColor(color_summed[mapIt->first]);
     //globalHisto -> SetLineStyle(i+1);
     if(m_xAxisRange)
       globalHisto->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
@@ -1347,324 +1356,8 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
 
 
 
-/*
-void drawTStack::DrawEventRatio_nJets(const std::string& histoName, const float& lumi, const int& step, const bool& logy)
-{ 
-  std::cout << "\n>>>plotUtils::Drawing event ratio" << std::endl;
-  
-  
-  
-  THStack* hs = new THStack("hs", "hs");
-  int nHists = 0;
-  TLegend legend(m_xLowLegend, m_yLowLegend, m_xHighLegend, m_yHighLegend);
-  legend.SetFillColor(kWhite);
-  legend.SetFillStyle(4000);
-  
-  double globalMaximum = 0.;
-  double globalMinimum = 5.;
-  
-  
-  
-  //---------------------------------------------
-  // define the map with summed cross sections
-  //---------------------------------------------
- 
-  std::map<std::string, double> crossSection_summed;
-  std::map<std::string, bool> isFirstSample_summed;
-  std::map<std::string, int> dataFlag_summed;
-  std::map<std::string, bool> isSignal_summed;
-  std::map<std::string, TH1F*> histo_summed_plus;
-  std::map<std::string, TH1F*> histo_summed_minus;
 
-  for(std::vector<std::pair<std::string, std::string> >::const_iterator vecIt = m_list.begin();
-      vecIt != m_list.end(); ++vecIt)
-  {
-    histo_summed_plus[vecIt->second] = NULL;
-    histo_summed_minus[vecIt->second] = NULL;
-    isFirstSample_summed[vecIt->second] = true;
-    isSignal_summed[vecIt->second] = false;
-  }
-  
-  
-  
-  //---------------------------------------------
-  // loop over all the samples and fill the stack
-  //---------------------------------------------
 
-  std::vector<TFile*> rootFiles;
-  TH1F* histoData_plus = NULL;
-  TH1F* histoData_minus = NULL;
-  TH1F* globalGlobalHisto_plus = NULL;
-  TH1F* globalGlobalHisto_minus = NULL;
-  int i = 0;
-  for(std::vector<std::pair<std::string, std::string> >::const_iterator vecIt = m_list.begin();
-      vecIt != m_list.end(); ++vecIt)
-  {
-    // open root file
-    std::string fullRootFileName = m_inputDir+vecIt->first+"/"+m_baseRootFileName+"_"+m_jetAlgorithm.at(i).second+".root";
-    //std::cout << "opening file: " << fullRootFileName << std::endl;
-    rootFiles.push_back(new TFile(fullRootFileName.c_str(), "READ"));
-    
-    
-    // get histogram
-    std::string fullHistoName_plus = "events_plus_" + histoName;
-    std::string fullHistoName_minus = "events_minus_" + histoName;
-    //std::cout << "getting histogram " << fullHistoName << std::endl;
-    TH1F* histo_plus = NULL;
-    TH1F* histo_minus = NULL;
-    rootFiles.at(i) -> GetObject(fullHistoName_plus.c_str(),  histo_plus);
-    rootFiles.at(i) -> GetObject(fullHistoName_minus.c_str(), histo_minus);
-    if( (histo_plus == NULL) || (histo_minus == NULL) )
-    {
-      std::cout << ">>>plotUtils::Error in getting object " << fullHistoName_plus << " and " << fullHistoName_minus;
-      exit(-1);
-    }
-    
-    dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
-    crossSection_summed[vecIt->second] += m_crossSection[vecIt->first];
-    if(m_mH[vecIt->first] > 0)
-      isSignal_summed[vecIt->second] = true;
-    
-    
-    if( m_dataFlag[vecIt->first] != 1 )
-    {
-      histo_plus  -> Scale(lumi*m_crossSection[vecIt->first]/histo_plus->GetBinContent(1));
-      histo_minus -> Scale(lumi*m_crossSection[vecIt->first]/histo_minus->GetBinContent(1));
-    } 
-    
-    
-    
-    // sum histograms
-    if( isFirstSample_summed[vecIt->second] == false )
-    {
-      histo_summed_plus[vecIt->second]  -> Add(histo_plus);
-      histo_summed_minus[vecIt->second] -> Add(histo_minus);
-    }
-    if( isFirstSample_summed[vecIt->second] == true )
-    {
-      histo_summed_plus[vecIt->second]  = (TH1F*)(histo_plus -> Clone());
-      histo_summed_minus[vecIt->second] = (TH1F*)(histo_minus -> Clone());
-      isFirstSample_summed[vecIt->second] = false;
-    }
-    
-    
-    
-    // save data histogram
-    if( dataFlag_summed[vecIt->second] == 1 )
-    {
-      if( histoData_plus != NULL)
-        histoData_plus  -> Add(histo_plus);
-      else
-        histoData_plus  = (TH1F*)(histo_plus -> Clone());
-     
-      if( histoData_minus != NULL)
-        histoData_minus  -> Add(histo_minus);
-      else
-        histoData_minus  = (TH1F*)(histo_minus -> Clone());
-      
-      histoData_plus -> Sumw2();
-      histoData_minus -> Sumw2();
-   }
-
-    ++i;
-  }
-  
-  
-  
-  std::ofstream* outFile = new std::ofstream((m_outputDir+"eventRatio_"+histoName+".txt").c_str(), std::ios::out);  
-  
-  
-  
-  int nSamples = 0;
-  for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
-      mapIt != crossSection_summed.end(); ++mapIt)
-    ++nSamples;
-  
-  
-  
-  i = 0;
-  for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
-      mapIt != crossSection_summed.end(); ++mapIt)
-  {    
-    TH1F* globalHisto_plus = histo_summed_plus[mapIt->first];
-    TH1F* globalHisto_minus = histo_summed_minus[mapIt->first];
-    
-    
-    
-    TH1F* globalHisto_ratio = (TH1F*)(globalHisto_plus -> Clone());
-    globalHisto_ratio -> Divide(globalHisto_plus, globalHisto_minus);
-        
-    
-    
-    globalHisto_ratio  -> SetLineColor(getColor(i));
-    globalHisto_ratio  -> SetLineStyle(i+1);
-    
-    if(m_xAxisRange)
-      globalHisto_ratio ->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
-    if(i == 0)
-      globalHisto_ratio  -> SetLineWidth(4);
-    else
-      globalHisto_ratio  -> SetLineWidth(4);
-    
-    if(globalHisto_ratio->GetMaximum() > globalMaximum)
-      globalMaximum = globalHisto_ratio -> GetMaximum();
-    if( (globalHisto_ratio->GetMinimum() < globalMinimum) && (globalHisto_ratio->GetMinimum() > 0.) )
-      globalMinimum = globalHisto_ratio -> GetMinimum();    
-    
-    
-    
-    
-    
-    
-    if( (dataFlag_summed[mapIt->first] != 1) )
-    {
-      for(int bin = 1; bin <= globalHisto_ratio->GetNbinsX(); ++bin)
-      hs -> Add(globalHisto_ratio);
-      ++nHists;
-    }
-    
-    legend.AddEntry(globalHisto_ratio, (mapIt->first).c_str(), "F");
-    
-    
-    
-    if(globalGlobalHisto_plus != NULL)
-      globalGlobalHisto_plus -> Add(globalHisto_plus);
-    else
-      globalGlobalHisto_plus = (TH1F*)(globalHisto_plus -> Clone());
-    
-    if(globalGlobalHisto_minus != NULL)
-      globalGlobalHisto_minus -> Add(globalHisto_minus);
-    else
-      globalGlobalHisto_minus = (TH1F*)(globalHisto_minus -> Clone());
-    
-    
-    if(outFile)
-    {
-      (*outFile) << "\n" << mapIt->first;
-      for(int bin = 1; bin <= globalHisto_ratio->GetNbinsX(); ++bin)
-      {
-        const char* binLabel = globalHisto_ratio -> GetXaxis() -> GetBinLabel(bin);
-        (*outFile) << "   " << binLabel << ":   " << std::fixed
-                                                  << std::setprecision(3)
-                                                  << std::scientific
-                                                  << 1. * globalHisto_ratio -> GetBinContent(bin);
-      }
-      
-      (*outFile) << "\n";
-    }
-    
-    
-    
-    ++i;
-  }
-  
-  
-  
-  
-  
-  // draw the stack and save file
-  TCanvas* c1 = new TCanvas();
-  c1 -> cd();
-  c1 -> SetGridx();
-  c1 -> SetGridy();
-  
-  TH1F* globalGlobalHisto_ratio = (TH1F*)(globalGlobalHisto_plus -> Clone());
-  globalGlobalHisto_ratio -> Divide(globalGlobalHisto_plus, globalGlobalHisto_minus);
-  globalGlobalHisto_ratio -> SetLineColor(kBlack);
-  globalGlobalHisto_ratio -> SetLineStyle(1);
-  hs -> Add(globalGlobalHisto_ratio);
-  
-  if( nHists > 0 )
-    hs -> Draw("nostack");
-  
-  if(m_drawLegend == true)
-  {
-    legend.SetTextFont(42);
-    legend.SetTextSize(0.025);
-    legend.Draw("same");
-  }
-  
-  
-  if(logy)
-    c1 -> SetLogy();
-  if(logy && nHists > 0)
-    hs->GetYaxis()->SetRangeUser(globalMinimum - 0.1*globalMinimum,
-                                 globalMaximum + 0.1*globalMaximum);
-  
-  if(nHists > 0)
-  {
-    hs -> GetXaxis() -> SetTitleSize(0.04);
-    hs -> GetXaxis() -> SetLabelSize(0.03);
-    hs -> GetXaxis() -> SetTitleOffset(1.25);
-    
-    hs -> GetYaxis() -> SetTitleSize(0.04);
-    hs -> GetYaxis() -> SetLabelSize(0.03);
-    hs -> GetYaxis() -> SetTitleOffset(1.50);
-    
-    
-    
-    if(m_xAxisRange)
-      hs->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
-    
-    hs->GetYaxis()->SetRangeUser(0., globalMaximum+0.1*globalMaximum);
-    if(m_yAxisRange)
-    {
-      hs->SetMinimum(m_yRangeMin);
-      hs->SetMaximum(m_yRangeMax);
-    }
-  
-  }
-  
-  
-  char buffer[50];
-  sprintf(buffer, "event ratio in %.3f pb^{-1}", lumi);
-  if(nHists > 0)
-    hs->GetYaxis()->SetTitle(buffer);
-  
-
-  if(histoData_plus != NULL)
-  {
-    TH1F* histoData_ratio = (TH1F*)(histoData_plus -> Clone());
-    histoData_ratio -> Divide(histoData_plus, histoData_minus);
-    
-    histoData_ratio -> SetMarkerStyle(20);  
-    if(nHists > 0)
-      histoData_ratio -> Draw("P,same");
-    else
-      histoData_ratio -> Draw("P");
-  }
-    
-  struct stat st;
-  if(stat(m_outputDir.c_str(), &st) != 0)
-  {
-    std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
-    exit(-1);
-  }
-    
-  c1->Print((m_outputDir+"eventRatio_"+histoName+".png").c_str(), "png");
-  
-  
-  
-  m_xAxisRange = false;
-  m_xAxisTitle = false;
-  m_yAxisRange = false;
-  m_yAxisTitle = false;
-  
-  delete c1;
-  delete hs;
-  
-  // close root files
-  if(outFile)
-    outFile -> close();
-  
-  for(unsigned int i = 0; i < rootFiles.size(); ++i)
-  {
-    rootFiles.at(i) -> Close();
-    delete rootFiles.at(i);
-  }
-    
-}
-*/
 
 
 

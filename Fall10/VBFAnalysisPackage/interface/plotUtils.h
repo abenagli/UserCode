@@ -71,6 +71,7 @@ class drawTStack
   std::string m_outputDir;
   
   std::vector<std::pair<std::string, std::string> > m_list;
+  std::map<std::string, int> m_color;
   std::map<std::string, int> m_dataFlag;
   std::map<std::string, double> m_mH;
   std::map<std::string, double> m_crossSection;

@@ -77,7 +77,7 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
+  ($sample,$sampleName,$color,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
