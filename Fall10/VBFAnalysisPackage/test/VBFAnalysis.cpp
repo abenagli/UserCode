@@ -489,10 +489,10 @@ int main(int argc, char** argv)
     
     
     // normal isolation cut
-    //if( isIsolated == false ) continue; 
+    if( isIsolated == false ) continue; 
     
     // inverted isolation cut
-    if( isAntiIsolated == false ) continue; 
+    //if( isAntiIsolated == false ) continue; 
     
     
     // fill distributions
