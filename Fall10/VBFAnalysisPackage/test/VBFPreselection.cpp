@@ -110,7 +110,7 @@ int main(int argc, char** argv)
   
   // define histograms
   std::cout << ">>> VBFPreselection::Define histograms" << std::endl;
-  int nStep = 10;
+  int nStep = 11;
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepNames;
@@ -299,8 +299,7 @@ int main(int argc, char** argv)
     //***********************************
     // STEP 10 - 1! lepton & >= n cnt jets
     step += 1;
-    char stepName[50]; sprintf(stepName, "1! lepton & >= %d cnt jet(s)", nJetMIN);
-    SetStepNames(stepNames, std::string(stepName), step, stepNameVerbosity);
+    SetStepNames(stepNames, "1! lepton", step, stepNameVerbosity);
     
     
     int nLep = 0;
@@ -454,6 +453,19 @@ int main(int argc, char** argv)
     SetLeptonVariables(vars, reader);
     
     
+    // fIll event counters
+    stepEvents[step] += 1;
+    
+    
+    
+    
+    
+    
+    //***********************************
+    // STEP 11 -  >= 2 cnt jets
+    step += 1;
+    char stepName[50]; sprintf(stepName, ">= %d cnt jet(s)", nJetMIN);
+    SetStepNames(stepNames, std::string(stepName), step, stepNameVerbosity);
     
     //*****************
     // met and neutrino
