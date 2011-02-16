@@ -87,7 +87,11 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("WJ2_charge", &vars.WJ2_charge, "WJ2_charge/F");
   vars.m_reducedTree -> Branch("WJ1_bTag",   &vars.WJ1_bTag,     "WJ1_bTag/F");
   vars.m_reducedTree -> Branch("WJ2_bTag",   &vars.WJ2_bTag,     "WJ2_bTag/F");
-  
+  vars.m_reducedTree -> Branch("WJJ_Deta",   &vars.WJJ_Deta,     "WJJ_Deta/F");
+  vars.m_reducedTree -> Branch("WJJ_Dphi",   &vars.WJJ_Dphi,     "WJJ_Dphi/F");
+  vars.m_reducedTree -> Branch("WJJ_DR",     &vars.WJJ_DR,         "WJJ_DR/F");
+  vars.m_reducedTree -> Branch("WJJ_m",      &vars.WJJ_m,           "WJJ_m/F");  
+
   vars.m_reducedTree -> Branch("lepWJJ_pt1", &vars.lepWJJ_pt1, "lepWJJ_pt1/F");
   vars.m_reducedTree -> Branch("lepWJJ_pt2", &vars.lepWJJ_pt2, "lepWJJ_pt2/F");
   vars.m_reducedTree -> Branch("lepWJJ_pt3", &vars.lepWJJ_pt3, "lepWJJ_pt3/F");
@@ -106,6 +110,10 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("tagJ2_charge", &vars.tagJ2_charge, "tagJ2_charge/F");
   vars.m_reducedTree -> Branch("tagJ1_bTag",   &vars.tagJ1_bTag,     "tagJ1_bTag/F");
   vars.m_reducedTree -> Branch("tagJ2_bTag",   &vars.tagJ2_bTag,     "tagJ2_bTag/F");
+  vars.m_reducedTree -> Branch("tagJJ_Deta",   &vars.tagJJ_Deta,     "tagJJ_Deta/F");
+  vars.m_reducedTree -> Branch("tagJJ_Dphi",   &vars.tagJJ_Dphi,     "tagJJ_Dphi/F");
+  vars.m_reducedTree -> Branch("tagJJ_DR",     &vars.tagJJ_DR,         "tagJJ_DR/F");
+  vars.m_reducedTree -> Branch("tagJJ_m",      &vars.tagJJ_m,           "tagJJ_m/F");
   
   
   // third jet variables
@@ -272,6 +280,11 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.WJ1_bTag = -99.;
   vars.WJ2_bTag = -99.;
   
+  vars.WJJ_Deta = -99.;
+  vars.WJJ_Dphi = -99.;
+  vars.WJJ_DR = -99.;
+  vars.WJJ_m = -99.;
+  
   vars.lepWJJ_ptOrdered.clear();  
   vars.lepWJJ_pt1 = -1.;
   vars.lepWJJ_pt2 = -1.;
@@ -304,6 +317,10 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.tagJ1_bTag = -99.;
   vars.tagJ2_bTag = -99.;
   
+  vars.tagJJ_Deta = -99.;
+  vars.tagJJ_Dphi = -99.;
+  vars.tagJJ_DR = -99.;
+  vars.tagJJ_m = -99.;
   
   
   // third jet variables
@@ -562,7 +579,12 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJ2_charge = vars.jets_charge.at(vars.selectIt_W.at(1));
   vars.WJ1_bTag = vars.jets_bTag.at(vars.selectIt_W.at(0));
   vars.WJ2_bTag = vars.jets_bTag.at(vars.selectIt_W.at(1));
-
+  
+  vars.WJJ_Deta = deltaEta(vars.WJ1.eta(),vars.WJ2.eta());
+  vars.WJJ_Dphi = deltaEta(vars.WJ1.phi(),vars.WJ2.phi());
+  vars.WJJ_DR = deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi());
+  vars.WJJ_m = (vars.WJ1+vars.WJ2).mass();
+  
   vars.lepWJJ_ptOrdered.push_back( vars.lep.pt() );
   vars.lepWJJ_ptOrdered.push_back( vars.WJ1.Et() );
   vars.lepWJJ_ptOrdered.push_back( vars.WJ2.Et() );
@@ -631,6 +653,10 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.tagJ1_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(0));
     vars.tagJ2_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(1));
     
+    vars.tagJJ_Deta = deltaEta(vars.tagJ1.eta(),vars.tagJ2.eta());
+    vars.tagJJ_Dphi = deltaEta(vars.tagJ1.phi(),vars.tagJ2.phi());
+    vars.tagJJ_DR = deltaR(vars.tagJ1.eta(),vars.tagJ1.phi(),vars.tagJ2.eta(),vars.tagJ2.phi());
+    vars.tagJJ_m = (vars.tagJ1+vars.tagJ2).mass();
     
     
     for(int jetIt = 0; jetIt < vars.nJets; ++jetIt)

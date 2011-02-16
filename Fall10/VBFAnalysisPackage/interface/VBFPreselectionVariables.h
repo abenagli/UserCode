@@ -172,6 +172,11 @@ struct VBFPreselectionVariables
   float WJ1_bTag;
   float WJ2_bTag;  
   
+  float WJJ_Deta;
+  float WJJ_Dphi;
+  float WJJ_DR;
+  float WJJ_m;
+  
   std::vector<float> lepWJJ_ptOrdered;
   float lepWJJ_pt1;  
   float lepWJJ_pt2;  
@@ -203,6 +208,11 @@ struct VBFPreselectionVariables
   float tagJ2_charge;
   float tagJ1_bTag;
   float tagJ2_bTag;  
+  
+  float tagJJ_Deta;
+  float tagJJ_Dphi;
+  float tagJJ_DR;
+  float tagJJ_m;  
   
   
   
