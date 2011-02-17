@@ -44,6 +44,7 @@ int main(int argc, char** argv)
   int entryFIRST       = gConfigParser -> readIntOption("Options::entryFIRST");
   int entryMAX         = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO      = gConfigParser -> readIntOption("Options::entryMODULO");
+  int verbosity        = gConfigParser -> readIntOption("Options::verbosity");
   int dataFlag         = gConfigParser -> readIntOption("Options::dataFlag");
   float crossSection   = gConfigParser -> readFloatOption("Options::crossSection");
   int TMVA4JetTraining = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
@@ -117,7 +118,6 @@ int main(int argc, char** argv)
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepNames;
-  bool stepNameVerbosity = false;
   
   
   
@@ -163,7 +163,7 @@ int main(int argc, char** argv)
   //********************
   // STEP 1 - all events
   int step = 1;
-  SetStepNames(stepNames, "total events", step, stepNameVerbosity);
+  SetStepNames(stepNames, "total events", step, verbosity);
   stepEvents[step] = totalEvents[1];
   
                                                                                                                                                            
@@ -171,28 +171,28 @@ int main(int argc, char** argv)
   //*********************
   // STEP 2 - no scraping
   step = 2;
-  SetStepNames(stepNames, "no scraping", step, stepNameVerbosity);
+  SetStepNames(stepNames, "no scraping", step, verbosity);
   stepEvents[step] = nonScrapedEvents[1];
   
   
   //*********************
   // STEP 3 - good vertex
   step = 3;
-  SetStepNames(stepNames, "good vertex", step, stepNameVerbosity);
+  SetStepNames(stepNames, "good vertex", step, verbosity);
   stepEvents[step] = goodVtxEvents[1];
   
   
   //*********************
   // STEP 4 - >= 1 lepton
   step = 4;
-  SetStepNames(stepNames, ">= 1 lepton", step, stepNameVerbosity);
+  SetStepNames(stepNames, ">= 1 lepton", step, verbosity);
   stepEvents[step] = leptonFilterEvents[1];
   
   
   //*******************
   // STEP 5 - >= 2 jets
   step = 5;
-  SetStepNames(stepNames, ">= 2 jets", step, stepNameVerbosity);
+  SetStepNames(stepNames, ">= 2 jets", step, verbosity);
   stepEvents[step] = jetFilterEvents[1];
   
   
@@ -262,7 +262,7 @@ int main(int argc, char** argv)
     //**************************
     // STEP 6 - run/LS selection
     step = 6;
-    SetStepNames(stepNames, "run/LS", step, stepNameVerbosity);
+    SetStepNames(stepNames, "run/LS", step, stepName);
     
 
     vars.runId   = reader.GetInt("runId")->at(0);
@@ -291,7 +291,7 @@ int main(int argc, char** argv)
     //***********************
     // STEP 7 - HLT selection
     step = step+1;
-    SetStepNames(stepNames, "HLT", step, stepNameVerbosity);
+    SetStepNames(stepNames, "HLT", step, verbosity);
     
     
     skipEvent = true;
@@ -314,7 +314,7 @@ int main(int argc, char** argv)
     //*********************
     // STEP 8 - good vertex
     step += 1;
-    SetStepNames(stepNames, "good vertex", step, stepNameVerbosity);
+    SetStepNames(stepNames, "good vertex", step, verbosity);
     
     SetPVVariables(vars, reader);
     if( vars.PV_ndof < 5 ) continue;
@@ -333,7 +333,7 @@ int main(int argc, char** argv)
     //********************
     // STEP 9 - HCAL noise
     step += 1;
-    SetStepNames(stepNames, "HCAL noise", step, stepNameVerbosity);
+    SetStepNames(stepNames, "HCAL noise", step, verbosity);
     
     if( vars.dataFlag == 1 )
       if( reader.GetInt("HBHE_NoiseFilterResult")->at(0) == 0 ) continue;
@@ -350,7 +350,7 @@ int main(int argc, char** argv)
     //***********************************
     // STEP 10 - 1! lepton & >= n cnt jets
     step += 1;
-    SetStepNames(stepNames, "1! lepton", step, stepNameVerbosity);
+    SetStepNames(stepNames, "1! lepton", step, verbosity);
     
     
     int nLep = 0;
@@ -516,7 +516,7 @@ int main(int argc, char** argv)
     // STEP 11 -  >= 2 cnt jets
     step += 1;
     char stepName[50]; sprintf(stepName, ">= %d cnt jet(s)", nJetCntMIN);
-    SetStepNames(stepNames, std::string(stepName), step, stepNameVerbosity);
+    SetStepNames(stepNames, std::string(stepName), step, verbosity);
     
     //*****************
     // met and neutrino
