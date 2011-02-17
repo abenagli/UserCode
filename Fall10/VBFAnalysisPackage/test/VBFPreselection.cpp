@@ -41,11 +41,13 @@ int main(int argc, char** argv)
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
   std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + jetAlgorithm + ".root";
   
-  int entryFIRST  = gConfigParser -> readIntOption("Options::entryFIRST");
-  int entryMAX    = gConfigParser -> readIntOption("Options::entryMAX");
-  int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
-  int dataFlag       = gConfigParser -> readIntOption("Options::dataFlag");
-  float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
+  int entryFIRST       = gConfigParser -> readIntOption("Options::entryFIRST");
+  int entryMAX         = gConfigParser -> readIntOption("Options::entryMAX");
+  int entryMODULO      = gConfigParser -> readIntOption("Options::entryMODULO");
+  int dataFlag         = gConfigParser -> readIntOption("Options::dataFlag");
+  float crossSection   = gConfigParser -> readFloatOption("Options::crossSection");
+  int TMVA4JetTraining = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
+
   
   int nJetMIN = gConfigParser -> readIntOption("Cuts::nJetMIN");
   float jetEtMIN  = gConfigParser -> readFloatOption("Cuts::jetEtMIN");
@@ -122,8 +124,9 @@ int main(int argc, char** argv)
   VBFPreselectionVariables vars;
   InitializeVBFPreselectionTree(vars, outputRootFullFileName);
   vars.mH = atof(higgsMass.c_str());
-  vars.crossSection = crossSection;
   vars.dataFlag = dataFlag;
+  vars.crossSection = crossSection;
+  vars.TMVA4Jet = -1;
   
   
   
@@ -203,6 +206,53 @@ int main(int argc, char** argv)
     ClearVBFPreselectionVariables(vars);
     if((entry%entryMODULO) == 0) std::cout << ">>>>> VBFPreselection::GetEntry " << entry << std::endl;   
     if(entry == entryMAX) break;
+    
+    
+    
+    
+    
+
+    //**************
+    // DUMP MC TRUTH
+    
+    ROOT::Math::XYZTVector mcH;
+    ROOT::Math::XYZTVector mcW1;
+    ROOT::Math::XYZTVector mcW2;
+    ROOT::Math::XYZTVector mcQ1_tag;
+    ROOT::Math::XYZTVector mcQ2_tag;
+    ROOT::Math::XYZTVector mcQ1_W;
+    ROOT::Math::XYZTVector mcQ2_W;
+    ROOT::Math::XYZTVector mcLepton;
+    std::vector<ROOT::Math::XYZTVector> mcQuarks;
+    std::vector<ROOT::Math::XYZTVector> mcQuarks_tag;
+    std::vector<ROOT::Math::XYZTVector> mcQuarks_W;
+
+    if( vars.mH > 0 )
+    {
+      mcH = reader.Get4V("mc_H")->at(0);
+      mcW1 = reader.Get4V("mcV1")->at(0);
+      mcW2 = reader.Get4V("mcV2")->at(0);
+      mcQ1_tag = (reader.Get4V("mcQ1_tag"))->at(0);
+      mcQ2_tag = (reader.Get4V("mcQ2_tag"))->at(0);
+      mcQ1_W   = (reader.Get4V("mcF1_fromV2"))->at(0);
+      mcQ2_W   = (reader.Get4V("mcF2_fromV2"))->at(0);
+      mcLepton = (reader.Get4V("mcF1_fromV1"))->at(0);
+      if( (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 12) ||
+          (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 14) ||
+          (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 16) )
+      mcLepton = (reader.Get4V("mcF2_fromV1"))->at(0);
+      
+      mcQuarks.push_back( mcQ1_tag );
+      mcQuarks.push_back( mcQ2_tag );
+      mcQuarks.push_back( mcQ1_W );
+      mcQuarks.push_back( mcQ2_W );
+
+      mcQuarks_tag.push_back( mcQ1_tag );
+      mcQuarks_tag.push_back( mcQ2_tag );
+      mcQuarks_W.push_back( mcQ1_W );
+      mcQuarks_W.push_back( mcQ2_W );
+    }
+    
     
     
     
@@ -534,58 +584,140 @@ int main(int argc, char** argv)
     //**************
     // >= n cnt jets 
     if( vars.nJets_cnt < nJetMIN ) continue;
+    if( vars.nJets >  nJetMAX ) continue;
     
     SetLeadingJetVariables(vars, reader, jetEtaCNT);
     
     
     
+    
+    
+    
+    //**************
+    // TMVA training 
+    if( TMVA4JetTraining == true )
+    {
+      // match with MC
+      std::vector<int> matchIt;
+      std::vector<int> matchIt_tag;
+      std::vector<int> matchIt_W;
+      int nMatching = -1;
+      int nMatching_tag = -1;
+      int nMatching_W = -1;
+      
+      if( vars.mH > 0 )
+      {
+        nMatching     = GetMatching(jets, mcQuarks,     0.3, 0.5, 1.5, &matchIt);
+        nMatching_tag = GetMatching(jets, mcQuarks_tag, 0.3, 0.5, 1.5, &matchIt_tag);
+        nMatching_W   = GetMatching(jets, mcQuarks_W,   0.3, 0.5, 1.5, &matchIt_W);
+  
+        if( (nMatching == 4) && (matchIt.at(0) > matchIt.at(1)) )
+        {
+          float dummy = matchIt.at(0);
+          matchIt.at(0) = matchIt.at(1);
+          matchIt.at(1) = dummy;
+        }
+  
+        if( (nMatching == 4) && (matchIt.at(2) > matchIt.at(3)) )
+        {
+          float dummy = matchIt.at(2);
+          matchIt.at(2) = matchIt.at(3);
+          matchIt.at(3) = dummy;
+        }
+  
+        std::sort(matchIt_tag.begin(), matchIt_tag.end());
+        std::sort(matchIt_W.begin(), matchIt_W.end());
+      }
+      
+      // fill the ntuple with combinations
+      if(nMatching == 4)
+      {
+        std::vector<std::vector<int> > combinations;
+        int nCombinations = Build4JetCombinations(combinations,vars.nJets);
+        
+        for(int combIt = 0; combIt < nCombinations; ++combIt)
+        {
+          std::vector<int> tempCombination = combinations.at(combIt);
+          
+          vars.selectIt_tag.at(0) = tempCombination.at(0);
+          vars.selectIt_tag.at(1) = tempCombination.at(1);
+          vars.selectIt_W.at(0) = tempCombination.at(2);
+          vars.selectIt_W.at(1) = tempCombination.at(3);
+	        
+          SetWJJVariables(vars, reader);
+          SetTagJJVariables(vars, reader);
+          SetHVariables(vars, reader);
+          
+          if(tempCombination == matchIt) vars.TMVA4Jet = 1;
+          else                           vars.TMVA4Jet = 0;          
+	        
+	        
+	        // Fill reduced tree
+	        FillVBFPreselectionTree(vars);
+        }
+        
+        // fIll event counters
+        stepEvents[step] += 1;
+      }
+    }
+    
+    
+    
+    
+    
+    
     //******************
     // select W/tag jets
-    if( vars.nJets < 3 )
+    if( TMVA4JetTraining == false )
     {
-      SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300.);
-      
-      std::vector<int> blacklistIt_W;
-      blacklistIt_W.push_back(vars.selectIt_W.at(0));
-      blacklistIt_W.push_back(vars.selectIt_W.at(1));
-      SelectTagJets(vars.selectIt_tag, vars.jets, jetEtMIN, 1., 200., &blacklistIt_W);
-    }
-    if( vars.nJets == 3 )
-    {
-      SelectTagJet(vars.selectIt_tag, vars.jets, jetEtMIN, jetEtaCNT);
-      
-      std::vector<int> blacklistIt_tag;
-      blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
-      blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-      SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300., &blacklistIt_tag);
-    }
-    if( vars.nJets > 3 )
-    {
-      SelectTagJets(vars.selectIt_tag, vars.jets, jetEtMIN, 1., 200.);
-      
-      std::vector<int> blacklistIt_tag;
-      blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
-      blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-      SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300., &blacklistIt_tag);
-    }
-    
-    
-    std::sort(vars.selectIt_W.begin(), vars.selectIt_W.end());
-    std::sort(vars.selectIt_tag.begin(), vars.selectIt_tag.end());
-    
-    SetWJJVariables(vars, reader);
-    SetTagJJVariables(vars, reader);
-    SetHVariables(vars, reader);
-    
-    
-    // fIll event counters
-    stepEvents[step] += 1;
+      if( vars.nJets < 3 )
+      {
+        SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300.);
         
-    
-    
-    // Fill reduced tree
-    FillVBFPreselectionTree(vars);
-    
+        std::vector<int> blacklistIt_W;
+        blacklistIt_W.push_back(vars.selectIt_W.at(0));
+        blacklistIt_W.push_back(vars.selectIt_W.at(1));
+        SelectTagJets(vars.selectIt_tag, vars.jets, jetEtMIN, 1., 200., &blacklistIt_W);
+      }
+      if( vars.nJets == 3 )
+      {
+        SelectTagJet(vars.selectIt_tag, vars.jets, jetEtMIN, jetEtaCNT);
+        
+        std::vector<int> blacklistIt_tag;
+        blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
+        blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
+        SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300., &blacklistIt_tag);
+      }
+      if( vars.nJets > 3 )
+      {
+        SelectTagJets(vars.selectIt_tag, vars.jets, jetEtMIN, 1., 200.);
+        
+        std::vector<int> blacklistIt_tag;
+        blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
+        blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
+        SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300., &blacklistIt_tag);
+      }
+      
+      
+      std::sort(vars.selectIt_W.begin(), vars.selectIt_W.end());
+      std::sort(vars.selectIt_tag.begin(), vars.selectIt_tag.end());
+      
+      SetWJJVariables(vars, reader);
+      SetTagJJVariables(vars, reader);
+      SetHVariables(vars, reader);
+      
+      
+      // fIll event counters
+      stepEvents[step] += 1;
+          
+      
+      
+      // Fill reduced tree
+      FillVBFPreselectionTree(vars);
+    }
+  
+  
+  
   } // loop over the events
   
   

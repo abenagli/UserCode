@@ -21,8 +21,9 @@ struct VBFPreselectionVariables
   
   // input parameters
   float mH;
-  float crossSection;
   int dataFlag; 
+  float crossSection;
+  int TMVA4Jet;
   int runId; 
   int lumiId; 
   int eventId; 
