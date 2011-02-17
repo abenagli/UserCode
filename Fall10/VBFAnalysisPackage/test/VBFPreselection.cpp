@@ -10,7 +10,7 @@
 
 
 
-void SetStepNames(std::map<int, std::string>&, const std::string&, const int&, bool);
+void SetStepNames(std::map<int, std::string>&, const std::string&, const int&, const int&);
 bool AcceptHLTPath(treeReader&, const std::string&);
 
 
@@ -262,7 +262,7 @@ int main(int argc, char** argv)
     //**************************
     // STEP 6 - run/LS selection
     step = 6;
-    SetStepNames(stepNames, "run/LS", step, stepName);
+    SetStepNames(stepNames, "run/LS", step, verbosity);
     
 
     vars.runId   = reader.GetInt("runId")->at(0);
@@ -752,7 +752,7 @@ int main(int argc, char** argv)
 
 
 
-void SetStepNames(std::map<int, std::string>& stepNames, const std::string& stepName, const int& step, bool verbosity)
+void SetStepNames(std::map<int, std::string>& stepNames, const std::string& stepName, const int& step, const int& verbosity)
 {
   char dummy[5];
   sprintf(dummy, "%d)", step);
