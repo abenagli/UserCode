@@ -614,14 +614,14 @@ int main(int argc, char** argv)
   
         if( (nMatching == 4) && (matchIt.at(0) > matchIt.at(1)) )
         {
-          float dummy = matchIt.at(0);
+          int dummy = matchIt.at(0);
           matchIt.at(0) = matchIt.at(1);
           matchIt.at(1) = dummy;
         }
   
         if( (nMatching == 4) && (matchIt.at(2) > matchIt.at(3)) )
         {
-          float dummy = matchIt.at(2);
+          int dummy = matchIt.at(2);
           matchIt.at(2) = matchIt.at(3);
           matchIt.at(3) = dummy;
         }
