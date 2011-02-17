@@ -596,7 +596,7 @@ int main(int argc, char** argv)
     
     //**************
     // TMVA training 
-    if( TMVA4JetTraining == true )
+    if( TMVA4JetTraining == 1 )
     {
       // match with MC
       std::vector<int> matchIt;
@@ -669,7 +669,7 @@ int main(int argc, char** argv)
     
     //******************
     // select W/tag jets
-    if( TMVA4JetTraining == false )
+    if( TMVA4JetTraining == 0 )
     {
       if( vars.nJets < 3 )
       {
