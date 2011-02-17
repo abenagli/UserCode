@@ -49,7 +49,8 @@ int main(int argc, char** argv)
   int TMVA4JetTraining = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
 
   
-  int nJetMIN = gConfigParser -> readIntOption("Cuts::nJetMIN");
+  int nJetCntMIN = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
+  int nJetMAX = gConfigParser -> readIntOption("Cuts::nJetMAX");
   float jetEtMIN  = gConfigParser -> readFloatOption("Cuts::jetEtMIN");
   float jetEtaCNT = gConfigParser -> readFloatOption("Cuts::jetEtaCNT");
   float jetEtaFWD = gConfigParser -> readFloatOption("Cuts::jetEtaFWD");
@@ -514,7 +515,7 @@ int main(int argc, char** argv)
     //***********************************
     // STEP 11 -  >= 2 cnt jets
     step += 1;
-    char stepName[50]; sprintf(stepName, ">= %d cnt jet(s)", nJetMIN);
+    char stepName[50]; sprintf(stepName, ">= %d cnt jet(s)", nJetCntMIN);
     SetStepNames(stepNames, std::string(stepName), step, stepNameVerbosity);
     
     //*****************
@@ -583,7 +584,7 @@ int main(int argc, char** argv)
     
     //**************
     // >= n cnt jets 
-    if( vars.nJets_cnt < nJetMIN ) continue;
+    if( vars.nJets_cnt < nJetCntMIN ) continue;
     if( vars.nJets >  nJetMAX ) continue;
     
     SetLeadingJetVariables(vars, reader, jetEtaCNT);
@@ -607,9 +608,9 @@ int main(int argc, char** argv)
       
       if( vars.mH > 0 )
       {
-        nMatching     = GetMatching(jets, mcQuarks,     0.3, 0.5, 1.5, &matchIt);
-        nMatching_tag = GetMatching(jets, mcQuarks_tag, 0.3, 0.5, 1.5, &matchIt_tag);
-        nMatching_W   = GetMatching(jets, mcQuarks_W,   0.3, 0.5, 1.5, &matchIt_W);
+        nMatching     = GetMatching(vars.jets, mcQuarks,     0.3, 0.5, 1.5, &matchIt);
+        nMatching_tag = GetMatching(vars.jets, mcQuarks_tag, 0.3, 0.5, 1.5, &matchIt_tag);
+        nMatching_W   = GetMatching(vars.jets, mcQuarks_W,   0.3, 0.5, 1.5, &matchIt_W);
   
         if( (nMatching == 4) && (matchIt.at(0) > matchIt.at(1)) )
         {
