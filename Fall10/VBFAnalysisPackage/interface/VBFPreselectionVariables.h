@@ -76,6 +76,7 @@ struct VBFPreselectionVariables
   
   float lep_charge;
   int lep_flavour;
+  float lep_zepp;
   float lep_dxy;
   float lep_dz;
   float lep_dB;
@@ -113,9 +114,6 @@ struct VBFPreselectionVariables
   
   // jet variables
   std::vector<ROOT::Math::XYZTVector> jets;
-  std::vector<ROOT::Math::XYZTVector> jets_cnt;
-  std::vector<ROOT::Math::XYZTVector> jets_fwd;
-  std::vector<ROOT::Math::XYZTVector> jets_btw;
   
   std::vector<float> jets_charge;
   std::vector<float> jets_etaEtaMoment;
@@ -140,12 +138,30 @@ struct VBFPreselectionVariables
   int nJets;
   int nJets_cnt;
   int nJets_fwd;
-  int nJets_btw;
+  
+  int nJets_et20;
+  int nJets_cnt_et20;
+  int nJets_fwd_et20;
+  int nJets_out_et20;
+  int nJets_mid_et20;
+  int nJets_btw_et20;
+
+  int nJets_et25;
+  int nJets_cnt_et25;
+  int nJets_fwd_et25;
+  int nJets_out_et25;
+  int nJets_mid_et25;
+  int nJets_btw_et25;
+  
+  int nJets_et30;
+  int nJets_cnt_et30;
+  int nJets_fwd_et30;
+  int nJets_out_et30;
+  int nJets_mid_et30;
+  int nJets_btw_et30;
+  
   float jets_bTag1;
   float jets_bTag2;
-  float HT;
-  float HT_cnt;
-  float HT_fwd;
   
   int selectIt_leadingJet;
   
@@ -154,6 +170,7 @@ struct VBFPreselectionVariables
   
   float leadingJ_charge;
   float leadingJ_bTag;
+  int leadingJ_chargedMultiplicity;
   
   
   
@@ -170,13 +187,18 @@ struct VBFPreselectionVariables
   
   float WJ1_charge;
   float WJ2_charge;
+  float WJ1_zepp;
+  float WJ2_zepp;
   float WJ1_bTag;
-  float WJ2_bTag;  
+  float WJ2_bTag;
+  int WJ1_chargedMultiplicity;
+  int WJ2_chargedMultiplicity;
   
   float WJJ_Deta;
   float WJJ_Dphi;
   float WJJ_DR;
   float WJJ_m;
+  float WJJ_zepp;
   
   std::vector<float> lepWJJ_ptOrdered;
   float lepWJJ_pt1;  
@@ -192,6 +214,7 @@ struct VBFPreselectionVariables
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNuW_m;
+  float lepNuW_zepp;
   
   
   

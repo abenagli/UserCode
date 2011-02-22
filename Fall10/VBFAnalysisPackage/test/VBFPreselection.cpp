@@ -566,9 +566,6 @@ int main(int argc, char** argv)
       }
       
       SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD);
-      ++vars.nJets;
-      if( fabs(jet.eta()) < jetEtaCNT )  ++vars.nJets_cnt;
-      if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd;
       
     } // loop on jets
     //std::cout << "jet end" << std::endl;
@@ -594,9 +591,9 @@ int main(int argc, char** argv)
     
     
     
-    /*
     //**************
     // TMVA training 
+    /*
     if( TMVA4JetTraining == 1 )
     {
       // match with MC

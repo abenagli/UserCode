@@ -68,6 +68,7 @@ struct VBFAnalysisVariables
   
   float lep_charge;
   int lep_flavour;
+  float lep_zepp;
   float lep_dxy;
   float lep_dz;
   float lep_dB;
@@ -102,18 +103,34 @@ struct VBFAnalysisVariables
   int nJets;
   int nJets_cnt;
   int nJets_fwd;
-  int nJets_btw;
+  int nJets_et20;
+  int nJets_cnt_et20;
+  int nJets_fwd_et20;
+  int nJets_out_et20;
+  int nJets_mid_et20;
+  int nJets_btw_et20;
+  int nJets_et25;
+  int nJets_cnt_et25;
+  int nJets_fwd_et25;
+  int nJets_out_et25;
+  int nJets_mid_et25;
+  int nJets_btw_et25;
+  int nJets_et30;
+  int nJets_cnt_et30;
+  int nJets_fwd_et30;
+  int nJets_out_et30;
+  int nJets_mid_et30;
+  int nJets_btw_et30;
+
   float jets_bTag1;
   float jets_bTag2;
-  float HT;
-  float HT_cnt;
-  float HT_fwd;
   
   ROOT::Math::XYZTVector* p_leadingJ;
   ROOT::Math::XYZTVector leadingJ;
     
   float leadingJ_charge;
   float leadingJ_bTag;
+  int leadingJ_chargedMultiplicity;
   
   
   
@@ -129,8 +146,18 @@ struct VBFAnalysisVariables
   
   float WJ1_charge;
   float WJ2_charge;
+  float WJ1_zepp;
+  float WJ2_zepp;
   float WJ1_bTag;
-  float WJ2_bTag;  
+  float WJ2_bTag;
+  int WJ1_chargedMultiplicity;
+  int WJ2_chargedMultiplicity;
+  
+  float WJJ_Deta;
+  float WJJ_Dphi;
+  float WJJ_DR;
+  float WJJ_m;
+  float WJJ_zepp;
   
   float lepWJJ_pt1;  
   float lepWJJ_pt2;  
@@ -142,6 +169,7 @@ struct VBFAnalysisVariables
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNuW_m;
+  float lepNuW_zepp;
   
   
   
@@ -156,6 +184,11 @@ struct VBFAnalysisVariables
   float tagJ2_charge;
   float tagJ1_bTag;
   float tagJ2_bTag;  
+  
+  float tagJJ_Deta;
+  float tagJJ_Dphi;
+  float tagJJ_DR;
+  float tagJJ_m;
   
   
   
