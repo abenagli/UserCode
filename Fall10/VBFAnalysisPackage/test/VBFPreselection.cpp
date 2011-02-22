@@ -227,32 +227,32 @@ int main(int argc, char** argv)
     std::vector<ROOT::Math::XYZTVector> mcQuarks;
     std::vector<ROOT::Math::XYZTVector> mcQuarks_tag;
     std::vector<ROOT::Math::XYZTVector> mcQuarks_W;
-
-    if( vars.mH > 0 )
-    {
-      mcH = reader.Get4V("mc_H")->at(0);
-      mcW1 = reader.Get4V("mcV1")->at(0);
-      mcW2 = reader.Get4V("mcV2")->at(0);
-      mcQ1_tag = (reader.Get4V("mcQ1_tag"))->at(0);
-      mcQ2_tag = (reader.Get4V("mcQ2_tag"))->at(0);
-      mcQ1_W   = (reader.Get4V("mcF1_fromV2"))->at(0);
-      mcQ2_W   = (reader.Get4V("mcF2_fromV2"))->at(0);
-      mcLepton = (reader.Get4V("mcF1_fromV1"))->at(0);
-      if( (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 12) ||
-          (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 14) ||
-          (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 16) )
-      mcLepton = (reader.Get4V("mcF2_fromV1"))->at(0);
-      
-      mcQuarks.push_back( mcQ1_tag );
-      mcQuarks.push_back( mcQ2_tag );
-      mcQuarks.push_back( mcQ1_W );
-      mcQuarks.push_back( mcQ2_W );
-
-      mcQuarks_tag.push_back( mcQ1_tag );
-      mcQuarks_tag.push_back( mcQ2_tag );
-      mcQuarks_W.push_back( mcQ1_W );
-      mcQuarks_W.push_back( mcQ2_W );
-    }
+    
+    //if( vars.mH > 0 )
+    //{
+    //  mcH = reader.Get4V("mc_H")->at(0);
+    //  mcW1 = reader.Get4V("mcV1")->at(0);
+    //  mcW2 = reader.Get4V("mcV2")->at(0);
+    //  mcQ1_tag = (reader.Get4V("mcQ1_tag"))->at(0);
+    //  mcQ2_tag = (reader.Get4V("mcQ2_tag"))->at(0);
+    //  mcQ1_W   = (reader.Get4V("mcF1_fromV2"))->at(0);
+    //  mcQ2_W   = (reader.Get4V("mcF2_fromV2"))->at(0);
+    //  mcLepton = (reader.Get4V("mcF1_fromV1"))->at(0);
+    //  if( (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 12) ||
+    //      (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 14) ||
+    //      (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 16) )
+    //  mcLepton = (reader.Get4V("mcF2_fromV1"))->at(0);
+    //  
+    //  mcQuarks.push_back( mcQ1_tag );
+    //  mcQuarks.push_back( mcQ2_tag );
+    //  mcQuarks.push_back( mcQ1_W );
+    //  mcQuarks.push_back( mcQ2_W );
+    //
+    //  mcQuarks_tag.push_back( mcQ1_tag );
+    //  mcQuarks_tag.push_back( mcQ2_tag );
+    //  mcQuarks_W.push_back( mcQ1_W );
+    //  mcQuarks_W.push_back( mcQ2_W );
+    //}
     
     
     
@@ -594,6 +594,7 @@ int main(int argc, char** argv)
     
     
     
+    /*
     //**************
     // TMVA training 
     if( TMVA4JetTraining == 1 )
@@ -611,7 +612,8 @@ int main(int argc, char** argv)
         nMatching     = GetMatching(vars.jets, mcQuarks,     0.3, 0.5, 1.5, &matchIt);
         nMatching_tag = GetMatching(vars.jets, mcQuarks_tag, 0.3, 0.5, 1.5, &matchIt_tag);
         nMatching_W   = GetMatching(vars.jets, mcQuarks_W,   0.3, 0.5, 1.5, &matchIt_W);
-  
+        
+	std::cout << "nMatching = " << nMatching << std::endl;
         if( (nMatching == 4) && (matchIt.at(0) > matchIt.at(1)) )
         {
           int dummy = matchIt.at(0);
@@ -661,6 +663,7 @@ int main(int argc, char** argv)
         stepEvents[step] += 1;
       }
     }
+    */
     
     
     
@@ -710,7 +713,6 @@ int main(int argc, char** argv)
       
       // fIll event counters
       stepEvents[step] += 1;
-          
       
       
       // Fill reduced tree
