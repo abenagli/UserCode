@@ -354,9 +354,8 @@ int main(int argc, char** argv)
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-
-    //cloneTrees[step] -> Fill();            
-    //FillAllHistograms(vars, step, verbosity);
+    
+    cloneTrees[step] -> Fill();
     
     
     
@@ -421,9 +420,8 @@ int main(int argc, char** argv)
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-
-    //cloneTrees[step] -> Fill();            
-    //FillAllHistograms(vars, step, verbosity);
+    
+    cloneTrees[step] -> Fill();
     
     
     
@@ -499,8 +497,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -537,33 +534,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
-    
-    
-    
-    
-    
-    
-    ////***************************************
-    // STEP 9 - Initial cuts - 1 central jet
-    //step += 1;
-    //SetStepNames(stepNames, "1 central jet", step, verbosity);
-    //
-    //
-    //if( vars.nJets < 1) continue;
-    //if( vars.nJets_cnt < 1) continue;
-    //
-    //
-    // fill distributions
-    //stepEvents[step] += 1;
-    //if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    //if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    //if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    //if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    //
-    //cloneTrees[step] -> Fill();    
-    ////FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -586,8 +557,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();    
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
        
     
@@ -612,8 +582,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();    
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -645,8 +614,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();    
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -669,8 +637,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();    
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -699,8 +666,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -724,8 +690,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -750,14 +715,13 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
     
     
-
+    
     //***********************************
     // STEP 16 - Initial cuts - PV tracks
     step += 1;
@@ -774,8 +738,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -802,8 +765,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();    
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -829,8 +791,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
+    cloneTrees[step] -> Fill();
     
     
     
@@ -852,9 +813,8 @@ int main(int argc, char** argv)
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
+    
+    cloneTrees[step] -> Fill();
     
     
     
@@ -877,9 +837,10 @@ int main(int argc, char** argv)
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-
-    cloneTrees[step] -> Fill();        
-    //FillAllHistograms(vars, step, verbosity);
+    
+    cloneTrees[step] -> Fill();
+    
+    
     
     
     
