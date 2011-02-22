@@ -582,7 +582,7 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJ2_bTag = vars.jets_bTag.at(vars.selectIt_W.at(1));
   
   vars.WJJ_Deta = deltaEta(vars.WJ1.eta(),vars.WJ2.eta());
-  vars.WJJ_Dphi = deltaEta(vars.WJ1.phi(),vars.WJ2.phi());
+  vars.WJJ_Dphi = deltaPhi(vars.WJ1.phi(),vars.WJ2.phi());
   vars.WJJ_DR = deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi());
   vars.WJJ_m = (vars.WJ1+vars.WJ2).mass();
   
@@ -655,7 +655,7 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.tagJ2_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(1));
     
     vars.tagJJ_Deta = deltaEta(vars.tagJ1.eta(),vars.tagJ2.eta());
-    vars.tagJJ_Dphi = deltaEta(vars.tagJ1.phi(),vars.tagJ2.phi());
+    vars.tagJJ_Dphi = deltaPhi(vars.tagJ1.phi(),vars.tagJ2.phi());
     vars.tagJJ_DR = deltaR(vars.tagJ1.eta(),vars.tagJ1.phi(),vars.tagJ2.eta(),vars.tagJ2.phi());
     vars.tagJJ_m = (vars.tagJ1+vars.tagJ2).mass();
     
