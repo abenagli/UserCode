@@ -92,10 +92,10 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   // W-jet variables
   vars.p_WJ1 = new ROOT::Math::XYZTVector;
   vars.p_WJ2 = new ROOT::Math::XYZTVector;
-  vars.p_WJ12 = new ROOT::Math::XYZTVector;
+  vars.p_WJJ = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("WJ1",                     &vars.p_WJ1);
   reducedTree -> SetBranchAddress("WJ2",                     &vars.p_WJ2);
-  reducedTree -> SetBranchAddress("WJ12",                    &vars.p_WJ12);
+  reducedTree -> SetBranchAddress("WJJ",                     &vars.p_WJJ);
   reducedTree -> SetBranchAddress("WJ1_charge",              &vars.WJ1_charge);
   reducedTree -> SetBranchAddress("WJ2_charge",              &vars.WJ2_charge);
   reducedTree -> SetBranchAddress("WJ1_zepp",                &vars.WJ1_zepp);

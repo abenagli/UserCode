@@ -1,5 +1,3 @@
-
-
 #include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
@@ -141,8 +139,8 @@ struct VBFAnalysisVariables
   ROOT::Math::XYZTVector* p_WJ2;
   ROOT::Math::XYZTVector WJ2;
   
-  ROOT::Math::XYZTVector* p_WJ12;
-  ROOT::Math::XYZTVector WJ12;
+  ROOT::Math::XYZTVector* p_WJJ;
+  ROOT::Math::XYZTVector WJJ;
   
   float WJ1_charge;
   float WJ2_charge;

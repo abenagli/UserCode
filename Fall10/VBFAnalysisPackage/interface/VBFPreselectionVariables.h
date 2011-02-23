@@ -182,8 +182,8 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector WJ2;
   ROOT::Math::XYZTVector* p_WJ2;
   
-  ROOT::Math::XYZTVector WJ12;
-  ROOT::Math::XYZTVector* p_WJ12;
+  ROOT::Math::XYZTVector WJJ;
+  ROOT::Math::XYZTVector* p_WJJ;
   
   float WJ1_charge;
   float WJ2_charge;
@@ -226,7 +226,7 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector tagJ2;
   ROOT::Math::XYZTVector* p_tagJ2;
   
-  ROOT::Math::XYZTVector tagJ12;
+  ROOT::Math::XYZTVector tagJJ;
   
   float tagJ1_charge;
   float tagJ2_charge;

@@ -99,9 +99,9 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   
   // W-jet variables
-  vars.m_reducedTree -> Branch("WJ1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1);
-  vars.m_reducedTree -> Branch("WJ2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2);
-  vars.m_reducedTree -> Branch("WJ12", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ12);
+  vars.m_reducedTree -> Branch("WJ1", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1);
+  vars.m_reducedTree -> Branch("WJ2", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2);
+  vars.m_reducedTree -> Branch("WJJ", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJJ);
   vars.m_reducedTree -> Branch("WJ1_charge",              &vars.WJ1_charge,                           "WJ1_charge/F");
   vars.m_reducedTree -> Branch("WJ2_charge",              &vars.WJ2_charge,                           "WJ2_charge/F");
   vars.m_reducedTree -> Branch("WJ1_zepp",                &vars.WJ1_zepp,                               "WJ1_zepp/F");
@@ -311,8 +311,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.WJ2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_WJ2 = NULL;
   
-  vars.WJ12 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
-  vars.p_WJ12 = NULL;
+  vars.WJJ = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_WJJ = NULL;
   
   vars.WJ1_charge = -99.;
   vars.WJ2_charge = -99.;
@@ -355,7 +355,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.tagJ2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_tagJ2 = NULL;
   
-  vars.tagJ12 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.tagJJ = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   
   vars.tagJ1_charge = -99.;
   vars.tagJ2_charge = -99.;
@@ -640,10 +640,10 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJ2 = vars.jets.at(vars.selectIt_W.at(1));
   vars.p_WJ2 = &vars.WJ2;
 
-  vars.WJ12 = vars.WJ1 + vars.WJ2;
-  vars.p_WJ12 = &vars.WJ12;
+  vars.WJJ = vars.WJ1 + vars.WJ2;
+  vars.p_WJJ = &vars.WJJ;
   
-  vars.lepW = vars.lep + vars.WJ12;
+  vars.lepW = vars.lep + vars.WJJ;
   
   vars.WJ1_charge = vars.jets_charge.at(vars.selectIt_W.at(0));
   vars.WJ2_charge = vars.jets_charge.at(vars.selectIt_W.at(1));
@@ -674,7 +674,7 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
   vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
-  vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJ12.phi());
+  vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
   
   
   // neutrino
@@ -718,7 +718,7 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.tagJ2 = vars.jets.at(vars.selectIt_tag.at(1));
     vars.p_tagJ2 = &vars.tagJ2;    
 
-    vars.tagJ12 = vars.tagJ1 + vars.tagJ2;
+    vars.tagJJ = vars.tagJ1 + vars.tagJ2;
     
     vars.tagJ1_charge = vars.jets_charge.at(vars.selectIt_tag.at(0));
     vars.tagJ2_charge = vars.jets_charge.at(vars.selectIt_tag.at(1));
@@ -775,9 +775,9 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
     
     vars.lep_zepp = (vars.lep.eta() - avgEta) / Deta;
     
-    vars.WJ1_zepp = (vars.WJ1.eta()  - avgEta) / Deta;
-    vars.WJ2_zepp = (vars.WJ2.eta()  - avgEta) / Deta;
-    vars.WJJ_zepp = (vars.WJ12.eta() - avgEta) / Deta;
+    vars.WJ1_zepp = (vars.WJ1.eta() - avgEta) / Deta;
+    vars.WJ2_zepp = (vars.WJ2.eta() - avgEta) / Deta;
+    vars.WJJ_zepp = (vars.WJJ.eta() - avgEta) / Deta;
     
     vars.lepNuW_zepp = (vars.lepNuW.eta() - avgEta) / Deta;
   }
