@@ -804,7 +804,7 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "jet veto", step, verbosity);
     
     
-    if( (vars.nJets_et20 - vars.nJets_out_et20) > 1 ) continue;    
+    if( (vars.nJets_btw_et20) > 1 ) continue;    
     
     
     // fill distributions

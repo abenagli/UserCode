@@ -104,20 +104,14 @@ struct VBFAnalysisVariables
   int nJets_et20;
   int nJets_cnt_et20;
   int nJets_fwd_et20;
-  int nJets_out_et20;
-  int nJets_mid_et20;
   int nJets_btw_et20;
   int nJets_et25;
   int nJets_cnt_et25;
   int nJets_fwd_et25;
-  int nJets_out_et25;
-  int nJets_mid_et25;
   int nJets_btw_et25;
   int nJets_et30;
   int nJets_cnt_et30;
   int nJets_fwd_et30;
-  int nJets_out_et30;
-  int nJets_mid_et30;
   int nJets_btw_et30;
 
   float jets_bTag1;
@@ -182,6 +176,8 @@ struct VBFAnalysisVariables
   float tagJ2_charge;
   float tagJ1_bTag;
   float tagJ2_bTag;  
+  int tagJ1_chargedMultiplicity;
+  int tagJ2_chargedMultiplicity;
   
   float tagJJ_Deta;
   float tagJJ_Dphi;
@@ -196,6 +192,12 @@ struct VBFAnalysisVariables
   
   float thirdJ_charge;
   float thirdJ_bTag;
+  float thirdJ_WJJDeta;
+  float thirdJ_WJJDphi;
+  float thirdJ_WJJDR;
+  float thirdJ_tagJJDeta;
+  float thirdJ_tagJJDphi;
+  float thirdJ_tagJJDR;
 };
 
 

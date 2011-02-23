@@ -61,20 +61,14 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("nJets_et20",     &vars.nJets_et20);
   reducedTree -> SetBranchAddress("nJets_cnt_et20", &vars.nJets_cnt_et20);
   reducedTree -> SetBranchAddress("nJets_fwd_et20", &vars.nJets_fwd_et20);
-  reducedTree -> SetBranchAddress("nJets_out_et20", &vars.nJets_out_et20);
-  reducedTree -> SetBranchAddress("nJets_mid_et20", &vars.nJets_mid_et20);
   reducedTree -> SetBranchAddress("nJets_btw_et20", &vars.nJets_btw_et20);
   reducedTree -> SetBranchAddress("nJets_et25",     &vars.nJets_et25);
   reducedTree -> SetBranchAddress("nJets_cnt_et25", &vars.nJets_cnt_et25);
   reducedTree -> SetBranchAddress("nJets_fwd_et25", &vars.nJets_fwd_et25);
-  reducedTree -> SetBranchAddress("nJets_out_et25", &vars.nJets_out_et25);
-  reducedTree -> SetBranchAddress("nJets_mid_et25", &vars.nJets_mid_et25);
   reducedTree -> SetBranchAddress("nJets_btw_et25", &vars.nJets_btw_et25);
   reducedTree -> SetBranchAddress("nJets_et30",     &vars.nJets_et30);
   reducedTree -> SetBranchAddress("nJets_cnt_et30", &vars.nJets_cnt_et30);
   reducedTree -> SetBranchAddress("nJets_fwd_et30", &vars.nJets_fwd_et30);
-  reducedTree -> SetBranchAddress("nJets_out_et30", &vars.nJets_out_et30);
-  reducedTree -> SetBranchAddress("nJets_mid_et30", &vars.nJets_mid_et30);
   reducedTree -> SetBranchAddress("nJets_btw_et30", &vars.nJets_btw_et30);
   
   reducedTree -> SetBranchAddress("jets_bTag1", &vars.jets_bTag1);
@@ -126,12 +120,14 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   // tag-jet variables
   vars.p_tagJ1 = new ROOT::Math::XYZTVector;
   vars.p_tagJ2 = new ROOT::Math::XYZTVector;
-  reducedTree -> SetBranchAddress("tagJ1", &vars.p_tagJ1);
-  reducedTree -> SetBranchAddress("tagJ2", &vars.p_tagJ2);
-  reducedTree -> SetBranchAddress("tagJ1_charge", &vars.tagJ1_charge);
-  reducedTree -> SetBranchAddress("tagJ2_charge", &vars.tagJ2_charge);
-  reducedTree -> SetBranchAddress("tagJ1_bTag",   &vars.tagJ1_bTag);
-  reducedTree -> SetBranchAddress("tagJ2_bTag",   &vars.tagJ2_bTag);
+  reducedTree -> SetBranchAddress("tagJ1",                     &vars.p_tagJ1);
+  reducedTree -> SetBranchAddress("tagJ2",                     &vars.p_tagJ2);
+  reducedTree -> SetBranchAddress("tagJ1_charge",              &vars.tagJ1_charge);
+  reducedTree -> SetBranchAddress("tagJ2_charge",              &vars.tagJ2_charge);
+  reducedTree -> SetBranchAddress("tagJ1_bTag",                &vars.tagJ1_bTag);
+  reducedTree -> SetBranchAddress("tagJ2_bTag",                &vars.tagJ2_bTag);
+  reducedTree -> SetBranchAddress("tagJ1_chargedMultiplicity", &vars.tagJ1_chargedMultiplicity);
+  reducedTree -> SetBranchAddress("tagJ2_chargedMultiplicity", &vars.tagJ2_chargedMultiplicity);
   
   reducedTree -> SetBranchAddress("tagJJ_Deta", &vars.tagJJ_Deta);
   reducedTree -> SetBranchAddress("tagJJ_Dphi", &vars.tagJJ_Dphi);
@@ -141,6 +137,12 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   // third jet variables
   vars.p_thirdJ = new ROOT::Math::XYZTVector; 
   reducedTree -> SetBranchAddress("thirdJ", &vars.p_thirdJ);
-  reducedTree -> SetBranchAddress("thirdJ_charge", &vars.thirdJ_charge);
-  reducedTree -> SetBranchAddress("thirdJ_bTag",   &vars.thirdJ_bTag);
+  reducedTree -> SetBranchAddress("thirdJ_charge",    &vars.thirdJ_charge);
+  reducedTree -> SetBranchAddress("thirdJ_bTag",      &vars.thirdJ_bTag);
+  reducedTree -> SetBranchAddress("thirdJ_WJJDeta",   &vars.thirdJ_WJJDeta);
+  reducedTree -> SetBranchAddress("thirdJ_WJJDphi",   &vars.thirdJ_WJJDphi);
+  reducedTree -> SetBranchAddress("thirdJ_WJJDR",     &vars.thirdJ_WJJDR);
+  reducedTree -> SetBranchAddress("thirdJ_tagJJDeta", &vars.thirdJ_tagJJDeta);
+  reducedTree -> SetBranchAddress("thirdJ_tagJJDphi", &vars.thirdJ_tagJJDphi);
+  reducedTree -> SetBranchAddress("thirdJ_tagJJDR",   &vars.thirdJ_tagJJDR);
 }
