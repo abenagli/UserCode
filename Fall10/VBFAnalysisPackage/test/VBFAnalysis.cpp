@@ -49,6 +49,7 @@ int main(int argc, char** argv)
   int entryFIRST = gConfigParser -> readIntOption("Options::entryFIRST");
   int entryMAX = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
+  int firstSTEP = gConfigParser -> readIntOption("Options::firstSTEP");
   int dataFlag = gConfigParser -> readIntOption("Options::dataFlag");
   float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   int verbosity = gConfigParser -> readIntOption("Options::verbosity"); 
@@ -144,7 +145,6 @@ int main(int argc, char** argv)
   
   // define event histogram
   int nStep = 20;
-  int firstStep = 7;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_plus_int  = new TH1F("events_plus_int",  "events_plus_int",  nStep, 0., 1.*nStep);
@@ -182,7 +182,7 @@ int main(int argc, char** argv)
   
   // define clone trees
   std::map<int, TTree*> cloneTrees;
-  for(int step = firstStep; step <= nStep; ++step)
+  for(int step = firstSTEP; step <= nStep; ++step)
   {
     char treeName[50];
     sprintf(treeName, "ntu_%d", step);;
@@ -355,7 +355,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
     
     
     
@@ -421,7 +421,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -497,7 +497,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -534,7 +534,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -557,7 +557,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
        
     
@@ -582,7 +582,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -614,7 +614,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -637,7 +637,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -666,7 +666,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -690,7 +690,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -715,7 +715,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -738,7 +738,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -765,7 +765,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -791,7 +791,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -814,7 +814,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -838,7 +838,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    cloneTrees[step] -> Fill();
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -881,7 +881,7 @@ int main(int argc, char** argv)
   
   
   
-  for(step = firstStep; step <= nStep; ++step)
+  for(step = firstSTEP; step <= nStep; ++step)
   {
     cloneTrees[step] -> AutoSave();
   } 
