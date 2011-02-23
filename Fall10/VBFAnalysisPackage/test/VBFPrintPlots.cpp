@@ -800,27 +800,6 @@ int main(int argc, char** argv)
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 10, false);
   
-  variableNames.at(0) = "nJets_et20 - nJets_out_et20";
-  histoName = "jets_in_n_et20";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("n_{inner jets} - et > 20 GeV");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, false);
-  
-  variableNames.at(0) = "nJets_out_et20";
-  histoName = "jets_out_n_et20";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("n_{outer jets} - et > 20 GeV");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, false);
-  
-  variableNames.at(0) = "nJets_mid_et20";
-  histoName = "jets_mid_et20";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("n_{middle jets} - et > 20 GeV");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, false);
-  
   variableNames.at(0) = "nJets_btw_et20";
   histoName = "jets_btw_et20";
   stack -> SetXaxisRange(0., 10.);
@@ -848,27 +827,6 @@ int main(int argc, char** argv)
   histoName = "jets_fwd_n_et30";
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("n_{forward jets} - et > 30 GeV");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, false);
-  
-  variableNames.at(0) = "nJets_et30 - nJets_out_et30";
-  histoName = "jets_in_n_et30";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("n_{inner jets} - et > 30 GeV");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, false);
-  
-  variableNames.at(0) = "nJets_out_et30";
-  histoName = "jets_out_n_et30";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("n_{outer jets} - et > 30 GeV");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, false);
-  
-  variableNames.at(0) = "nJets_mid_et30";
-  histoName = "jets_mid_et30";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("n_{middle jets} - et > 30 GeV");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 10, false);
   
@@ -921,7 +879,7 @@ int main(int argc, char** argv)
   stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, false, cuts);
   
-  variableNames.at(0) = "WJ12.Et()";
+  variableNames.at(0) = "WJ1J.Et()";
   histoName = "WJJ_et";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0., 300.);
