@@ -52,6 +52,48 @@ std::map<int, int> GetTotalEvents(const std::string& histoName, const std::strin
 //  ------------------------------------------------------------
 
 
+
+std::map<int, std::string> GetBinLabels(const std::string& histoName, const std::string& inputFileList)
+{
+  std::ifstream inFile(inputFileList.c_str());
+  std::string buffer;
+  std::map<int, std::string> binLabels;
+  
+  if(!inFile.is_open())
+  {
+    std::cerr << "** ERROR: Can't open '" << inputFileList << "' for input" << std::endl;
+    return binLabels;
+  }
+  
+  while(1)
+  {
+    inFile >> buffer;
+    if(!inFile.good()) break;
+
+    TFile* f = TFile::Open(buffer.c_str());
+    TH1F* histo = NULL;
+    f -> GetObject(histoName.c_str(), histo);
+    if(histo == NULL)
+    {
+      std::cout << ">>>ntpleUtils::Error in getting object " << histoName << std::endl;
+      exit(-1);
+    }
+    
+    
+    for(int bin = 1; bin <= histo -> GetNbinsX(); ++bin)
+      binLabels[bin] = std::string(histo -> GetXaxis() -> GetBinLabel(bin));
+    
+    f -> Close();
+    
+    delete f;
+  }
+
+  return binLabels;
+}
+
+//  ------------------------------------------------------------
+
+
 bool FillChain(TChain& chain, const std::string& inputFileList)
 {
   std::ifstream inFile(inputFileList.c_str());
