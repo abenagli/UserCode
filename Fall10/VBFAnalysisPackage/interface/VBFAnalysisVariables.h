@@ -75,6 +75,7 @@ struct VBFAnalysisVariables
   float lep_emIso;
   float lep_hadIso;
   int lep_isEB;
+  float lep_simpleEleId80cIso;
   float lep_sigmaIetaIeta;
   float lep_DphiIn;
   float lep_DetaIn;

@@ -56,11 +56,11 @@ int main(int argc, char** argv)
   std::string jetType = gConfigParser -> readStringOption("Options::jetType");
   
   char stepDir[50];
-	sprintf(stepDir, "plots_%d", step);
+  sprintf(stepDir, "plots_%d", step);
   char stepNumber[50];
-	sprintf(stepNumber, "%d", step);
-	std::string fullOutputDir = outputDir + "/" + stepDir + "_" + jetType + "_" + method + "/";
-	std::string fullHtmlName = outputDir + "/" + stepDir + "_" + jetType + "_" + method + ".html";
+  sprintf(stepNumber, "%d", step);
+  std::string fullOutputDir = outputDir + "/" + stepDir + "_" + jetType + "_" + method + "/";
+  std::string fullHtmlName = outputDir + "/" + stepDir + "_" + jetType + "_" + method + ".html";
   
   
   
@@ -70,11 +70,13 @@ int main(int argc, char** argv)
   // make directory
   int iStatus = 0;
 	
-  std::string command = "rm -rf " + fullOutputDir + "/*" ;
-	iStatus = RunCommand(command.c_str());
+  std::string command;
 
-	command = "mkdir " + fullOutputDir;
-	iStatus = RunCommand(command.c_str());  
+  command = "rm -rf " + fullOutputDir + "/";
+  iStatus = RunCommand(command.c_str());
+  
+  command = "mkdir " + fullOutputDir;
+  iStatus = RunCommand(command.c_str());  
   
   
   
@@ -83,14 +85,15 @@ int main(int argc, char** argv)
   
   // make html
   iStatus = 0;
-	
-	if( method == "sameAreaStack" )
-    command = "cat " + baseDir + "/cfg/plots.html | sed -e s%STEP%" + stepNumber + "%g | sed -e s%NORM%area%g | sed -e s%DIR%" + stepDir + "_" + jetType + "_" + method + "%g > " + fullHtmlName;
-	if( method == "eventsScaled" )
-    command = "cat " + baseDir + "/cfg/plots.html | sed -e s%STEP%" + stepNumber + "%g | sed -e s%NORM%lumi%g | sed -e s%DIR%" + stepDir + "_" + jetType + "_" + method + "%g > " + fullHtmlName;
-	
-	iStatus = RunCommand(command.c_str());
 
+  if( method == "sameAreaStack" )
+    command = "cat " + baseDir + "/cfg/plots.html | sed -e s%STEP%" + stepNumber + "%g | sed -e s%NORM%area%g | sed -e s%DIR%" + stepDir + "_" + jetType + "_" + method + "%g > " + fullHtmlName;
+  if( method == "eventsScaled" )
+    command = "cat " + baseDir + "/cfg/plots.html | sed -e s%STEP%" + stepNumber + "%g | sed -e s%NORM%lumi%g | sed -e s%DIR%" + stepDir + "_" + jetType + "_" + method + "%g > " + fullHtmlName;
+  
+  if( method != "sameAreaNoStack" )
+    iStatus = RunCommand(command.c_str());
+  
   
   
   
@@ -107,6 +110,7 @@ int main(int argc, char** argv)
   stack -> DrawEvents("eventsScaledStack", lumi, step, true);
   stack -> DrawEvents("efficiencies", lumi, step, true);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true);
+  stack -> DrawEvents("significance", lumi, step, false);
   //stack -> DrawEventRatio_nJets("int", lumi, step, false);
   //stack -> DrawEventRatio_nJets("0jets", lumi, step, false);
   //stack -> DrawEventRatio_nJets("1jets", lumi, step, false);
@@ -753,6 +757,36 @@ int main(int argc, char** argv)
   
   
   
+  variableNames.at(0) = "thirdJ.Et()";
+  histoName = "thirdJ_et";
+  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisTitle("et_{third jet}");
+  stack -> SetUnit("GeV");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, false);
+  
+  variableNames.at(0) = "thirdJ.eta()";
+  histoName = "thirdJ_eta";
+  stack -> SetXaxisRange(-5., 5.);
+  stack -> SetXaxisTitle("#eta_{third jet}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi,step, 50, false);
+  
+  variableNames.at(0) = "thirdJ_WJJDeta";
+  histoName = "thirdJ_WJJDeta";
+  stack -> SetXaxisRange(0., 5.);
+  stack -> SetXaxisTitle("#Delta#eta_{third jet - W jet}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi,step, 50, false);
+  
+  variableNames.at(0) = "thirdJ_tagJJDeta";
+  histoName = "thirdJ_tagJJDeta";
+  stack -> SetXaxisRange(0., 5.);
+  stack -> SetXaxisTitle("#Delta#eta_{third jet - tag jet}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi,step, 50, false);
+  
+  
+  
   
   
   
@@ -879,7 +913,7 @@ int main(int argc, char** argv)
   stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, false, cuts);
   
-  variableNames.at(0) = "WJ1J.Et()";
+  variableNames.at(0) = "WJJ.Et()";
   histoName = "WJJ_et";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0., 300.);
@@ -923,7 +957,7 @@ int main(int argc, char** argv)
   
   variableNames2.at(0) = "WJ1.Et()";
   variableNames2.at(1) = "WJ2.Et()";
-  histoName = "WJJ_min_et+WJJ_max_et";
+  histoName = "WJJ_et_min+WJJ_et_max";
   cuts2->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   cuts2->at(1) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0., 300.);
@@ -932,7 +966,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames2, histoName, method, lumi, step, 60, false, cuts2);
   
   variableNames.at(0) = "max(WJ1.Et(), WJ2.Et())";
-  histoName = "WJJ_max_et";
+  histoName = "WJJ_et_max";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";  
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("et_{WJJ} max");
@@ -940,7 +974,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, false, cuts);
   
   variableNames.at(0) = "min(WJ1.Et(), WJ2.Et())";
-  histoName = "WJJ_min_et";
+  histoName = "WJJ_et_min";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0., 150.);
   stack -> SetXaxisTitle("et_{WJJ} min");
@@ -951,7 +985,7 @@ int main(int argc, char** argv)
     
   variableNames2.at(0) = "WJ1.eta()";
   variableNames2.at(1) = "WJ1.eta()";
-  histoName = "WJJ_min_eta+WJJ_max_eta";
+  histoName = "WJJ_eta_min+WJJ_eta_max";
   cuts2->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   cuts2->at(1) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(-5., 5.);
@@ -960,7 +994,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames2, histoName, method, lumi, step, 50, false, cuts2);
   
   variableNames.at(0) = "max(abs(WJ1.eta()), abs(WJ2.eta()))";
-  histoName = "WJJ_max_absEta";
+  histoName = "WJJ_absEta_max";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0., 2.5);
   stack -> SetXaxisTitle("eta_{WJJ} max");
@@ -968,7 +1002,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi, step, 25, false, cuts);
   
   variableNames.at(0) = "min(abs(WJ1.eta()), abs(WJ2.eta()))";
-  histoName = "WJJ_min_absEta";
+  histoName = "WJJ_absEta_min";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0., 2.5);
   stack -> SetXaxisTitle("eta_{WJJ} min");
@@ -978,8 +1012,8 @@ int main(int argc, char** argv)
   
   
   variableNames2.at(0) = "abs(WJ1_zepp)";
-  variableNames2.at(0) = "abs(WJ2_zepp)";
-  histoName = "WJJ_min_zepp+WJJ_max_zepp";
+  variableNames2.at(1) = "abs(WJ2_zepp)";
+  histoName = "WJJ_zepp_min+WJJ_zepp_max";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0, 1.);
   stack -> SetXaxisTitle("zepp_{WJJ}");
@@ -987,7 +1021,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames2, histoName, method, lumi, step, 20, false, cuts2);
   
   variableNames.at(0) = "max(abs(WJ1_zepp), abs(WJ2_zepp))";
-  histoName = "WJJ_max_zepp";
+  histoName = "WJJ_zepp_max";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0, 1.);
   stack -> SetXaxisTitle("zepp_{WJJ} max");
@@ -995,7 +1029,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi, step, 20, false, cuts);
   
   variableNames.at(0) = "min(abs(WJ1_zepp), abs(WJ2_zepp))";
-  histoName = "WJJ_min_zepp";
+  histoName = "WJJ_zepp_min";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0, 1.);
   stack -> SetXaxisTitle("zepp_{WJJ} min");
@@ -1157,7 +1191,7 @@ int main(int argc, char** argv)
   
   variableNames2.at(0) = "tagJ1.eta()";
   variableNames2.at(1) = "tagJ2.eta()";
-  histoName = "tagJJ_min_eta+tagJJ_max_eta";
+  histoName = "tagJJ_eta_min+tagJJ_eta_max";
   cuts2->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   cuts2->at(1) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(-5., 5.);
@@ -1168,24 +1202,24 @@ int main(int argc, char** argv)
   variableNames.at(0) = "max(abs(tagJ1.eta()),abs(tagJ2.eta()))";
   histoName = "tagJJ_absEta_max";
   cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
-  stack -> SetXaxisRange(0, 10);
+  stack -> SetXaxisRange(0, 6);
   stack -> SetXaxisTitle("max #eta_{tagJJ}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 30, false, cuts);
   
   variableNames.at(0) = "min(abs(tagJ1.eta()),abs(tagJ2.eta()))";
   histoName = "tagJJ_absEta_min";
   cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
-  stack -> SetXaxisRange(0, 10);
+  stack -> SetXaxisRange(0, 6);
   stack -> SetXaxisTitle("min #eta_{tagJJ}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 30, false, cuts);
   
   
   
   variableNames.at(0) = "tagJ1.Et()";
   variableNames.at(0) = "tagJ2.Et()";
-  histoName = "tagJJ_min_et+tagJJ_max_et";
+  histoName = "tagJJ_et_min+tagJJ_et_max";
   cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0, 300);
   stack -> SetXaxisTitle("et_{tagJJ}");
@@ -1193,7 +1227,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, false, cuts);
   
   variableNames.at(0) = "max(abs(tagJ1.Et()),abs(tagJ2.Et()))";
-  histoName = "tagJJ_max_et";
+  histoName = "tagJJ_et_max";
   cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0, 300);
   stack -> SetXaxisTitle("max et_{tagJJ}");
@@ -1201,7 +1235,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, false, cuts);
   
   variableNames.at(0) = "min(abs(tagJ1.Et()),abs(tagJ2.Et()))";
-  histoName = "tagJJ_min_et";
+  histoName = "tagJJ_et_min";
   cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0, 150);
   stack -> SetXaxisTitle("min et_{tagJJ}");
@@ -1210,6 +1244,13 @@ int main(int argc, char** argv)
   
   
   
+  variableNames.at(0) = "tagJ1_chargedMultiplicity+tagJ2_chargedMultiplicity";
+  histoName = "tagJJ_chargedMultiplicity";
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
+  stack -> SetXaxisRange(0., 40.);
+  stack -> SetXaxisTitle("charged multiplicity_{tagJJ}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 20, false, cuts);
   
   
   
@@ -1507,23 +1548,25 @@ int main(int argc, char** argv)
 
 int RunCommand(const char *strCommand)
 {
-	int iForkId, iStatus;
-	iForkId = vfork();
-	if (iForkId == 0)	// This is the child 
-	{
-		iStatus = execl("/bin/sh","sh","-c", strCommand, (char*) NULL);
-		exit(iStatus);	// We must exit here, 
-				// or we will have multiple
-				// mainlines running...  
-	}
-	else if (iForkId > 0)	// Parent, no error
-	{
-		iStatus = 0;
-	}
-	else	// Parent, with error (iForkId == -1)
-	{
-		iStatus = -1;
-	}
-	return(iStatus);
+  std::cout << ">>>VBFPrintPlots::command " << std::string(strCommand) << std::endl;
+  
+  int iForkId, iStatus;
+  iForkId = vfork();
+  if (iForkId == 0)	// This is the child 
+  {
+    iStatus = execl("/bin/sh","sh","-c", strCommand, (char*) NULL);
+    exit(iStatus);	// We must exit here, 
+			// or we will have multiple
+			// mainlines running...  
+  }
+  else if (iForkId > 0)	// Parent, no error
+  {
+    iStatus = 0;
+  }
+  else	// Parent, with error (iForkId == -1)
+  {
+    iStatus = -1;
+  }
+  return(iStatus);
 } 
 

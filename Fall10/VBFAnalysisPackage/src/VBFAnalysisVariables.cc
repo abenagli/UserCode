@@ -33,11 +33,12 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lep_tkIso",   &vars.lep_tkIso);
   reducedTree -> SetBranchAddress("lep_emIso",   &vars.lep_emIso);
   reducedTree -> SetBranchAddress("lep_hadIso",  &vars.lep_hadIso);
-  reducedTree -> SetBranchAddress("lep_isEB",          &vars.lep_isEB);
-  reducedTree -> SetBranchAddress("lep_sigmaIetaIeta", &vars.lep_sigmaIetaIeta);
-  reducedTree -> SetBranchAddress("lep_DphiIn",        &vars.lep_DphiIn);
-  reducedTree -> SetBranchAddress("lep_DetaIn",        &vars.lep_DetaIn);
-  reducedTree -> SetBranchAddress("lep_HOverE",        &vars.lep_HOverE);
+  reducedTree -> SetBranchAddress("lep_isEB",              &vars.lep_isEB);
+  reducedTree -> SetBranchAddress("lep_simpleEleId80cIso", &vars.lep_simpleEleId80cIso);
+  reducedTree -> SetBranchAddress("lep_sigmaIetaIeta",     &vars.lep_sigmaIetaIeta);
+  reducedTree -> SetBranchAddress("lep_DphiIn",            &vars.lep_DphiIn);
+  reducedTree -> SetBranchAddress("lep_DetaIn",            &vars.lep_DetaIn);
+  reducedTree -> SetBranchAddress("lep_HOverE",            &vars.lep_HOverE);
   reducedTree -> SetBranchAddress("lep_tracker",                  &vars.lep_tracker);
   reducedTree -> SetBranchAddress("lep_standalone",               &vars.lep_standalone);
   reducedTree -> SetBranchAddress("lep_global",                   &vars.lep_global);

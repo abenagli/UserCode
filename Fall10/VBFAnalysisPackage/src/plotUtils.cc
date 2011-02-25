@@ -970,7 +970,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       for(std::map<std::string, double>::const_iterator mapIt2 = crossSection_summed.begin();
           mapIt2 != crossSection_summed.end(); ++mapIt2)
       {
-        if(m_mH[mapIt2->first] < 0) continue;
+        if(isSignal_summed[mapIt2->first] == true) continue;
         TH1F* globalHisto2 = histo_summed[mapIt2->first];
         
         if(totalBkgHisto == NULL)
@@ -1275,6 +1275,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   {
     if(nHists > 0)
     hs->GetYaxis()->SetTitle("S / #sqrt{B}");
+    hs->SetMaximum(1.1);
     
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)

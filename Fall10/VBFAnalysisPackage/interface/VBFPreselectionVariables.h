@@ -54,6 +54,7 @@ struct VBFPreselectionVariables
   std::vector<float> leptons_emIso;
   std::vector<float> leptons_hadIso;
   std::vector<int> electrons_isEB;
+  std::vector<float> electrons_simpleEleId80cIso;
   std::vector<float> electrons_sigmaIetaIeta;
   std::vector<float> electrons_DphiIn;
   std::vector<float> electrons_DetaIn;
@@ -85,6 +86,7 @@ struct VBFPreselectionVariables
   float lep_emIso;
   float lep_hadIso;
   int lep_isEB;
+  float lep_simpleEleId80cIso;
   float lep_sigmaIetaIeta;
   float lep_DphiIn;
   float lep_DetaIn;

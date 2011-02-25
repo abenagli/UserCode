@@ -87,7 +87,8 @@ int main(int argc, char** argv)
   float muNumberOfValidMuonHitsMIN = gConfigParser -> readFloatOption("Cuts::muNumberOfValidMuonHitsMIN");
   float mu3DipMAX = gConfigParser -> readFloatOption("Cuts::mu3DipMAX");
   
-  float lepAbsEtaMAX = gConfigParser -> readFloatOption("Cuts::lepAbsEtaMAX");
+  float eleAbsEtaMAX = gConfigParser -> readFloatOption("Cuts::eleAbsEtaMAX");
+  float muAbsEtaMAX = gConfigParser -> readFloatOption("Cuts::muAbsEtaMAX");
   float lepMetMtMIN = gConfigParser -> readFloatOption("Cuts::lepMetMtMIN");
   float lepMetDphiMIN = gConfigParser -> readFloatOption("Cuts::lepMetDphiMIN");  
   float lepMetDphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetDphiMAX");  
@@ -99,6 +100,8 @@ int main(int argc, char** argv)
   float tagJJDetaMIN = gConfigParser -> readFloatOption("Cuts::tagJJDetaMIN");
   float tagJJMaxEtMIN = gConfigParser -> readFloatOption("Cuts::tagJJMaxEtMIN");
   float tagJJMinEtMIN = gConfigParser -> readFloatOption("Cuts::tagJJMinEtMIN");
+  float tagJJMaxEtaMIN = gConfigParser -> readFloatOption("Cuts::tagJJMaxEtaMIN");
+  float tagJJMinEtaMIN = gConfigParser -> readFloatOption("Cuts::tagJJMinEtaMIN");
   
   float WJJMassMIN = gConfigParser -> readFloatOption("Cuts::WJJMassMIN");
   float WJJMassMAX = gConfigParser -> readFloatOption("Cuts::WJJMassMAX");
@@ -106,6 +109,10 @@ int main(int argc, char** argv)
   float WJJMinEtMIN = gConfigParser -> readFloatOption("Cuts::WJJMinEtMIN");
   float WJJDphiMIN = gConfigParser -> readFloatOption("Cuts::WJJDphiMIN");
   float WJJDphiMAX = gConfigParser -> readFloatOption("Cuts::WJJDphiMAX");
+  
+  float lepZeppMAX = gConfigParser -> readFloatOption("Cuts::lepZeppMAX");
+  float WJJMaxZeppMAX = gConfigParser -> readFloatOption("Cuts::WJJMaxZeppMAX");
+  float WJJMinZeppMAX = gConfigParser -> readFloatOption("Cuts::WJJMinZeppMAX");
   
   float lepMetWDphiMIN = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMIN");
   float lepMetWDphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMAX");
@@ -144,7 +151,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 20;
+  int nStep = 19;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_plus_int  = new TH1F("events_plus_int",  "events_plus_int",  nStep, 0., 1.*nStep);
@@ -201,7 +208,7 @@ int main(int argc, char** argv)
   
   
   //********************                                                                                                                                                        
-  // STEP 1 - all events
+  // STEP 1 - All events
   int step = 1;
   stepEvents[step] = totalEvents[1];
   stepEvents_plus_int[step] = totalEvents[1];
@@ -213,55 +220,37 @@ int main(int argc, char** argv)
     stepEvents_plus[njetBin] = tempMap;
     stepEvents_minus[njetBin] = tempMap;
   }
-  stepNames[step] = "1) total events";
+  stepNames[step] = "1) All events";
   
   
   
-  //******************
-  // STEP 2 - GOODCOLL
+  //*******************************
+  // STEP 2 - Skim: 1 lepton 2 jets
   step = 2;
-  stepEvents[step] = totalEvents[3];
-  stepEvents_plus_int[step] = totalEvents[3];
-  stepEvents_minus_int[step] = totalEvents[3];
+  stepEvents[step] = totalEvents[7];
+  stepEvents_plus_int[step] = totalEvents[7];
+  stepEvents_minus_int[step] = totalEvents[7];
   for(int njetBin = jetNMIN; njetBin <= jetNMAX; ++njetBin)
   {
-    (stepEvents_plus[njetBin])[step] = totalEvents[3];
-    (stepEvents_minus[njetBin])[step] = totalEvents[3];
+    (stepEvents_plus[njetBin])[step] = totalEvents[7];
+    (stepEvents_minus[njetBin])[step] = totalEvents[7];
   }
-  stepNames[step] = "2) Preselection - Good collision";
+  stepNames[step] = "2) 1! lepton && >= 2 cnt jets";
   
   
   
-  //*************************
-  // STEP 3 - 1 lepton 2 jets
+  //*************
+  // STEP 3 - HLT
   step = 3;
-  stepEvents[step] = totalEvents[5];
-  stepEvents_plus_int[step] = totalEvents[5];
-  stepEvents_minus_int[step] = totalEvents[5];
+  stepEvents[step] = totalEvents[9];
+  stepEvents_plus_int[step] = totalEvents[9];
+  stepEvents_minus_int[step] = totalEvents[9];
   for(int njetBin = jetNMIN; njetBin <= jetNMAX; ++njetBin)
   {
-    (stepEvents_plus[njetBin])[step] = totalEvents[5];
-    (stepEvents_minus[njetBin])[step] = totalEvents[5];
+    (stepEvents_plus[njetBin])[step] = totalEvents[9];
+    (stepEvents_minus[njetBin])[step] = totalEvents[9];
   }
-  stepNames[step] = "3) Preselection - 1 lep & 2 jets";
-  
-  
-  
-  
-  
-  
-  //******************************
-  // STEP 4 - 1! lepton 2 cnt jets
-  step = 4;
-  stepEvents[step] = totalEvents[10];
-  stepEvents_plus_int[step] = totalEvents[10];
-  stepEvents_minus_int[step] = totalEvents[10];
-  for(int njetBin = jetNMIN; njetBin <= jetNMAX; ++njetBin)
-  {
-    (stepEvents_plus[njetBin])[step] = totalEvents[10];
-    (stepEvents_minus[njetBin])[step] = totalEvents[10];
-  }
-  stepNames[step] = "4) 1! lep & 2 cnt jets";
+  stepNames[step] = "3) HLT";
   
   
   
@@ -322,13 +311,14 @@ int main(int argc, char** argv)
     
     
     //***********************
-    // STEP 5 - lepton pt/eta
-    step = 5;
+    // STEP 4 - lepton pt/eta
+    step = 4;
     SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
     
     if( vars.lep.pt() < lepPtMIN ) continue;
     if( vars.lep.pt() > lepPtMAX ) continue;
-    if( fabs(vars.lep.eta()) > lepAbsEtaMAX ) continue;
+    if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
+    if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
     
     if( vars.lep_flavour == 11 )    
     {
@@ -363,7 +353,7 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 6 - Initial cuts - lepton ID
+    // STEP 5 - Initial cuts - lepton ID
     step += 1;
     SetStepNames(stepNames, "lepton ID", step, verbosity);
     
@@ -389,6 +379,10 @@ int main(int argc, char** argv)
         if( fabs(vars.lep_DetaIn)   > eleDetaInEEMAX )        isId = false;
         if( vars.lep_HOverE         > eleHOverEEEMAX )        isId = false;
       }    
+      
+      // conversion removal
+      if( vars.lep_simpleEleId80cIso < 4 ) isId = false;
+      
     }
     
     
@@ -429,7 +423,7 @@ int main(int argc, char** argv)
     
     
     //******************************************
-    // STEP 7 - Initial cuts - lepton isolation
+    // STEP 6 - Initial cuts - lepton isolation
     step += 1;
     SetStepNames(stepNames, "lepton isolation", step, verbosity);
     
@@ -505,7 +499,7 @@ int main(int argc, char** argv)
     
     
     //***************************************
-    // STEP 8 - Initial cuts - lepton 3D I.P.
+    // STEP 7 - Initial cuts - lepton 3D I.P.
     step += 1;
     SetStepNames(stepNames, "lepton 3D I.P.", step, verbosity);
     
@@ -542,7 +536,7 @@ int main(int argc, char** argv)
     
     
     //****************************
-    // STEP 9 - Initial cuts - met
+    // STEP 8 - Initial cuts - met
     step += 1;
     SetStepNames(stepNames, "met", step, verbosity);
     
@@ -565,7 +559,7 @@ int main(int argc, char** argv)
     
     
     //****************************
-    // STEP 10 - Initial cuts - mt
+    // STEP 9 - Initial cuts - mt
     step += 1;
     SetStepNames(stepNames, "lepton+met mt", step, verbosity);
     
@@ -589,40 +583,8 @@ int main(int argc, char** argv)
     
     
     
-    //************************************
-    // STEP 11 - Initial cuts - anti b-tag
-    step += 1;
-    SetStepNames(stepNames, "anti b-tag", step, verbosity);
-    
-    
-    bool isBTagged = false;
-    //for(unsigned int jetIt = 0; jetIt < vars.nJets; ++jetIt)
-    //{
-    //  if( vars.jets_bTag.at(jetIt) > 2.5 ) isBTagged = true;
-    //}
-    
-    if( (vars.nJets >=1) && (vars.jets_bTag1 > 2.50) ) isBTagged = true;
-    if( (vars.nJets >=2) && (vars.jets_bTag2 > 1.50) ) isBTagged = true;
-    if( isBTagged == true) continue;
-    
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
     //**********************************
-    // STEP 12 - Initial cuts - 2 W-jets
+    // STEP 10 - Initial cuts - 2 W-jets
     step += 1;
     SetStepNames(stepNames, "2 W-jets", step, verbosity);
     
@@ -645,7 +607,7 @@ int main(int argc, char** argv)
     
     
     //************************************
-    // STEP 13 - Initial cuts - W-jet cuts
+    // STEP 11 - Initial cuts - W-jet cuts
     step += 1;
     SetStepNames(stepNames, "W-jet cuts", step, verbosity);
     
@@ -674,7 +636,7 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 14 - Initial cuts - W-W cuts
+    // STEP 12 - Initial cuts - W-W cuts
     step += 1;
     SetStepNames(stepNames, "W-W cuts", step, verbosity);
     
@@ -698,7 +660,7 @@ int main(int argc, char** argv)
     
     
     //**************************************
-    // STEP 15 - Initial cuts - pt max  cuts
+    // STEP 13 - Initial cuts - pt max  cuts
     step += 1;
     SetStepNames(stepNames, "pt max cuts", step, verbosity);
     
@@ -722,31 +684,8 @@ int main(int argc, char** argv)
     
     
     
-    //***********************************
-    // STEP 16 - Initial cuts - PV tracks
-    step += 1;
-    SetStepNames(stepNames, "PV tracks", step, verbosity);
-    
-    
-    //if( vars.PV_nTracks > 60 ) continue;
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
     //************************************
-    // STEP 17 - Initial cuts - 2 tag-jets
+    // STEP 14 - Initial cuts - 2 tag-jets
     step += 1;
     SetStepNames(stepNames, "2 tag-jets", step, verbosity);
     
@@ -773,7 +712,7 @@ int main(int argc, char** argv)
     
     
     //**************************************
-    // STEP 18 - Initial cuts - tag-jet cuts
+    // STEP 15 - Initial cuts - tag-jet cuts
     step += 1;
     SetStepNames(stepNames, "tag-jet cuts", step, verbosity);
     
@@ -782,6 +721,8 @@ int main(int argc, char** argv)
     if( (vars.tagJ1+vars.tagJ2).mass() < tagJJMassMIN ) continue;
     if( std::max(vars.tagJ1.Et(),vars.tagJ2.Et()) < tagJJMaxEtMIN ) continue;
     if( std::min(vars.tagJ1.Et(),vars.tagJ2.Et()) < tagJJMinEtMIN ) continue;
+    if( std::max(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMaxEtaMIN ) continue;
+    if( std::min(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMinEtaMIN ) continue;
     
     
     // fill distributions
@@ -798,8 +739,65 @@ int main(int argc, char** argv)
     
     
     
+    //*****************************************
+    // STEP 16 - Initial cuts - zeppenfeld cuts
+    step += 1;
+    SetStepNames(stepNames, "zeppenfeld cuts", step, verbosity);
+    
+    
+    if( fabs(vars.lep_zepp) > lepZeppMAX ) continue;
+    if( std::max(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMaxZeppMAX ) continue;
+    if( std::min(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMinZeppMAX ) continue;
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //************************************
+    // STEP 17 - Initial cuts - b-tag veto
+    step += 1;
+    SetStepNames(stepNames, "b-tag veto", step, verbosity);
+    
+    
+    bool isBTagged = false;
+    //for(unsigned int jetIt = 0; jetIt < vars.nJets; ++jetIt)
+    //{
+    //  if( vars.jets_bTag.at(jetIt) > 2.5 ) isBTagged = true;
+    //}
+    
+    if( (vars.nJets >=1) && (vars.jets_bTag1 > 2.50) ) isBTagged = true;
+    if( (vars.nJets >=2) && (vars.jets_bTag2 > 1.50) ) isBTagged = true;
+    if( isBTagged == true) continue;
+    
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
+
     //**********************************
-    // STEP 19 - Initial cuts - jet veto
+    // STEP 18 - Initial cuts - jet veto
     step += 1;
     SetStepNames(stepNames, "jet veto", step, verbosity);
     
@@ -822,7 +820,7 @@ int main(int argc, char** argv)
     
     
     //************************************
-    // STEP 20 - Initial cuts - Higgs mass
+    // STEP 19 - Initial cuts - Higgs mass
     step += 1;
     SetStepNames(stepNames, "Higgs mass", step, verbosity);
     

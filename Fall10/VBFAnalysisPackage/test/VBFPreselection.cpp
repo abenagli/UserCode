@@ -114,7 +114,7 @@ int main(int argc, char** argv)
   
   // define histograms
   std::cout << ">>> VBFPreselection::Define histograms" << std::endl;
-  int nStep = 11;
+  int nStep = 9;
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepNames;
@@ -163,7 +163,7 @@ int main(int argc, char** argv)
   //********************
   // STEP 1 - all events
   int step = 1;
-  SetStepNames(stepNames, "total events", step, verbosity);
+  SetStepNames(stepNames, "All events", step, verbosity);
   stepEvents[step] = totalEvents[1];
   
                                                                                                                                                            
@@ -171,29 +171,32 @@ int main(int argc, char** argv)
   //*********************
   // STEP 2 - no scraping
   step = 2;
-  SetStepNames(stepNames, "no scraping", step, verbosity);
+  SetStepNames(stepNames, "Skim: no scraping", step, verbosity);
   stepEvents[step] = nonScrapedEvents[1];
   
   
   //*********************
   // STEP 3 - good vertex
   step = 3;
-  SetStepNames(stepNames, "good vertex", step, verbosity);
+  SetStepNames(stepNames, "Skim: good vertex", step, verbosity);
   stepEvents[step] = goodVtxEvents[1];
   
   
   //*********************
   // STEP 4 - >= 1 lepton
   step = 4;
-  SetStepNames(stepNames, ">= 1 lepton", step, verbosity);
+  SetStepNames(stepNames, "Skim: >= 1 lepton", step, verbosity);
   stepEvents[step] = leptonFilterEvents[1];
   
   
   //*******************
   // STEP 5 - >= 2 jets
   step = 5;
-  SetStepNames(stepNames, ">= 2 jets", step, verbosity);
+  SetStepNames(stepNames, "Skim: >= 2 jets", step, verbosity);
   stepEvents[step] = jetFilterEvents[1];
+  
+  
+  
   
   
   
@@ -259,103 +262,19 @@ int main(int argc, char** argv)
     
     
     
-    //**************************
-    // STEP 6 - run/LS selection
+    //*******************
+    // STEP 6 - 1! lepton
     step = 6;
-    SetStepNames(stepNames, "run/LS", step, verbosity);
-    
-
-    vars.runId   = reader.GetInt("runId")->at(0);
-    vars.lumiId  = reader.GetInt("lumiId")->at(0);
-    vars.eventId = reader.GetInt("eventId")->at(0);
-    
-    bool skipEvent = false;
-    if( vars.dataFlag == 1 )
-    {
-      int runId  = reader.GetInt("runId")->at(0);
-      int lumiId = reader.GetInt("lumiId")->at(0);
-      if(AcceptEventByRunAndLumiSection(runId, lumiId, jsonMap) == false) skipEvent = true;      
-    }
-    
-    if( skipEvent == true ) continue;
-    
-    
-    // fill event counters
-    stepEvents[step] += 1;
-    
-    
-    
-    
-    
-        
-    //***********************
-    // STEP 7 - HLT selection
-    step = step+1;
-    SetStepNames(stepNames, "HLT", step, verbosity);
-    
-    
-    skipEvent = true;
-    
-    for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
-      if( AcceptHLTPath(reader, HLTPathNames.at(HLTIt)) == true )
-        skipEvent = false;
-    
-    //if( skipEvent == true ) continue;
-    
-    
-    // fill event counters
-    stepEvents[step] += 1;    
-    
-    
-    
-    
-    
-       
-    //*********************
-    // STEP 8 - good vertex
-    step += 1;
-    SetStepNames(stepNames, "good vertex", step, verbosity);
-    
-    SetPVVariables(vars, reader);
-    if( vars.PV_ndof < 5 ) continue;
-    if( fabs(vars.PV_z) > 24. ) continue;
-    if( vars.PV_d0 > 2. ) continue;
-    
-    
-    // fill event counters
-    stepEvents[step] += 1;
-    
-    
-    
-    
-    
-    
-    //********************
-    // STEP 9 - HCAL noise
-    step += 1;
-    SetStepNames(stepNames, "HCAL noise", step, verbosity);
-    
-    if( vars.dataFlag == 1 )
-      if( reader.GetInt("HBHE_NoiseFilterResult")->at(0) == 0 ) continue;
-    
-    
-    // fill event counters
-    stepEvents[step] += 1;
-    
-    
-    
-    
-    
-    
-    //***********************************
-    // STEP 10 - 1! lepton & >= n cnt jets
-    step += 1;
     SetStepNames(stepNames, "1! lepton", step, verbosity);
     
     
     int nLep = 0;
     int nEle = 0;
     int nMu = 0;
+    
+    int nLep_loose = 0;
+    int nEle_loose = 0;
+    int nMu_loose = 0;
     
     // loop on electrons
     //std::cout << "ele begin" << std::endl;
@@ -375,14 +294,16 @@ int main(int argc, char** argv)
       
       
       if( pt < 10. ) continue;
-      vars.electrons_loose.push_back( reader.Get4V("electrons")->at(eleIt) );
       
+      
+      
+      //-------------------
+      // standard selection
       
       if( (reader.GetInt("electrons_isEB")->at(eleIt)) == 1 )
       {
-        if(  tkIso / pt > 1.00 ) continue;
-        if(  emIso / pt > 1.00 ) continue;
-        if( hadIso / pt > 1.00 ) continue;
+        // isol loose
+        if(  (tkIso+emIso+hadIso) / pt > 0.5 ) continue;
         
         // eleId VBTF 95% 
         if( sigmaIetaIeta < 0.004 ) continue;
@@ -391,18 +312,16 @@ int main(int argc, char** argv)
         if(        DetaIn > 0.007 ) continue;
         if(        HOverE > 0.150 ) continue;
 	
-        //if( dataFlag == 1 )
-        //{
-        //  if( GetElectronFlag(reader.GetString("electrons_seed_flag")->at(eleIt)) == false ) continue;
-        //  if( GetElectronSeverityLevel(reader.GetString("electrons_seed_severityLevel")->at(eleIt)) == false ) continue;
-        //}
+        if( dataFlag == 1 )
+        {
+          if( GetElectronFlag(reader.GetString("electrons_seed_flag")->at(eleIt)) == false ) continue;
+          if( GetElectronSeverityLevel(reader.GetString("electrons_seed_severityLevel")->at(eleIt)) == false ) continue;
+        }
       }
-      
       else
       {
-        if(  tkIso / pt > 1.00 ) continue;
-        if(  emIso / pt > 1.00 ) continue;
-        if( hadIso / pt > 1.00 ) continue;
+        // isol loose
+        if(  (tkIso+emIso+hadIso) / pt > 0.5 ) continue;
         
         // eleId VBTF 95%
         if( sigmaIetaIeta > 0.030 ) continue;
@@ -412,11 +331,40 @@ int main(int argc, char** argv)
       }
       
       SetElectronVariables(vars, reader, eleIt);
-      ++nLep;
-      ++nEle;
-        
+            
+      
+      
+      //----------------
+      // loose selection
+      
+      if( (reader.GetInt("electrons_isEB")->at(eleIt)) == 1 )
+      {
+        // isol VBTF 95% 
+        if(  tkIso / pt > 0.15 ) continue;
+        if(  emIso / pt > 2.00 ) continue;
+        if( hadIso / pt > 0.12 ) continue;
+      }
+      else
+      {
+        // eleId VBTF 95%
+        if(  tkIso / pt > 0.08 ) continue;
+        if(  emIso / pt > 0.06 ) continue;
+        if( hadIso / pt > 0.05 ) continue;
+      }
+
+      vars.electrons_loose.push_back( reader.Get4V("electrons")->at(eleIt) );
+      
     } // loop on electrons
+
+    nLep += vars.electrons.size();
+    nEle  = vars.electrons.size();
+    
+    nLep_loose += vars.electrons_loose.size();
+    nEle_loose  = vars.electrons_loose.size();
+
     //std::cout << "ele end" << std::endl;
+    
+    
     
     
     // loop on muons
@@ -430,70 +378,64 @@ int main(int argc, char** argv)
       float emIso  = reader.GetFloat("muons_emIsoR03")->at(muIt);
       float hadIso = reader.GetFloat("muons_hadIsoR03")->at(muIt);
       
+      int tracker    = reader.GetInt("muons_tracker")->at(muIt);
+      int standalone = reader.GetInt("muons_standalone")->at(muIt);
+      int global     = reader.GetInt("muons_global")->at(muIt);
       
-      if( pt < 5. ) continue;
-      if(  tkIso / pt > 1.00 ) continue;
-      if(  emIso / pt > 1.00 ) continue;
-      if( hadIso / pt > 1.00 ) continue;
+      float dxy                    = reader.GetFloat("muons_dxy_PV")->at(muIt);
+      float normalizedChi2         = reader.GetFloat("muons_normalizedChi2")->at(muIt);
+      int numberOfValidTrackerHits = reader.GetInt("muons_numberOfValidTrackerHits")->at(muIt);
+      int numberOfValidMuonHits    = reader.GetInt("muons_numberOfValidMuonHits")->at(muIt);
+      
+      if( pt < 10. ) continue;
+      
+      if( tracker    != 1 ) continue;
+      if( standalone != 1 ) continue;
+      if( global     != 1 ) continue;
+      if( fabs(dxy)                > 0.2 ) continue;
+      if( normalizedChi2           > 10. ) continue;
+      if( numberOfValidTrackerHits < 11)   continue;
+      if( numberOfValidMuonHits    < 1 )   continue;
+      
+      
+      
+      //-------------------
+      // standard selection
+      
+      if(  (tkIso+emIso+hadIso) / pt > 0.500 ) continue;
+      
+      SetMuonVariables(vars, reader, muIt);
+      
+      
+      
+      //----------------
+      // loose selection
+      
+      if(  (tkIso+emIso+hadIso) / pt > 0.150 ) continue;
       
       vars.muons_loose.push_back( reader.Get4V("muons")->at(muIt) );
       
-      SetMuonVariables(vars, reader, muIt);
-      ++nLep;
-      ++nMu;
-      
     } // loop on muons
+    
+    nLep += vars.muons.size();
+    nMu   = vars.muons.size();
+    
+    nLep_loose += vars.muons_loose.size();
+    nMu_loose   = vars.muons_loose.size();
     //std::cout << "mu end" << std::endl;
+    
+    
+    
     
     
     
     //**********
     // 1! lepton
     if( nLep < nLepMIN ) continue;
-    if( nLep > nLepMAX ) continue;
+    if( nLep_loose > nLepMAX ) continue;
     if( (leptonFLAVOUR == "e")   && ( nEle      < nLepMIN) ) continue;
     if( (leptonFLAVOUR == "mu")  && (      nMu  < nLepMIN) ) continue;
     if( (leptonFLAVOUR == "emu") && ((nEle+nMu) < nLepMIN) ) continue;
-    
-    
-    
-    //*******  
-    // Z veto
-    bool isZFound = false;
-    
-    // electrons
-    for(unsigned int eleIt1 = 0; eleIt1 < vars.electrons_loose.size(); ++eleIt1)
-      for(unsigned int eleIt2 = eleIt1+1; eleIt2 < vars.electrons_loose.size(); ++eleIt2)
-      {
-        ROOT::Math::XYZTVector ele1 = reader.Get4V("electrons")->at(eleIt1);
-        float charge1 = reader.GetFloat("electrons_charge")->at(eleIt1);
-        
-        ROOT::Math::XYZTVector ele2 = reader.Get4V("electrons")->at(eleIt2);
-        float charge2 = reader.GetFloat("electrons_charge")->at(eleIt2);
-        
-        if( (charge1*charge2 == -1) &&
-            ( (ele1+ele2).mass() > 80. ) &&
-            ( (ele1+ele2).mass() < 100. ) ) 
-          isZFound = true;
-      }
-    
-    // muons
-    for(unsigned int muIt1 = 0; muIt1 < vars.muons_loose.size(); ++muIt1)
-      for(unsigned int muIt2 = muIt1+1; muIt2 < vars.muons_loose.size(); ++muIt2)
-      {
-        ROOT::Math::XYZTVector mu1 = reader.Get4V("muons")->at(muIt1);
-        float charge1 = reader.GetFloat("muons_charge")->at(muIt1);
-        
-        ROOT::Math::XYZTVector mu2 = reader.Get4V("muons")->at(muIt2);
-        float charge2 = reader.GetFloat("muons_charge")->at(muIt2);
-        
-        if( (charge1*charge2 == -1) &&
-            ( (mu1+mu2).mass() > 80. ) &&
-            ( (mu1+mu2).mass() < 100. ) ) 
-          isZFound = true;
-      }
-    
-    if( isZFound == true) continue;
     
     
     
@@ -512,8 +454,8 @@ int main(int argc, char** argv)
     
     
     
-    //***********************************
-    // STEP 11 -  >= 2 cnt jets
+    //*************************
+    // STEP 7 -  >= 2 cnt jets
     step += 1;
     char stepName[50]; sprintf(stepName, ">= %d cnt jet(s)", nJetCntMIN);
     SetStepNames(stepNames, std::string(stepName), step, verbosity);
@@ -705,6 +647,7 @@ int main(int argc, char** argv)
       
       SetWJJVariables(vars, reader);
       SetTagJJVariables(vars, reader);
+      SetThirdJetVariables(vars, reader);
       SetHVariables(vars, reader);
       
       
@@ -716,8 +659,67 @@ int main(int argc, char** argv)
       FillVBFPreselectionTree(vars);
     }
   
-  
-  
+    
+    
+    
+    
+    
+    //**************************
+    // STEP 8 - run/LS selection
+    step = step + 1;
+    SetStepNames(stepNames, "Run/LS selection", step, verbosity);
+    
+    
+    vars.runId   = reader.GetInt("runId")->at(0);
+    vars.lumiId  = reader.GetInt("lumiId")->at(0);
+    vars.eventId = reader.GetInt("eventId")->at(0);
+    
+    bool skipEvent = false;
+    if( vars.dataFlag == 1 )
+    {
+      int runId  = reader.GetInt("runId")->at(0);
+      int lumiId = reader.GetInt("lumiId")->at(0);
+      if(AcceptEventByRunAndLumiSection(runId, lumiId, jsonMap) == false) skipEvent = true;      
+      
+      // HCAL noise
+      if( reader.GetInt("HBHE_NoiseFilterResult")->at(0) == 0 ) skipEvent = true;
+    }
+    
+    if( skipEvent == true ) continue;
+    
+    
+    // fill event counters
+    stepEvents[step] += 1;
+    
+    
+    
+    
+    
+        
+    //***********************
+    // STEP 9 - HLT selection
+    step = step+1;
+    SetStepNames(stepNames, "HLT", step, verbosity);
+    
+    
+    skipEvent = true;
+    
+    for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
+      if( AcceptHLTPath(reader, HLTPathNames.at(HLTIt)) == true )
+        skipEvent = false;
+    
+    //if( skipEvent == true ) continue;
+    
+    
+    // fill event counters
+    stepEvents[step] += 1;
+    
+    
+    
+    
+    
+    
+    
   } // loop over the events
   
   

@@ -42,13 +42,14 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep_tkIso",   &vars.lep_tkIso,     "lep_tkIso/F");
   vars.m_reducedTree -> Branch("lep_emIso",   &vars.lep_emIso,     "lep_emIso/F");
   vars.m_reducedTree -> Branch("lep_hadIso",  &vars.lep_hadIso,   "lep_hadIso/F");
-  vars.m_reducedTree -> Branch("lep_isEB",          &vars.lep_isEB,                   "lep_isEB/I");
-  vars.m_reducedTree -> Branch("lep_sigmaIetaIeta", &vars.lep_sigmaIetaIeta, "lep_sigmaIetaIeta/F");
-  vars.m_reducedTree -> Branch("lep_DphiIn",        &vars.lep_DphiIn,               "lep_DphiIn/F");
-  vars.m_reducedTree -> Branch("lep_DetaIn",        &vars.lep_DetaIn,               "lep_DetaIn/F");
-  vars.m_reducedTree -> Branch("lep_HOverE",        &vars.lep_HOverE,               "lep_HOverE/F");
-  vars.m_reducedTree -> Branch("lep_fbrem",         &vars.lep_fbrem,                 "lep_fbrem/F");
-  vars.m_reducedTree -> Branch("lep_EOverP",        &vars.lep_EOverP,               "lep_EOverP/F");
+  vars.m_reducedTree -> Branch("lep_isEB",          &vars.lep_isEB,                               "lep_isEB/I");
+  vars.m_reducedTree -> Branch("lep_simpleEleId80cIso", &vars.lep_simpleEleId80cIso, "lep_simpleEleId80cIso/F");
+  vars.m_reducedTree -> Branch("lep_sigmaIetaIeta",     &vars.lep_sigmaIetaIeta,         "lep_sigmaIetaIeta/F");
+  vars.m_reducedTree -> Branch("lep_DphiIn",            &vars.lep_DphiIn,                       "lep_DphiIn/F");
+  vars.m_reducedTree -> Branch("lep_DetaIn",            &vars.lep_DetaIn,                       "lep_DetaIn/F");
+  vars.m_reducedTree -> Branch("lep_HOverE",            &vars.lep_HOverE,                       "lep_HOverE/F");
+  vars.m_reducedTree -> Branch("lep_fbrem",             &vars.lep_fbrem,                         "lep_fbrem/F");
+  vars.m_reducedTree -> Branch("lep_EOverP",            &vars.lep_EOverP,                       "lep_EOverP/F");
   vars.m_reducedTree -> Branch("lep_tracker",                  &vars.lep_tracker,                                   "lep_tracker/I");
   vars.m_reducedTree -> Branch("lep_standalone",               &vars.lep_standalone,                             "lep_standalone/I");
   vars.m_reducedTree -> Branch("lep_global",                   &vars.lep_global,                                     "lep_global/I");
@@ -188,6 +189,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.leptons_emIso.clear();
   vars.leptons_hadIso.clear();
   vars.electrons_isEB.clear();
+  vars.electrons_simpleEleId80cIso.clear();
   vars.electrons_sigmaIetaIeta.clear();
   vars.electrons_DphiIn.clear();
   vars.electrons_DetaIn.clear();
@@ -219,6 +221,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lep_emIso = -1.;
   vars.lep_hadIso = -1.;
   vars.lep_isEB = -1;
+  vars.lep_simpleEleId80cIso = -1.;
   vars.lep_sigmaIetaIeta = -1.;
   vars.lep_DphiIn = -99.;
   vars.lep_DetaIn = -99.;
@@ -437,6 +440,7 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
     
     vars.lep_flavour = 11;
     vars.lep_isEB = vars.electrons_isEB.at(vars.selectIt_ele);
+    vars.lep_simpleEleId80cIso = vars.electrons_simpleEleId80cIso.at(vars.selectIt_ele);
     vars.lep_sigmaIetaIeta = vars.electrons_sigmaIetaIeta.at(vars.selectIt_ele);
     vars.lep_DphiIn = vars.electrons_DphiIn.at(vars.selectIt_ele);
     vars.lep_DetaIn = vars.electrons_DetaIn.at(vars.selectIt_ele);
@@ -485,6 +489,7 @@ void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, co
   vars.leptons_edB.push_back(reader.GetFloat("electrons_edB")->at(eleIt));
   
   vars.electrons_isEB.push_back(reader.GetInt("electrons_isEB")->at(eleIt));
+  vars.electrons_simpleEleId80cIso.push_back(reader.GetFloat("simpleEleId80cIso")->at(eleIt));
   vars.electrons_sigmaIetaIeta.push_back(reader.GetFloat("electrons_sigmaIetaIeta")->at(eleIt));
   vars.electrons_DphiIn.push_back(reader.GetFloat("electrons_deltaPhiIn")->at(eleIt));
   vars.electrons_DetaIn.push_back(reader.GetFloat("electrons_deltaEtaIn")->at(eleIt));
