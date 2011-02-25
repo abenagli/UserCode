@@ -676,7 +676,7 @@ int main(int argc, char** argv)
       if(AcceptEventByRunAndLumiSection(runId, lumiId, jsonMap) == false) skipEvent = true;      
       
       // HCAL noise
-      if( reader.GetInt("HBHE_NoiseFilterResult")->at(0) == 0 ) skipEvent = true;
+      if( reader.GetInt("HCAL_noise")->at(0) == 0 ) skipEvent = true;
     }
     
     if( skipEvent == true ) continue;
