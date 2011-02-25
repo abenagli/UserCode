@@ -311,12 +311,6 @@ int main(int argc, char** argv)
         if(        DphiIn > 0.800 ) continue;
         if(        DetaIn > 0.007 ) continue;
         if(        HOverE > 0.150 ) continue;
-	
-        if( dataFlag == 1 )
-        {
-          if( GetElectronFlag(reader.GetString("electrons_seed_flag")->at(eleIt)) == false ) continue;
-          if( GetElectronSeverityLevel(reader.GetString("electrons_seed_severityLevel")->at(eleIt)) == false ) continue;
-        }
       }
       else
       {
