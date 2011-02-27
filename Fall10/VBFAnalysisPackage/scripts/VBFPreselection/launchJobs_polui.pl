@@ -209,7 +209,7 @@ while (<LISTOFSamples>)
     # submit job
     ############
     
-    $command = "qsub -V -q production -d ".$jobDir." ".$tempBjob."\n" ;  
+    $command = "/opt/exp_soft/cms/t3/t3submit -q cms ".$tempBjob."\n" ;  
     print SAMPLEJOBLISTFILE $command."\n";
     
     #print "\n" ;
