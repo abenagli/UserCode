@@ -10,11 +10,13 @@
 drawTStack::drawTStack(const std::string& inputDir,
                        const std::string& listFileName,
                        const std::string& baseRootFileName,
-                       const std::string& outputDir):
+                       const std::string& outputDir,
+                       const std::string& imgFormat):
  m_inputDir(inputDir),
  m_listFileName(listFileName),
  m_baseRootFileName(baseRootFileName),
  m_outputDir(outputDir),
+ m_imgFormat(imgFormat),
  m_xAxisRange(false),
  m_xRangeMin(0.),
  m_xRangeMax(1.),
@@ -622,8 +624,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
     exit(-1);
   }
-  //c1->Print((m_outputDir+"lin_"+fullTitle+".eps").c_str(), "eps");
-  c1->Print((m_outputDir+"lin_"+fullTitle+".png").c_str(), "png");
+  c1->Print((m_outputDir+"lin_"+fullTitle+"."+m_imgFormat).c_str(), m_imgFormat.c_str());
   
   
   
@@ -726,7 +727,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     exit(-1);
   }
   //c2->Print(("log_"+m_outputDir+fullTitle+".eps").c_str(), "eps");
-  c2->Print((m_outputDir+"log_"+fullTitle+".png").c_str(), "png");
+  c2->Print((m_outputDir+"log_"+fullTitle+"."+m_imgFormat).c_str(), m_imgFormat.c_str());
   
   
   
@@ -1149,7 +1150,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
-    c1->Print((m_outputDir+"events.png").c_str(), "png");
+    c1->Print((m_outputDir+"events."+m_imgFormat).c_str(), m_imgFormat.c_str());
   }
   
   if(mode == "eventsScaled")
@@ -1177,7 +1178,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       exit(-1);
     }
     
-    c1->Print((m_outputDir+"eventsScaled.png").c_str(), "png");
+    c1->Print((m_outputDir+"eventsScaled."+m_imgFormat).c_str(), m_imgFormat.c_str());
   }
   
   
@@ -1234,7 +1235,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       exit(-1);
     }
     
-    c1->Print((m_outputDir+"eventsScaledStack.png").c_str(), "png");
+    c1->Print((m_outputDir+"eventsScaledStack."+m_imgFormat).c_str(), m_imgFormat.c_str());
   }
   
   
@@ -1251,7 +1252,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
-    c1->Print((m_outputDir+"efficiencies.png").c_str(), "png");
+    c1->Print((m_outputDir+"efficiencies."+m_imgFormat).c_str(), m_imgFormat.c_str());
   }
   
   
@@ -1268,7 +1269,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
-    c1->Print((m_outputDir+"efficienciesRelative.png").c_str(), "png");  
+    c1->Print((m_outputDir+"efficienciesRelative."+m_imgFormat).c_str(), m_imgFormat.c_str());  
   }
 
   if(mode == "significance")
@@ -1283,7 +1284,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
       exit(-1);
     }
-    c1->Print((m_outputDir+"significance.png").c_str(), "png");
+    c1->Print((m_outputDir+"significance."+m_imgFormat).c_str(), m_imgFormat.c_str());
   }  
   
   
@@ -1321,7 +1322,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     std::cout << ">>>plotUtils::Error accessing directory " << m_outputDir;
     exit(-1);
   }
-  c1->Print( (m_outputDir+mode+"_step.png").c_str(), "png");
+  c1->Print( (m_outputDir+mode+"_step."+m_imgFormat).c_str(), m_imgFormat.c_str());
   
   delete c1;
   

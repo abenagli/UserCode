@@ -34,7 +34,8 @@ class drawTStack
   drawTStack(const std::string& inputDir,
              const std::string& listFileName,
              const std::string& baseRootFileName,
-             const std::string& outputDir);
+             const std::string& outputDir,
+             const std::string& imgFormat);
   
   //! dtor
   ~drawTStack();
@@ -69,6 +70,7 @@ class drawTStack
   std::string m_listFileName;
   std::string m_baseRootFileName;
   std::string m_outputDir;
+  std::string m_imgFormat;
   
   std::vector<std::pair<std::string, std::string> > m_list;
   std::map<std::string, int> m_color;

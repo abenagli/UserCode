@@ -49,6 +49,7 @@ int main(int argc, char** argv)
   
   
   std::string outputDir = gConfigParser -> readStringOption("Output::outputDir");
+  std::string imgFormat = gConfigParser -> readStringOption("Output::imgFormat");
 
   int step = gConfigParser -> readIntOption("Options::step");  
   float lumi = gConfigParser -> readFloatOption("Options::lumi");
@@ -101,7 +102,7 @@ int main(int argc, char** argv)
   
   
   // draw plots
-  drawTStack* stack = new drawTStack(inputDir, samplesListFile, inputFileName, fullOutputDir);
+  drawTStack* stack = new drawTStack(inputDir, samplesListFile, inputFileName, fullOutputDir, imgFormat);
   
   stack -> SetXLegend(0.76, 0.99);
   stack -> SetYLegend(0.60, 0.85);
