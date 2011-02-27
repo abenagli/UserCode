@@ -59,6 +59,7 @@ int main(int argc, char** argv)
 
   float lepPtMIN = gConfigParser -> readFloatOption("Cuts::lepPtMIN");
   float lepPtMAX = gConfigParser -> readFloatOption("Cuts::lepPtMAX");
+  std::string leptonFLAVOUR = gConfigParser -> readStringOption("Cuts::leptonFLAVOUR");
   //float eleTkIsoOverPtEBMAX = gConfigParser -> readFloatOption("Cuts::eleTkIsoOverPtEBMAX");
   //float eleEmIsoOverPtEBMAX = gConfigParser -> readFloatOption("Cuts::eleEmIsoOverPtEBMAX");
   //float eleHadIsoOverPtEBMAX = gConfigParser -> readFloatOption("Cuts::eleHadIsoOverPtEBMAX");
@@ -317,6 +318,8 @@ int main(int argc, char** argv)
     
     if( vars.lep.pt() < lepPtMIN ) continue;
     if( vars.lep.pt() > lepPtMAX ) continue;
+    if( (leptonFLAVOUR == "e") &&  (vars.lep_flavour != 11) ) continue;
+    if( (leptonFLAVOUR == "mu") && (vars.lep_flavour != 11) ) continue;
     if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
     if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
     
