@@ -148,38 +148,6 @@ while (<LISTOFSamples>)
     
     
     
-    $it = 0;
-    $JOBLISTOFFiles = $jobDir."/list_".$sample.".txt";
-    open (JOBLISTOFFiles, ">", $JOBLISTOFFiles) or die "Can't open file ".$JOBLISTOFFiles;
-
-    open (LISTOFFiles2,$LISTOFFiles) ;
-    while (<LISTOFFiles2>)
-    {
-      chomp; 
-      s/#.*//;                # no comments
-      s/^\s+//;               # no leading white
-      s/\s+$//;               # no trailing white
-      $file = $_ ;
-      
-      if( ($it >= ($jobIt - 1)*$JOBModulo) && ($it < ($jobIt)*$JOBModulo) )
-      { 
-	print JOBLISTOFFiles "root://polgrid4.in2p3.fr/".$INPUTSAVEPath."/".$sample."/".$file."\n";
-      }
-      ++$it;
-    }
-    
-    
-    
-    $tempo2 = "./tempo2" ;    
-    system ("cat ".$tempo1." | sed -e s%INPUTFILELIST%".$JOBLISTOFFiles."%g > ".$tempo2) ;
-    
-    
-    $JOBCfgFile = $jobDir."/selections_cfg.py" ;
-    system ("mv ".$tempo2." ".$JOBCfgFile) ;
-    system ("rm ./tempo*") ;
-    
-    
-    
     
     
     
@@ -200,8 +168,59 @@ while (<LISTOFSamples>)
     $command = "mkdir ".$OUTPUTSAVEPath."/".$sample;
     print SAMPLEJOBFILE $command."\n";
     
+    $command = "mkdir /data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/";
+    print SAMPLEJOBFILE $command."\n";
+    
+    $command = "chmod 777 /data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/";
+    print SAMPLEJOBFILE $command."\n";
+    
+    
+    
+    
+    
+    $it = 0;
+    $JOBLISTOFFiles = $jobDir."/list_".$sample.".txt";
+    open (JOBLISTOFFiles, ">", $JOBLISTOFFiles) or die "Can't open file ".$JOBLISTOFFiles;
+
+    open (LISTOFFiles2,$LISTOFFiles) ;
+    while (<LISTOFFiles2>)
+    {
+      chomp; 
+      s/#.*//;                # no comments
+      s/^\s+//;               # no leading white
+      s/\s+$//;               # no trailing white
+      $file = $_ ;
+      
+      if( ($it >= ($jobIt - 1)*$JOBModulo) && ($it < ($jobIt)*$JOBModulo) )
+      { 
+        $command = "rfcp ".$INPUTSAVEPath."/".$sample."/".$file." /data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/";
+        print SAMPLEJOBFILE $command."\n";
+	
+        print JOBLISTOFFiles "/data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/".$file."\n";
+      }
+      ++$it;
+    }
+    
+    
+    
+    $tempo2 = "./tempo2" ;    
+    system ("cat ".$tempo1." | sed -e s%INPUTFILELIST%".$JOBLISTOFFiles."%g > ".$tempo2) ;
+    
+    
+    $JOBCfgFile = $jobDir."/selections_cfg.py" ;
+    system ("mv ".$tempo2." ".$JOBCfgFile) ;
+    system ("rm ./tempo*") ;
+    
+    
+    
+    
+    
+    
     $command = "unbuffer ".$EXEName." ".$JOBCfgFile." >> ".$jobDir."/out.txt" ;
     print SAMPLEJOBFILE $command."\n";    
+    
+    $command = "rfrm -rf /data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/";
+    print SAMPLEJOBFILE $command."\n";
     
     
     
