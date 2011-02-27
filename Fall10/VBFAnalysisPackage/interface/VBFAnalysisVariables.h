@@ -52,6 +52,7 @@ struct VBFAnalysisVariables
   
   
   // PV variables
+  int PV_n;
   float PV_d0;
   int PV_nTracks;
   int PV_ndof;
@@ -123,6 +124,8 @@ struct VBFAnalysisVariables
     
   float leadingJ_charge;
   float leadingJ_bTag;
+  float leadingJ_dzAvg;
+  float leadingJ_dzAvgCut;
   int leadingJ_chargedMultiplicity;
   
   
@@ -143,6 +146,10 @@ struct VBFAnalysisVariables
   float WJ2_zepp;
   float WJ1_bTag;
   float WJ2_bTag;
+  float WJ1_dzAvg;
+  float WJ2_dzAvg;
+  float WJ1_dzAvgCut;
+  float WJ2_dzAvgCut;
   int WJ1_chargedMultiplicity;
   int WJ2_chargedMultiplicity;
   
@@ -176,7 +183,11 @@ struct VBFAnalysisVariables
   float tagJ1_charge;
   float tagJ2_charge;
   float tagJ1_bTag;
-  float tagJ2_bTag;  
+  float tagJ2_bTag;
+  float tagJ1_dzAvg;
+  float tagJ2_dzAvg;
+  float tagJ1_dzAvgCut;
+  float tagJ2_dzAvgCut;
   int tagJ1_chargedMultiplicity;
   int tagJ2_chargedMultiplicity;
   
@@ -193,6 +204,8 @@ struct VBFAnalysisVariables
   
   float thirdJ_charge;
   float thirdJ_bTag;
+  float thirdJ_dzAvg;
+  float thirdJ_dzAvgCut;
   float thirdJ_WJJDeta;
   float thirdJ_WJJDphi;
   float thirdJ_WJJDR;

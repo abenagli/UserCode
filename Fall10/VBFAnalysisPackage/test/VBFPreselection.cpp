@@ -267,6 +267,7 @@ int main(int argc, char** argv)
     step = 6;
     SetStepNames(stepNames, "1! lepton", step, verbosity);
     
+    SetPVVariables(vars, reader);
     
     int nLep = 0;
     int nEle = 0;

@@ -23,6 +23,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   
   // PV variables
+  vars.m_reducedTree -> Branch("PV_n",              &vars.PV_n,                           "PV_n/I");
   vars.m_reducedTree -> Branch("PV_d0",             &vars.PV_d0,                         "PV_d0/F");
   vars.m_reducedTree -> Branch("PV_z",              &vars.PV_z,                           "PV_z/F");
   vars.m_reducedTree -> Branch("PV_nTracks",        &vars.PV_nTracks,               "PV_nTracks/I");
@@ -90,6 +91,8 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("leadingJ", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_leadingJ);
   vars.m_reducedTree -> Branch("leadingJ_charge",              &vars.leadingJ_charge,                           "leadingJ_charge/F");
   vars.m_reducedTree -> Branch("leadingJ_bTag",                &vars.leadingJ_bTag,                               "leadingJ_bTag/F");
+  vars.m_reducedTree -> Branch("leadingJ_dzAvg",               &vars.leadingJ_dzAvg,                             "leadingJ_dzAvg/F");
+  vars.m_reducedTree -> Branch("leadingJ_dzAvgCut",            &vars.leadingJ_dzAvgCut,                       "leadingJ_dzAvgCut/F");
   vars.m_reducedTree -> Branch("leadingJ_chargedMultiplicity", &vars.leadingJ_chargedMultiplicity, "leadingJ_chargedMultiplicity/I");
   
   
@@ -103,6 +106,10 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("WJ2_zepp",                &vars.WJ2_zepp,                               "WJ2_zepp/F");
   vars.m_reducedTree -> Branch("WJ1_bTag",                &vars.WJ1_bTag,                               "WJ1_bTag/F");
   vars.m_reducedTree -> Branch("WJ2_bTag",                &vars.WJ2_bTag,                               "WJ2_bTag/F");
+  vars.m_reducedTree -> Branch("WJ1_dzAvg",               &vars.WJ1_dzAvg,                             "WJ1_dzAvg/F");
+  vars.m_reducedTree -> Branch("WJ2_dzAvg",               &vars.WJ2_dzAvg,                             "WJ2_dzAvg/F");
+  vars.m_reducedTree -> Branch("WJ1_dzAvgCut",            &vars.WJ1_dzAvgCut,                       "WJ1_dzAvgCut/F");
+  vars.m_reducedTree -> Branch("WJ2_dzAvgCut",            &vars.WJ2_dzAvgCut,                       "WJ2_dzAvgCut/F");
   vars.m_reducedTree -> Branch("WJ1_chargedMultiplicity", &vars.WJ1_chargedMultiplicity, "WJ1_chargedMultiplicity/I");
   vars.m_reducedTree -> Branch("WJ2_chargedMultiplicity", &vars.WJ2_chargedMultiplicity, "WJ2_chargedMultiplicity/I");
   vars.m_reducedTree -> Branch("WJJ_Deta",   &vars.WJJ_Deta,     "WJJ_Deta/F");
@@ -130,6 +137,10 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("tagJ2_charge",              &vars.tagJ2_charge,                           "tagJ2_charge/F");
   vars.m_reducedTree -> Branch("tagJ1_bTag",                &vars.tagJ1_bTag,                               "tagJ1_bTag/F");
   vars.m_reducedTree -> Branch("tagJ2_bTag",                &vars.tagJ2_bTag,                               "tagJ2_bTag/F");
+  vars.m_reducedTree -> Branch("tagJ1_dzAvg",               &vars.tagJ1_dzAvg,                             "tagJ1_dzAvg/F");
+  vars.m_reducedTree -> Branch("tagJ2_dzAvg",               &vars.tagJ2_dzAvg,                             "tagJ2_dzAvg/F");
+  vars.m_reducedTree -> Branch("tagJ1_dzAvgCut",            &vars.tagJ1_dzAvgCut,                       "tagJ1_dzAvgCut/F");
+  vars.m_reducedTree -> Branch("tagJ2_dzAvgCut",            &vars.tagJ2_dzAvgCut,                       "tagJ2_dzAvgCut/F");
   vars.m_reducedTree -> Branch("tagJ1_chargedMultiplicity", &vars.tagJ1_chargedMultiplicity, "tagJ1_chargedMultiplicity/I");
   vars.m_reducedTree -> Branch("tagJ2_chargedMultiplicity", &vars.tagJ2_chargedMultiplicity, "tagJ2_chargedMultiplicity/I");
   vars.m_reducedTree -> Branch("tagJJ_Deta",   &vars.tagJJ_Deta,     "tagJJ_Deta/F");
@@ -142,6 +153,8 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("thirdJ", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_thirdJ);
   vars.m_reducedTree -> Branch("thirdJ_charge",    &vars.thirdJ_charge,       "thirdJ_charge/F");
   vars.m_reducedTree -> Branch("thirdJ_bTag",      &vars.thirdJ_bTag,           "thirdJ_bTag/F");
+  vars.m_reducedTree -> Branch("thirdJ_dzAvg",     &vars.thirdJ_dzAvg,         "thirdJ_dzAvg/F");
+  vars.m_reducedTree -> Branch("thirdJ_dzAvgCut",  &vars.thirdJ_dzAvgCut,   "thirdJ_dzAvgCut/F");
   vars.m_reducedTree -> Branch("thirdJ_WJJDeta",   &vars.thirdJ_WJJDeta,     "thirdJ_WJJDeta/F");
   vars.m_reducedTree -> Branch("thirdJ_WJJDphi",   &vars.thirdJ_WJJDphi,     "thirdJ_WJJDphi/F");
   vars.m_reducedTree -> Branch("thirdJ_WJJDR",     &vars.thirdJ_WJJDR,         "thirdJ_WJJDR/F");
@@ -270,6 +283,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.jets_etOrdered.clear();
   vars.jets_bTag.clear();
   vars.jets_bTagOrdered.clear();
+  vars.jets_dzAvg.clear();
+  vars.jets_dzAvgCut.clear();
   
   vars.nJets = 0;
   vars.nJets_cnt = 0;
@@ -298,6 +313,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   
   vars.leadingJ_charge = -99.;
   vars.leadingJ_bTag = -99.;
+  vars.leadingJ_dzAvg = -99.;
+  vars.leadingJ_dzAvgCut = -99.;
   vars.leadingJ_chargedMultiplicity = -1;
   
   
@@ -319,6 +336,10 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.WJ2_zepp = -99.;
   vars.WJ1_bTag = -99.;
   vars.WJ2_bTag = -99.;
+  vars.WJ1_dzAvg = -99.;
+  vars.WJ2_dzAvg = -99.;
+  vars.WJ1_dzAvgCut = -99.;
+  vars.WJ2_dzAvgCut = -99.;
   vars.WJ1_chargedMultiplicity = -1;
   vars.WJ2_chargedMultiplicity = -1;
   
@@ -360,6 +381,10 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.tagJ2_charge = -99.;
   vars.tagJ1_bTag = -99.;
   vars.tagJ2_bTag = -99.;
+  vars.tagJ1_dzAvg = -99.;
+  vars.tagJ2_dzAvg = -99.;
+  vars.tagJ1_dzAvgCut = -99.;
+  vars.tagJ2_dzAvgCut = -99.;
   vars.tagJ1_chargedMultiplicity = -1;
   vars.tagJ2_chargedMultiplicity = -1;
   
@@ -377,6 +402,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   
   vars.thirdJ_charge = -99.;
   vars.thirdJ_bTag = -99.;
+  vars.thirdJ_dzAvg = -99.;
+  vars.thirdJ_dzAvgCut = -99.;
   vars.thirdJ_WJJDeta = -99.;
   vars.thirdJ_WJJDphi = -99.;
   vars.thirdJ_WJJDR = -99.;
@@ -403,6 +430,7 @@ void DeleteVBFPreselectionVariables(VBFPreselectionVariables& vars)
 
 void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
+  vars.PV_n = reader.GetFloat("PV_d0")->size();
   vars.PV_d0 = reader.GetFloat("PV_d0")->at(0);
   vars.PV_nTracks = reader.GetInt("PV_nTracks")->at(0);
   vars.PV_ndof = reader.GetInt("PV_ndof")->at(0);
@@ -591,6 +619,8 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     vars.jets_chargedMultiplicity.push_back( -1 );
     vars.jets_neutralMultiplicity.push_back( -1 );
     vars.jets_muonMultiplicity.push_back( -1 );
+    vars.jets_dzAvg.push_back( -99.);
+    vars.jets_dzAvgCut.push_back( -99. );
   }
   
   if(jetType == "PF")
@@ -608,6 +638,8 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     vars.jets_chargedMultiplicity.push_back( reader.GetInt("jets_chargedMultiplicity")->at(jetIt) );
     vars.jets_neutralMultiplicity.push_back( reader.GetInt("jets_neutralMultiplicity")->at(jetIt) );
     vars.jets_muonMultiplicity.push_back( reader.GetInt("jets_muonMultiplicity")->at(jetIt) );
+    vars.jets_dzAvg.push_back( reader.GetFloat("jets_dzAvg")->at(jetIt) );
+    vars.jets_dzAvgCut.push_back( reader.GetFloat("jets_dzAvgCut")->at(jetIt) );
   }
   
   vars.jets_etOrdered.push_back( reader.Get4V("jets")->at(jetIt).Et() );
@@ -636,6 +668,8 @@ void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, 
   
   vars.leadingJ_charge = vars.jets_charge.at(vars.selectIt_leadingJet);
   vars.leadingJ_bTag = vars.jets_bTag.at(vars.selectIt_leadingJet);
+  vars.leadingJ_dzAvg = vars.jets_dzAvg.at(vars.selectIt_leadingJet);
+  vars.leadingJ_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_leadingJet);
   vars.leadingJ_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_leadingJet);
 }
 
@@ -659,6 +693,10 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJ2_charge = vars.jets_charge.at(vars.selectIt_W.at(1));
   vars.WJ1_bTag = vars.jets_bTag.at(vars.selectIt_W.at(0));
   vars.WJ2_bTag = vars.jets_bTag.at(vars.selectIt_W.at(1));
+  vars.WJ1_dzAvg = vars.jets_dzAvg.at(vars.selectIt_W.at(0));
+  vars.WJ2_dzAvg = vars.jets_dzAvg.at(vars.selectIt_W.at(1));
+  vars.WJ1_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_W.at(0));
+  vars.WJ2_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_W.at(1));
   vars.WJ1_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_W.at(0));
   vars.WJ2_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_W.at(1));
   
@@ -734,6 +772,10 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.tagJ2_charge = vars.jets_charge.at(vars.selectIt_tag.at(1));
     vars.tagJ1_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(0));
     vars.tagJ2_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(1));
+    vars.tagJ1_dzAvg = vars.jets_dzAvg.at(vars.selectIt_tag.at(0));
+    vars.tagJ2_dzAvg = vars.jets_dzAvg.at(vars.selectIt_tag.at(1));
+    vars.tagJ1_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_tag.at(0));
+    vars.tagJ2_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_tag.at(1));
     vars.tagJ1_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_tag.at(0));
     vars.tagJ2_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_tag.at(1));
     
@@ -831,6 +873,8 @@ void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader)
   
   vars.thirdJ_charge = vars.jets_charge.at(vars.selectIt_thirdJet);
   vars.thirdJ_bTag = vars.jets_bTag.at(vars.selectIt_thirdJet);
+  vars.thirdJ_dzAvg = vars.jets_dzAvg.at(vars.selectIt_thirdJet);
+  vars.thirdJ_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_thirdJet);
   
   if( (vars.selectIt_W.at(0) != -1) && (vars.selectIt_W.at(1) != -1) )
   {

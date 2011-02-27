@@ -610,7 +610,34 @@ int main(int argc, char** argv)
     
     
     //************************************
-    // STEP 11 - Initial cuts - W-jet cuts
+    // STEP 11 - Initial cuts - 2 tag-jets
+    step += 1;
+    SetStepNames(stepNames, "2 tag-jets", step, verbosity);
+    
+    
+    // at least 1 tag jet
+    //if( (vars.selectIt_tag.at(0) == -1) && (vars.selectIt_tag.at(1) == -1) ) continue;
+    
+    // at least 2 tag jets
+    if( (vars.tagJ1.Et() <= 0.) || (vars.tagJ2.Et() <= 0.) ) continue;
+    
+    
+    // Fill distributions
+    stepEvents[step] += 1;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //************************************
+    // STEP 12 - Initial cuts - W-jet cuts
     step += 1;
     SetStepNames(stepNames, "W-jet cuts", step, verbosity);
     
@@ -639,7 +666,7 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 12 - Initial cuts - W-W cuts
+    // STEP 13 - Initial cuts - W-W cuts
     step += 1;
     SetStepNames(stepNames, "W-W cuts", step, verbosity);
     
@@ -663,7 +690,7 @@ int main(int argc, char** argv)
     
     
     //**************************************
-    // STEP 13 - Initial cuts - pt max  cuts
+    // STEP 14 - Initial cuts - pt max  cuts
     step += 1;
     SetStepNames(stepNames, "pt max cuts", step, verbosity);
     
@@ -674,33 +701,6 @@ int main(int argc, char** argv)
     
     
     // fill distributions
-    stepEvents[step] += 1;
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
-    //************************************
-    // STEP 14 - Initial cuts - 2 tag-jets
-    step += 1;
-    SetStepNames(stepNames, "2 tag-jets", step, verbosity);
-    
-    
-    // at least 1 tag jet
-    //if( (vars.selectIt_tag.at(0) == -1) && (vars.selectIt_tag.at(1) == -1) ) continue;
-    
-    // at least 2 tag jets
-    if( (vars.tagJ1.Et() <= 0.) || (vars.tagJ2.Et() <= 0.) ) continue;
-    
-    
-    // Fill distributions
     stepEvents[step] += 1;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;

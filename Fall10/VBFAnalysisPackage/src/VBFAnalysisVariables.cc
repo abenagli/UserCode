@@ -17,7 +17,12 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   
   // PV variables
-  reducedTree -> SetBranchAddress("PV_nTracks", &vars.PV_nTracks);
+  reducedTree -> SetBranchAddress("PV_n",              &vars.PV_n);
+  reducedTree -> SetBranchAddress("PV_d0",             &vars.PV_d0);
+  reducedTree -> SetBranchAddress("PV_nTracks",        &vars.PV_nTracks);
+  reducedTree -> SetBranchAddress("PV_ndof",           &vars.PV_ndof);
+  reducedTree -> SetBranchAddress("PV_normalizedChi2", &vars.PV_normalizedChi2);
+  reducedTree -> SetBranchAddress("PV_z",              &vars.PV_z);
   
   
   // lepton variables
@@ -81,6 +86,8 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("leadingJ",                     &vars.p_leadingJ);
   reducedTree -> SetBranchAddress("leadingJ_charge",              &vars.leadingJ_charge);
   reducedTree -> SetBranchAddress("leadingJ_bTag",                &vars.leadingJ_bTag);
+  reducedTree -> SetBranchAddress("leadingJ_dzAvg",               &vars.leadingJ_dzAvg);
+  reducedTree -> SetBranchAddress("leadingJ_dzAvgCut",            &vars.leadingJ_dzAvgCut);
   reducedTree -> SetBranchAddress("leadingJ_chargedMultiplicity", &vars.leadingJ_chargedMultiplicity);
   
   
@@ -97,6 +104,10 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("WJ2_zepp",                &vars.WJ2_zepp);
   reducedTree -> SetBranchAddress("WJ1_bTag",                &vars.WJ1_bTag);
   reducedTree -> SetBranchAddress("WJ2_bTag",                &vars.WJ2_bTag);
+  reducedTree -> SetBranchAddress("WJ1_dzAvg",               &vars.WJ1_dzAvg);
+  reducedTree -> SetBranchAddress("WJ2_dzAvg",               &vars.WJ2_dzAvg);
+  reducedTree -> SetBranchAddress("WJ1_dzAvgCut",            &vars.WJ1_dzAvgCut);
+  reducedTree -> SetBranchAddress("WJ2_dzAvgCut",            &vars.WJ2_dzAvgCut);
   reducedTree -> SetBranchAddress("WJ1_chargedMultiplicity", &vars.WJ1_chargedMultiplicity);
   reducedTree -> SetBranchAddress("WJ2_chargedMultiplicity", &vars.WJ2_chargedMultiplicity);
   
@@ -127,6 +138,10 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("tagJ2_charge",              &vars.tagJ2_charge);
   reducedTree -> SetBranchAddress("tagJ1_bTag",                &vars.tagJ1_bTag);
   reducedTree -> SetBranchAddress("tagJ2_bTag",                &vars.tagJ2_bTag);
+  reducedTree -> SetBranchAddress("tagJ1_dzAvg",               &vars.tagJ1_dzAvg);
+  reducedTree -> SetBranchAddress("tagJ2_dzAvg",               &vars.tagJ2_dzAvg);
+  reducedTree -> SetBranchAddress("tagJ1_dzAvgCut",            &vars.tagJ1_dzAvgCut);
+  reducedTree -> SetBranchAddress("tagJ2_dzAvgCut",            &vars.tagJ2_dzAvgCut);
   reducedTree -> SetBranchAddress("tagJ1_chargedMultiplicity", &vars.tagJ1_chargedMultiplicity);
   reducedTree -> SetBranchAddress("tagJ2_chargedMultiplicity", &vars.tagJ2_chargedMultiplicity);
   
@@ -140,6 +155,8 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("thirdJ", &vars.p_thirdJ);
   reducedTree -> SetBranchAddress("thirdJ_charge",    &vars.thirdJ_charge);
   reducedTree -> SetBranchAddress("thirdJ_bTag",      &vars.thirdJ_bTag);
+  reducedTree -> SetBranchAddress("thirdJ_dzAvg",     &vars.thirdJ_dzAvg);
+  reducedTree -> SetBranchAddress("thirdJ_dzAvgCut",  &vars.thirdJ_dzAvgCut);
   reducedTree -> SetBranchAddress("thirdJ_WJJDeta",   &vars.thirdJ_WJJDeta);
   reducedTree -> SetBranchAddress("thirdJ_WJJDphi",   &vars.thirdJ_WJJDphi);
   reducedTree -> SetBranchAddress("thirdJ_WJJDR",     &vars.thirdJ_WJJDR);
