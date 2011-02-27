@@ -163,7 +163,7 @@ while (<LISTOFSamples>)
       
       if( ($it >= ($jobIt - 1)*$JOBModulo) && ($it < ($jobIt)*$JOBModulo) )
       { 
-	print JOBLISTOFFiles $INPUTSAVEPath."/".$sample."/".$file."\n";
+	print JOBLISTOFFiles "root://polgrid4.in2p3.fr/".$INPUTSAVEPath."/".$sample."/".$file."\n";
       }
       ++$it;
     }
