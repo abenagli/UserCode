@@ -278,7 +278,8 @@ int main(int argc, char** argv)
     int nMu_loose = 0;
     
     // loop on electrons
-    //std::cout << "ele begin" << std::endl;
+    if( verbosity == 1)
+      std::cout << "ele begin" << std::endl;
     for(unsigned int eleIt = 0; eleIt < (reader.Get4V("electrons")->size()); ++eleIt)
     {
       float pt = reader.Get4V("electrons")->at(eleIt).pt();
@@ -356,14 +357,17 @@ int main(int argc, char** argv)
     
     nLep_loose += vars.electrons_loose.size();
     nEle_loose  = vars.electrons_loose.size();
-
-    //std::cout << "ele end" << std::endl;
+    
+    if( verbosity == 1)    
+      std::cout << "ele end" << std::endl;
     
     
     
     
     // loop on muons
-    //std::cout << "mu begin" << std::endl;
+
+    if( verbosity == 1)
+      std::cout << "mu begin" << std::endl;
     for(unsigned int muIt = 0; muIt < (reader.Get4V("muons")->size()); ++muIt)
     {
       
@@ -417,7 +421,9 @@ int main(int argc, char** argv)
     
     nLep_loose += vars.muons_loose.size();
     nMu_loose   = vars.muons_loose.size();
-    //std::cout << "mu end" << std::endl;
+
+    if( verbosity == 1)
+      std::cout << "mu end" << std::endl;
     
     
     
@@ -463,7 +469,9 @@ int main(int argc, char** argv)
     
     //************
     // select jets
-    //std::cout << "jet begin" << std::endl;
+
+    if( verbosity == 1)
+      std::cout << "jet begin" << std::endl;
     for(unsigned int jetIt = 0; jetIt < (reader.Get4V("jets")->size()); ++jetIt)
     {
       
@@ -505,7 +513,8 @@ int main(int argc, char** argv)
       SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD);
       
     } // loop on jets
-    //std::cout << "jet end" << std::endl;
+    if( verbosity == 1)
+      std::cout << "jet end" << std::endl;
     
     std::sort(vars.jets_etOrdered.begin(), vars.jets_etOrdered.end(), maggiore);
     std::sort(vars.jets_bTagOrdered.begin(), vars.jets_bTagOrdered.end(), maggiore);
