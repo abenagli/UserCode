@@ -178,6 +178,7 @@ void FillVBFPreselectionTree(VBFPreselectionVariables& vars)
 void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
 {
   // PV variables
+  vars.PV_n = -1;
   vars.PV_d0 = -1.;
   vars.PV_z = -99.;  
   vars.PV_nTracks = -1;
@@ -430,7 +431,7 @@ void DeleteVBFPreselectionVariables(VBFPreselectionVariables& vars)
 
 void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
-  vars.PV_n = reader.GetFloat("PV_d0")->size();
+  vars.PV_n = (int)(reader.GetFloat("PV_d0")->size());
   vars.PV_d0 = reader.GetFloat("PV_d0")->at(0);
   vars.PV_nTracks = reader.GetInt("PV_nTracks")->at(0);
   vars.PV_ndof = reader.GetInt("PV_ndof")->at(0);
@@ -620,7 +621,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     vars.jets_neutralMultiplicity.push_back( -1 );
     vars.jets_muonMultiplicity.push_back( -1 );
     vars.jets_dzAvg.push_back( -99.);
-    vars.jets_dzAvgCut.push_back( -99. );
+    //vars.jets_dzAvgCut.push_back( -99. );
   }
   
   if(jetType == "PF")
@@ -639,7 +640,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     vars.jets_neutralMultiplicity.push_back( reader.GetInt("jets_neutralMultiplicity")->at(jetIt) );
     vars.jets_muonMultiplicity.push_back( reader.GetInt("jets_muonMultiplicity")->at(jetIt) );
     vars.jets_dzAvg.push_back( reader.GetFloat("jets_dzAvg")->at(jetIt) );
-    vars.jets_dzAvgCut.push_back( reader.GetFloat("jets_dzAvgCut")->at(jetIt) );
+    //vars.jets_dzAvgCut.push_back( reader.GetFloat("jets_dzAvgCut")->at(jetIt) );
   }
   
   vars.jets_etOrdered.push_back( reader.Get4V("jets")->at(jetIt).Et() );
@@ -669,7 +670,7 @@ void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, 
   vars.leadingJ_charge = vars.jets_charge.at(vars.selectIt_leadingJet);
   vars.leadingJ_bTag = vars.jets_bTag.at(vars.selectIt_leadingJet);
   vars.leadingJ_dzAvg = vars.jets_dzAvg.at(vars.selectIt_leadingJet);
-  vars.leadingJ_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_leadingJet);
+  //vars.leadingJ_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_leadingJet);
   vars.leadingJ_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_leadingJet);
 }
 
@@ -695,8 +696,8 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJ2_bTag = vars.jets_bTag.at(vars.selectIt_W.at(1));
   vars.WJ1_dzAvg = vars.jets_dzAvg.at(vars.selectIt_W.at(0));
   vars.WJ2_dzAvg = vars.jets_dzAvg.at(vars.selectIt_W.at(1));
-  vars.WJ1_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_W.at(0));
-  vars.WJ2_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_W.at(1));
+  //vars.WJ1_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_W.at(0));
+  //vars.WJ2_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_W.at(1));
   vars.WJ1_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_W.at(0));
   vars.WJ2_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_W.at(1));
   
@@ -774,8 +775,8 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.tagJ2_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(1));
     vars.tagJ1_dzAvg = vars.jets_dzAvg.at(vars.selectIt_tag.at(0));
     vars.tagJ2_dzAvg = vars.jets_dzAvg.at(vars.selectIt_tag.at(1));
-    vars.tagJ1_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_tag.at(0));
-    vars.tagJ2_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_tag.at(1));
+    //vars.tagJ1_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_tag.at(0));
+    //vars.tagJ2_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_tag.at(1));
     vars.tagJ1_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_tag.at(0));
     vars.tagJ2_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_tag.at(1));
     
@@ -874,7 +875,7 @@ void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.thirdJ_charge = vars.jets_charge.at(vars.selectIt_thirdJet);
   vars.thirdJ_bTag = vars.jets_bTag.at(vars.selectIt_thirdJet);
   vars.thirdJ_dzAvg = vars.jets_dzAvg.at(vars.selectIt_thirdJet);
-  vars.thirdJ_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_thirdJet);
+  //vars.thirdJ_dzAvgCut = vars.jets_dzAvgCut.at(vars.selectIt_thirdJet);
   
   if( (vars.selectIt_W.at(0) != -1) && (vars.selectIt_W.at(1) != -1) )
   {

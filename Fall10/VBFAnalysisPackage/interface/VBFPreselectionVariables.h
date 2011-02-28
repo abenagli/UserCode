@@ -30,7 +30,7 @@ struct VBFPreselectionVariables
   
   
   // PV variables
-  float PV_n;
+  int PV_n;
   float PV_d0;
   float PV_z;
   int PV_nTracks;
