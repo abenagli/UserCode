@@ -681,12 +681,10 @@ int main(int argc, char** argv)
     bool skipEvent = false;
     if( vars.dataFlag == 1 )
     {
-      int runId  = reader.GetInt("runId")->at(0);
-      int lumiId = reader.GetInt("lumiId")->at(0);
-      if(AcceptEventByRunAndLumiSection(runId, lumiId, jsonMap) == false) skipEvent = true;      
+      if(AcceptEventByRunAndLumiSection(vars.runId, vars.lumiId, jsonMap) == false) skipEvent = true;      
       
       // HCAL noise
-      if( reader.GetInt("HCAL_noise")->at(0) == 0 ) skipEvent = true;
+      //if( reader.GetInt("HCAL_noise")->at(0) == 0 ) skipEvent = true;
     }
     
     if( skipEvent == true ) continue;
