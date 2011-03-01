@@ -110,9 +110,11 @@ int main(int argc, char** argv)
   stack -> DrawEvents("events", lumi, step, true);
   stack -> DrawEvents("eventsScaled", lumi, step, true);
   stack -> DrawEvents("eventsScaledStack", lumi, step, true);
+  stack -> SetYaxisRange(0.01, 1.);
   stack -> DrawEvents("efficiencies", lumi, step, true);
+  stack -> SetYaxisRange(0.1, 1.);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true);
-  stack -> DrawEvents("significance", lumi, step, false);
+  //stack -> DrawEvents("significance", lumi, step, false);
   //stack -> DrawEventRatio_nJets("int", lumi, step, false);
   //stack -> DrawEventRatio_nJets("0jets", lumi, step, false);
   //stack -> DrawEventRatio_nJets("1jets", lumi, step, false);
@@ -158,7 +160,14 @@ int main(int argc, char** argv)
   //---------------------------------------------  
   // PV
   //---------------------------------------------
-
+  
+  variableNames.at(0) = "PV_n";  
+  histoName    = "PV_n";
+  stack -> SetXaxisRange(0.5, 25.5);
+  stack -> SetXaxisTitle("n_{PV}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 25, false);
+    
   variableNames.at(0) = "PV_d0";  
   histoName    = "PV_d0";
   stack -> SetXaxisRange(0.44, 0.49);
@@ -1065,6 +1074,34 @@ int main(int argc, char** argv)
   
   
   
+  variableNames2.at(0) = "WJ1_dzAvg-PV_z";
+  variableNames2.at(1) = "WJ2_dzAvg-PV_z";
+  histoName = "WJJ_dzAvg_max+WJJ_dzAvg_min";
+  cuts2->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && WJ1_dzAvg > -99. && WJ2_dzAvg > -99.";
+  cuts2->at(1) = "WJ1.Et() > 0. && WJ2.Et() > 0. && WJ1_dzAvg > -99. && WJ2_dzAvg > -99.";
+  stack -> SetXaxisRange(-10., 10.);
+  stack -> SetXaxisTitle("dz_{WJets}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames2, histoName, method, lumi, step, 100, false, cuts2);
+  
+  variableNames.at(0) = "max(abs(WJ1_dzAvg-PV_z),abs(WJ2_dzAvg-PV_z))";
+  histoName = "WJJ_dzAvg_max";
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && WJ1_dzAvg > -99. && WJ2_dzAvg > -99.";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("max dz_{WJets}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
+  
+  variableNames.at(0) = "min(abs(WJ1_dzAvg-PV_z),abs(WJ2_dzAvg-PV_z))";
+  histoName = "WJJ_dzAvg_min";
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && WJ1_dzAvg > -99. && WJ2_dzAvg > -99.";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("min dz_{WJets}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
+  
+  
+  
   
   
   
@@ -1247,12 +1284,37 @@ int main(int argc, char** argv)
   
   
   
+  variableNames2.at(0) = "tagJ1_dzAvg-PV_z";
+  variableNames2.at(1) = "tagJ2_dzAvg-PV_z";
+  histoName = "tagJJ_dzAvg_max+tagJJ_dzAvg_min";
+  cuts2->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0. && tagJ1_dzAvg > -99. && tagJ2_dzAvg > -99.";
+  cuts2->at(1) = "tagJ1.Et() > 0. && tagJ2.Et() > 0. && tagJ1_dzAvg > -99. && tagJ2_dzAvg > -99.";
+  stack -> SetXaxisRange(-10., 10.);
+  stack -> SetXaxisTitle("dz_{tagJets}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames2, histoName, method, lumi, step, 100, false, cuts2);
+  
+  variableNames.at(0) = "max(abs(tagJ1_dzAvg-PV_z),abs(tagJ2_dzAvg-PV_z))";
+  histoName = "tagJJ_dzAvg_max";
+  cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0. && tagJ1_dzAvg > -99. && tagJ2_dzAvg > -99.";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("max dz_{tagJets}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
+  
+  variableNames.at(0) = "min(abs(tagJ1_dzAvg-PV_z),abs(tagJ2_dzAvg-PV_z))";
+  histoName = "tagJJ_dzAvg_min";
+  cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0. && tagJ1_dzAvg > -99. && tagJ2_dzAvg > -99.";
+  stack -> SetXaxisRange(0., 10.);
+  stack -> SetXaxisTitle("min dz_{tagJets}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);  
   
   
   
   
   
- 
+  
 //  histoName = "jets_etaEtaMoment";
 //  stack -> SetXaxisRange(0., 0.1);
 //  stack -> SetXaxisTitle("#eta#eta_{jets}");
