@@ -331,11 +331,11 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   TLatex *latex = new TLatex(0.76, 0.91, lumiBuffer); 
   TLatex *latex2 = NULL;
   if( mode == "eventsScaled" )
-    latex2 = new TLatex(0.76, 0.88, lumiBuffer2);
+    latex2 = new TLatex(0.76, 0.86, lumiBuffer2);
   if( mode == "sameAreaStack" )
-    latex2 = new TLatex(0.76, 0.88, "norm. to same area");
+    latex2 = new TLatex(0.76, 0.86, "norm. to same area");
   if( mode == "sameAreaNoStack" )
-    latex2 = new TLatex(0.76, 0.88, "#splitline{each histo norm.}{to unit area}");
+    latex2 = new TLatex(0.76, 0.86, "#splitline{each histo normalized}{to unit area}");
   //if( mode == "eventsScaled" )
   //  latex = new TLatex(0.76, 0.50, lumiBuffer);
   //if( mode == "sameAreaStack" )
