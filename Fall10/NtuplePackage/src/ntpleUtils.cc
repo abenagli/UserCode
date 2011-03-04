@@ -197,11 +197,11 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
   double maxMJJ = -999999.;
   double tempMJJ = 0.;
   
-  double maxPt = -999999.;
-  double tempPt = 0.;
+  double maxEt = -999999.;
+  double tempEt = 0.;
   
-  double maxSumPt = -999999.;
-  double tempSumPt = 0.;
+  double maxSumEt = -999999.;
+  double tempSumEt = 0.;
   
   
   
@@ -262,12 +262,12 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
       }
       
       // -------------------------------------
-      else if(method == "maxPt")
+      else if(method == "maxEt")
       {
-        tempPt = sqrt( (jets.at(i) + jets.at(j)).perp2() );
-        if(tempPt > maxPt)
+        tempEt = sqrt( (jets.at(i) + jets.at(j)).perp2() );
+        if(tempEt > maxEt)
         {
-          maxPt = tempPt;
+          maxEt = tempEt;
           
 	        it.at(0) = i;
 	        it.at(1) = j;
@@ -276,12 +276,12 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
       
       // -------------------------------------
       
-      else if(method == "maxSumPt")
+      else if(method == "maxSumEt")
       {
-        tempSumPt = sqrt(jets.at(i).perp2()) + sqrt(jets.at(j).perp2());
-        if(tempSumPt > maxSumPt)
+        tempSumEt = sqrt(jets.at(i).perp2()) + sqrt(jets.at(j).perp2());
+        if(tempSumEt > maxSumEt)
         {
-          maxSumPt = tempSumPt;
+          maxSumEt = tempSumEt;
           
    	      it.at(0) = i;
 	        it.at(1) = j;
@@ -300,11 +300,11 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
   if(method == "maxMJJ")
     return maxMJJ;
   
-  else if(method == "maxPt")
-    return maxPt;
+  else if(method == "maxEt")
+    return maxEt;
   
-  else if(method == "maxSumPt")
-    return maxSumPt;
+  else if(method == "maxSumEt")
+    return maxSumEt;
   
   else return -1.;
 }
@@ -332,11 +332,11 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
   double maxMJJ = -999999.;
   double tempMJJ = 0.;
   
-  double maxPt = -999999.;
-  double tempPt = 0.;
+  double maxEt = -999999.;
+  double tempEt = 0.;
   
-  double maxSumPt = -999999.;
-  double tempSumPt = 0.;
+  double maxSumEt = -999999.;
+  double tempSumEt = 0.;
   
   
   
@@ -403,15 +403,15 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
       }
       
       // -------------------------------------
-      else if(method == "maxPt")
+      else if(method == "maxEt")
       {
-        tempPt = sqrt( (jets.at(i) + jets.at(j)).perp2() );
+        tempEt = sqrt( (jets.at(i) + jets.at(j)).perp2() );
         tempDeta = deltaEta(jets.at(i).Eta(), jets.at(j).Eta());
-        if( (tempPt > maxPt) &&
+        if( (tempEt > maxEt) &&
             (tempDeta > DetaMin) &&
             (tempDeta < DetaMax) )
         {
-          maxPt = tempPt;
+          maxEt = tempEt;
           
 	        it.at(0) = i;
 	        it.at(1) = j;
@@ -420,15 +420,15 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
       
       // -------------------------------------
       
-      else if(method == "maxSumPt")
+      else if(method == "maxSumEt")
       {
-        tempSumPt = sqrt(jets.at(i).perp2()) + sqrt(jets.at(j).perp2());
+        tempSumEt = sqrt(jets.at(i).perp2()) + sqrt(jets.at(j).perp2());
         tempDeta = deltaEta(jets.at(i).Eta(), jets.at(j).Eta());
-        if( (tempSumPt > maxSumPt) &&
+        if( (tempSumEt > maxSumEt) &&
             (tempDeta > DetaMin) &&
             (tempDeta < DetaMax) )
         {
-          maxSumPt = tempSumPt;
+          maxSumEt = tempSumEt;
           
    	      it.at(0) = i;
 	        it.at(1) = j;
@@ -447,11 +447,11 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
   if(method == "maxMJJ")
     return maxMJJ;
   
-  else if(method == "maxPt")
-    return maxPt;
+  else if(method == "maxEt")
+    return maxEt;
   
-  else if(method == "maxSumPt")
-    return maxSumPt;
+  else if(method == "maxSumEt")
+    return maxSumEt;
   
   else return -1.;
 }
@@ -523,6 +523,7 @@ int SelectLepton(std::vector<ROOT::Math::XYZTVector>& leptons,
 
 
 double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
+                     const std::string& method,
                      const double& etMin,
                      const double& DetaMIN,
                      const double& mjjMIN,
@@ -537,8 +538,11 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
   
   // initialize the selection variable
   double maxMjj = -999999.;
+  double maxDeta = -999999.;
+  double maxSumEt = -999999.;
   double tempMjj = 0.;
-  double tempDeta = 0.;
+  double tempDeta = 0.; 
+  double tempSumEt = 0.;
   double prodEta = 0.;
   
   
@@ -575,17 +579,88 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
       
       tempMjj = (jets.at(i) + jets.at(j)).mass();
       tempDeta = deltaEta(jets.at(i).eta(), jets.at(j).eta());
+      tempSumEt = jets.at(i).Et() + jets.at(j).Et();  
       prodEta = jets.at(i).eta() * jets.at(j).eta(); 
       
-      if( (tempMjj > maxMjj) && 
-          (tempDeta > DetaMIN) &&
-          (tempMjj > mjjMIN) && 
-          (prodEta < 0.) )
+      if(method == "maxMjj")
       {
-        maxMjj = tempMjj;
-        
-        it.at(0) = i;
-        it.at(1) = j;
+        if( (tempMjj > maxMjj) && 
+            (tempDeta > DetaMIN) &&
+            (tempMjj > mjjMIN) )
+        {
+          maxMjj = tempMjj;
+          
+          it.at(0) = i;
+          it.at(1) = j;
+        }
+      }
+      
+      if(method == "maxMjjEtaOpposite")
+      {
+        if( (tempMjj > maxMjj) && 
+            (tempDeta > DetaMIN) &&
+            (tempMjj > mjjMIN) && 
+            (prodEta < 0.) )
+        {
+          maxMjj = tempMjj;
+          
+          it.at(0) = i;
+          it.at(1) = j;
+        }
+      }
+      
+      if(method == "maxDeta")
+      {
+        if( (tempDeta > maxDeta) && 
+            (tempDeta > DetaMIN) &&
+            (tempMjj > mjjMIN) )
+        {
+          maxDeta = tempDeta;
+          
+          it.at(0) = i;
+          it.at(1) = j;
+        }
+      }
+      
+      if(method == "maxDetaEtaOpposite")
+      {
+        if( (tempDeta > maxDeta) && 
+            (tempDeta > DetaMIN) &&
+            (tempMjj > mjjMIN) && 
+            (prodEta < 0.) )
+        {
+          maxDeta = tempDeta;
+          
+          it.at(0) = i;
+          it.at(1) = j;
+        }
+      }
+      
+      if(method == "maxSumEt")
+      {
+        if( (tempSumEt > maxSumEt) && 
+            (tempDeta > DetaMIN) &&
+            (tempMjj > mjjMIN) )
+        {
+          maxSumEt = tempSumEt;
+          
+          it.at(0) = i;
+          it.at(1) = j;
+        }
+      }
+      
+      if(method == "maxSumEtEtaOpposite")
+      {
+        if( (tempSumEt > maxSumEt) && 
+            (tempDeta > DetaMIN) &&
+            (tempMjj > mjjMIN) && 
+            (prodEta < 0.) )
+        {
+          maxSumEt = tempSumEt;
+          
+          it.at(0) = i;
+          it.at(1) = j;
+        }
       }
       
       
@@ -714,8 +789,8 @@ double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
       
       tempDeta = (tempDeta_W / 2.5);
       
-      //std::cout << "1st jet: " << i << "   pt = " << jet1_W.pt() << "   eta = " << jet1_W.eta() << std::endl;
-      //std::cout << "2nd jet: " << j << "   pt = " << jet2_W.pt() << "   eta = " << jet2_W.eta() << std::endl;
+      //std::cout << "1st jet: " << i << "   et = " << jet1_W.Et() << "   eta = " << jet1_W.eta() << std::endl;
+      //std::cout << "2nd jet: " << j << "   et = " << jet2_W.Et() << "   eta = " << jet2_W.eta() << std::endl;
       //std::cout << "mJJ = " << (jet1_W+jet2_W).mass() << "   Deta = " << deltaEta(jet1_W.eta(),jet2_W.eta()) << std::endl; 
       bool isTagJetFound = false;
       
@@ -743,8 +818,8 @@ double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
           
           tempDeta += 1. / (tempMjj_tag / 80.399);
 	  
-          //std::cout << "3rd jet: " << k << "   pt = " << jet1_tag.pt() << "   eta = " << jet1_tag.eta() << std::endl;
-          //std::cout << "4th jet: " << l << "   pt = " << jet2_tag.pt() << "   eta = " << jet2_tag.eta() << std::endl;
+          //std::cout << "3rd jet: " << k << "   et = " << jet1_tag.Et() << "   eta = " << jet1_tag.eta() << std::endl;
+          //std::cout << "4th jet: " << l << "   et = " << jet2_tag.Et() << "   eta = " << jet2_tag.eta() << std::endl;
           //std::cout << "mJJ = " << (jet1_tag+jet2_tag).mass() << "   Deta = " << deltaEta(jet1_tag.eta(),jet2_tag.eta()) << std::endl;           
 
           if(method == "minDeta")
@@ -815,9 +890,9 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
   
   // initialize the selection variable
   double minDeta = 999999.;
-  double maxSumPt = -999999.;
+  double maxSumEt = -999999.;
   double minDMjj = 999999.;
-  double tempSumPt = 0.;
+  double tempSumEt = 0.;
   double tempMjj = 0.;
   double tempDMjj = 0.;
   double tempDeta = 0.; 
@@ -855,18 +930,18 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
       // -------------------------------------
       // select jets with different techniques
       // -------------------------------------
-      tempSumPt = jets.at(i).pt() + jets.at(j).pt();
+      tempSumEt = jets.at(i).Et() + jets.at(j).Et();
       tempDeta = deltaEta(jets.at(i).Eta(), jets.at(j).Eta());
       tempMjj = (jets.at(i) + jets.at(j)).mass();
       tempDMjj = fabs((jets.at(i) + jets.at(j)).mass() - 80.399);
       
-      if(method == "maxSumPt")
+      if(method == "maxSumEt")
       {
-        if( (tempSumPt > maxSumPt) &&
+        if( (tempSumEt > maxSumEt) &&
             (tempDeta < DetaMAX) &&
             (tempMjj < mjjMAX) )
         {
-          maxSumPt = tempSumPt;
+          maxSumEt = tempSumEt;
           
           it.at(0) = i;
           it.at(1) = j;
@@ -906,7 +981,7 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
   
   
   
-  return maxSumPt;
+  return maxSumEt;
 }
 
 

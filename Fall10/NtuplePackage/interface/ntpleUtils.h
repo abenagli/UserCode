@@ -186,6 +186,7 @@ double SelectTagJet(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& j
 
 /** select tag jets */
 double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
+                     const std::string& method,
                      const double& etMin,
                      const double& DetaMIN,
                      const double& mjjMIN,                     
