@@ -55,7 +55,11 @@ int main(int argc, char** argv)
   float jetEtMIN  = gConfigParser -> readFloatOption("Cuts::jetEtMIN");
   float jetEtaCNT = gConfigParser -> readFloatOption("Cuts::jetEtaCNT");
   float jetEtaFWD = gConfigParser -> readFloatOption("Cuts::jetEtaFWD");
-    
+  
+  std::string WSelectionMETHOD   = gConfigParser -> readStringOption("Cuts::WSelectionMETHOD");
+  std::string tagSelectionMETHOD = gConfigParser -> readStringOption("Cuts::tagSelectionMETHOD");
+  int tagFIRST = gConfigParser -> readIntOption("Cuts::tagFIRST");
+  
   int nLepMIN = gConfigParser -> readIntOption("Cuts::nLepMIN");
   int nLepMAX = gConfigParser -> readIntOption("Cuts::nLepMAX");
   
@@ -145,6 +149,7 @@ int main(int argc, char** argv)
     HLTPathNames.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v1");
     HLTPathNames.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v2");
     HLTPathNames.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3");
+    HLTPathNames.push_back("HLT_Ele17_SW_L1R");
   }
   if( (leptonFLAVOUR == "mu") || (leptonFLAVOUR == "emu") )
   {
@@ -617,35 +622,38 @@ int main(int argc, char** argv)
     // select W/tag jets
     if( TMVA4JetTraining == 0 )
     {
-      if( vars.nJets < 3 )
+      if( vars.nJets < 4 )
       {
-        SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300.);
+        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5, 500.);
         
         std::vector<int> blacklistIt_W;
         blacklistIt_W.push_back(vars.selectIt_W.at(0));
         blacklistIt_W.push_back(vars.selectIt_W.at(1));
-        SelectTagJets(vars.selectIt_tag, vars.jets, jetEtMIN, 1., 200., &blacklistIt_W);
-      }
-      if( vars.nJets == 3 )
-      {
-        SelectTagJet(vars.selectIt_tag, vars.jets, jetEtMIN, jetEtaCNT);
-        
-        std::vector<int> blacklistIt_tag;
-        blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
-        blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-        SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300., &blacklistIt_tag);
-      }
-      if( vars.nJets > 3 )
-      {
-        SelectTagJets(vars.selectIt_tag, vars.jets, jetEtMIN, 1., 200.);
-        
-        std::vector<int> blacklistIt_tag;
-        blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
-        blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-        SelectWJets(vars.selectIt_W, vars.jets, "minDeta", jetEtMIN, jetEtaCNT, 3., 300., &blacklistIt_tag);
+	SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0., &blacklistIt_W);
       }
       
-      
+      if( vars.nJets >= 4 )
+      {
+        if( tagFIRST == 1)
+        {
+          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0.);
+          
+          std::vector<int> blacklistIt_tag;
+          blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
+          blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5., 500., &blacklistIt_tag);
+        }
+        else
+        {
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5, 500.);
+          
+          std::vector<int> blacklistIt_W;
+          blacklistIt_W.push_back(vars.selectIt_W.at(0));
+          blacklistIt_W.push_back(vars.selectIt_W.at(1));
+	  SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0., &blacklistIt_W);
+        }
+      }
+          
       std::sort(vars.selectIt_W.begin(), vars.selectIt_W.end());
       std::sort(vars.selectIt_tag.begin(), vars.selectIt_tag.end());
       
@@ -705,12 +713,21 @@ int main(int argc, char** argv)
     
     
     skipEvent = true;
-    
+
+    if( verbosity == 1)    
+    {
+      std::vector<std::string> HLT_names = *(reader.GetString("HLT_Names"));
+      for(unsigned int HLTIt = 0; HLTIt < HLT_names.size(); ++HLTIt)
+	std::cout << "HLTbit " << HLTIt << "   " << HLT_names.at(HLTIt) << std::endl;    
+    }
+        
     for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
+    {
       if( AcceptHLTPath(reader, HLTPathNames.at(HLTIt)) == true )
         skipEvent = false;
-    
-    //if( skipEvent == true ) continue;
+    }
+        
+    if( skipEvent == true ) continue;
     
     
     // fill event counters

@@ -112,9 +112,9 @@ int main(int argc, char** argv)
   stack -> DrawEvents("eventsScaledStack", lumi, step, true);
   stack -> SetYaxisRange(0.01, 1.);
   stack -> DrawEvents("efficiencies", lumi, step, true);
-  stack -> SetYaxisRange(0.1, 1.);
+  stack -> SetYaxisRange(0.01, 1.);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true);
-  //stack -> DrawEvents("significance", lumi, step, false);
+  stack -> DrawEvents("significance", lumi, step, false);
   //stack -> DrawEventRatio_nJets("int", lumi, step, false);
   //stack -> DrawEventRatio_nJets("0jets", lumi, step, false);
   //stack -> DrawEventRatio_nJets("1jets", lumi, step, false);
@@ -163,10 +163,10 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "PV_n";  
   histoName    = "PV_n";
-  stack -> SetXaxisRange(0.5, 25.5);
+  stack -> SetXaxisRange(-0.5, 19.5);
   stack -> SetXaxisTitle("n_{PV}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 25, false);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 20, false);
     
   variableNames.at(0) = "PV_d0";  
   histoName    = "PV_d0";
@@ -220,10 +220,10 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "lep.pt()";
   histoName = "lep_pt";
-  stack -> SetXaxisRange(0., 200.);
+  stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("pt_{lepton}");
   stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, false);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, false);
   
   //histoName = "plus_lep_pt";
   //cuts->at(0) = "lep_charge > 0";
@@ -312,10 +312,10 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "met.Et()";  
   histoName = "met_et";
-  stack -> SetXaxisRange(0., 120.);
+  stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("missing et");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 24, false);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, false);
 
   //histoName = "plus_met_et";
   //cuts->at(0) = "lep_charge > 0";  
@@ -1058,7 +1058,7 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "-1.*lep_charge*(WJ1_charge+WJ2_charge)";
   histoName = "WJJ_charge";
-  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0.";
   stack -> SetXaxisRange(-3.5, 3.5);
   stack -> SetXaxisTitle("charge_{WJets}");
   stack -> SetUnit("");
@@ -1147,10 +1147,10 @@ int main(int argc, char** argv)
   variableNames.at(0) = "lepNuW_m";
   histoName = "lepNuW_m";
   cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0.";
-  stack -> SetXaxisRange(100., 600);
+  stack -> SetXaxisRange(100., 800);
   stack -> SetXaxisTitle("m_{lepton+met+WJets}");
   stack -> SetUnit("GeV/c2");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 70, false, cuts);
   
   variableNames.at(0) = "abs(lepNuW_zepp)";
   histoName = "lepNuW_zepp";
@@ -1164,7 +1164,7 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "lepMetW_Dphi";
   histoName = "lepMetW_Dphi";
-  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0.";  
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";  
   stack -> SetXaxisRange(0., 3.14159);
   stack -> SetXaxisTitle("#Delta#phi_{lepton+Met-WJets}");
   stack -> SetUnit("");
@@ -1189,7 +1189,7 @@ int main(int argc, char** argv)
   histoName = "tagJJ_m";
   cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(0., 2500.);
-  stack -> SetYaxisRange(0.0003, 0.3);
+  //stack -> SetYaxisRange(0.0003, 0.3);
   stack -> SetXaxisTitle("m_{tagJets}");
   stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
@@ -1208,6 +1208,14 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("#Delta#eta_{tagJets}");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);  
+  
+  variableNames.at(0) = "tagJJ_Dphi";
+  histoName = "tagJJ_Dphi";
+  cuts->at(0) = "tagJ1.Et() > 0. && tagJ2.Et() > 0.";
+  stack -> SetXaxisRange(0., 3.14159);
+  stack -> SetXaxisTitle("#Delta#phi_{tagJets}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 36, false, cuts);  
   
   variableNames.at(0) = "tagJ1.eta()*tagJ2.eta()";
   histoName = "tagJJ_etaProd";
