@@ -58,13 +58,14 @@ drawTStack::drawTStack(const std::string& inputDir,
     std::string sample;
     std::string sumName;
     int color;
+    int linestyle;
     int dataFlag;
     double mH;
     double crossSection;
     double scaleFactor;
     std::string jetAlgorithm;
     
-    listFile >> sample >> sumName >> color >> dataFlag >> mH >> crossSection >> scaleFactor >> jetAlgorithm;
+    listFile >> sample >> sumName >> color >> linestyle >> dataFlag >> mH >> crossSection >> scaleFactor >> jetAlgorithm;
 
     if(sample.size() == 0)
       continue;
@@ -78,6 +79,8 @@ drawTStack::drawTStack(const std::string& inputDir,
               << std::setw(3)
               << color << "\t"
               << std::setw(3)
+              << linestyle << "\t"
+              << std::setw(3)
               << dataFlag << "\t"
               << std::setw(6)
               << mH << "\t"
@@ -90,6 +93,7 @@ drawTStack::drawTStack(const std::string& inputDir,
     std::pair<std::string, std::string> dummyPair(sample, sumName);
     m_list.push_back(dummyPair);
     m_color[sample] = color;
+    m_linestyle[sample] = linestyle;
     m_dataFlag[sample] = dataFlag;
     m_mH[sample] = mH;
     m_crossSection[sample] = crossSection*scaleFactor;
@@ -134,6 +138,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   std::map<std::string, double> crossSection_summed;
   std::map<std::string, bool> isFirstSample_summed;
   std::map<std::string, int> color_summed;
+  std::map<std::string, int> linestyle_summed;
   std::map<std::string, int> dataFlag_summed;
   std::map<std::string, TH1F*> histo_summed;
   
@@ -144,6 +149,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     crossSection_summed[vecIt->second] = 0.;
     isFirstSample_summed[vecIt->second] = true;
     color_summed[vecIt->second] = -1;
+    linestyle_summed[vecIt->second] = -1;
     dataFlag_summed[vecIt->second] = -1;
     histo_summed[vecIt->second] = NULL;
   }
@@ -212,6 +218,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     // Draw::if data do not apply any scale factor
     histo -> Sumw2();
     color_summed[vecIt->second] = m_color[vecIt->first];
+    linestyle_summed[vecIt->second] = m_linestyle[vecIt->first];
     dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
     
     if( (histo->GetEntries() > 0.) && (m_dataFlag[vecIt->first] != 1) )
@@ -386,6 +393,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       globalHisto -> Scale(1. * lumi);
       globalHisto -> SetLineColor(color_summed[mapIt->first]);
       globalHisto -> SetFillColor(color_summed[mapIt->first]);
+      globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
       globalHisto -> SetFillStyle(3003);
       globalHisto -> SetLineWidth(2);
       
@@ -400,6 +408,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     {
       globalHisto -> Scale(1./globalHisto->Integral(1, globalHisto->GetNbinsX()));
       globalHisto -> SetLineColor(color_summed[mapIt->first]);
+      globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
       globalHisto -> SetLineWidth(4);
       
       if(globalHisto->GetMaximum() > globalMaximum)
@@ -428,6 +437,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       globalHisto -> Scale(dataGlobalGlobalIntegral/globalGlobalIntegral);
       globalHisto -> SetLineColor(color_summed[mapIt->first]);
       globalHisto -> SetFillColor(color_summed[mapIt->first]);
+      globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
       globalHisto -> SetFillStyle(3003);
       globalHisto -> SetLineWidth(2);
       
@@ -800,6 +810,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   std::map<std::string, double> crossSection_summed;
   std::map<std::string, bool> isFirstSample_summed;
   std::map<std::string, int> color_summed;
+  std::map<std::string, int> linestyle_summed;
   std::map<std::string, int> dataFlag_summed;
   std::map<std::string, bool> isSignal_summed;
   std::map<std::string, TH1F*> histo_summed;
@@ -810,6 +821,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     histo_summed[vecIt->second] = NULL;
     isFirstSample_summed[vecIt->second] = true;
     color_summed[vecIt->second] = -1;
+    linestyle_summed[vecIt->second] = -1;
     dataFlag_summed[vecIt->second] = -1;
     isSignal_summed[vecIt->second] = false;
   }
@@ -846,6 +858,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     }
     
     color_summed[vecIt->second] = m_color[vecIt->first];
+    linestyle_summed[vecIt->second] = m_linestyle[vecIt->first];
     dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
     crossSection_summed[vecIt->second] += m_crossSection[vecIt->first];
     if(m_mH[vecIt->first] > 0)
@@ -987,6 +1000,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     
     
     globalHisto -> SetLineColor(color_summed[mapIt->first]);
+    globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
     //globalHisto -> SetLineStyle(i+1);
     if(m_xAxisRange)
       globalHisto->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
