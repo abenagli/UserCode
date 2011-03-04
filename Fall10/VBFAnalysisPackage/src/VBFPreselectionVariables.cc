@@ -2,6 +2,13 @@
 
 
 
+TFile* GetOutputRootFile(VBFPreselectionVariables& vars)
+{
+  return vars.m_outputRootFile;
+}
+
+
+
 void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::string& outputRootFileName)
 {
   //-------------

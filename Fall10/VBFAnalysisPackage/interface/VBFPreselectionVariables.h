@@ -271,6 +271,7 @@ struct VBFPreselectionVariables
 
 
 
+TFile* GetOutputRootFile(VBFPreselectionVariables& vars);
 void InitializeVBFPreselectionTree(VBFPreselectionVariables&, const std::string&);
 void FillVBFPreselectionTree(VBFPreselectionVariables& vars);
 
