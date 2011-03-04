@@ -100,6 +100,7 @@ int main(int argc, char** argv)
   float lepMetDphiMIN = gConfigParser -> readFloatOption("Cuts::lepMetDphiMIN");  
   float lepMetDphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetDphiMAX");  
   
+  int metCUT = gConfigParser -> readIntOption("Cuts::metCUT");
   float metEtMIN = gConfigParser -> readFloatOption("Cuts::metEtMIN");
   float metEtMAX = gConfigParser -> readFloatOption("Cuts::metEtMAX");
   
@@ -547,7 +548,8 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "met", step, verbosity);
     
     
-    if( vars.met.Et() < 20. ) continue;
+    if( metCUT == 1 )
+      if( vars.met.Et() < 25. ) continue;
     
     // fill distributions
     stepEvents[step] += 1;
@@ -622,9 +624,12 @@ int main(int argc, char** argv)
     step += 1;
     SetStepNames(stepNames, "lep. W cuts", step, verbosity);
     
-    
-    if( vars.met.Et() < metEtMIN ) continue;
-    if( vars.met.Et() > metEtMAX ) continue;
+
+    if( metCUT == 1 )    
+    {
+      if( vars.met.Et() < metEtMIN ) continue;
+      if( vars.met.Et() > metEtMAX ) continue;
+    }
     if( vars.lepMet_mt < lepMetMtMIN ) continue;
     if( fabs(vars.lepMet_Dphi) < lepMetDphiMIN ) continue;
     if( fabs(vars.lepMet_Dphi) > lepMetDphiMAX ) continue;
