@@ -77,7 +77,7 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$color,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
+  ($sample,$sampleName,$color,$linestyle,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
@@ -146,6 +146,7 @@ while(<SAMPLESListFile>)
   #print($command."\n\n\n");
   system($command);
   
+  print SAMPLEJOBLISTFILE "echo \"/opt/exp_soft/cms/t3/t3submit -q cms ".$sampleJobFile."\"\n";
   print SAMPLEJOBLISTFILE "/opt/exp_soft/cms/t3/t3submit -q cms ".$sampleJobFile."\n";
   
   ++$type;

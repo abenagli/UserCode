@@ -70,7 +70,7 @@ while (<LISTOFSamples>)
   
   chomp($_);
   
-  ($sample,$dummy,$color,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
+  ($sample,$dummy,$color,$linestyle,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
   $subsample = substr($sample,0,1);
   if($subsample eq "#")
   {
@@ -179,7 +179,7 @@ while (<LISTOFSamples>)
     
     
     $it = 0;
-    $JOBLISTOFFiles = $jobDir."/list_".$sample.".txt";
+    $JOBLISTOFFiles = $jobDir."/list.txt";
     open (JOBLISTOFFiles, ">", $JOBLISTOFFiles) or die "Can't open file ".$JOBLISTOFFiles;
 
     open (LISTOFFiles2,$LISTOFFiles) ;
@@ -197,6 +197,7 @@ while (<LISTOFSamples>)
         print SAMPLEJOBFILE $command."\n";
 	
         print JOBLISTOFFiles "/data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/".$file."\n";
+        #print JOBLISTOFFiles "root://polgrid4.in2p3.fr/".$INPUTSAVEPath."/".$sample."/".$file."\n";
       }
       ++$it;
     }
@@ -227,6 +228,12 @@ while (<LISTOFSamples>)
     ############
     # submit job
     ############
+    
+    $command = "sleep 0.5\n";
+    print SAMPLEJOBLISTFILE $command."\n";
+    
+    $command = "echo \"/opt/exp_soft/cms/t3/t3submit -q cms ".$tempBjob."\"\n" ;  
+    print SAMPLEJOBLISTFILE $command."\n";
     
     $command = "/opt/exp_soft/cms/t3/t3submit -q cms ".$tempBjob."\n" ;  
     print SAMPLEJOBLISTFILE $command."\n";
