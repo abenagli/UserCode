@@ -114,7 +114,7 @@ int main(int argc, char** argv)
   stack -> DrawEvents("efficiencies", lumi, step, true);
   stack -> SetYaxisRange(0.01, 1.);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true);
-  stack -> DrawEvents("significance", lumi, step, false);
+  //stack -> DrawEvents("significance", lumi, step, false);
   //stack -> DrawEventRatio_nJets("int", lumi, step, false);
   //stack -> DrawEventRatio_nJets("0jets", lumi, step, false);
   //stack -> DrawEventRatio_nJets("1jets", lumi, step, false);
@@ -917,11 +917,12 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "WJJ_m";
   histoName = "WJJ_m";
-  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0.";
-  stack -> SetXaxisRange(0., 300.);
+  //cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0.";
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
+  stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("m_{WJets}");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, false, cuts);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, false, cuts);
   
   variableNames.at(0) = "WJJ.Et()";
   histoName = "WJJ_et";
@@ -1146,7 +1147,8 @@ int main(int argc, char** argv)
     
   variableNames.at(0) = "lepNuW_m";
   histoName = "lepNuW_m";
-  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0.";
+  //cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0.";
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";
   stack -> SetXaxisRange(100., 800);
   stack -> SetXaxisTitle("m_{lepton+met+WJets}");
   stack -> SetUnit("GeV/c2");
@@ -1154,7 +1156,7 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "abs(lepNuW_zepp)";
   histoName = "lepNuW_zepp";
-  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0."; 
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0."; 
   stack -> SetXaxisRange(0., 1.);
   stack -> SetXaxisTitle("zepp_{lepton+met+WJets}");
   stack -> SetUnit("GeV/c2");
@@ -1164,7 +1166,7 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "lepMetW_Dphi";
   histoName = "lepMetW_Dphi";
-  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && tagJ1.Et() > 0. && tagJ2.Et() > 0.";  
+  cuts->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0.";  
   stack -> SetXaxisRange(0., 3.14159);
   stack -> SetXaxisTitle("#Delta#phi_{lepton+Met-WJets}");
   stack -> SetUnit("");
