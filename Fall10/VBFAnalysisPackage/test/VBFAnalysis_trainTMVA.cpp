@@ -134,7 +134,7 @@ int main(int argc, char** argv)
   // Define variables
   factory -> AddVariable("jets_bTag1",    'F');
   factory -> AddVariable("jets_bTag1",    'F');
-  factory -> AddVariable("met.Et()",      'F');
+//  factory -> AddVariable("met_et",      'F');
   factory -> AddVariable("lepMet_mt",     'F');
   factory -> AddVariable("lepMet_Dphi",   'F');
   factory -> AddVariable("WJJ_m",         'F');
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
   factory -> AddVariable("WJ2_zepp",      'F');
   factory -> AddVariable("lep_zepp",      'F');
   
-  factory -> AddVariable("lep.Eta()",     'F');
+//  factory -> AddVariable("lep.Eta()",     'F');
 
   std::cout << "sono qua 2" << std::endl;
   factory -> PrepareTrainingAndTestTree("", "SplitMode=Random");
