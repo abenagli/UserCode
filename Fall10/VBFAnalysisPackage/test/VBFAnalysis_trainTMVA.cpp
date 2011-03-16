@@ -1,4 +1,3 @@
-#include "WplusWminusRatioVariables.h"
 #include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
@@ -64,7 +63,7 @@ int main(int argc, char** argv)
   int entryFIRST  = gConfigParser -> readIntOption("Options::entryFIRST");
   int entryMAX    = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
-  int step        = gConfigParser -> readFloatOption("Options::step");
+  int step        = gConfigParser -> readIntOption("Options::step");
   
   
   
@@ -84,37 +83,36 @@ int main(int argc, char** argv)
   TMVA::Factory* factory = new TMVA::Factory("TMVA", outFile);
   
   
-  
-  
-  
-  
   // add trees to the factory
   for(unsigned int i = 0; i < nTotTrees; ++i)
   {
     // open root file
     std::string inputFullFileName;
     if(i < nSigTrees) inputFullFileName = baseDir + "/" + inputSigDirs.at(i)   + "/" + inputFileName + ".root";
-    else              inputFullFileName = baseDir + "/" + inputBkgDirs.at(i-1) + "/" + inputFileName + ".root";
+    else              inputFullFileName = baseDir + "/" + inputBkgDirs.at(i-nSigTrees) + "/" + inputFileName + ".root";
     TFile* inputFile = TFile::Open(inputFullFileName.c_str());
+    std::cout << "\n\n sto leggendo il file --->> " << inputFullFileName.c_str() << "\n\n" << std::endl;
     
-    
+    // Get the number of events BEFORE the selection
+    TH1F* events = (TH1F*) inputFile -> Get("events");
+    totEvents = events -> GetBinContent(1);
+  
     // get the tree at nth step
     TTree* tree = NULL;
     char treeName[50];
-    sprintf(treeName, "tree_%d", step);
+    sprintf(treeName, "ntu_%d", step);
     inputFile -> GetObject(treeName, tree);
     
-    
     // set tree branches
-    tree -> SetBranchAddress("totEvents",    &totEvents);
     tree -> SetBranchAddress("mH",           &mH);
     tree -> SetBranchAddress("crossSection", &crossSection);
     tree -> GetEntry(0);
     
-    
+    // Do not consider this contribution IF at the level of the AN before the MVA step no events are surviving
+    if ( tree -> GetEntries() == 0 ) continue; 
+
     // compute event weight at nth step
     double weight = 1. * tree -> GetEntries() / totEvents * crossSection; 
-    
     
     // add tree to the factory
     if(i < nSigTrees)
@@ -126,58 +124,77 @@ int main(int argc, char** argv)
     else
     {
       factory -> AddBackgroundTree(tree, weight);    
-      std::cout << ">>>>> VBFAnalysis_trainMVA:: background tree in " << inputBkgDirs.at(i-1) << " added to the factory" << std::endl;
+      std::cout << ">>>>> VBFAnalysis_trainMVA:: background tree in " << inputBkgDirs.at(i-nSigTrees) << " added to the factory" << std::endl;
     }
     
   }
   
-  
-  
-  
-  
-  
+  std::cout << "sono qua 1" << std::endl;
+
   // Define variables
-  factory -> AddVariable("PV_nTracks",    'F');
+  factory -> AddVariable("jets_bTag1",    'F');
+  factory -> AddVariable("jets_bTag1",    'F');
+  factory -> AddVariable("met.Et()",      'F');
+  factory -> AddVariable("lepMet_mt",     'F');
+  factory -> AddVariable("lepMet_Dphi",   'F');
+  factory -> AddVariable("WJJ_m",         'F');
+  factory -> AddVariable("WJJ_DR",        'F');
+
+  factory -> AddVariable("lepMetW_Dphi",  'F');
+  factory -> AddVariable("lepWJJ_pt1",    'F');
+  factory -> AddVariable("lepWJJ_pt2",    'F');
+  factory -> AddVariable("lepWJJ_pt3",    'F');
+  factory -> AddVariable("lepNuW_m",      'F');
+
   factory -> AddVariable("tagJJ_Deta",    'F');
   factory -> AddVariable("tagJJ_m",       'F');
-  factory -> AddVariable("WJJ_m",         'F');
-  factory -> AddVariable("lepMetW_Dphi",  'F');
-  factory -> AddVariable("lepNuW_m",      'F');
-  factory -> AddVariable("lep_eta",       'F');
+
+  factory -> AddVariable("WJ1_zepp",      'F');
+  factory -> AddVariable("WJ2_zepp",      'F');
+  factory -> AddVariable("lep_zepp",      'F');
   
+  factory -> AddVariable("lep.Eta()",     'F');
+
+  std::cout << "sono qua 2" << std::endl;
   factory -> PrepareTrainingAndTestTree("", "SplitMode=Random");
-  
+  std::cout << "sono qua 3" << std::endl;
+
   std::cout << "******************************************************" << std::endl;
   std::cout << "BookMethod" << std::endl;
   std::cout << "******************************************************" << std::endl;
   //factory -> BookMethod(TMVA::Types::kCuts, "kCuts");
-  factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood");
-  factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
-  factory -> BookMethod(TMVA::Types::kKNN, "kKNN");
-  factory -> BookMethod(TMVA::Types::kFisher, "kFisher");
+//  factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood");
+//  factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
+//  factory -> BookMethod(TMVA::Types::kKNN, "kKNN");
+//  factory -> BookMethod(TMVA::Types::kFisher, "kFisher");
   //factory -> BookMethod(TMVA::Types::kLD, "kLD");
   //factory -> BookMethod(TMVA::Types::kCFMlpANN, "kCFMlpANN");
   //factory -> BookMethod(TMVA::Types::kTMlpANN, "kTMlpANN");
-  factory -> BookMethod(TMVA::Types::kMLP, "kMLP");
-  factory -> BookMethod(TMVA::Types::kSVM, "kSVM");
+//  factory -> BookMethod(TMVA::Types::kMLP, "kMLP");
+//  factory -> BookMethod(TMVA::Types::kSVM, "kSVM");
   factory -> BookMethod(TMVA::Types::kBDT, "kBDT");
 
-  
+  std::cout << "sono qua 4" << std::endl;
+
   std::cout << "******************************************************" << std::endl;
   std::cout << "TrainAllMethods" << std::endl;
   std::cout << "******************************************************" << std::endl;
   factory -> TrainAllMethods();
   
+  std::cout << "sono qua 5" << std::endl;
+
   std::cout << "******************************************************" << std::endl;
   std::cout << "TestAllMethods" << std::endl;
   std::cout << "******************************************************" << std::endl;
   factory -> TestAllMethods();
+  std::cout << "sono qua 6" << std::endl;
   
   std::cout << "******************************************************" << std::endl;
   std::cout << "EvaluateAllMethods" << std::endl;
   std::cout << "******************************************************" << std::endl;
   factory -> EvaluateAllMethods();
-  
+  std::cout << "sono qua 7" << std::endl;
+
   
   return 0;
 }
