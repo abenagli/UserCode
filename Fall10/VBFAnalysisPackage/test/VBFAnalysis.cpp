@@ -53,6 +53,7 @@ int main(int argc, char** argv)
   int dataFlag = gConfigParser -> readIntOption("Options::dataFlag");
   float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   int verbosity = gConfigParser -> readIntOption("Options::verbosity"); 
+  int trainMVA = gConfigParser -> readIntOption("Options::trainMVA"); 
   
   int jetNMIN = gConfigParser -> readIntOption("Cuts::jetNMIN");
   int jetNMAX = gConfigParser -> readIntOption("Cuts::jetNMAX");
@@ -602,7 +603,7 @@ int main(int argc, char** argv)
     
     if( (vars.nJets >=1) && (vars.jets_bTag1 > 2.50) ) isBTagged = true;
     if( (vars.nJets >=2) && (vars.jets_bTag2 > 1.50) ) isBTagged = true;
-    if( isBTagged == true) continue;
+    if( (trainMVA == 0) && (isBTagged == true) ) continue;
     
     
     // fill distributions
@@ -627,12 +628,12 @@ int main(int argc, char** argv)
 
     if( metCUT == 1 )    
     {
-      if( vars.met.Et() < metEtMIN ) continue;
-      if( vars.met.Et() > metEtMAX ) continue;
+      if( (trainMVA == 0) && (vars.met.Et() < metEtMIN) ) continue;
+      if( (trainMVA == 0) && (vars.met.Et() > metEtMAX) ) continue;
     }
-    if( vars.lepMet_mt < lepMetMtMIN ) continue;
-    if( fabs(vars.lepMet_Dphi) < lepMetDphiMIN ) continue;
-    if( fabs(vars.lepMet_Dphi) > lepMetDphiMAX ) continue;
+    if( (trainMVA == 0) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepMet_Dphi) > lepMetDphiMAX) ) continue;
     
     
     // fill distributions    
@@ -656,12 +657,12 @@ int main(int argc, char** argv)
     
     
     // mjj cut
-    if( (vars.WJ1+vars.WJ2).mass() < WJJMassMIN ) continue;
-    if( (vars.WJ1+vars.WJ2).mass() > WJJMassMAX ) continue;
     if( std::max(vars.WJ1.Et(), vars.WJ2.Et()) < WJJMaxEtMIN ) continue;
     if( std::min(vars.WJ1.Et(), vars.WJ2.Et()) < WJJMinEtMIN ) continue;
-    if( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN ) continue;
-    if( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX ) continue;
+    if( (trainMVA == 0) && ((vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
+    if( (trainMVA == 0) && ((vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
+    if( (trainMVA == 0) && (fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
+    if( (trainMVA == 0) && (fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX) ) continue;
     
     
     // fill distributions
@@ -684,8 +685,8 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "W-W cuts", step, verbosity);
     
     
-    if( fabs(vars.lepMetW_Dphi) < lepMetWDphiMIN ) continue;
-    if( fabs(vars.lepMetW_Dphi) > lepMetWDphiMAX ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepMetW_Dphi) < lepMetWDphiMIN) ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepMetW_Dphi) > lepMetWDphiMAX) ) continue;
     
     
     // fill distributions
@@ -708,9 +709,9 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "pt max cuts", step, verbosity);
     
     
-    if( fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN ) continue;
-    if( fabs(vars.lepWJJ_pt2) < lepWJJPt2MIN ) continue;
-    if( fabs(vars.lepWJJ_pt3) < lepWJJPt3MIN ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN) ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepWJJ_pt2) < lepWJJPt2MIN) ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepWJJ_pt3) < lepWJJPt3MIN) ) continue;
     
     
     // fill distributions
@@ -733,8 +734,8 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "Higgs mass", step, verbosity);
     
     
-    if( fabs(vars.lepNuW_m) < lepNuWMMIN ) continue;    
-    if( fabs(vars.lepNuW_m) > lepNuWMMAX ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepNuW_m) < lepNuWMMIN) ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepNuW_m) > lepNuWMMAX) ) continue;
     
     
     // fill distributions
@@ -807,13 +808,13 @@ int main(int argc, char** argv)
     step += 1;
     SetStepNames(stepNames, "tag-jet cuts", step, verbosity);
     
-    
-    if( fabs(deltaEta(vars.tagJ1.eta(),vars.tagJ2.eta())) < tagJJDetaMIN ) continue;
-    if( (vars.tagJ1+vars.tagJ2).mass() < tagJJMassMIN ) continue;
+
     if( std::max(vars.tagJ1.Et(),vars.tagJ2.Et()) < tagJJMaxEtMIN ) continue;
     if( std::min(vars.tagJ1.Et(),vars.tagJ2.Et()) < tagJJMinEtMIN ) continue;
-    if( std::max(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMaxEtaMIN ) continue;
-    if( std::min(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMinEtaMIN ) continue;
+    if( (trainMVA == 0) && (fabs(deltaEta(vars.tagJ1.eta(),vars.tagJ2.eta())) < tagJJDetaMIN) ) continue;
+    if( (trainMVA == 0) && ((vars.tagJ1+vars.tagJ2).mass() < tagJJMassMIN) ) continue;
+    if( (trainMVA == 0) && (std::max(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMaxEtaMIN) ) continue;
+    if( (trainMVA == 0) && (std::min(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMinEtaMIN) ) continue;
     
     
     // fill distributions
@@ -836,9 +837,9 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "zeppenfeld cuts", step, verbosity);
     
     
-    if( fabs(vars.lep_zepp) > lepZeppMAX ) continue;
-    if( std::max(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMaxZeppMAX ) continue;
-    if( std::min(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMinZeppMAX ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lep_zepp) > lepZeppMAX) ) continue;
+    if( (trainMVA == 0) && (std::max(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMaxZeppMAX) ) continue;
+    if( (trainMVA == 0) && (std::min(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMinZeppMAX) ) continue;
     
     // fill distributions
     stepEvents[step] += 1;
