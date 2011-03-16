@@ -16,20 +16,20 @@
   std::string TJets_tWchannelFolder = "2_TToBLNu_TuneZ2_tW-channel_7TeV-madgraph_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
 
   std::string variableName = "met.Et()";
-  std::string cutNameQCD = "(lep_tkIso+lep_emIso+lep_hadIso)/lep.pt() > 0.3 && (lep_tkIso+lep_emIso+lep_hadIso)/lep.pt() < 0.5";
-  std::string cutName = "";
+  std::string cutNameQCD = "lep_flavour == 11 && (lep_tkIso+lep_emIso+lep_hadIso)/lep.pt() > 0.3 && (lep_tkIso+lep_emIso+lep_hadIso)/lep.pt() < 0.5";
+  std::string cutName = "lep_flavour == 11";
 
   
-  int step = 6;
+  int step = 8;
   char treeName[50];
   sprintf(treeName, "ntu_%d", step);
   
   float lumi = 35.;
   
-  int nBins = 120;
+  int nBins = 100;
   double xMin = 0.;
-  double xMin_signal = 0.;
-  double xMax = 120.;
+  double xMin_signal = 25.;
+  double xMax = 200.;
   
   
     
@@ -57,6 +57,18 @@
   TH1F* WShapeHisto = new TH1F("WShapeHisto", "WShapeHisto", nBins, xMin, xMax);
   WShapeTree -> Draw( (variableName+">> WShapeHisto").c_str(), cutName.c_str() );
   WShapeHisto -> Sumw2();
+  
+  TTree* WShapeTree;
+  WShapeTree = inFile_WShape.GetObject(treeName, WShapeTree);
+
+  TH1F* eventsHisto;
+  eventsHisto = inFile_WShape.GetObject("events", eventsHisto);
+  int totEvents = eventsHisto -> GetBinContent(1);
+
+  float crossSection;
+  WShapeTree -> SetBranchAddress("crossSection", &crossSection);
+  WShapeTree -> GetEntry(0);
+  float NW_MC = eventsHisto -> GetBinContent(step) / totEvents * crossSection * lumi;
   //inFile_WShape.Close();
   
   
@@ -99,11 +111,9 @@
     TTree* BKGShapeTree;
     BKGShapeTree = inFile_BKGShape.GetObject(treeName, BKGShapeTree);
     
-    TH1F* eventsHisto;
     eventsHisto = inFile_BKGShape.GetObject("events", eventsHisto);
-    int totEvents = eventsHisto -> GetBinContent(1);
+    totEvents = eventsHisto -> GetBinContent(1);
     
-    float crossSection;
     BKGShapeTree -> SetBranchAddress("crossSection", &crossSection);
     BKGShapeTree -> GetEntry(0);
     
@@ -156,11 +166,18 @@
   
   
   // define the total shape
-  RooRealVar NW("NW", "NW", 1000., 0., 10000000.);
-  RooRealVar NBKG("NBKG", "NBKG", NBKG_MC, NBKG_MC, NBKG_MC);
-  RooRealVar NQCD("NQCD", "NQCD", 1000., 0., 10000000.);
+  //RooRealVar NW("NW", "NW", 1000., 0., 10000000.);
+  RooRealVar alpha("alpha", "alpha", 1., 0.5, 1.5);
   
-  RooAddPdf totPdf("totPdf", "tot", RooArgList(QCDPdf,WPdf,BKGPdf), RooArgList(NQCD,NW,NBKG));
+  RooRealVar NW("NW", "NW", NW_MC, NW_MC, NW_MC);
+  RooFormulaVar NWfit("NWfit", "alpha*NW", RooArgSet(alpha,NW));
+  
+  RooRealVar NBKG("NBKG", "NBKG", NBKG_MC, NBKG_MC, NBKG_MC);
+  RooFormulaVar NBKGfit("NBKGfit", "alpha*NBKG", RooArgSet(alpha,NBKG));
+  
+  RooRealVar NQCDfit("NQCDfit", "NQCDfit", 1000., 0., 10000000.);
+
+  RooAddPdf totPdf("totPdf", "tot", RooArgList(QCDPdf,WPdf,BKGPdf), RooArgList(NQCDfit,NWfit,NBKGfit));
   
   
   // fit the histo
@@ -172,9 +189,9 @@
   RooAbsReal* BKGIntegral = BKGPdf.createIntegral(x, NormSet(x), Range("signal")); 
   RooAbsReal* QCDIntegral = QCDPdf.createIntegral(x, NormSet(x), Range("signal"));   
   
-  std::cout << "NW in signal region = " << WIntegral->getVal() * NW.getVal() << std::endl;
-  std::cout << "NBKG in signal region = " << BKGIntegral->getVal() * NBKG.getVal() << std::endl;
-  std::cout << "NQCD in signal region = " << QCDIntegral->getVal() * NQCD.getVal() << std::endl;
+  std::cout << "NW in signal region = " << WIntegral->getVal() * NWfit.getVal() << std::endl;
+  std::cout << "NBKG in signal region = " << BKGIntegral->getVal() * NBKGfit.getVal() << std::endl;
+  std::cout << "NQCD in signal region = " << QCDIntegral->getVal() * NQCDfit.getVal() << std::endl;
   
   
   
@@ -189,13 +206,13 @@
   rooPlot->Draw();
   
   char WString[50];
-  sprintf(WString, "NW = %.3f^{+%.1f}_{-%.1f}", NW.getVal(), NW.getAsymErrorHi(), NW.getAsymErrorLo());
+  //sprintf(WString, "NW = %.3f^{+%.1f}_{-%.1f}", NWfit.getVal(), NWfit.getAsymErrorHi(), NWfit.getAsymErrorLo());
   
   char BKGString[50];
-  sprintf(BKGString, "NBKG = %.3f^{+%.1f}_{-%.1f}", NBKG.getVal(), NBKG.getAsymErrorHi(), NBKG.getAsymErrorLo());
+  //sprintf(BKGString, "NBKG = %.3f^{+%.1f}_{-%.1f}", NBKGfit.getVal(), NBKGfit.getAsymErrorHi(), NBKGfit.getAsymErrorLo());
     
   char QCDString[50];
-  sprintf(QCDString, "NQCD = %.3f^{+%.1f}_{-%.1f}", NQCD.getVal(), NQCD.getAsymErrorHi(), NQCD.getAsymErrorLo());
+  //sprintf(QCDString, "NQCD = %.3f^{+%.1f}_{-%.1f}", NQCDfit.getVal(), NQCDfit.getAsymErrorHi(), NQCDfit.getAsymErrorLo());
 
   TLatex WLatex(0.65, 0.85, WString);
   WLatex.SetNDC();
