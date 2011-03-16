@@ -92,6 +92,8 @@
 2_TToBLNu_TuneZ2_t-channel_7TeV-madgraph_Fall10-START38_V12-v2             3_t(t)+jets_madgraph   6  1   0    -1.        21.0000   1.0   AK5PF
 2_TToBLNu_TuneZ2_tW-channel_7TeV-madgraph_Fall10-START38_V12-v2            3_t(t)+jets_madgraph   6  1   0    -1.        10.6000   1.0   AK5PF
 2_TTJets_TuneZ2_7TeV-madgraph-tauola_Fall10-START38_V12-v3                 3_t(t)+jets_madgraph   6  1   0    -1.       165.0000   1.0   AK5PF
+2_TTTo2L2Nu2B_7TeV-powheg-pythia6_Fall10-START38_V12-v1                    3_t(t)+jets_powheg     6  1   0    -1.        17.5000   1.0   AK5PF
+2_TTToLNu2Q2B_7TeV-powheg-pythia6_Fall10-START38_V12-v1                    3_t(t)+jets_powheg     6  1   0    -1.        72.8000   1.0   AK5PF
 2_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall10-START38_V12-v3        4_Z+jets_madgraph      7  1   0    -1.      3048.0000   1.0   AK5PF
 2_GJets_TuneD6T_HT-40To100_7TeV-madgraph_Fall10-START38_V12-v1             5_g+jets_madgraph      30 1   0    -1.     23600.0000   1.0   AK5PF
 2_GJets_TuneD6T_HT-100To200_7TeV-madgraph_Fall10-START38_V12-v1            5_g+jets_madgraph      30 1   0    -1.      3480.0000   1.0   AK5PF
@@ -112,4 +114,3 @@
 2_Electron_Run2010B-Nov4ReReco_v1                                          0_data_EG              0  1   1    -1.         1.0000   1.0   AK5PF
 2_Mu_Run2010A-Nov4ReReco_v1                                                0_data_Mu              0  1   1    -1.         1.0000   1.0   AK5PF
 2_Mu_Run2010B-Nov4ReReco_v1                                                0_data_Mu              0  1   1    -1.         1.0000   1.0   AK5PF
- 
