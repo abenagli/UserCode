@@ -811,6 +811,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   std::map<std::string, bool> isFirstSample_summed;
   std::map<std::string, int> color_summed;
   std::map<std::string, int> linestyle_summed;
+  std::map<std::string, double> mH_summed;
   std::map<std::string, int> dataFlag_summed;
   std::map<std::string, bool> isSignal_summed;
   std::map<std::string, TH1F*> histo_summed;
@@ -822,6 +823,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     isFirstSample_summed[vecIt->second] = true;
     color_summed[vecIt->second] = -1;
     linestyle_summed[vecIt->second] = -1;
+    mH_summed[vecIt->second] = -1;
     dataFlag_summed[vecIt->second] = -1;
     isSignal_summed[vecIt->second] = false;
   }
@@ -859,6 +861,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     
     color_summed[vecIt->second] = m_color[vecIt->first];
     linestyle_summed[vecIt->second] = m_linestyle[vecIt->first];
+    mH_summed[vecIt->second] = m_mH[vecIt->first];
     dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
     crossSection_summed[vecIt->second] += m_crossSection[vecIt->first];
     if(m_mH[vecIt->first] > 0)
@@ -946,6 +949,8 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   
   
   i = 0;
+  std::map<int, float> nEventsScaled_sig;
+  std::map<int, float> nEventsScaled_bkg;
   for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
       mapIt != crossSection_summed.end(); ++mapIt)
   {    
@@ -1017,6 +1022,16 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     
     
     
+    if( mode == "eventsScaled" )
+    {
+      for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)
+      {
+        if( mH_summed[mapIt->first] > 0. )
+          nEventsScaled_sig[bin] += globalHisto->GetBinContent(bin);
+        else
+          nEventsScaled_bkg[bin] += globalHisto->GetBinContent(bin);
+      }
+    }
     
     
     
@@ -1193,6 +1208,18 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     }
     
     c1->Print((m_outputDir+"eventsScaled."+m_imgFormat).c_str(), m_imgFormat.c_str());
+    
+    
+    
+    (*outFile) << "\n";
+    for(unsigned int bin = 1; bin <= nEventsScaled_sig.size(); ++bin)
+    {
+      (*outFile) << "bin " << bin << ":   S = " 
+                               << nEventsScaled_sig[bin]
+                               << ":   B = " 
+                               << nEventsScaled_bkg[bin]
+                               << std::endl;
+    }
   }
   
   
