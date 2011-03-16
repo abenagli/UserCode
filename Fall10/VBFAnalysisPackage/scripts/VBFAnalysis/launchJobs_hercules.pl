@@ -77,7 +77,7 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$color,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
+  ($sample,$sampleName,$color,$linestyle,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
@@ -146,6 +146,8 @@ while(<SAMPLESListFile>)
   #print($command."\n\n\n");
   system($command);
   
+  print SAMPLEJOBLISTFILE "\nsleep 0.5\n";
+  print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\"\n";  
   print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\n";
   
   ++$type;
