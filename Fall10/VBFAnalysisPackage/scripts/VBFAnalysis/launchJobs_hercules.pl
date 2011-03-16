@@ -147,7 +147,7 @@ while(<SAMPLESListFile>)
   system($command);
   
   print SAMPLEJOBLISTFILE "\nsleep 0.5\n";
-  print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\"\n";  
+  print SAMPLEJOBLISTFILE "echo \"qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\"\n";  
   print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\n";
   
   ++$type;
