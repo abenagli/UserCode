@@ -146,6 +146,7 @@ while(<SAMPLESListFile>)
   #print($command."\n\n\n");
   system($command);
   
+  print SAMPLEJOBLISTFILE "\nsleep 0.5\n";
   print SAMPLEJOBLISTFILE "echo \"/opt/exp_soft/cms/t3/t3submit -q cms ".$sampleJobFile."\"\n";
   print SAMPLEJOBLISTFILE "/opt/exp_soft/cms/t3/t3submit -q cms ".$sampleJobFile."\n";
   
