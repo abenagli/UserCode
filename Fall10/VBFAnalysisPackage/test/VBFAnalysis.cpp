@@ -13,6 +13,7 @@
 #include "TRandom3.h"
 
 #include "TMVA/Reader.h"
+#include "/grid_mnt/data__HOME/llr/cms/abenagli/COLLISIONS7TeV/Fall10/VBFAnalysisPackage/data/weights/TMVA_kBDT.class.C"
 
 
 
@@ -54,6 +55,7 @@ int main(int argc, char** argv)
   float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   int verbosity = gConfigParser -> readIntOption("Options::verbosity"); 
   int trainMVA = gConfigParser -> readIntOption("Options::trainMVA"); 
+  int applyMVA = gConfigParser -> readIntOption("Options::applyMVA"); 
   
   int jetNMIN = gConfigParser -> readIntOption("Cuts::jetNMIN");
   int jetNMAX = gConfigParser -> readIntOption("Cuts::jetNMAX");
@@ -160,7 +162,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 20;
+  int nStep = 21;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_plus_int  = new TH1F("events_plus_int",  "events_plus_int",  nStep, 0., 1.*nStep);
@@ -204,8 +206,34 @@ int main(int argc, char** argv)
     sprintf(treeName, "ntu_%d", step);;
     cloneTrees[step] = chain -> CloneTree(0);
     cloneTrees[step] -> SetName(treeName); 
-  }  
+  }
   
+  
+  
+  
+  
+    // define MVA reader
+    std::vector<std::string> MVAInputVariables;
+    if( applyMVA == 1 )
+    {
+      MVAInputVariables.push_back("jets_bTag1");
+      MVAInputVariables.push_back("jets_bTag1");
+      MVAInputVariables.push_back("lepMet_mt");
+      MVAInputVariables.push_back("lepMet_Dphi");
+      MVAInputVariables.push_back("WJJ_m");
+      MVAInputVariables.push_back("WJJ_DR");
+      MVAInputVariables.push_back("lepMetW_Dphi");
+      MVAInputVariables.push_back("lepWJJ_pt1");
+      MVAInputVariables.push_back("lepWJJ_pt2");
+      MVAInputVariables.push_back("lepWJJ_pt3");
+      MVAInputVariables.push_back("lepNuW_m");
+      MVAInputVariables.push_back("tagJJ_Deta");
+      MVAInputVariables.push_back("tagJJ_m");
+      MVAInputVariables.push_back("WJ1_zepp");
+      MVAInputVariables.push_back("WJ2_zepp");
+      MVAInputVariables.push_back("lep_zepp");
+    }
+    ReadkBDT MVAReader(MVAInputVariables);
   
   
   
@@ -603,7 +631,7 @@ int main(int argc, char** argv)
     
     if( (vars.nJets >=1) && (vars.jets_bTag1 > 2.50) ) isBTagged = true;
     if( (vars.nJets >=2) && (vars.jets_bTag2 > 1.50) ) isBTagged = true;
-    if( (trainMVA == 0) && (isBTagged == true) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
     
     
     // fill distributions
@@ -628,12 +656,12 @@ int main(int argc, char** argv)
 
     if( metCUT == 1 )    
     {
-      if( (trainMVA == 0) && (vars.met.Et() < metEtMIN) ) continue;
-      if( (trainMVA == 0) && (vars.met.Et() > metEtMAX) ) continue;
+      if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.met.Et() < metEtMIN) ) continue;
+      if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.met.Et() > metEtMAX) ) continue;
     }
-    if( (trainMVA == 0) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
-    if( (trainMVA == 0) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
-    if( (trainMVA == 0) && (fabs(vars.lepMet_Dphi) > lepMetDphiMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMet_Dphi) > lepMetDphiMAX) ) continue;
     
     
     // fill distributions    
@@ -659,10 +687,10 @@ int main(int argc, char** argv)
     // mjj cut
     if( std::max(vars.WJ1.Et(), vars.WJ2.Et()) < WJJMaxEtMIN ) continue;
     if( std::min(vars.WJ1.Et(), vars.WJ2.Et()) < WJJMinEtMIN ) continue;
-    if( (trainMVA == 0) && ((vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
-    if( (trainMVA == 0) && ((vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
-    if( (trainMVA == 0) && (fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
-    if( (trainMVA == 0) && (fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ((vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ((vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX) ) continue;
     
     
     // fill distributions
@@ -685,8 +713,8 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "W-W cuts", step, verbosity);
     
     
-    if( (trainMVA == 0) && (fabs(vars.lepMetW_Dphi) < lepMetWDphiMIN) ) continue;
-    if( (trainMVA == 0) && (fabs(vars.lepMetW_Dphi) > lepMetWDphiMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMetW_Dphi) < lepMetWDphiMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMetW_Dphi) > lepMetWDphiMAX) ) continue;
     
     
     // fill distributions
@@ -709,9 +737,9 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "pt max cuts", step, verbosity);
     
     
-    if( (trainMVA == 0) && (fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN) ) continue;
-    if( (trainMVA == 0) && (fabs(vars.lepWJJ_pt2) < lepWJJPt2MIN) ) continue;
-    if( (trainMVA == 0) && (fabs(vars.lepWJJ_pt3) < lepWJJPt3MIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepWJJ_pt2) < lepWJJPt2MIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepWJJ_pt3) < lepWJJPt3MIN) ) continue;
     
     
     // fill distributions
@@ -734,8 +762,8 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "Higgs mass", step, verbosity);
     
     
-    if( (trainMVA == 0) && (fabs(vars.lepNuW_m) < lepNuWMMIN) ) continue;
-    if( (trainMVA == 0) && (fabs(vars.lepNuW_m) > lepNuWMMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m) < lepNuWMMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m) > lepNuWMMAX) ) continue;
     
     
     // fill distributions
@@ -811,10 +839,10 @@ int main(int argc, char** argv)
 
     if( std::max(vars.tagJ1.Et(),vars.tagJ2.Et()) < tagJJMaxEtMIN ) continue;
     if( std::min(vars.tagJ1.Et(),vars.tagJ2.Et()) < tagJJMinEtMIN ) continue;
-    if( (trainMVA == 0) && (fabs(deltaEta(vars.tagJ1.eta(),vars.tagJ2.eta())) < tagJJDetaMIN) ) continue;
-    if( (trainMVA == 0) && ((vars.tagJ1+vars.tagJ2).mass() < tagJJMassMIN) ) continue;
-    if( (trainMVA == 0) && (std::max(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMaxEtaMIN) ) continue;
-    if( (trainMVA == 0) && (std::min(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMinEtaMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(deltaEta(vars.tagJ1.eta(),vars.tagJ2.eta())) < tagJJDetaMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ((vars.tagJ1+vars.tagJ2).mass() < tagJJMassMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (std::max(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMaxEtaMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (std::min(fabs(vars.tagJ1.eta()),fabs(vars.tagJ2.eta())) < tagJJMinEtaMIN) ) continue;
     
     
     // fill distributions
@@ -837,9 +865,9 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "zeppenfeld cuts", step, verbosity);
     
     
-    if( (trainMVA == 0) && (fabs(vars.lep_zepp) > lepZeppMAX) ) continue;
-    if( (trainMVA == 0) && (std::max(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMaxZeppMAX) ) continue;
-    if( (trainMVA == 0) && (std::min(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMinZeppMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lep_zepp) > lepZeppMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (std::max(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMaxZeppMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (std::min(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMinZeppMAX) ) continue;
     
     // fill distributions
     stepEvents[step] += 1;
@@ -877,7 +905,54 @@ int main(int argc, char** argv)
     
     
     
+
+    //*********************
+    // READ THE MVA WEIGHTS
     
+    if( applyMVA == 0 ) continue;
+    
+    std::vector<double> MVAInputValues;
+    MVAInputValues.push_back(vars.jets_bTag1);
+    MVAInputValues.push_back(vars.jets_bTag1);
+    MVAInputValues.push_back(vars.lepMet_mt);
+    MVAInputValues.push_back(vars.lepMet_Dphi);
+    MVAInputValues.push_back(vars.WJJ_m);
+    MVAInputValues.push_back(vars.WJJ_DR);
+    MVAInputValues.push_back(vars.lepMetW_Dphi);
+    MVAInputValues.push_back(vars.lepWJJ_pt1);
+    MVAInputValues.push_back(vars.lepWJJ_pt2);
+    MVAInputValues.push_back(vars.lepWJJ_pt3);
+    MVAInputValues.push_back(vars.lepNuW_m);
+    MVAInputValues.push_back(vars.tagJJ_Deta);
+    MVAInputValues.push_back(vars.tagJJ_m);
+    MVAInputValues.push_back(vars.WJ1_zepp);
+    MVAInputValues.push_back(vars.WJ2_zepp);
+    MVAInputValues.push_back(vars.lep_zepp);
+    vars.mva = MVAReader.GetMvaValue(MVAInputValues);    
+    
+    
+    
+    
+    
+    
+    //*****************************
+    // STEP 21 - Initial cuts - MVA
+    step += 1;
+    SetStepNames(stepNames, "mva", step, verbosity);
+    
+    
+    if( vars.mva < 0. ) continue;    
+    
+
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();    
     
     
     

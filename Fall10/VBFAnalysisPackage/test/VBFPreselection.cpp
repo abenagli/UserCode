@@ -130,6 +130,7 @@ int main(int argc, char** argv)
   InitializeVBFPreselectionTree(vars, outputRootFullFileName);
   vars.mH = atof(higgsMass.c_str());
   vars.dataFlag = dataFlag;
+  vars.totEvents = totalEvents[1];
   vars.crossSection = crossSection;
   vars.TMVA4Jet = -1;
   
@@ -629,7 +630,7 @@ int main(int argc, char** argv)
         std::vector<int> blacklistIt_W;
         blacklistIt_W.push_back(vars.selectIt_W.at(0));
         blacklistIt_W.push_back(vars.selectIt_W.at(1));
-	SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0., &blacklistIt_W);
+	      SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0., &blacklistIt_W);
       }
       
       if( vars.nJets >= 4 )
@@ -650,7 +651,7 @@ int main(int argc, char** argv)
           std::vector<int> blacklistIt_W;
           blacklistIt_W.push_back(vars.selectIt_W.at(0));
           blacklistIt_W.push_back(vars.selectIt_W.at(1));
-	  SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0., &blacklistIt_W);
+	        SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0., &blacklistIt_W);
         }
       }
           
@@ -665,10 +666,6 @@ int main(int argc, char** argv)
       
       // fIll event counters
       stepEvents[step] += 1;
-      
-      
-      // Fill reduced tree
-      FillVBFPreselectionTree(vars);
     }
   
     
@@ -736,6 +733,13 @@ int main(int argc, char** argv)
     
     
     
+    
+    
+    //***************************
+    // FILL THE PRESELECTION TREE
+    
+    // Fill reduced tree
+    FillVBFPreselectionTree(vars);
     
     
     

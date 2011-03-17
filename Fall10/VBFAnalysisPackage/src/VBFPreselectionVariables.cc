@@ -22,11 +22,16 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   vars.m_reducedTree -> Branch("mH",           &vars.mH,                     "mH/F");
   vars.m_reducedTree -> Branch("dataFlag",     &vars.dataFlag,         "dataFlag/I");
+  vars.m_reducedTree -> Branch("totEvents",    &vars.totEvents,       "totEvents/I");
   vars.m_reducedTree -> Branch("crossSection", &vars.crossSection, "crossSection/F");
   vars.m_reducedTree -> Branch("TMVA4Jet",     &vars.TMVA4Jet,         "TMVA4Jet/I");
   vars.m_reducedTree -> Branch("runId",        &vars.runId,               "runId/I");
   vars.m_reducedTree -> Branch("lumiId",       &vars.lumiId,             "lumiId/I");
   vars.m_reducedTree -> Branch("eventId",      &vars.eventId,           "eventId/I");
+  
+  
+  // MVA variables
+  vars.m_reducedTree -> Branch("mva", &vars.mva, "mva/F");
   
   
   // PV variables
@@ -42,6 +47,8 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_lep);
   vars.m_reducedTree -> Branch("lep_charge",  &vars.lep_charge,   "lep_charge/F");
   vars.m_reducedTree -> Branch("lep_flavour", &vars.lep_flavour, "lep_flavour/I");
+  vars.m_reducedTree -> Branch("lep_pt",      &vars.lep_pt,           "lep_pt/F");
+  vars.m_reducedTree -> Branch("lep_eta",     &vars.lep_eta,         "lep_eta/F");
   vars.m_reducedTree -> Branch("lep_zepp",    &vars.lep_zepp,       "lep_zepp/F");
   vars.m_reducedTree -> Branch("lep_dxy",     &vars.lep_dxy,         "lep_dxy/F");
   vars.m_reducedTree -> Branch("lep_dz",      &vars.lep_dz,           "lep_dz/F");
@@ -68,6 +75,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   // met variables
   vars.m_reducedTree -> Branch("met", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_met);
+  vars.m_reducedTree -> Branch("met_et",       &vars.met_et,             "met_et/F");
   vars.m_reducedTree -> Branch("lepMet_mt",    &vars.lepMet_mt,       "lepMet_mt/F");
   vars.m_reducedTree -> Branch("lepMet_Dphi",  &vars.lepMet_Dphi,   "lepMet_Dphi/F");
   
@@ -184,6 +192,10 @@ void FillVBFPreselectionTree(VBFPreselectionVariables& vars)
 
 void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
 {
+  // mva variables
+  vars.mva = -99.; 
+  
+  
   // PV variables
   vars.PV_n = -1;
   vars.PV_d0 = -1.;
@@ -233,6 +245,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   
   vars.lep_charge = -1.;
   vars.lep_flavour = -1;
+  vars.lep_pt = -1.;
+  vars.lep_eta = -99.;
   vars.lep_zepp = -99.;
   vars.lep_dxy = -1.;
   vars.lep_dz = -99.;
@@ -261,6 +275,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   // met variables 
   vars.met = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_met = NULL;
+  vars.met_et = -1.;
   
   vars.lepMet = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.neutrino = ROOT::Math::XYZTVector(0., 0., 0., 0.);
@@ -453,6 +468,8 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lep = vars.leptons.at(vars.selectIt_lep);
   vars.p_lep = &vars.lep;
   
+  vars.lep_pt      = vars.p_lep->pt();
+  vars.lep_eta     = vars.p_lep->eta();
   vars.lep_charge  = vars.leptonCharges.at(vars.selectIt_lep);
   vars.lep_dxy     = vars.leptons_dxy.at(vars.selectIt_lep);
   vars.lep_dz      = vars.leptons_dz.at(vars.selectIt_lep);
@@ -568,6 +585,7 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
   if(jetType == "PF")
     vars.met = reader.Get4V("PFMet")->at(0);
   vars.p_met = &vars.met;
+  vars.met_et = vars.p_met->Et();
   
   vars.lepMet = vars.lep + vars.met;
   

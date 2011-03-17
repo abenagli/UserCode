@@ -21,18 +21,9 @@ struct VBFAnalysisVariables
   
   
   
-  // histograms
-  hFactory* histograms;
-  h2Factory* histograms2;
-  stdHisto* stdHistograms;
-  
-  
-  
-  
-  
-  
   // outfile definition
   TFile* m_outputRootFile;
+  
   
   
   // input parameters
@@ -217,7 +208,5 @@ struct VBFAnalysisVariables
 
 
 void SetVBFPreselectionTreeBranches(VBFAnalysisVariables&, TTree*);
-void SetVBFAnalysisHistograms(VBFAnalysisVariables&, const std::string&, const int&);
-
 void InitialiseVBFAnalysisTree(VBFAnalysisVariables& vars, TFile* outputRootFile, const int& nStep, const int& firstStep);
 void FillVBFAnalysisTree(VBFAnalysisVariables& vars, const int& step);

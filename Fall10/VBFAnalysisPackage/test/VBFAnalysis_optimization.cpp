@@ -1,4 +1,4 @@
-#include "VBFAnalysisVariables.h"
+#include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
 #include "hFactory.h"
@@ -9,8 +9,11 @@
 
 #include "TH1F.h"
 #include "TProfile.h"
-#include "TGraph.h"
-#include "TF1.h"
+#include "TObject.h"
+#include "TCut.h"
+
+#include "TMVA/Factory.h"
+#include "TMVA/Reader.h"
 
 
 
@@ -31,77 +34,53 @@ int main(int argc, char** argv)
   // Parse the config file
   parseConfigFile (argv[1]) ;
   
-  std::string baseDir = gConfigParser -> readStringOption("Input::baseDir");
-  std::string jetAlgorithm  = gConfigParser -> readStringOption("Input::jetAlgorithm");
-  std::string jetType       = gConfigParser -> readStringOption("Input::jetType");
-  std::string step          = gConfigParser -> readStringOption("Input::step");
+  //[Input]
+  std::string baseDir      = gConfigParser -> readStringOption("Input::baseDir");
+  std::string jetAlgorithm = gConfigParser -> readStringOption("Input::jetAlgorithm");
+  std::string jetType      = gConfigParser -> readStringOption("Input::jetType");
+  std::string higgsMass    = gConfigParser -> readStringOption("Input::higgsMass");
   
   std::string inputFileName = gConfigParser -> readStringOption("Input::inputFileName");
   std::vector<std::string> inputSigDirs = gConfigParser -> readStringListOption("Input::inputSigDirs");
   std::vector<std::string> inputBkgDirs = gConfigParser -> readStringListOption("Input::inputBkgDirs");
-
+  
   unsigned int nSigTrees = inputSigDirs.size();
   unsigned int nBkgTrees = inputBkgDirs.size();
   unsigned int nTotTrees = nSigTrees + nBkgTrees;
-
+  
   std::vector<std::string> inputTotDirs;
   for(unsigned int i = 0; i < nSigTrees; ++ i) inputTotDirs.push_back(inputSigDirs.at(i));
   for(unsigned int i = 0; i < nBkgTrees; ++ i) inputTotDirs.push_back(inputBkgDirs.at(i));
   
-  
-  
+  //[Output]
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
-  std::string outputRootFullFileName = outputRootFilePath+outputRootFileName+"_"+jetAlgorithm+".root";
   
-    
-  int entryFIRST = gConfigParser -> readIntOption("Options::entryFIRST");
-  int entryMAX = gConfigParser -> readIntOption("Options::entryMAX");
+  //[Options]
+  int entryFIRST  = gConfigParser -> readIntOption("Options::entryFIRST");
+  int entryMAX    = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
-  
-  
-  
+  int step        = gConfigParser -> readIntOption("Options::step");
   
   
   
   // Define tree variables
   int totEvents;
+  float mH;
   float crossSection;
-  float jets_bTag1;  
-  float jets_bTag2;  
-  
-  
-  
-  // define set of cuts
-  std::vector<std::vector<float> > cuts;
-  for(float bTag1 = 20.; bTag1 > -10.; bTag1-=0.20)
-    for(float bTag2 = bTag1; bTag2 > -10.; bTag2-=0.20)
-    {  
-      std::vector<float> dummy;
-      dummy.push_back(bTag1);
-      dummy.push_back(bTag2);
-      
-      cuts.push_back(dummy);  
-    }
-  
-  
-  
-  // define event counters
-  std::vector<std::vector<float>* > nSigEvents;
-  std::vector<std::vector<float>* > nBkgEvents;
-  
-  for(unsigned int cutsIt = 0; cutsIt < cuts.size(); ++cutsIt)
-  {
-    nSigEvents.push_back( new std::vector<float>(nSigTrees) );
-    nBkgEvents.push_back( new std::vector<float>(nBkgTrees) );
-  }
   
   
   
   
   
   
-  // loop over samples
+  // Define the TMVA factory
+  std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + higgsMass + ".root";
+  TFile* outFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
+  TMVA::Factory* factory = new TMVA::Factory("TMVA", outFile);
+  
+  
+  // add trees to the factory
   for(unsigned int i = 0; i < nTotTrees; ++i)
   {
     // open root file
@@ -109,141 +88,91 @@ int main(int argc, char** argv)
     if(i < nSigTrees) inputFullFileName = baseDir + "/" + inputSigDirs.at(i)   + "/" + inputFileName + ".root";
     else              inputFullFileName = baseDir + "/" + inputBkgDirs.at(i-nSigTrees) + "/" + inputFileName + ".root";
     TFile* inputFile = TFile::Open(inputFullFileName.c_str());
-    std::cout << ">>> VBFAnalysis_optimization::Open " << inputFullFileName << std::endl;
     
-    
+    // Get the total number of events
+    TH1F* events = (TH1F*) inputFile -> Get("events");
+    totEvents = events -> GetBinContent(1);
+  
     // get the tree at nth step
     TTree* tree = NULL;
-    std::string treeName = "ntu_"+step;    
-    inputFile -> GetObject(treeName.c_str(), tree);
+    char treeName[50];
+    sprintf(treeName, "ntu_%d", step);
+    inputFile -> GetObject(treeName, tree);
+    if ( tree -> GetEntries() == 0 ) continue; 
     
     
-    // get the events histogram
-    TH1F* events;
-    inputFile -> GetObject("events", events);     
-    totEvents = events->GetBinContent(1);
     
     // set tree branches
+    tree -> SetBranchAddress("mH",           &mH);
     tree -> SetBranchAddress("crossSection", &crossSection);
-    tree -> SetBranchAddress("jets_bTag1", &jets_bTag1);
-    tree -> SetBranchAddress("jets_bTag2", &jets_bTag2);
-    
-    
-    // compute event weight
     tree -> GetEntry(0);
-    double weight = 1000. / totEvents * crossSection;
-  
     
-    // loop over the events
-    for(int entry = 0; entry < tree->GetEntries(); ++entry)
+    // compute event weight at nth step
+    double weight = 1. * tree -> GetEntries() / totEvents * crossSection; 
+    
+    
+    
+    // add tree to the factory
+    if(i < nSigTrees)
     {
-      tree -> GetEntry(entry);
-      
-      
-      for(unsigned int cutsIt = 0; cutsIt < cuts.size(); ++cutsIt)
-      {
-        if( jets_bTag1 > (cuts.at(cutsIt)).at(0) ) continue;
-        if( jets_bTag2 > (cuts.at(cutsIt)).at(1) ) continue;
-
-        if( i < nSigTrees ) (nSigEvents.at(cutsIt))->at(i) += 1. * weight;
-        else                (nBkgEvents.at(cutsIt))->at(i-nSigTrees) += 1. * weight;
-      }
+      factory -> AddSignalTree(tree, weight);
+      std::cout << ">>>>> VBFAnalysis_optimization:: signal tree in " << inputSigDirs.at(i) << " added to the factory" << std::endl;
     }
     
-  } // loop over samples
-  
-  
-  
-  
-  
-  // fill output tree
-  TFile* outputRootFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
-  outputRootFile -> cd();
-
-  TTree* outputTree = new TTree("ntu", "ntu");
-  
-  float cut_bTag1;
-  float cut_bTag2;
-  float nSig;
-  float nBkg;
-
-  outputTree -> Branch("cut_bTag1", &cut_bTag1);
-  outputTree -> Branch("cut_bTag2", &cut_bTag2);
-  outputTree -> Branch("nSig", &nSig);
-  outputTree -> Branch("nBkg", &nBkg);
-  
-  for(unsigned int cutsIt = 0; cutsIt < cuts.size(); ++cutsIt)
-  {
-    cut_bTag1 = (cuts.at(cutsIt)).at(0);
-    cut_bTag2 = (cuts.at(cutsIt)).at(1);
+    else
+    {
+      factory -> AddBackgroundTree(tree, weight);    
+      std::cout << ">>>>> VBFAnalysis_optimization:: background tree in " << inputBkgDirs.at(i-nSigTrees) << " added to the factory" << std::endl;
+    }
     
-    nSig = 0.;
-    for(unsigned int i = 0; i < nSigTrees; ++i)
-      nSig += (nSigEvents.at(cutsIt)) -> at(i);
-    
-    nBkg = 0.;
-    for(unsigned int i = 0; i < nBkgTrees; ++i)
-      nBkg += (nBkgEvents.at(cutsIt)) -> at(i);
-    
-    outputTree -> Fill();
   }
   
   
   
+  // Define variables
+  factory -> AddVariable("jets_bTag1",    'F');
+  factory -> AddVariable("jets_bTag2",    'F');
+  factory -> AddVariable("lepMet_mt",     'F');
+  factory -> AddVariable("lepMet_Dphi",   'F');
+  factory -> AddVariable("WJJ_DR",        'F');
+  factory -> AddVariable("lepMetW_Dphi",  'F');
+  factory -> AddVariable("lepWJJ_pt1",    'F');
+  factory -> AddVariable("lepWJJ_pt2",    'F');
+  factory -> AddVariable("lepWJJ_pt3",    'F');
+  factory -> AddVariable("lepNuW_m",      'F');
+  factory -> AddVariable("tagJJ_Deta",    'F');
+  factory -> AddVariable("tagJJ_m",       'F');
+  factory -> AddVariable("abs(WJ1_zepp)", 'F');
+  factory -> AddVariable("abs(WJ2_zepp)", 'F');
+  factory -> AddVariable("abs(lep_zepp)", 'F');
+
+  factory -> PrepareTrainingAndTestTree("", "SplitMode=Random");
   
   
-  
-  // define iso-significance curves
-  TF1* sig_01 = new TF1("sig_01", "(x*x)/(0.1*0.1)", 0., 100.);
-  sig_01 -> SetLineStyle(2);
-  sig_01 -> SetLineWidth(1);
-  
-  TF1* sig_025 = new TF1("sig_025", "(x*x)/(0.25*0.25)", 0., 100.);
-  sig_025 -> SetLineStyle(2);
-  sig_025 -> SetLineWidth(1);
-  
-  TF1* sig_05 = new TF1("sig_05", "(x*x)/(0.5*0.5)", 0., 100.);
-  sig_05 -> SetLineStyle(2);
-  sig_05 -> SetLineWidth(1);
-  
-  TF1* sig_075 = new TF1("sig_075", "(x*x)/(0.75*0.75)", 0., 100.);
-  sig_075 -> SetLineStyle(2);
-  sig_075 -> SetLineWidth(1);
-  
-  TF1* sig_1 = new TF1("sig_1", "(x*x)/(1.0*1.0)", 0., 100.);
-  sig_1 -> SetLineColor(kRed);
-  sig_1 -> SetLineStyle(1);
-  sig_1 -> SetLineWidth(1);
-  
-  TF1* sig_15 = new TF1("sig_15", "(x*x)/(1.5*1.5)", 0., 100.);
-  sig_15 -> SetLineStyle(2);
-  sig_15 -> SetLineWidth(1);
-  
-  TF1* sig_2 = new TF1("sig_2", "(x*x)/(2.0*2.0)", 0., 100.);
-  sig_2 -> SetLineStyle(2);
-  sig_2 -> SetLineWidth(1);
-  
-  TF1* sig_3 = new TF1("sig_3", "(x*x)/(3.0*3.0)", 0., 100.);
-  sig_3 -> SetLineStyle(2);
-  sig_3 -> SetLineWidth(1);
+  std::cout << "******************************************************" << std::endl;
+  std::cout << "BookMethod" << std::endl;
+  std::cout << "******************************************************" << std::endl;
+  factory -> BookMethod(TMVA::Types::kCuts, "kCutsGA");
   
   
+  std::cout << "******************************************************" << std::endl;
+  std::cout << "TrainAllMethods" << std::endl;
+  std::cout << "******************************************************" << std::endl;
+  factory -> TrainAllMethods();
   
   
+  std::cout << "******************************************************" << std::endl;
+  std::cout << "TestAllMethods" << std::endl;
+  std::cout << "******************************************************" << std::endl;
+  factory -> TestAllMethods();
   
-  // save histograms
-  outputTree -> Write();
-  sig_01 -> Write();
-  sig_025 -> Write();
-  sig_05 -> Write();
-  sig_075 -> Write();
-  sig_1 -> Write();
-  sig_15 -> Write();
-  sig_2 -> Write();
-  sig_3 -> Write();
   
-  outputRootFile -> Close();
+  std::cout << "******************************************************" << std::endl;
+  std::cout << "EvaluateAllMethods" << std::endl;
+  std::cout << "******************************************************" << std::endl;
+  factory -> EvaluateAllMethods();
   
-  delete outputRootFile;
+  
   return 0;
 }
+

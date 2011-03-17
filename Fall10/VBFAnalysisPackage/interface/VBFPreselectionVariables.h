@@ -21,12 +21,17 @@ struct VBFPreselectionVariables
   
   // input parameters
   float mH;
-  int dataFlag; 
+  int dataFlag;
+  int totEvents;
   float crossSection;
   int TMVA4Jet;
   int runId; 
   int lumiId; 
   int eventId; 
+  
+  
+  // PV variables  
+  float mva;
   
   
   // PV variables
@@ -78,6 +83,8 @@ struct VBFPreselectionVariables
   
   float lep_charge;
   int lep_flavour;
+  float lep_pt;
+  float lep_eta;
   float lep_zepp;
   float lep_dxy;
   float lep_dz;
@@ -106,6 +113,8 @@ struct VBFPreselectionVariables
   // met variables
   ROOT::Math::XYZTVector met;
   ROOT::Math::XYZTVector* p_met;
+  
+  float met_et;  
   
   ROOT::Math::XYZTVector lepMet;
   ROOT::Math::XYZTVector neutrino;
