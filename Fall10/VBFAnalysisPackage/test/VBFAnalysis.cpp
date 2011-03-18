@@ -13,7 +13,6 @@
 #include "TRandom3.h"
 
 #include "TMVA/Reader.h"
-#include "/grid_mnt/data__HOME/llr/cms/abenagli/COLLISIONS7TeV/Fall10/VBFAnalysisPackage/data/weights/TMVA_kBDT.class.C"
 
 
 
@@ -38,11 +37,12 @@ int main(int argc, char** argv)
   // Parse the config file
   parseConfigFile (argv[1]) ;
   
-  std::string baseDir = gConfigParser -> readStringOption("Input::baseDir");
-  std::string inputFileList = gConfigParser -> readStringOption("Input::inputFileList");
-  std::string jetAlgorithm  = gConfigParser -> readStringOption("Input::jetAlgorithm");
-  std::string jetType       = gConfigParser -> readStringOption("Input::jetType");
-  std::string higgsMass     = gConfigParser -> readStringOption("Input::higgsMass");
+  std::string baseDir        = gConfigParser -> readStringOption("Input::baseDir");
+  std::string inputFileList  = gConfigParser -> readStringOption("Input::inputFileList");
+  std::string jetAlgorithm   = gConfigParser -> readStringOption("Input::jetAlgorithm");
+  std::string jetType        = gConfigParser -> readStringOption("Input::jetType");
+  std::string higgsMass      = gConfigParser -> readStringOption("Input::higgsMass");
+  std::string MVAWeightsFile = gConfigParser -> readStringOption("Input::MVAWeightsFile");
   
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
@@ -134,6 +134,8 @@ int main(int argc, char** argv)
   float lepWJJPt2MIN = gConfigParser -> readFloatOption("Cuts::lepWJJPt2MIN");
   float lepWJJPt3MIN = gConfigParser -> readFloatOption("Cuts::lepWJJPt3MIN");
   
+  float MVAMIN = gConfigParser -> readFloatOption("Cuts::MVAMIN");
+  
   std::map<int, int> totalEvents = GetTotalEvents("events", inputFileList.c_str()); 
   
   
@@ -212,32 +214,31 @@ int main(int argc, char** argv)
   
   
   
-    // define MVA reader
-    std::vector<std::string> MVAInputVariables;
-    if( applyMVA == 1 )
-    {
-      MVAInputVariables.push_back("jets_bTag1");
-      MVAInputVariables.push_back("jets_bTag1");
-      MVAInputVariables.push_back("lepMet_mt");
-      MVAInputVariables.push_back("lepMet_Dphi");
-      MVAInputVariables.push_back("WJJ_m");
-      MVAInputVariables.push_back("WJJ_DR");
-      MVAInputVariables.push_back("lepMetW_Dphi");
-      MVAInputVariables.push_back("lepWJJ_pt1");
-      MVAInputVariables.push_back("lepWJJ_pt2");
-      MVAInputVariables.push_back("lepWJJ_pt3");
-      MVAInputVariables.push_back("lepNuW_m");
-      MVAInputVariables.push_back("tagJJ_Deta");
-      MVAInputVariables.push_back("tagJJ_m");
-      MVAInputVariables.push_back("WJ1_zepp");
-      MVAInputVariables.push_back("WJ2_zepp");
-      MVAInputVariables.push_back("lep_zepp");
-    }
-    ReadkBDT MVAReader(MVAInputVariables);
-  
-  
-  
-  
+  // define MVA reader
+  TMVA::Reader* MVAReader = new TMVA::Reader();
+  if( applyMVA == 1 )
+  {
+    MVAReader -> AddVariable("jets_bTag1",  &vars.jets_bTag1);
+    MVAReader -> AddVariable("jets_bTag2",  &vars.jets_bTag2);
+    MVAReader -> AddVariable("lep_eta",     &vars.lep_eta);
+    MVAReader -> AddVariable("met_et",      &vars.met_et);
+    MVAReader -> AddVariable("lepMet_mt",   &vars.lepMet_mt);
+    MVAReader -> AddVariable("lepMet_Dphi", &vars.lepMet_Dphi);
+    MVAReader -> AddVariable("WJJ_m",       &vars.WJJ_m);
+    MVAReader -> AddVariable("WJJ_DR",      &vars.WJJ_DR);
+    MVAReader -> AddVariable("lepMetW_Dphi",&vars.lepMetW_Dphi);
+    MVAReader -> AddVariable("lepWJJ_pt1",  &vars.lepWJJ_pt1);
+    MVAReader -> AddVariable("lepWJJ_pt2",  &vars.lepWJJ_pt2);
+    MVAReader -> AddVariable("lepWJJ_pt3",  &vars.lepWJJ_pt3);
+    MVAReader -> AddVariable("lepNuW_m",    &vars.lepNuW_m);
+    MVAReader -> AddVariable("tagJJ_Deta",  &vars.tagJJ_Deta);
+    MVAReader -> AddVariable("tagJJ_m",     &vars.tagJJ_m);
+    MVAReader -> AddVariable("WJ1_zepp",    &vars.WJ1_zepp);
+    MVAReader -> AddVariable("WJ2_zepp",    &vars.WJ2_zepp);
+    MVAReader -> AddVariable("lep_zepp",    &vars.lep_zepp);
+    
+    MVAReader -> BookMVA("kBDT",MVAWeightsFile);
+  }
   
   
   
@@ -892,6 +893,13 @@ int main(int argc, char** argv)
     if( (vars.nJets_btw_et20) > 1 ) continue;    
     
     
+    // read MVA
+    if( applyMVA == 1 )
+    {
+      vars.mva = MVAReader -> EvaluateMVA("kBDT");    
+    }  
+    
+        
     // fill distributions
     stepEvents[step] += 1;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
@@ -905,46 +913,16 @@ int main(int argc, char** argv)
     
     
     
-
-    //*********************
-    // READ THE MVA WEIGHTS
-    
-    if( applyMVA == 0 ) continue;
-    
-    std::vector<double> MVAInputValues;
-    MVAInputValues.push_back(vars.jets_bTag1);
-    MVAInputValues.push_back(vars.jets_bTag1);
-    MVAInputValues.push_back(vars.lepMet_mt);
-    MVAInputValues.push_back(vars.lepMet_Dphi);
-    MVAInputValues.push_back(vars.WJJ_m);
-    MVAInputValues.push_back(vars.WJJ_DR);
-    MVAInputValues.push_back(vars.lepMetW_Dphi);
-    MVAInputValues.push_back(vars.lepWJJ_pt1);
-    MVAInputValues.push_back(vars.lepWJJ_pt2);
-    MVAInputValues.push_back(vars.lepWJJ_pt3);
-    MVAInputValues.push_back(vars.lepNuW_m);
-    MVAInputValues.push_back(vars.tagJJ_Deta);
-    MVAInputValues.push_back(vars.tagJJ_m);
-    MVAInputValues.push_back(vars.WJ1_zepp);
-    MVAInputValues.push_back(vars.WJ2_zepp);
-    MVAInputValues.push_back(vars.lep_zepp);
-    vars.mva = MVAReader.GetMvaValue(MVAInputValues);    
-    
-    
-    
-    
-    
     
     //*****************************
     // STEP 21 - Initial cuts - MVA
     step += 1;
-    SetStepNames(stepNames, "mva", step, verbosity);
+    SetStepNames(stepNames, "MVA", step, verbosity);
     
     
-    if( vars.mva < 0. ) continue;    
+    if( vars.mva < MVAMIN ) continue;    
     
 
-    
     // fill distributions
     stepEvents[step] += 1;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;

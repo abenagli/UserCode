@@ -58,6 +58,7 @@ struct VBFAnalysisVariables
   
   float lep_charge;
   int lep_flavour;
+  float lep_eta;
   float lep_zepp;
   float lep_dxy;
   float lep_dz;
@@ -84,6 +85,7 @@ struct VBFAnalysisVariables
   // met variables
   ROOT::Math::XYZTVector* p_met;
   ROOT::Math::XYZTVector met;
+  float met_et;
   
   float lepMet_mt;
   float lepMet_Dphi;

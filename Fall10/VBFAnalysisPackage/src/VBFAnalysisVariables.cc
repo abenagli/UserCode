@@ -9,6 +9,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   //-------------
   
   reducedTree -> SetBranchAddress("mH",           &vars.mH);
+  reducedTree -> SetBranchAddress("totEvents",    &vars.totEvents);
   reducedTree -> SetBranchAddress("crossSection", &vars.crossSection);
   reducedTree -> SetBranchAddress("dataFlag",     &vars.dataFlag);
   reducedTree -> SetBranchAddress("runId",        &vars.runId);
@@ -30,6 +31,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lep",         &vars.p_lep);
   reducedTree -> SetBranchAddress("lep_charge",  &vars.lep_charge);
   reducedTree -> SetBranchAddress("lep_flavour", &vars.lep_flavour);
+  reducedTree -> SetBranchAddress("lep_eta",     &vars.lep_eta);
   reducedTree -> SetBranchAddress("lep_zepp",    &vars.lep_zepp);
   reducedTree -> SetBranchAddress("lep_dxy",     &vars.lep_dxy);
   reducedTree -> SetBranchAddress("lep_dz",      &vars.lep_dz);
@@ -55,8 +57,9 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   // met variables
   vars.p_met = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("met", &vars.p_met);
-  reducedTree -> SetBranchAddress("lepMet_mt",    &vars.lepMet_mt);
-  reducedTree -> SetBranchAddress("lepMet_Dphi",  &vars.lepMet_Dphi);
+  reducedTree -> SetBranchAddress("met_et",      &vars.met_et);
+  reducedTree -> SetBranchAddress("lepMet_mt",   &vars.lepMet_mt);
+  reducedTree -> SetBranchAddress("lepMet_Dphi", &vars.lepMet_Dphi);
   
   
   // jet variables
