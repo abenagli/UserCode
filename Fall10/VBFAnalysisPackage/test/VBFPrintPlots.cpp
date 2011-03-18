@@ -146,11 +146,12 @@ int main(int argc, char** argv)
   // MVA
   //---------------------------------------------
   
-  //histoName = "mva";
-  //stack -> SetXaxisRange(0., 1.);
-  //stack -> SetXaxisTitle("mva");
-  //stack -> SetUnit("");
-  //<stack -> Draw(variableNames, histoName, method, lumi, step, 2., true);
+  variableNames.at(0) = "mva";  
+  histoName = "mva";
+  stack -> SetXaxisRange(-1., 1.);
+  stack -> SetXaxisTitle("mva");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, true);
   
   
   
