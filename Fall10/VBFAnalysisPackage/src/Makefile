@@ -36,21 +36,24 @@ CLHEPLIBS     =  $(shell clhep-config --libs)
 NTUPLEPACKAGEFLAGS = $(shell ntuplepkg-config --include)
 NTUPLEPACKAGELIBS = $(shell ntuplepkg-config --libs)
 
+KINFITTERPACKAGEFLAGS = $(shell kinfitpkg-config --include)
+KINFITTERPACKAGELIBS = $(shell kinfitpkg-config --libs)
+
 
 
 ARCHL = -m64
 
 CXX  =  c++
-CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
+CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
 CPP  =  c++
-CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
+CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)
 SONAME	 =  libVBF.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
-GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) -lGenVector -lFoam -lMinuit -lTMVA -lMLP -lXMLIO  -lTreePlayer  $(NTUPLEPACKAGELIBS)
+GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) -lGenVector -lFoam -lMinuit -lTMVA -lMLP -lXMLIO  -lTreePlayer  $(NTUPLEPACKAGELIBS) $(KINFITTERPACKAGELIBS)
 
 
 #################################################
@@ -61,9 +64,9 @@ LibSuf  =  .dylib
 
 ARCHL = -m32
 
-CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
-CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
 SONAME	 =  libVBF.dylib
@@ -79,9 +82,9 @@ LibSuf  =  .dylib
 
 ARCHL = -m64
 
-CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
-CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
 SONAME	 =  libVBF.dylib

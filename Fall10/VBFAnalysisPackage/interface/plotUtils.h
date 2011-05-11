@@ -46,7 +46,8 @@ class drawTStack
             const std::string& mode,
             const float& lumi, const int& step,
             const int& nBins, const bool& logy,
-            std::vector<std::string>* cut = NULL);
+            std::vector<std::string>* cut = NULL,
+            const bool& PURescale = false);
   void DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy);
   void DrawEventRatio_nJets(const std::string& histoName, const float& lumi, const int& step, const bool& logy);
   
@@ -75,6 +76,7 @@ class drawTStack
   std::vector<std::pair<std::string, std::string> > m_list;
   std::map<std::string, int> m_color;
   std::map<std::string, int> m_linestyle;
+  std::map<std::string, int> m_fillstyle;
   std::map<std::string, int> m_dataFlag;
   std::map<std::string, double> m_mH;
   std::map<std::string, double> m_crossSection;

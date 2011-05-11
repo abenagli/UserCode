@@ -10,6 +10,10 @@
 #include "TObject.h"
 #include "TTree.h"
 
+#include "TFitConstraintM.h"
+#include "TFitParticleEtEtaPhi.h"
+#include "TKinFitter.h"
+
 
 
 struct VBFPreselectionVariables
@@ -17,6 +21,7 @@ struct VBFPreselectionVariables
   // tree definition
   TFile* m_outputRootFile;
   TTree* m_reducedTree;
+  
   
   
   // input parameters
@@ -28,10 +33,20 @@ struct VBFPreselectionVariables
   int runId; 
   int lumiId; 
   int eventId; 
+  int eventNaiveId; 
   
   
-  // PV variables  
+  
+  // mva variables  
   float mva;
+  
+  
+  
+  // PU variables
+  int PUit_n;
+  float rhoForIsolation;
+  float rhoForJets;
+  
   
   
   // PV variables
@@ -52,27 +67,34 @@ struct VBFPreselectionVariables
   std::vector<ROOT::Math::XYZTVector> muons_loose;
   std::vector<float> leptonCharges;
   std::vector<std::string> leptonFlavours;    
-  std::vector<float> leptons_dxy;
-  std::vector<float> leptons_dz;
-  std::vector<float> leptons_dB;
-  std::vector<float> leptons_edB;
+  std::vector<float> leptons_z;
+  std::vector<float> leptons_dxy_BS;
+  std::vector<float> leptons_dz_BS;
+  std::vector<float> leptons_dxy_PV;
+  std::vector<float> leptons_edxy_PV;
+  std::vector<float> leptons_dz_PV;
   std::vector<float> leptons_tkIso;
   std::vector<float> leptons_emIso;
   std::vector<float> leptons_hadIso;
   std::vector<int> electrons_isEB;
-  std::vector<float> electrons_simpleEleId80cIso;
+  std::vector<float> electrons_etaSC;
   std::vector<float> electrons_sigmaIetaIeta;
   std::vector<float> electrons_DphiIn;
   std::vector<float> electrons_DetaIn;
   std::vector<float> electrons_HOverE;
   std::vector<float> electrons_fbrem;
   std::vector<float> electrons_EOverP;
+  std::vector<int> electrons_mishits;
+  std::vector<float> electrons_dist;
+  std::vector<float> electrons_dcot;
   std::vector<int> muons_tracker;
   std::vector<int> muons_standalone;
   std::vector<int> muons_global;
   std::vector<float> muons_normalizedChi2;
+  std::vector<int> muons_numberOfMatches;
   std::vector<int> muons_numberOfValidTrackerHits;
   std::vector<int> muons_numberOfValidMuonHits;
+  std::vector<int> muons_pixelLayersWithMeasurement;
   
   int selectIt_lep;
   int selectIt_ele;
@@ -86,27 +108,34 @@ struct VBFPreselectionVariables
   float lep_pt;
   float lep_eta;
   float lep_zepp;
-  float lep_dxy;
-  float lep_dz;
-  float lep_dB;
-  float lep_edB;
+  float lep_z;
+  float lep_dxy_BS;
+  float lep_dz_BS;
+  float lep_dxy_PV;
+  float lep_edxy_PV;
+  float lep_dz_PV;
   float lep_tkIso;
   float lep_emIso;
   float lep_hadIso;
   int lep_isEB;
-  float lep_simpleEleId80cIso;
+  float lep_etaSC;
   float lep_sigmaIetaIeta;
   float lep_DphiIn;
   float lep_DetaIn;
   float lep_HOverE;
   float lep_fbrem;
   float lep_EOverP;
+  int lep_mishits;
+  float lep_dist;
+  float lep_dcot;
   int lep_tracker;
   int lep_standalone;
   int lep_global;
   float lep_normalizedChi2;
+  int lep_numberOfMatches;
   int lep_numberOfValidTrackerHits;
   int lep_numberOfValidMuonHits;
+  int lep_pixelLayersWithMeasurement;
   
   
   
@@ -199,6 +228,10 @@ struct VBFPreselectionVariables
   float WJ2_charge;
   float WJ1_zepp;
   float WJ2_zepp;
+  float WJ1_lep_Dphi;
+  float WJ2_lep_Dphi;
+  float WJ1_met_Dphi;
+  float WJ2_met_Dphi;
   float WJ1_bTag;
   float WJ2_bTag;
   float WJ1_dzAvg;
@@ -211,6 +244,7 @@ struct VBFPreselectionVariables
   float WJJ_Deta;
   float WJJ_Dphi;
   float WJJ_DR;
+  float WJJ_et;
   float WJJ_m;
   float WJJ_zepp;
   
@@ -225,9 +259,11 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector lepW;
   ROOT::Math::XYZTVector lepNuW;
   
+  float lepMetW_pt;
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNuW_m;
+  float lepNuW_m_KF;
   float lepNuW_zepp;
   
   
@@ -287,6 +323,7 @@ void FillVBFPreselectionTree(VBFPreselectionVariables& vars);
 void ClearVBFPreselectionVariables(VBFPreselectionVariables&);
 void DeleteVBFPreselectionVariables(VBFPreselectionVariables&);
 
+void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag);
 void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
 void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);

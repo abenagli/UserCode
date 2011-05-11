@@ -70,14 +70,17 @@ int main(int argc, char** argv)
   //float eleEmIsoOverPtEBMAX = gConfigParser -> readFloatOption("Cuts::eleEmIsoOverPtEBMAX");
   //float eleHadIsoOverPtEBMAX = gConfigParser -> readFloatOption("Cuts::eleHadIsoOverPtEBMAX");
   float eleCombIsoOverPtEBMAX = gConfigParser -> readFloatOption("Cuts::eleCombIsoOverPtEBMAX");
+  float eleCombAntiIsoOverPtEBMAX = gConfigParser -> readFloatOption("Cuts::eleCombAntiIsoOverPtEBMAX");
   //float eleTkIsoOverPtEEMAX = gConfigParser -> readFloatOption("Cuts::eleTkIsoOverPtEEMAX");
   //float eleEmIsoOverPtEEMAX = gConfigParser -> readFloatOption("Cuts::eleEmIsoOverPtEEMAX");
   //float eleHadIsoOverPtEEMAX = gConfigParser -> readFloatOption("Cuts::eleHadIsoOverPtEEMAX");
   float eleCombIsoOverPtEEMAX = gConfigParser -> readFloatOption("Cuts::eleCombIsoOverPtEEMAX");
+  float eleCombAntiIsoOverPtEEMAX = gConfigParser -> readFloatOption("Cuts::eleCombAntiIsoOverPtEEMAX");
   //float muTkIsoOverPtMAX = gConfigParser -> readFloatOption("Cuts::muTkIsoOverPtMAX");
   //float muEmIsoOverPtMAX = gConfigParser -> readFloatOption("Cuts::muEmIsoOverPtMAX");
   //float muHadIsoOverPtMAX = gConfigParser -> readFloatOption("Cuts::muHadIsoOverPtMAX");
   float muCombIsoOverPtMAX = gConfigParser -> readFloatOption("Cuts::muCombIsoOverPtMAX");
+  float muCombAntiIsoOverPtMAX = gConfigParser -> readFloatOption("Cuts::muCombAntiIsoOverPtMAX");
   
   int idCUT = gConfigParser -> readIntOption("Cuts::idCUT");
   int antiIdCUT = gConfigParser -> readIntOption("Cuts::antiIdCUT");
@@ -116,10 +119,15 @@ int main(int argc, char** argv)
   
   float WJJMassMIN = gConfigParser -> readFloatOption("Cuts::WJJMassMIN");
   float WJJMassMAX = gConfigParser -> readFloatOption("Cuts::WJJMassMAX");
+  float WJJEtMIN = gConfigParser -> readFloatOption("Cuts::WJJEtMIN");
   float WJJMaxEtMIN = gConfigParser -> readFloatOption("Cuts::WJJMaxEtMIN");
   float WJJMinEtMIN = gConfigParser -> readFloatOption("Cuts::WJJMinEtMIN");
   float WJJDRMIN = gConfigParser -> readFloatOption("Cuts::WJJDRMIN");
   float WJJDRMAX = gConfigParser -> readFloatOption("Cuts::WJJDRMAX");
+  float WJJDetaMIN = gConfigParser -> readFloatOption("Cuts::WJJDetaMIN");
+  float WJJDetaMAX = gConfigParser -> readFloatOption("Cuts::WJJDetaMAX");
+  float WJJDphiMIN = gConfigParser -> readFloatOption("Cuts::WJJDphiMIN");
+  float WJJDphiMAX = gConfigParser -> readFloatOption("Cuts::WJJDphiMAX");
   
   float lepZeppMAX = gConfigParser -> readFloatOption("Cuts::lepZeppMAX");
   float WJJMaxZeppMAX = gConfigParser -> readFloatOption("Cuts::WJJMaxZeppMAX");
@@ -316,7 +324,6 @@ int main(int argc, char** argv)
     // SET SOME VARIABLES
     
     vars.totEvents = stepEvents[1];
-    vars.mva = -99.;
     vars.lep = *(vars.p_lep);
     vars.met = *(vars.p_met);
     vars.leadingJ = *(vars.p_leadingJ);
@@ -356,13 +363,13 @@ int main(int argc, char** argv)
     if( vars.lep.pt() < lepPtMIN ) continue;
     if( vars.lep.pt() > lepPtMAX ) continue;
     if( (leptonFLAVOUR == "e") &&  (vars.lep_flavour != 11) ) continue;
-    if( (leptonFLAVOUR == "mu") && (vars.lep_flavour != 11) ) continue;
+    if( (leptonFLAVOUR == "mu") && (vars.lep_flavour != 13) ) continue;
     if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
     if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
     
     if( vars.lep_flavour == 11 )    
     {
-      if( (fabs(vars.lep.eta()) > 1.4442) && (fabs(vars.lep.eta()) < 1.566) ) continue;
+      if( (fabs(vars.lep_etaSC) > 1.4442) && (fabs(vars.lep_etaSC) < 1.566) ) continue;
     }
     
     // correct for mu trigger efficiency
@@ -408,7 +415,7 @@ int main(int argc, char** argv)
         if( vars.lep_sigmaIetaIeta  > eleSigmaIetaIetaEBMAX ) isId = false;
         if( fabs(vars.lep_DphiIn)   > eleDphiInEBMAX )        isId = false;
         if( fabs(vars.lep_DetaIn)   > eleDetaInEBMAX )        isId = false;
-        if( vars.lep_HOverE         > eleHOverEEBMAX )        isId = false;
+        //if( vars.lep_HOverE         > eleHOverEEBMAX )        isId = false;
       }
       
       // endcap
@@ -417,11 +424,12 @@ int main(int argc, char** argv)
         if( vars.lep_sigmaIetaIeta  > eleSigmaIetaIetaEEMAX ) isId = false;      
         if( fabs(vars.lep_DphiIn)   > eleDphiInEEMAX )        isId = false;
         if( fabs(vars.lep_DetaIn)   > eleDetaInEEMAX )        isId = false;
-        if( vars.lep_HOverE         > eleHOverEEEMAX )        isId = false;
+        //if( vars.lep_HOverE         > eleHOverEEEMAX )        isId = false;
       }    
       
       // conversion removal
-      if( vars.lep_simpleEleId80cIso < 4 ) isId = false;
+      //FIXME
+      //if( vars.lep_simpleEleId80cIso < 4 ) isId = false;
       
     }
     
@@ -432,7 +440,8 @@ int main(int argc, char** argv)
       if( vars.lep_tracker    != 1 ) isId = false;
       if( vars.lep_standalone != 1 ) isId = false;
       if( vars.lep_global     != 1 ) isId = false;
-      if( fabs(vars.lep_dxy)                > muDxyMAX )                      isId = false;
+      
+      if( fabs(vars.lep_dxy_PV)             > muDxyMAX )                      isId = false;
       if( vars.lep_normalizedChi2           > muNormalizedChi2MAX )           isId = false;
       if( vars.lep_numberOfValidTrackerHits < muNumberOfValidTrackerHitsMIN ) isId = false;
       if( vars.lep_numberOfValidMuonHits    < muNumberOfValidMuonHitsMIN )    isId = false;
@@ -468,49 +477,32 @@ int main(int argc, char** argv)
     bool isIsolated = true;
     bool isAntiIsolated = true;
     
+    float rho = vars.rhoForIsolation;
+    
     if( vars.lep_flavour == 11 )
     {
       // barrel
       if( vars.lep_isEB == 1)
       {
-        //if( vars.lep_tkIso/vars.lep.pt()  > eleTkIsoOverPtEBMAX ) isIsolated = false;
-        //if( vars.lep_emIso/vars.lep.pt() > eleEmIsoOverPtEBMAX ) isIsolated = false;
-        //if( vars.lep_hadIso/vars.lep.pt() > eleHadIsoOverPtEBMAX ) isIsolated = false;
-        if( (vars.lep_tkIso+vars.lep_emIso+vars.lep_hadIso)/vars.lep.pt() > eleCombIsoOverPtEBMAX ) isIsolated = false;
+        if( (vars.lep_tkIso + std::max(float(0.),float(vars.lep_emIso)) + vars.lep_hadIso - rho*3.1415*0.3*0.3)/vars.lep.pt() > eleCombIsoOverPtEBMAX ) isIsolated = false;
         
-        //if( vars.lep_tkIso/vars.lep.pt()  < eleTkIsoOverPtEBMAX ) isAntiIsolated = false;
-        //if( vars.lep_emIso/vars.lep.pt() < eleEmIsoOverPtEBMAX ) isAntiIsolated = false;
-        //if( vars.lep_hadIso/vars.lep.pt() < eleHadIsoOverPtEBMAX ) isAntiIsolated = false;
-        if( (vars.lep_tkIso+vars.lep_emIso+vars.lep_hadIso)/vars.lep.pt() < eleCombIsoOverPtEBMAX ) isAntiIsolated = false;
+        if( (vars.lep_tkIso + std::max(float(0.),float(vars.lep_emIso)) + vars.lep_hadIso - rho*3.1415*0.3*0.3)/vars.lep.pt() < eleCombAntiIsoOverPtEBMAX ) isAntiIsolated = false;
       }
       
       // endcap
       else
       {
-        //if( vars.lep_tkIso  / vars.lep.pt() > eleTkIsoOverPtEEMAX )  isIsolated = false;
-	// if( vars.lep_emIso  / vars.lep.pt() > eleEmIsoOverPtEEMAX )  isIsolated = false;
-        //if( vars.lep_hadIso / vars.lep.pt() > eleHadIsoOverPtEEMAX ) isIsolated = false;
-        if( (vars.lep_tkIso+vars.lep_emIso+vars.lep_hadIso)/vars.lep.pt() > eleCombIsoOverPtEEMAX ) isIsolated = false;        
+        if( (vars.lep_tkIso + vars.lep_emIso + vars.lep_hadIso - rho*3.1415*0.3*0.3)/vars.lep.pt() > eleCombIsoOverPtEEMAX ) isIsolated = false;        
         
-        //if( vars.lep_tkIso  / vars.lep.pt() < eleTkIsoOverPtEEMAX )  isAntiIsolated = false;
-	//if( vars.lep_emIso  / vars.lep.pt() < eleEmIsoOverPtEEMAX )  isAntiIsolated = false;
-        //if( vars.lep_hadIso / vars.lep.pt() < eleHadIsoOverPtEEMAX ) isAntiIsolated = false;
-        if( (vars.lep_tkIso+vars.lep_emIso+vars.lep_hadIso)/vars.lep.pt() < eleCombIsoOverPtEEMAX ) isAntiIsolated = false;
+        if( (vars.lep_tkIso + vars.lep_emIso + vars.lep_hadIso - rho*3.1415*0.3*0.3)/vars.lep.pt() < eleCombAntiIsoOverPtEEMAX ) isAntiIsolated = false;
       }
     }
     
     if( vars.lep_flavour == 13 )
     {
-      //isolation
-      //if( vars.lep_tkIso  / vars.lep.pt() > muTkIsoOverPtMAX )  isIsolated = false;
-      //if( vars.lep_emIso  / vars.lep.pt() > muEmIsoOverPtMAX )  isIsolated = false;
-      //if( vars.lep_hadIso / vars.lep.pt() > muHadIsoOverPtMAX ) isIsolated = false;
-      if( (vars.lep_tkIso+vars.lep_emIso+vars.lep_hadIso) / vars.lep.pt() > muCombIsoOverPtMAX ) isIsolated = false;
+      if( (vars.lep_tkIso + vars.lep_emIso + vars.lep_hadIso - rho*3.1415*0.3*0.3) / vars.lep.pt() > muCombIsoOverPtMAX ) isIsolated = false;
       
-      //if( vars.lep_tkIso  / vars.lep.pt() < muTkIsoOverPtMAX )  isAntiIsolated = false;
-      //if( vars.lep_emIso  / vars.lep.pt() < muEmIsoOverPtMAX )  isAntiIsolated = false;
-      //if( vars.lep_hadIso / vars.lep.pt() < muHadIsoOverPtMAX ) isAntiIsolated = false;
-      if( (vars.lep_tkIso+vars.lep_emIso+vars.lep_hadIso) / vars.lep.pt() < muCombIsoOverPtMAX ) isAntiIsolated = false;
+      if( (vars.lep_tkIso + vars.lep_emIso + vars.lep_hadIso - rho*3.1415*0.3*0.3) / vars.lep.pt() < muCombAntiIsoOverPtMAX ) isAntiIsolated = false;
     }    
     
     
@@ -545,12 +537,14 @@ int main(int argc, char** argv)
     
     if( vars.lep_flavour == 11 )
     {
-      if( fabs(vars.lep_dB/vars.lep_edB) > ele3DipMAX ) is3DIP = false;
+      //FIXME
+      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > ele3DipMAX ) is3DIP = false;
     }
     
     if( vars.lep_flavour == 13 )
     {
-      if( fabs(vars.lep_dB/vars.lep_edB) > mu3DipMAX ) is3DIP = false;
+      //FIXME
+      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > mu3DipMAX ) is3DIP = false;
     }    
     
     
@@ -601,7 +595,8 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "2 W-jets", step, verbosity);
     
     
-    // at least 4 jets
+    //if( vars.nJets > 3 ) continue;
+    //if( vars.nJets_cnt > 2 ) continue;
     if( (vars.WJ1.Et() <= 0.) || (vars.WJ2.Et() <= 0.) ) continue;
       
     // Fill distributions
@@ -664,6 +659,11 @@ int main(int argc, char** argv)
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMet_Dphi) > lepMetDphiMAX) ) continue;
     
+    //float phi = vars.WJ1.phi();
+    //if( vars.WJ2.Et() > vars.WJ1.Et() )
+    //  phi = vars.WJ2.phi();    
+    //
+    //if( deltaPhi(vars.met.phi(),phi) < 0.4 ) continue;
     
     // fill distributions    
     stepEvents[step] += 1;
@@ -688,10 +688,15 @@ int main(int argc, char** argv)
     // mjj cut
     if( std::max(vars.WJ1.Et(), vars.WJ2.Et()) < WJJMaxEtMIN ) continue;
     if( std::min(vars.WJ1.Et(), vars.WJ2.Et()) < WJJMinEtMIN ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ((vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ((vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).Et() < WJJEtMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) < WJJDetaMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) > WJJDetaMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) < WJJDphiMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) > WJJDphiMAX) ) continue;
     
     
     // fill distributions

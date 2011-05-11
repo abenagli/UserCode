@@ -34,11 +34,19 @@ struct VBFAnalysisVariables
   int runId;
   int lumiId;
   int eventId;
+  int eventNaiveId;
   
   
   
   // mva value
-  double mva;
+  float mva;
+  
+  
+  
+  // PV variables
+  int PUit_n;
+  float rhoForIsolation;
+  float rhoForJets;
   
   
   
@@ -60,25 +68,32 @@ struct VBFAnalysisVariables
   int lep_flavour;
   float lep_eta;
   float lep_zepp;
-  float lep_dxy;
-  float lep_dz;
-  float lep_dB;
-  float lep_edB;
+  float lep_z;
+  float lep_dxy_BS;
+  float lep_dz_BS;
+  float lep_dxy_PV;
+  float lep_edxy_PV;
+  float lep_dz_PV;
   float lep_tkIso;
   float lep_emIso;
   float lep_hadIso;
   int lep_isEB;
-  float lep_simpleEleId80cIso;
+  float lep_etaSC;
   float lep_sigmaIetaIeta;
   float lep_DphiIn;
   float lep_DetaIn;
   float lep_HOverE;
+  int lep_mishits;
+  float lep_dist;
+  float lep_dcot;
   int lep_tracker;
   int lep_standalone;
   int lep_global;
   float lep_normalizedChi2;
+  int lep_numberOfMatches;
   int lep_numberOfValidTrackerHits;
   int lep_numberOfValidMuonHits;
+  int lep_pixelLayersWithMeasurement;
   
   
   
@@ -135,6 +150,10 @@ struct VBFAnalysisVariables
   
   float WJ1_charge;
   float WJ2_charge;
+  float WJ1_lep_Dphi;
+  float WJ1_met_Dphi;
+  float WJ2_lep_Dphi;
+  float WJ2_met_Dphi;
   float WJ1_zepp;
   float WJ2_zepp;
   float WJ1_bTag;
@@ -149,6 +168,7 @@ struct VBFAnalysisVariables
   float WJJ_Deta;
   float WJJ_Dphi;
   float WJJ_DR;
+  float WJJ_et;
   float WJJ_m;
   float WJJ_zepp;
   
@@ -159,6 +179,7 @@ struct VBFAnalysisVariables
   
   
   // Higgs variables
+  float lepMetW_pt;
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNuW_m;

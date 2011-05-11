@@ -15,6 +15,17 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("runId",        &vars.runId);
   reducedTree -> SetBranchAddress("lumiId",       &vars.lumiId);
   reducedTree -> SetBranchAddress("eventId",      &vars.eventId);
+  reducedTree -> SetBranchAddress("eventNaiveId", &vars.eventNaiveId);
+  
+  
+  // MVA variables
+  reducedTree -> SetBranchAddress("mva", &vars.mva);  
+  
+  
+  // PU variables
+  reducedTree -> SetBranchAddress("PUit_n", &vars.PUit_n);
+  reducedTree -> SetBranchAddress("rhoForIsolation", &vars.rhoForIsolation);
+  reducedTree -> SetBranchAddress("rhoForJets", &vars.rhoForJets);
   
   
   // PV variables
@@ -33,25 +44,32 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lep_flavour", &vars.lep_flavour);
   reducedTree -> SetBranchAddress("lep_eta",     &vars.lep_eta);
   reducedTree -> SetBranchAddress("lep_zepp",    &vars.lep_zepp);
-  reducedTree -> SetBranchAddress("lep_dxy",     &vars.lep_dxy);
-  reducedTree -> SetBranchAddress("lep_dz",      &vars.lep_dz);
-  reducedTree -> SetBranchAddress("lep_dB",      &vars.lep_dB);
-  reducedTree -> SetBranchAddress("lep_edB",     &vars.lep_edB);
+  reducedTree -> SetBranchAddress("lep_z",       &vars.lep_z);
+  reducedTree -> SetBranchAddress("lep_dxy_BS",  &vars.lep_dxy_BS);
+  reducedTree -> SetBranchAddress("lep_dz_BS",   &vars.lep_dz_BS);
+  reducedTree -> SetBranchAddress("lep_dxy_PV",  &vars.lep_dxy_PV);
+  reducedTree -> SetBranchAddress("lep_edxy_PV", &vars.lep_edxy_PV);
+  reducedTree -> SetBranchAddress("lep_dz_PV",   &vars.lep_dz_PV);
   reducedTree -> SetBranchAddress("lep_tkIso",   &vars.lep_tkIso);
   reducedTree -> SetBranchAddress("lep_emIso",   &vars.lep_emIso);
   reducedTree -> SetBranchAddress("lep_hadIso",  &vars.lep_hadIso);
   reducedTree -> SetBranchAddress("lep_isEB",              &vars.lep_isEB);
-  reducedTree -> SetBranchAddress("lep_simpleEleId80cIso", &vars.lep_simpleEleId80cIso);
+  reducedTree -> SetBranchAddress("lep_etaSC",             &vars.lep_etaSC);
   reducedTree -> SetBranchAddress("lep_sigmaIetaIeta",     &vars.lep_sigmaIetaIeta);
   reducedTree -> SetBranchAddress("lep_DphiIn",            &vars.lep_DphiIn);
   reducedTree -> SetBranchAddress("lep_DetaIn",            &vars.lep_DetaIn);
   reducedTree -> SetBranchAddress("lep_HOverE",            &vars.lep_HOverE);
-  reducedTree -> SetBranchAddress("lep_tracker",                  &vars.lep_tracker);
-  reducedTree -> SetBranchAddress("lep_standalone",               &vars.lep_standalone);
-  reducedTree -> SetBranchAddress("lep_global",                   &vars.lep_global);
-  reducedTree -> SetBranchAddress("lep_normalizedChi2",           &vars.lep_normalizedChi2);
-  reducedTree -> SetBranchAddress("lep_numberOfValidTrackerHits", &vars.lep_numberOfValidTrackerHits);
-  reducedTree -> SetBranchAddress("lep_numberOfValidMuonHits",    &vars.lep_numberOfValidMuonHits);
+  reducedTree -> SetBranchAddress("lep_mishits",           &vars.lep_mishits);
+  reducedTree -> SetBranchAddress("lep_dist",              &vars.lep_dist);
+  reducedTree -> SetBranchAddress("lep_dcot",              &vars.lep_dcot);
+  reducedTree -> SetBranchAddress("lep_tracker",                    &vars.lep_tracker);
+  reducedTree -> SetBranchAddress("lep_standalone",                 &vars.lep_standalone);
+  reducedTree -> SetBranchAddress("lep_global",                     &vars.lep_global);
+  reducedTree -> SetBranchAddress("lep_normalizedChi2",             &vars.lep_normalizedChi2);
+  reducedTree -> SetBranchAddress("lep_numberOfMatches",            &vars.lep_numberOfMatches);
+  reducedTree -> SetBranchAddress("lep_numberOfValidTrackerHits",   &vars.lep_numberOfValidTrackerHits);
+  reducedTree -> SetBranchAddress("lep_numberOfValidMuonHits",      &vars.lep_numberOfValidMuonHits);
+  reducedTree -> SetBranchAddress("lep_pixelLayersWithMeasurement", &vars.lep_pixelLayersWithMeasurement);
   
   
   // met variables
@@ -103,6 +121,10 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("WJJ",                     &vars.p_WJJ);
   reducedTree -> SetBranchAddress("WJ1_charge",              &vars.WJ1_charge);
   reducedTree -> SetBranchAddress("WJ2_charge",              &vars.WJ2_charge);
+  reducedTree -> SetBranchAddress("WJ1_lep_Dphi",            &vars.WJ1_lep_Dphi);
+  reducedTree -> SetBranchAddress("WJ1_met_Dphi",            &vars.WJ1_met_Dphi);
+  reducedTree -> SetBranchAddress("WJ2_lep_Dphi",            &vars.WJ2_lep_Dphi);
+  reducedTree -> SetBranchAddress("WJ2_met_Dphi",            &vars.WJ2_met_Dphi);
   reducedTree -> SetBranchAddress("WJ1_zepp",                &vars.WJ1_zepp);
   reducedTree -> SetBranchAddress("WJ2_zepp",                &vars.WJ2_zepp);
   reducedTree -> SetBranchAddress("WJ1_bTag",                &vars.WJ1_bTag);
@@ -117,6 +139,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("WJJ_Deta", &vars.WJJ_Deta);
   reducedTree -> SetBranchAddress("WJJ_Dphi", &vars.WJJ_Dphi);
   reducedTree -> SetBranchAddress("WJJ_DR",   &vars.WJJ_DR);
+  reducedTree -> SetBranchAddress("WJJ_et",   &vars.WJJ_et);
   reducedTree -> SetBranchAddress("WJJ_m",    &vars.WJJ_m);
   reducedTree -> SetBranchAddress("WJJ_zepp", &vars.WJJ_zepp);
   
@@ -126,6 +149,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   
   // Higgs variables
+  reducedTree -> SetBranchAddress("lepMetW_pt",   &vars.lepMetW_pt);
   reducedTree -> SetBranchAddress("lepMetW_mt",   &vars.lepMetW_mt);
   reducedTree -> SetBranchAddress("lepMetW_Dphi", &vars.lepMetW_Dphi);
   reducedTree -> SetBranchAddress("lepNuW_m",     &vars.lepNuW_m);

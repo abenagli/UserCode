@@ -28,10 +28,17 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("runId",        &vars.runId,               "runId/I");
   vars.m_reducedTree -> Branch("lumiId",       &vars.lumiId,             "lumiId/I");
   vars.m_reducedTree -> Branch("eventId",      &vars.eventId,           "eventId/I");
+  vars.m_reducedTree -> Branch("eventNaiveId", &vars.eventNaiveId, "eventNaiveId/I");
   
   
   // MVA variables
   vars.m_reducedTree -> Branch("mva", &vars.mva, "mva/F");
+  
+  
+  // PU variables
+  vars.m_reducedTree -> Branch("PUit_n",          &vars.PUit_n,                   "PUit_n/I");
+  vars.m_reducedTree -> Branch("rhoForIsolation", &vars.rhoForIsolation, "rhoForIsolation/F");
+  vars.m_reducedTree -> Branch("rhoForJets",      &vars.rhoForJets,           "rhoForJets/F");
   
   
   // PV variables
@@ -50,27 +57,34 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep_pt",      &vars.lep_pt,           "lep_pt/F");
   vars.m_reducedTree -> Branch("lep_eta",     &vars.lep_eta,         "lep_eta/F");
   vars.m_reducedTree -> Branch("lep_zepp",    &vars.lep_zepp,       "lep_zepp/F");
-  vars.m_reducedTree -> Branch("lep_dxy",     &vars.lep_dxy,         "lep_dxy/F");
-  vars.m_reducedTree -> Branch("lep_dz",      &vars.lep_dz,           "lep_dz/F");
-  vars.m_reducedTree -> Branch("lep_dB",      &vars.lep_dB,           "lep_dB/F");
-  vars.m_reducedTree -> Branch("lep_edB",     &vars.lep_edB,         "lep_edB/F");
+  vars.m_reducedTree -> Branch("lep_z",       &vars.lep_z,             "lep_z/F");
+  vars.m_reducedTree -> Branch("lep_dxy_BS",  &vars.lep_dxy_BS,   "lep_dxy_BS/F");
+  vars.m_reducedTree -> Branch("lep_dz_BS",   &vars.lep_dz_BS,     "lep_dz_BS/F");
+  vars.m_reducedTree -> Branch("lep_dxy_PV",  &vars.lep_dxy_PV,   "lep_dxy_PV/F");
+  vars.m_reducedTree -> Branch("lep_edxy_PV", &vars.lep_edxy_PV, "lep_edxy_PV/F");
+  vars.m_reducedTree -> Branch("lep_dz_PV",   &vars.lep_dz_PV,     "lep_dz_PV/F");
   vars.m_reducedTree -> Branch("lep_tkIso",   &vars.lep_tkIso,     "lep_tkIso/F");
   vars.m_reducedTree -> Branch("lep_emIso",   &vars.lep_emIso,     "lep_emIso/F");
   vars.m_reducedTree -> Branch("lep_hadIso",  &vars.lep_hadIso,   "lep_hadIso/F");
-  vars.m_reducedTree -> Branch("lep_isEB",          &vars.lep_isEB,                               "lep_isEB/I");
-  vars.m_reducedTree -> Branch("lep_simpleEleId80cIso", &vars.lep_simpleEleId80cIso, "lep_simpleEleId80cIso/F");
+  vars.m_reducedTree -> Branch("lep_isEB",              &vars.lep_isEB,                           "lep_isEB/I");
+  vars.m_reducedTree -> Branch("lep_etaSC",             &vars.lep_etaSC,                         "lep_etaSC/F");
   vars.m_reducedTree -> Branch("lep_sigmaIetaIeta",     &vars.lep_sigmaIetaIeta,         "lep_sigmaIetaIeta/F");
   vars.m_reducedTree -> Branch("lep_DphiIn",            &vars.lep_DphiIn,                       "lep_DphiIn/F");
   vars.m_reducedTree -> Branch("lep_DetaIn",            &vars.lep_DetaIn,                       "lep_DetaIn/F");
   vars.m_reducedTree -> Branch("lep_HOverE",            &vars.lep_HOverE,                       "lep_HOverE/F");
   vars.m_reducedTree -> Branch("lep_fbrem",             &vars.lep_fbrem,                         "lep_fbrem/F");
   vars.m_reducedTree -> Branch("lep_EOverP",            &vars.lep_EOverP,                       "lep_EOverP/F");
-  vars.m_reducedTree -> Branch("lep_tracker",                  &vars.lep_tracker,                                   "lep_tracker/I");
-  vars.m_reducedTree -> Branch("lep_standalone",               &vars.lep_standalone,                             "lep_standalone/I");
-  vars.m_reducedTree -> Branch("lep_global",                   &vars.lep_global,                                     "lep_global/I");
-  vars.m_reducedTree -> Branch("lep_normalizedChi2",           &vars.lep_normalizedChi2,                     "lep_normalizedChi2/F");
-  vars.m_reducedTree -> Branch("lep_numberOfValidTrackerHits", &vars.lep_numberOfValidTrackerHits, "lep_numberOfValidTrackerHits/I");
-  vars.m_reducedTree -> Branch("lep_numberOfValidMuonHits",    &vars.lep_numberOfValidMuonHits,       "lep_numberOfValidMuonHits/I");
+  vars.m_reducedTree -> Branch("lep_mishits",           &vars.lep_mishits,                     "lep_mishits/I");
+  vars.m_reducedTree -> Branch("lep_dist",              &vars.lep_dist,                           "lep_dist/F");
+  vars.m_reducedTree -> Branch("lep_dcot",              &vars.lep_dcot,                           "lep_dcot/F");
+  vars.m_reducedTree -> Branch("lep_tracker",                   &vars.lep_tracker,                                       "lep_tracker/I");
+  vars.m_reducedTree -> Branch("lep_standalone",                &vars.lep_standalone,                                 "lep_standalone/I");
+  vars.m_reducedTree -> Branch("lep_global",                    &vars.lep_global,                                         "lep_global/I");
+  vars.m_reducedTree -> Branch("lep_normalizedChi2",            &vars.lep_normalizedChi2,                         "lep_normalizedChi2/F");
+  vars.m_reducedTree -> Branch("lep_numberOfMatches",           &vars.lep_numberOfMatches,                       "lep_numberOfMatches/I");
+  vars.m_reducedTree -> Branch("lep_numberOfValidTrackerHits",  &vars.lep_numberOfValidTrackerHits,     "lep_numberOfValidTrackerHits/I");
+  vars.m_reducedTree -> Branch("lep_numberOfValidMuonHits",     &vars.lep_numberOfValidMuonHits,           "lep_numberOfValidMuonHits/I");
+  vars.m_reducedTree -> Branch("lep_pixelLayerWithMeasurement", &vars.lep_pixelLayersWithMeasurement, "lep_pixelLayersWithMeasurement/I");
   
   
   // met variables
@@ -119,6 +133,10 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("WJ2_charge",              &vars.WJ2_charge,                           "WJ2_charge/F");
   vars.m_reducedTree -> Branch("WJ1_zepp",                &vars.WJ1_zepp,                               "WJ1_zepp/F");
   vars.m_reducedTree -> Branch("WJ2_zepp",                &vars.WJ2_zepp,                               "WJ2_zepp/F");
+  vars.m_reducedTree -> Branch("WJ1_lep_Dphi",            &vars.WJ1_lep_Dphi,                       "WJ1_lep_Dphi/F");
+  vars.m_reducedTree -> Branch("WJ2_lep_Dphi",            &vars.WJ2_lep_Dphi,                       "WJ2_lep_Dphi/F");
+  vars.m_reducedTree -> Branch("WJ1_met_Dphi",            &vars.WJ1_met_Dphi,                       "WJ1_met_Dphi/F");
+  vars.m_reducedTree -> Branch("WJ2_met_Dphi",            &vars.WJ2_met_Dphi,                       "WJ2_met_Dphi/F");
   vars.m_reducedTree -> Branch("WJ1_bTag",                &vars.WJ1_bTag,                               "WJ1_bTag/F");
   vars.m_reducedTree -> Branch("WJ2_bTag",                &vars.WJ2_bTag,                               "WJ2_bTag/F");
   vars.m_reducedTree -> Branch("WJ1_dzAvg",               &vars.WJ1_dzAvg,                             "WJ1_dzAvg/F");
@@ -130,6 +148,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("WJJ_Deta",   &vars.WJJ_Deta,     "WJJ_Deta/F");
   vars.m_reducedTree -> Branch("WJJ_Dphi",   &vars.WJJ_Dphi,     "WJJ_Dphi/F");
   vars.m_reducedTree -> Branch("WJJ_DR",     &vars.WJJ_DR,         "WJJ_DR/F");
+  vars.m_reducedTree -> Branch("WJJ_et",     &vars.WJJ_et,         "WJJ_et/F");
   vars.m_reducedTree -> Branch("WJJ_m",      &vars.WJJ_m,           "WJJ_m/F");
   vars.m_reducedTree -> Branch("WJJ_zepp",   &vars.WJJ_zepp,     "WJJ_zepp/F");
 
@@ -139,9 +158,11 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   
   // Higgs variables
+  vars.m_reducedTree -> Branch("lepMetW_pt",   &vars.lepMetW_pt,     "lepMetW_pt/F");
   vars.m_reducedTree -> Branch("lepMetW_mt",   &vars.lepMetW_mt,     "lepMetW_mt/F");
   vars.m_reducedTree -> Branch("lepMetW_Dphi", &vars.lepMetW_Dphi, "lepMetW_Dphi/F");
   vars.m_reducedTree -> Branch("lepNuW_m",     &vars.lepNuW_m,         "lepNuW_m/F");
+  vars.m_reducedTree -> Branch("lepNuW_m_KF",  &vars.lepNuW_m_KF,   "lepNuW_m_KF/F");
   vars.m_reducedTree -> Branch("lepNuW_zepp",  &vars.lepNuW_zepp,   "lepNuW_zepp/F");
   
   
@@ -176,6 +197,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("thirdJ_tagJJDeta", &vars.thirdJ_tagJJDeta, "thirdJ_tagJJDeta/F");
   vars.m_reducedTree -> Branch("thirdJ_tagJJDphi", &vars.thirdJ_tagJJDphi, "thirdJ_tagJJDphi/F");
   vars.m_reducedTree -> Branch("thirdJ_tagJJDR",   &vars.thirdJ_tagJJDR,     "thirdJ_tagJJDR/F");
+  
 }
 
 
@@ -196,6 +218,12 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.mva = -99.; 
   
   
+  // PU variables
+  vars.PUit_n = -1;
+  vars.rhoForIsolation = -99.;
+  vars.rhoForJets = -99.;
+  
+  
   // PV variables
   vars.PV_n = -1;
   vars.PV_d0 = -1.;
@@ -214,27 +242,34 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.muons_loose.clear();
   vars.leptonCharges.clear();
   vars.leptonFlavours.clear();    
-  vars.leptons_dxy.clear();
-  vars.leptons_dz.clear();
-  vars.leptons_dB.clear();
-  vars.leptons_edB.clear();
+  vars.leptons_z.clear();
+  vars.leptons_dxy_BS.clear();
+  vars.leptons_dz_BS.clear();
+  vars.leptons_dxy_PV.clear();
+  vars.leptons_edxy_PV.clear();
+  vars.leptons_dz_PV.clear();
   vars.leptons_tkIso.clear();
   vars.leptons_emIso.clear();
   vars.leptons_hadIso.clear();
   vars.electrons_isEB.clear();
-  vars.electrons_simpleEleId80cIso.clear();
+  vars.electrons_etaSC.clear();
   vars.electrons_sigmaIetaIeta.clear();
   vars.electrons_DphiIn.clear();
   vars.electrons_DetaIn.clear();
   vars.electrons_HOverE.clear();
   vars.electrons_fbrem.clear();
   vars.electrons_EOverP.clear();
+  vars.electrons_mishits.clear();
+  vars.electrons_dist.clear();
+  vars.electrons_dcot.clear();
   vars.muons_tracker.clear();
   vars.muons_standalone.clear();
   vars.muons_global.clear();
   vars.muons_normalizedChi2.clear();
+  vars.muons_numberOfMatches.clear();
   vars.muons_numberOfValidTrackerHits.clear();
   vars.muons_numberOfValidMuonHits.clear();
+  vars.muons_pixelLayersWithMeasurement.clear();
   
   vars.selectIt_lep = -1;
   vars.selectIt_ele = -1;
@@ -248,27 +283,34 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lep_pt = -1.;
   vars.lep_eta = -99.;
   vars.lep_zepp = -99.;
-  vars.lep_dxy = -1.;
-  vars.lep_dz = -99.;
-  vars.lep_dB = -1.;
-  vars.lep_edB = -1.;
+  vars.lep_z = -99.;
+  vars.lep_dxy_BS = -99.;
+  vars.lep_dz_BS = -99.;
+  vars.lep_dxy_PV = -99.;
+  vars.lep_edxy_PV = -99.;
+  vars.lep_dz_PV = -99.;
   vars.lep_tkIso = -1.;
   vars.lep_emIso = -1.;
   vars.lep_hadIso = -1.;
   vars.lep_isEB = -1;
-  vars.lep_simpleEleId80cIso = -1.;
+  vars.lep_etaSC = -1.;
   vars.lep_sigmaIetaIeta = -1.;
   vars.lep_DphiIn = -99.;
   vars.lep_DetaIn = -99.;
   vars.lep_HOverE = -1.;
   vars.lep_fbrem = -1.;
+  vars.lep_mishits = -1;
+  vars.lep_dist = -99.;
+  vars.lep_dcot = -99.;
   vars.lep_EOverP = -1.;
   vars.lep_tracker = -1;
   vars.lep_standalone = -1;
   vars.lep_global = -1;
   vars.lep_normalizedChi2 = -1.;
+  vars.lep_numberOfMatches = -1;
   vars.lep_numberOfValidTrackerHits = -1;
   vars.lep_numberOfValidMuonHits = -1;
+  vars.lep_pixelLayersWithMeasurement = -1;
   
   
   
@@ -357,6 +399,10 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.WJ2_charge = -99.;
   vars.WJ1_zepp = -99.;
   vars.WJ2_zepp = -99.;
+  vars.WJ1_lep_Dphi = -99.;
+  vars.WJ2_lep_Dphi = -99.;
+  vars.WJ1_met_Dphi = -99.;
+  vars.WJ2_met_Dphi = -99.;
   vars.WJ1_bTag = -99.;
   vars.WJ2_bTag = -99.;
   vars.WJ1_dzAvg = -99.;
@@ -369,6 +415,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.WJJ_Deta = -99.;
   vars.WJJ_Dphi = -99.;
   vars.WJJ_DR = -99.;
+  vars.WJJ_et = -99.;
   vars.WJJ_m = -99.;
   vars.WJJ_zepp = -99.;
   
@@ -383,9 +430,11 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lepW = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.lepNuW = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   
+  vars.lepMetW_pt = -1.;
   vars.lepMetW_mt = -1.;
   vars.lepMetW_Dphi = -1.;
   vars.lepNuW_m = -1.;
+  vars.lepNuW_m_KF = -1.;
   vars.lepNuW_zepp = -99.;
   
   
@@ -451,6 +500,17 @@ void DeleteVBFPreselectionVariables(VBFPreselectionVariables& vars)
 
 
 
+void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag)
+{
+  if( dataFlag == 0 )
+    vars.PUit_n = (int)(reader.GetInt("mc_PUit_NumInteractions")->at(0));
+  
+  vars.rhoForIsolation = reader.GetFloat("rho_isolation")->at(0);
+  vars.rhoForJets = reader.GetFloat("rho_jets")->at(0);
+}
+
+
+
 void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
   vars.PV_n = (int)(reader.GetFloat("PV_d0")->size());
@@ -471,10 +531,12 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lep_pt      = vars.p_lep->pt();
   vars.lep_eta     = vars.p_lep->eta();
   vars.lep_charge  = vars.leptonCharges.at(vars.selectIt_lep);
-  vars.lep_dxy     = vars.leptons_dxy.at(vars.selectIt_lep);
-  vars.lep_dz      = vars.leptons_dz.at(vars.selectIt_lep);
-  vars.lep_dB      = vars.leptons_dB.at(vars.selectIt_lep);
-  vars.lep_edB     = vars.leptons_edB.at(vars.selectIt_lep);
+  vars.lep_z       = vars.leptons_z.at(vars.selectIt_lep);
+  vars.lep_dxy_BS  = vars.leptons_dxy_BS.at(vars.selectIt_lep);
+  vars.lep_dz_BS   = vars.leptons_dz_BS.at(vars.selectIt_lep);
+  vars.lep_dxy_PV  = vars.leptons_dxy_PV.at(vars.selectIt_lep);
+  vars.lep_edxy_PV = vars.leptons_edxy_PV.at(vars.selectIt_lep);
+  vars.lep_dz_PV   = vars.leptons_dz_PV.at(vars.selectIt_lep);
   vars.lep_tkIso   = vars.leptons_tkIso.at(vars.selectIt_lep);
   vars.lep_emIso   = vars.leptons_emIso.at(vars.selectIt_lep);
   vars.lep_hadIso  = vars.leptons_hadIso.at(vars.selectIt_lep);
@@ -493,13 +555,16 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
     
     vars.lep_flavour = 11;
     vars.lep_isEB = vars.electrons_isEB.at(vars.selectIt_ele);
-    vars.lep_simpleEleId80cIso = vars.electrons_simpleEleId80cIso.at(vars.selectIt_ele);
+    vars.lep_etaSC = vars.electrons_etaSC.at(vars.selectIt_ele);
     vars.lep_sigmaIetaIeta = vars.electrons_sigmaIetaIeta.at(vars.selectIt_ele);
     vars.lep_DphiIn = vars.electrons_DphiIn.at(vars.selectIt_ele);
     vars.lep_DetaIn = vars.electrons_DetaIn.at(vars.selectIt_ele);
     vars.lep_HOverE = vars.electrons_HOverE.at(vars.selectIt_ele);
     vars.lep_fbrem  = vars.electrons_fbrem.at(vars.selectIt_ele);
     vars.lep_EOverP = vars.electrons_EOverP.at(vars.selectIt_ele);
+    vars.lep_mishits = vars.electrons_mishits.at(vars.selectIt_ele);
+    vars.lep_dist = vars.electrons_dist.at(vars.selectIt_ele);
+    vars.lep_dcot = vars.electrons_dcot.at(vars.selectIt_ele);
   }
   
   // if muon
@@ -517,8 +582,10 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.lep_standalone = vars.muons_standalone.at(vars.selectIt_mu);
     vars.lep_global = vars.muons_global.at(vars.selectIt_mu);
     vars.lep_normalizedChi2 = vars.muons_normalizedChi2.at(vars.selectIt_mu);
+    vars.lep_numberOfMatches = vars.muons_numberOfMatches.at(vars.selectIt_mu);
     vars.lep_numberOfValidTrackerHits = vars.muons_numberOfValidTrackerHits.at(vars.selectIt_mu);
     vars.lep_numberOfValidMuonHits = vars.muons_numberOfValidMuonHits.at(vars.selectIt_mu);
+    vars.lep_pixelLayersWithMeasurement = vars.muons_pixelLayersWithMeasurement.at(vars.selectIt_mu);
   }
   
 }
@@ -536,19 +603,24 @@ void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, co
   vars.leptons_emIso.push_back(reader.GetFloat("electrons_emIsoR03")->at(eleIt));
   vars.leptons_hadIso.push_back(reader.GetFloat("electrons_hadIsoR03_depth1")->at(eleIt)+
 			        reader.GetFloat("electrons_hadIsoR03_depth2")->at(eleIt));
-  vars.leptons_dxy.push_back(reader.GetFloat("electrons_dxy_PV")->at(eleIt));
-  vars.leptons_dz.push_back(reader.GetFloat("electrons_dz_PV")->at(eleIt));
-  vars.leptons_dB.push_back(reader.GetFloat("electrons_dB")->at(eleIt));
-  vars.leptons_edB.push_back(reader.GetFloat("electrons_edB")->at(eleIt));
+  vars.leptons_z.push_back(reader.GetFloat("electrons_z")->at(eleIt));
+  vars.leptons_dxy_BS.push_back(reader.GetFloat("electrons_dxy_BS")->at(eleIt));
+  vars.leptons_dz_BS.push_back(reader.GetFloat("electrons_dz_BS")->at(eleIt));
+  vars.leptons_dxy_PV.push_back(reader.GetFloat("electrons_dxy_PV")->at(eleIt));
+  vars.leptons_edxy_PV.push_back(reader.GetFloat("electrons_edxy_PV")->at(eleIt));
+  vars.leptons_dz_PV.push_back(reader.GetFloat("electrons_dz_PV")->at(eleIt));
   
   vars.electrons_isEB.push_back(reader.GetInt("electrons_isEB")->at(eleIt));
-  vars.electrons_simpleEleId80cIso.push_back(reader.GetFloat("simpleEleId80cIso")->at(eleIt));
+  vars.electrons_etaSC.push_back(reader.Get3PV("electrons_positionSC")->at(eleIt).eta());
   vars.electrons_sigmaIetaIeta.push_back(reader.GetFloat("electrons_sigmaIetaIeta")->at(eleIt));
   vars.electrons_DphiIn.push_back(reader.GetFloat("electrons_deltaPhiIn")->at(eleIt));
   vars.electrons_DetaIn.push_back(reader.GetFloat("electrons_deltaEtaIn")->at(eleIt));
   vars.electrons_HOverE.push_back(reader.GetFloat("electrons_hOverE")->at(eleIt));
   vars.electrons_fbrem.push_back(reader.GetFloat("electrons_fbrem")->at(eleIt));
   vars.electrons_EOverP.push_back(reader.GetFloat("electrons_eSCOverP")->at(eleIt));
+  vars.electrons_mishits.push_back(reader.GetInt("electrons_mishits")->at(eleIt));
+  vars.electrons_dist.push_back(reader.GetFloat("electrons_dist")->at(eleIt));
+  vars.electrons_dcot.push_back(reader.GetFloat("electrons_dcot")->at(eleIt));
 }
 
 
@@ -562,17 +634,21 @@ void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
   vars.leptons_tkIso.push_back(reader.GetFloat("muons_tkIsoR03")->at(muIt));
   vars.leptons_emIso.push_back(reader.GetFloat("muons_emIsoR03")->at(muIt));
   vars.leptons_hadIso.push_back(reader.GetFloat("muons_hadIsoR03")->at(muIt));
-  vars.leptons_dxy.push_back(reader.GetFloat("muons_dxy_PV")->at(muIt));
-  vars.leptons_dz.push_back(reader.GetFloat("muons_dz_PV")->at(muIt));
-  vars.leptons_dB.push_back(reader.GetFloat("muons_dB")->at(muIt));
-  vars.leptons_edB.push_back(reader.GetFloat("muons_edB")->at(muIt));
+  vars.leptons_z.push_back(reader.GetFloat("muons_z")->at(muIt));
+  vars.leptons_dxy_BS.push_back(reader.GetFloat("muons_dxy_BS")->at(muIt));
+  vars.leptons_dz_BS.push_back(reader.GetFloat("muons_dz_BS")->at(muIt));
+  vars.leptons_dxy_PV.push_back(reader.GetFloat("muons_dxy_PV")->at(muIt));
+  vars.leptons_edxy_PV.push_back(reader.GetFloat("muons_edxy_PV")->at(muIt));
+  vars.leptons_dz_PV.push_back(reader.GetFloat("muons_dz_PV")->at(muIt));
   
   vars.muons_tracker.push_back(reader.GetInt("muons_tracker")->at(muIt));
   vars.muons_standalone.push_back(reader.GetInt("muons_standalone")->at(muIt));
   vars.muons_global.push_back(reader.GetInt("muons_global")->at(muIt));
   vars.muons_normalizedChi2.push_back(reader.GetFloat("muons_normalizedChi2")->at(muIt));
+  vars.muons_numberOfMatches.push_back(reader.GetInt("muons_numberOfMatches")->at(muIt));
   vars.muons_numberOfValidTrackerHits.push_back(reader.GetInt("muons_numberOfValidTrackerHits")->at(muIt));
   vars.muons_numberOfValidMuonHits.push_back(reader.GetInt("muons_numberOfValidMuonHits")->at(muIt));
+  vars.muons_pixelLayersWithMeasurement.push_back(reader.GetInt("muons_pixelLayersWithMeasurement")->at(muIt));
 }
 
 
@@ -717,6 +793,10 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   
   vars.WJ1_charge = vars.jets_charge.at(vars.selectIt_W.at(0));
   vars.WJ2_charge = vars.jets_charge.at(vars.selectIt_W.at(1));
+  vars.WJ1_lep_Dphi = deltaPhi(vars.WJ1.phi(),vars.lep.phi());
+  vars.WJ2_lep_Dphi = deltaPhi(vars.WJ2.phi(),vars.lep.phi());
+  vars.WJ1_met_Dphi = deltaPhi(vars.WJ1.phi(),vars.met.phi());
+  vars.WJ2_met_Dphi = deltaPhi(vars.WJ2.phi(),vars.met.phi());
   vars.WJ1_bTag = vars.jets_bTag.at(vars.selectIt_W.at(0));
   vars.WJ2_bTag = vars.jets_bTag.at(vars.selectIt_W.at(1));
   vars.WJ1_dzAvg = vars.jets_dzAvg.at(vars.selectIt_W.at(0));
@@ -729,6 +809,7 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJJ_Deta = deltaEta(vars.WJ1.eta(),vars.WJ2.eta());
   vars.WJJ_Dphi = deltaPhi(vars.WJ1.phi(),vars.WJ2.phi());
   vars.WJJ_DR = deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi());
+  vars.WJJ_et = (vars.WJ1+vars.WJ2).Et();
   vars.WJJ_m = (vars.WJ1+vars.WJ2).mass();
   
   vars.lepWJJ_ptOrdered.push_back( vars.lep.pt() );
@@ -747,6 +828,7 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
+  vars.lepMetW_pt = (vars.lep + vars.met + vars.WJJ).pt();
   vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
   vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
   
@@ -779,6 +861,85 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lepNuW_m = vars.lepNuW.mass();
   
   //std::cout << "Higgs mt = " << vars.lepMetW_mt << "   Higgs m = " << vars.lepNuW_m << std::endl;
+  
+  
+  
+  
+  
+  
+  // kinematic fit
+  if( vars.WJ1.pt() <= 0. ) return;
+  if( vars.WJ2.pt() <= 0. ) return;
+  
+  TLorentzVector vl(vars.lep.px(),vars.lep.py(),vars.lep.pz(),vars.lep.energy());
+  TLorentzVector vm(vars.met.px(),vars.met.py(),0.,vars.met.energy());
+  TLorentzVector vn(vars.neutrino.px(),vars.neutrino.py(),vars.neutrino.pz(),vars.neutrino.energy());
+  TLorentzVector v1(vars.WJ1.px(),vars.WJ1.py(),vars.WJ1.pz(),vars.WJ1.energy());
+  TLorentzVector v2(vars.WJ2.px(),vars.WJ2.py(),vars.WJ2.pz(),vars.WJ2.energy());
+  
+  TMatrixD ml(3,3);
+  TMatrixD mm(3,3);
+  TMatrixD m1(3,3);
+  TMatrixD m2(3,3);
+  ml.Zero();
+  mm.Zero();
+  m1.Zero();
+  m2.Zero();
+
+  ml(0,0) = 0.05;   // et
+  ml(1,1) = 0.0025; // eta
+  ml(2,2) = 0.0025; // phi
+  
+  mm(0,0) = 0.25;  // et
+  mm(1,1) = 9999.; // eta
+  mm(2,2) = 0.25;  // phi
+  
+  m1(0,0) = 25.;  // et
+  m1(1,1) = 0.01; // eta
+  m1(2,2) = 0.01; // phi
+  
+  m2(0,0) = 25.;  // et
+  m2(1,1) = 0.01; // eta
+  m2(2,2) = 0.01; // phi
+  
+  TFitParticleEtEtaPhi* l = new TFitParticleEtEtaPhi("lepton","lepton",&vl,&ml);
+  TFitParticleEtEtaPhi* m = new TFitParticleEtEtaPhi("neutrino","neutrino",&vm,&mm);
+  TFitParticleEtEtaPhi* jet1 = new TFitParticleEtEtaPhi("Jet1","Jet1",&v1,&m1);
+  TFitParticleEtEtaPhi* jet2 = new TFitParticleEtEtaPhi("Jet2","Jet2",&v2,&m2);
+  
+  //vec1 and vec2 must make a W boson
+  TFitConstraintM *mCons1 = new TFitConstraintM( "W2MassConstraint", "W2Mass-Constraint", 0, 0 , 80.398);
+  mCons1->addParticles1( jet1, jet2 );
+  TFitConstraintM *mCons2 = new TFitConstraintM( "W1MassConstraint", "W1Mass-Constraint", 0, 0 , 80.398);
+  mCons2->addParticles1( l, m );
+  TFitConstraintM *mCons3 = new TFitConstraintM( "NuMassConstraint", "NuMass-Constraint", 0, 0 , 0.);
+  mCons3->addParticle1( m );
+  
+  //Definition of the fitter
+  //Add three measured particles(jets)
+  //Add two constraints
+  TKinFitter* fitter = new TKinFitter("fitter", "fitter");
+  fitter->addMeasParticle( l );
+  fitter->addMeasParticle( m );
+  fitter->addMeasParticle( jet1 );
+  fitter->addMeasParticle( jet2 );
+  fitter->addConstraint( mCons1 );
+  fitter->addConstraint( mCons2 );
+  fitter->addConstraint( mCons3 );
+  
+  //Set convergence criteria
+  fitter->setMaxNbIter( 30 );
+  fitter->setMaxDeltaS( 1e-2 );
+  fitter->setMaxF( 1e-1 );
+  fitter->setVerbosity(2);
+
+  //Perform the fit
+  //fitter->fit();
+  
+  
+  // update the higgs mass after kinematic fit
+  vars.lepNuW_m_KF = ( (*(jet1->getCurr4Vec())) + (*(jet2->getCurr4Vec())) + (*(l->getCurr4Vec())) + (*(m->getCurr4Vec())) ).M();
+  //vars.lepNuW_m_KF = ( (*(jet1->getCurr4Vec())) + (*(jet2->getCurr4Vec())) + vl + vn ).M();
 }
 
 

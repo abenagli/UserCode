@@ -34,6 +34,15 @@ m_verbosity (verbosity)
    m_tree->SetBranchAddress (bre->GetName (), &m_3Vvectors[bre->GetName ()]) ;
   }
   
+  if (bname.find ("vector<ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> >") != std::string::npos)
+  {
+   if (m_verbosity)
+     std::cout << "3PV | setting " << bre->GetName () << " for type : " << bre->GetClassName () << "\n" ;
+   std::vector<ROOT::Math::XYZPoint> * dummy = new std::vector<ROOT::Math::XYZPoint> ;
+   m_3PVvectors[bre->GetName ()] = dummy ;
+   m_tree->SetBranchAddress (bre->GetName (), &m_3PVvectors[bre->GetName ()]) ;
+  }
+  
   if (bname.find ("vector<int>") != std::string::npos)
   {
    if (m_verbosity)
@@ -120,6 +129,12 @@ std::vector<ROOT::Math::XYZVector>* treeReader::Get3V(const std::string &name){
  std::map<std::string,std::vector<ROOT::Math::XYZVector> * >::const_iterator    it_3V  = m_3Vvectors.find(name);
  if (it_3V  != m_3Vvectors.end()  ) return m_3Vvectors[name];
  else return new std::vector<ROOT::Math::XYZVector>;
+}
+
+std::vector<ROOT::Math::XYZPoint>* treeReader::Get3PV(const std::string &name){
+ std::map<std::string,std::vector<ROOT::Math::XYZPoint> * >::const_iterator    it_3PV  = m_3PVvectors.find(name);
+ if (it_3PV  != m_3PVvectors.end()  ) return m_3PVvectors[name];
+ else return new std::vector<ROOT::Math::XYZPoint>;
 }
 
 std::vector<ROOT::Math::XYZTVector>* treeReader::Get4V(const std::string &name){

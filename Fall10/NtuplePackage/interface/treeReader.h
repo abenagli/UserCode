@@ -6,6 +6,7 @@
 #include "TMath.h"
 #include "Math/Vector4D.h"
 #include "Math/Vector3D.h"
+#include "Math/Point3D.h"
 #include "TBranch.h"
 #include "TBranchElement.h"
 
@@ -25,6 +26,7 @@ class treeReader
     
 //     template <class T> std::vector<T>* Get(const std::string &name);
     std::vector<ROOT::Math::XYZVector>*  Get3V    (const std::string &name);
+    std::vector<ROOT::Math::XYZPoint>*   Get3PV   (const std::string &name);
     std::vector<ROOT::Math::XYZTVector>* Get4V    (const std::string &name);
     std::vector<double>*                 GetDouble(const std::string &name);
     std::vector<float>*                  GetFloat (const std::string &name);
@@ -35,6 +37,7 @@ class treeReader
   private:
 
     std::map <std::string, std::vector<ROOT::Math::XYZVector> * >  m_3Vvectors ;
+    std::map <std::string, std::vector<ROOT::Math::XYZPoint> * >   m_3PVvectors ;
     std::map <std::string, std::vector<ROOT::Math::XYZTVector> * > m_4Vvectors ;
     std::map <std::string, std::vector<double> * >                 m_Dvectors ;
     std::map <std::string, std::vector<float> * >                  m_Fvectors ;

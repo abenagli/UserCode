@@ -44,6 +44,11 @@ int parseConfigFile (const TString& config) ;
 
 
 
+/** compute the PU rescale factor */
+double PURescaleFactor (const int& nPU_MC);
+
+
+
 /** compute delta phi */
 double deltaPhi (const double& phi1, const double& phi2);
 
