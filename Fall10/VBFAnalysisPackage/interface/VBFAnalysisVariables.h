@@ -64,6 +64,9 @@ struct VBFAnalysisVariables
   ROOT::Math::XYZTVector* p_lep;
   ROOT::Math::XYZTVector lep;
   
+  ROOT::Math::XYZTVector* p_lepNu;
+  ROOT::Math::XYZTVector lepNu;
+  
   float lep_charge;
   int lep_flavour;
   float lep_eta;
@@ -100,10 +103,13 @@ struct VBFAnalysisVariables
   // met variables
   ROOT::Math::XYZTVector* p_met;
   ROOT::Math::XYZTVector met;
+  ROOT::Math::XYZTVector* p_nu;
+  ROOT::Math::XYZTVector nu;
   float met_et;
   
   float lepMet_mt;
   float lepMet_Dphi;
+  float lepNu_ctheta;
   
   
   
@@ -168,6 +174,7 @@ struct VBFAnalysisVariables
   float WJJ_Deta;
   float WJJ_Dphi;
   float WJJ_DR;
+  float WJJ_ctheta;
   float WJJ_et;
   float WJJ_m;
   float WJJ_zepp;
@@ -183,7 +190,12 @@ struct VBFAnalysisVariables
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNuW_m;
+  float lepNuW_ctheta;
   float lepNuW_zepp;
+  
+  float lepNuW_cphi;
+  float lep_ctheta;
+  float WJ1_ctheta;
   
   
   
@@ -231,5 +243,6 @@ struct VBFAnalysisVariables
 
 
 void SetVBFPreselectionTreeBranches(VBFAnalysisVariables&, TTree*);
+void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree*);
 void InitialiseVBFAnalysisTree(VBFAnalysisVariables& vars, TFile* outputRootFile, const int& nStep, const int& firstStep);
-void FillVBFAnalysisTree(VBFAnalysisVariables& vars, const int& step);
+void FillVBFAnalysisTree(VBFAnalysisVariables& vars, const int&);

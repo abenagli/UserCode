@@ -140,24 +140,11 @@ int main(int argc, char** argv)
   
   if( (leptonFLAVOUR == "e") || (leptonFLAVOUR == "emu") )
   {
-    HLTPathNames.push_back("HLT_Photon15_L1R");
-    HLTPathNames.push_back("HLT_Ele15_LW_L1R");
-    HLTPathNames.push_back("HLT_Ele15_SW_L1R");
-    HLTPathNames.push_back("HLT_Ele15_SW_CaloEleId_L1R");
-    HLTPathNames.push_back("HLT_Ele17_SW_CaloEleId_L1R");
-    HLTPathNames.push_back("HLT_Ele17_SW_TightEleIdIsol_L1R_v1");
-    HLTPathNames.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v1");
-    HLTPathNames.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v2");
     HLTPathNames.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3");
-    HLTPathNames.push_back("HLT_Ele17_SW_L1R");
   }
   if( (leptonFLAVOUR == "mu") || (leptonFLAVOUR == "emu") )
   {
-    HLTPathNames.push_back("HLT_Mu9");
-    HLTPathNames.push_back("HLT_Mu11");
-    HLTPathNames.push_back("HLT_Mu15_v1");
-    HLTPathNames.push_back("HLT_IsoMu13_v3");
-    HLTPathNames.push_back("HLT_IsoMu13_v4");
+    HLTPathNames.push_back("HLT_IsoMu17_v4");
   }
     
     
@@ -329,7 +316,8 @@ int main(int argc, char** argv)
         skipEvent = false;
     }
         
-    //if( skipEvent == true ) continue;
+    //if( (dataFlag == 1) && (skipEvent == true) ) continue;
+    if( (dataFlag == 0) && (skipEvent == true) ) continue;
     
     
     // fill event counters
@@ -407,12 +395,12 @@ int main(int argc, char** argv)
       if( ( pt > 20.)  &&
           ( fabs(eta) < 2.5 ) &&
           ( (fabs(etaSC) < 1.4442) || (fabs(etaSC) > 1.5660) ) &&
-	  ( tkIso/pt < 0.1 ) &&
+          ( tkIso/pt < 0.1 ) &&
           ( fabs(dxy) < 0.02 ) && 
           ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&
           ( ( (isEB == 1) && (DphiIn < 0.060) )        || ( (isEB == 0) && (DphiIn < 0.030) ) ) &&
           ( ( (isEB == 1) && (DetaIn < 0.004) )        || ( (isEB == 0) && (DetaIn < 0.007) ) ) &&
-          ( ( (isEB == 1) && (HOverE < 0.040) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&
+          //( ( (isEB == 1) && (HOverE < 0.040) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&
           ( mishits == 0 ) &&
           ( ( fabs(dist) > 0.02 ) || ( fabs(dcot) > 0.02 ) ) )
       {
@@ -501,7 +489,7 @@ int main(int argc, char** argv)
       // tight selection
       bool isTightMuon = false;
       if( ( pt > 20. ) &&
-          ( fabs(eta) < 2.1 ) &&
+          ( fabs(eta) < 2.5 ) &&
 	  ( tkIso/pt < 0.05 ) &&
           ( fabs(z-vars.PV_z) < 1. ) && 
           ( fabs(dxy) < 0.02 ) &&
@@ -908,7 +896,21 @@ int main(int argc, char** argv)
       // fIll event counters
       stepEvents[step] += 1;
     }
-  
+    
+    
+    
+    
+    
+    
+    //***************
+    // Get the angles
+    //double ctheta_l, ctheta_j1, ctheta_j2;
+    //GetLNuJJAngles(ctheta_l,ctheta_j1,ctheta_j2,
+    //               *vars.p_lep,
+    //               *vars.p_nu,
+    //               *vars.p_WJ1,
+    //               *vars.p_WJ2);
+    
     
     
     

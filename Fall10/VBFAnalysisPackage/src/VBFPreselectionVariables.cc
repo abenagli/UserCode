@@ -89,6 +89,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   // met variables
   vars.m_reducedTree -> Branch("met", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_met);
+  vars.m_reducedTree -> Branch("nu",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu);
   vars.m_reducedTree -> Branch("met_et",       &vars.met_et,             "met_et/F");
   vars.m_reducedTree -> Branch("lepMet_mt",    &vars.lepMet_mt,       "lepMet_mt/F");
   vars.m_reducedTree -> Branch("lepMet_Dphi",  &vars.lepMet_Dphi,   "lepMet_Dphi/F");
@@ -317,10 +318,11 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   // met variables 
   vars.met = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_met = NULL;
+  vars.nu = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_nu = NULL;
   vars.met_et = -1.;
   
   vars.lepMet = ROOT::Math::XYZTVector(0., 0., 0., 0.);
-  vars.neutrino = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   
   vars.lepMet_mt = -1.;
   vars.lepMet_Dphi = -1.;
@@ -853,11 +855,12 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   
   
   if( fabs(vars.mH - (vars.lepW + nu1).mass()) < fabs(vars.mH - (vars.lepW + nu2).mass()) )
-    vars.neutrino = nu1;
+    vars.nu = nu1;
   else
-    vars.neutrino = nu2;
-
-  vars.lepNuW = vars.lepW + vars.neutrino;
+    vars.nu = nu2;
+  
+  vars.p_nu = &vars.nu;
+  vars.lepNuW = vars.lepW + vars.nu;
   vars.lepNuW_m = vars.lepNuW.mass();
   
   //std::cout << "Higgs mt = " << vars.lepMetW_mt << "   Higgs m = " << vars.lepNuW_m << std::endl;
@@ -873,7 +876,7 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   
   TLorentzVector vl(vars.lep.px(),vars.lep.py(),vars.lep.pz(),vars.lep.energy());
   TLorentzVector vm(vars.met.px(),vars.met.py(),0.,vars.met.energy());
-  TLorentzVector vn(vars.neutrino.px(),vars.neutrino.py(),vars.neutrino.pz(),vars.neutrino.energy());
+  TLorentzVector vn(vars.nu.px(),vars.nu.py(),vars.nu.pz(),vars.nu.energy());
   TLorentzVector v1(vars.WJ1.px(),vars.WJ1.py(),vars.WJ1.pz(),vars.WJ1.energy());
   TLorentzVector v2(vars.WJ2.px(),vars.WJ2.py(),vars.WJ2.pz(),vars.WJ2.energy());
   
@@ -903,7 +906,7 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   m2(2,2) = 0.01; // phi
   
   TFitParticleEtEtaPhi* l = new TFitParticleEtEtaPhi("lepton","lepton",&vl,&ml);
-  TFitParticleEtEtaPhi* m = new TFitParticleEtEtaPhi("neutrino","neutrino",&vm,&mm);
+  TFitParticleEtEtaPhi* m = new TFitParticleEtEtaPhi("nu","nu",&vm,&mm);
   TFitParticleEtEtaPhi* jet1 = new TFitParticleEtEtaPhi("Jet1","Jet1",&v1,&m1);
   TFitParticleEtEtaPhi* jet2 = new TFitParticleEtEtaPhi("Jet2","Jet2",&v2,&m2);
   

@@ -46,8 +46,9 @@ class drawTStack
             const std::string& mode,
             const float& lumi, const int& step,
             const int& nBins, const bool& logy,
-            std::vector<std::string>* cut = NULL,
-            const bool& PURescale = false);
+            const bool& PURescale = false,
+            std::vector<std::string>* cut = NULL);
+  
   void DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy);
   void DrawEventRatio_nJets(const std::string& histoName, const float& lumi, const int& step, const bool& logy);
   

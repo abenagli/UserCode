@@ -74,7 +74,9 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   // met variables
   vars.p_met = new ROOT::Math::XYZTVector;
+  vars.p_nu = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("met", &vars.p_met);
+  reducedTree -> SetBranchAddress("nu", &vars.p_nu);
   reducedTree -> SetBranchAddress("met_et",      &vars.met_et);
   reducedTree -> SetBranchAddress("lepMet_mt",   &vars.lepMet_mt);
   reducedTree -> SetBranchAddress("lepMet_Dphi", &vars.lepMet_Dphi);
@@ -190,4 +192,17 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("thirdJ_tagJJDeta", &vars.thirdJ_tagJJDeta);
   reducedTree -> SetBranchAddress("thirdJ_tagJJDphi", &vars.thirdJ_tagJJDphi);
   reducedTree -> SetBranchAddress("thirdJ_tagJJDR",   &vars.thirdJ_tagJJDR);
+}
+
+
+
+void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
+{
+  reducedTree -> Branch("lepNu_ctheta",  &vars.lepNu_ctheta,   "lepNu_ctheta/F");
+  reducedTree -> Branch("WJJ_ctheta",    &vars.WJJ_ctheta,       "WJJ_ctheta/F");
+  reducedTree -> Branch("lepNuW_ctheta", &vars.lepNuW_ctheta, "lepNuW_ctheta/F");
+  
+  reducedTree -> Branch("lepNuW_cphi", &vars.lepNuW_cphi, "lepNuW_cphi/F");
+  reducedTree -> Branch("lep_ctheta",  &vars.lep_ctheta,   "lep_ctheta/F");
+  reducedTree -> Branch("WJ1_ctheta",  &vars.WJ1_ctheta,   "WJ1_ctheta/F");
 }

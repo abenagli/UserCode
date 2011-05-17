@@ -1,6 +1,7 @@
 #include "VBFAnalysisVariables.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
+#include "kalanand.h"
 #include "hFactory.h"
 #include "h2Factory.h"
 #include "stdHisto.h"
@@ -11,6 +12,7 @@
 #include "TProfile.h"
 #include "TObject.h"
 #include "TRandom3.h"
+#include "Math/Vector4D.h"
 
 #include "TMVA/Reader.h"
 
@@ -60,8 +62,10 @@ int main(int argc, char** argv)
   int jetNMIN = gConfigParser -> readIntOption("Cuts::jetNMIN");
   int jetNMAX = gConfigParser -> readIntOption("Cuts::jetNMAX");
   
-  float lepPtMIN = gConfigParser -> readFloatOption("Cuts::lepPtMIN");
-  float lepPtMAX = gConfigParser -> readFloatOption("Cuts::lepPtMAX");
+  float elePtMIN = gConfigParser -> readFloatOption("Cuts::elePtMIN");
+  float elePtMAX = gConfigParser -> readFloatOption("Cuts::elePtMAX");
+  float muPtMIN = gConfigParser -> readFloatOption("Cuts::muPtMIN");
+  float muPtMAX = gConfigParser -> readFloatOption("Cuts::muPtMAX");
   std::string leptonFLAVOUR = gConfigParser -> readStringOption("Cuts::leptonFLAVOUR");
   
   int isoCUT = gConfigParser -> readIntOption("Cuts::isoCUT");
@@ -216,6 +220,7 @@ int main(int argc, char** argv)
     sprintf(treeName, "ntu_%d", step);;
     cloneTrees[step] = chain -> CloneTree(0);
     cloneTrees[step] -> SetName(treeName); 
+    AddVBFAnalysisTreeBranches(vars,cloneTrees[step]);
   }
   
   
@@ -326,12 +331,51 @@ int main(int argc, char** argv)
     vars.totEvents = stepEvents[1];
     vars.lep = *(vars.p_lep);
     vars.met = *(vars.p_met);
+    vars.nu = *(vars.p_nu);
+    vars.lepNu = *(vars.p_lep) + *(vars.p_nu);
     vars.leadingJ = *(vars.p_leadingJ);
     vars.WJ1 = *(vars.p_WJ1);
     vars.WJ2 = *(vars.p_WJ2);
+    vars.WJJ = *(vars.p_WJ1) + *(vars.p_WJ2);
     vars.tagJ1 = *(vars.p_tagJ1);
     vars.tagJ2 = *(vars.p_tagJ2);
+    GetJacksonAngle(vars.lepNu_ctheta,
+                    vars.lep,vars.nu);
+    GetJacksonAngle(vars.WJJ_ctheta,
+                    vars.WJ1,vars.WJ2);
+    GetJacksonAngle(vars.lepNuW_ctheta,
+                    vars.lepNu,vars.WJJ);
+    GetLNuJJAngles(vars.lepNuW_cphi,vars.lep_ctheta,vars.WJ1_ctheta,
+                   vars.lep,vars.nu,vars.WJ1,vars.WJ2);
+    
+    
+    // check with kalanand functions
+    TLorentzVector k_lep(vars.lep.Px(),vars.lep.Py(),vars.lep.Pz(),vars.lep.E());
+    TLorentzVector k_nu(vars.nu.Px(),vars.nu.Py(),vars.nu.Pz(),vars.nu.E());
+    TLorentzVector k_WJ1(vars.WJ1.Px(),vars.WJ1.Py(),vars.WJ1.Pz(),vars.WJ1.E());
+    TLorentzVector k_WJ2(vars.WJ2.Px(),vars.WJ2.Py(),vars.WJ2.Pz(),vars.WJ2.E());
+    TLorentzVector k_lepNu = k_lep+k_nu;
+    TLorentzVector k_WJJ = k_WJ1+k_WJ2;
+    
+    float k_lepNu_ctheta = JacksonAngle(k_lep,k_nu);
+    float k_WJJ_ctheta = JacksonAngle(k_WJ1,k_WJ2);
+    float k_lepNuW_ctheta = JacksonAngle(k_lepNu,k_WJJ);
 
+    float k_lepNuW_cphi;
+    float k_lep_ctheta;
+    float k_WJ1_ctheta;
+    dg_kin_Wuv_Wjj(k_lep,k_nu,k_WJ1,k_WJ2,k_lepNuW_cphi,k_lep_ctheta,k_WJ1_ctheta);
+    
+    std::cout << "lepNu_ctheta:    io: " << vars.lepNu_ctheta  << "   kalanand: " << k_lepNu_ctheta << std::endl;
+    std::cout << "WJJ_ctheta:      io: " << vars.WJJ_ctheta    << "   kalanand: " << k_WJJ_ctheta << std::endl;
+    std::cout << "lepNuW_ctheta:   io: " << vars.lepNuW_ctheta << "   kalanand: " << k_lepNuW_ctheta << std::endl;
+    
+    std::cout << std::endl;
+    
+    std::cout << "lepNuW_cphi:   io: " << vars.lepNuW_cphi  << "   kalanand: " << k_lepNuW_cphi << std::endl;
+    std::cout << "lep_ctheta:    io: " << vars.lep_ctheta   << "   kalanand: " << k_lep_ctheta << std::endl;
+    std::cout << "WJ1_ctheta:    io: " << vars.WJ1_ctheta   << "   kalanand: " << k_WJ1_ctheta << std::endl;
+     
     
     
     
@@ -360,8 +404,10 @@ int main(int argc, char** argv)
     step = 4;
     SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
     
-    if( vars.lep.pt() < lepPtMIN ) continue;
-    if( vars.lep.pt() > lepPtMAX ) continue;
+    if( (vars.lep_flavour == 11) && (vars.lep.pt() < elePtMIN) ) continue;
+    if( (vars.lep_flavour == 11) && (vars.lep.pt() > elePtMAX) ) continue;
+    if( (vars.lep_flavour == 13) && (vars.lep.pt() < muPtMIN) ) continue;
+    if( (vars.lep_flavour == 13) && (vars.lep.pt() > muPtMAX) ) continue;
     if( (leptonFLAVOUR == "e") &&  (vars.lep_flavour != 11) ) continue;
     if( (leptonFLAVOUR == "mu") && (vars.lep_flavour != 13) ) continue;
     if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
@@ -415,7 +461,7 @@ int main(int argc, char** argv)
         if( vars.lep_sigmaIetaIeta  > eleSigmaIetaIetaEBMAX ) isId = false;
         if( fabs(vars.lep_DphiIn)   > eleDphiInEBMAX )        isId = false;
         if( fabs(vars.lep_DetaIn)   > eleDetaInEBMAX )        isId = false;
-        //if( vars.lep_HOverE         > eleHOverEEBMAX )        isId = false;
+        if( vars.lep_HOverE         > eleHOverEEBMAX )        isId = false;
       }
       
       // endcap
@@ -424,7 +470,7 @@ int main(int argc, char** argv)
         if( vars.lep_sigmaIetaIeta  > eleSigmaIetaIetaEEMAX ) isId = false;      
         if( fabs(vars.lep_DphiIn)   > eleDphiInEEMAX )        isId = false;
         if( fabs(vars.lep_DetaIn)   > eleDetaInEEMAX )        isId = false;
-        //if( vars.lep_HOverE         > eleHOverEEEMAX )        isId = false;
+        if( vars.lep_HOverE         > eleHOverEEEMAX )        isId = false;
       }    
       
       // conversion removal
@@ -626,7 +672,7 @@ int main(int argc, char** argv)
     //}
     
     if( (vars.nJets >=1) && (vars.jets_bTag1 > 2.50) ) isBTagged = true;
-    if( (vars.nJets >=2) && (vars.jets_bTag2 > 1.50) ) isBTagged = true;
+    if( (vars.nJets >=2) && (vars.jets_bTag2 > 2.00) ) isBTagged = true;
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
     
     

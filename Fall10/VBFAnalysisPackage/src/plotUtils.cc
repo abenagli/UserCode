@@ -129,8 +129,8 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
                       const std::string& mode,
                       const float& lumi, const int& step,
                       const int& nBins, const bool& logy,
-                      std::vector<std::string>* cut,
-                      const bool& PURescale)
+                      const bool& PURescale,
+                      std::vector<std::string>* cut)
 { 
   std::cout << "\n>>>plotUtils::Draw::Drawing histogram " << histoName;
   
@@ -197,20 +197,27 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     
     // Draw:: dump tree into histogram
     TH1F* histo = new TH1F(histoName.c_str(), "", nBins, m_xRangeMin, m_xRangeMax);    
-    TH1F* histo2 = new TH1F((histoName+"2").c_str(), "", nBins, m_xRangeMin, m_xRangeMax);    
     for(unsigned int jj = 0; jj < variableNames.size(); ++jj)
     {
       //std::cout << "Draw::Dumping tree variable " << (variableNames.at(jj)+">>"+histoName).c_str() << std::endl;
-      if(cut != NULL)
-        tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), (cut->at(jj)).c_str() );
-      else
-        tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str());
-      if(PURescale)
+      
+      if(cut == NULL)
       {
-        tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName+"2").c_str() );
-        histo -> Scale(histo2->Integral()/histo->Integral());
+        if(PURescale)
+          tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), "PURescaleFactor(PUit_n)");
+        else
+          tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str());
+       }
+      
+      else
+      {
+        if(PURescale)
+          tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), ("PURescaleFactor(PUit_n) * "+cut->at(jj)).c_str() );
+        else
+          tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), (cut->at(jj)).c_str() );
       }
     }
+    
     
     
     // Draw::get event histogram
@@ -347,7 +354,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   sprintf(lumiBuffer, "CMS Preliminary 2010");
   
   char lumiBuffer2[50];
-  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.3f pb^{-1}", lumi);
+  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.1f pb^{-1}", lumi);
 
   TLatex *latex = new TLatex(0.76, 0.91, lumiBuffer); 
   TLatex *latex2 = NULL;
@@ -805,7 +812,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   sprintf(lumiBuffer, "CMS Preliminary 2010");
 
   char lumiBuffer2[100];
-  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.3f pb^{-1}", lumi);
+  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.1f pb^{-1}", lumi);
   
   TLatex* latex = new TLatex(0.76, 0.91, lumiBuffer);
   TLatex* latex2 = new TLatex(0.76, 0.88, lumiBuffer2);
@@ -1068,6 +1075,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
         ( (mode == "eventsScaledStack") && (dataFlag_summed[mapIt->first] != 1) ) )
     {
       hs -> Add(globalHisto);
+     
       ++nHists;
       
       if(globalGlobalHisto != NULL)

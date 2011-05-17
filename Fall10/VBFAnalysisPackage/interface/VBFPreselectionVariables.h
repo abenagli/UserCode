@@ -142,11 +142,12 @@ struct VBFPreselectionVariables
   // met variables
   ROOT::Math::XYZTVector met;
   ROOT::Math::XYZTVector* p_met;
+  ROOT::Math::XYZTVector nu;
+  ROOT::Math::XYZTVector* p_nu;
   
   float met_et;  
   
   ROOT::Math::XYZTVector lepMet;
-  ROOT::Math::XYZTVector neutrino;
   
   float lepMet_mt;
   float lepMet_Dphi;
