@@ -14,7 +14,9 @@
 #include "TH1F.h"
 #include "TChain.h"
 #include "TVector3.h"
+#include "Math/Vector3D.h"
 #include "Math/Vector4D.h"
+#include "Math/Boost.h"
 #include "ConfigParser.h"
 
 
@@ -225,6 +227,20 @@ void Print4JetCombination(const std::vector<int>& combination);
 
 /** print 4-vector */
 void Print4V(const ROOT::Math::XYZTVector& p);
+
+/** get lnujj angles  */
+void GetJacksonAngle(float& ctheta,
+                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& p1,
+                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& p2);
+
+void GetLNuJJAngles(float& cphi_lvjj,
+                    float& ctheta_l,
+                    float& ctheta_j1,
+                    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& l,
+                    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& v,
+                    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& j1,
+                    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& j2);
+
 
 
 
