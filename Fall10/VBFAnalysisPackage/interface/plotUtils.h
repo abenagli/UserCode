@@ -14,6 +14,7 @@
 #include "TCanvas.h"
 #include "TFile.h"
 #include "TH1F.h"
+#include "TGraph.h"
 #include "TTree.h"
 #include "THStack.h"
 #include "TLegend.h"
@@ -64,6 +65,7 @@ class drawTStack
 
   void SetUnit(const std::string& unit);  
   
+  void DrawTStackError(THStack* hs);
   
   
  private:

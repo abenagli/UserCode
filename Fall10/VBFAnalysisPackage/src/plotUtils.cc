@@ -51,6 +51,8 @@ drawTStack::drawTStack(const std::string& inputDir,
     std::cout << "\n>>>plotUtils::drawTStack::Opening file " << listFullFileName;
   
   
+  std::cout << std::endl;
+  
   
   // drawTStack::loop over list of samples
   while(!listFile.eof())
@@ -73,24 +75,24 @@ drawTStack::drawTStack(const std::string& inputDir,
     if(sample.at(0) == '#')
       continue;
     
-    std::cout << std::fixed << std::setprecision(1) << std::setw(75)
-              << sample << "\t"
+    std::cout << std::fixed << std::setprecision(1) << std::setw(90)
+              << sample << " "
               << std::setw(20)
-              << sumName << "\t"
+              << sumName << " "
               << std::setw(3)
-              << color << "\t"
+              << color << " "
               << std::setw(3)
-              << linestyle << "\t"
+              << linestyle << " "
+              << std::setw(4)
+              << fillstyle << " "
               << std::setw(3)
-              << fillstyle << "\t"
-              << std::setw(3)
-              << dataFlag << "\t"
+              << dataFlag << " "
               << std::setw(6)
-              << mH << "\t"
+              << mH << " "
               << std::setw(10)
-              << crossSection << "\t" 
-              << scaleFactor << "\t" 
-              << jetAlgorithm << "\t" 
+              << crossSection << " "
+              << scaleFactor << " "
+              << jetAlgorithm << " "
               << std::endl;
     
     std::pair<std::string, std::string> dummyPair(sample, sumName);
@@ -146,6 +148,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   std::map<std::string, int> linestyle_summed;
   std::map<std::string, int> fillstyle_summed;
   std::map<std::string, int> dataFlag_summed;
+  std::map<std::string, double> mH_summed;
   std::map<std::string, TH1F*> histo_summed;
   
   // Draw::initialize summed vectors
@@ -158,6 +161,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     linestyle_summed[vecIt->second] = -1;
     fillstyle_summed[vecIt->second] = -1;
     dataFlag_summed[vecIt->second] = -1;
+    mH_summed[vecIt->second] = -1;
     histo_summed[vecIt->second] = NULL;
   }
   
@@ -182,7 +186,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   {
     // Draw::open root file
     std::string fullRootFileName = m_inputDir+vecIt->first+"/"+m_baseRootFileName+"_"+m_jetAlgorithm.at(i).second+".root";
-    //std::cout << "opening file: " << fullRootFileName << std::endl;
+    //std::cout << "opening file: " << fullRootFileName << std::endl;//
     rootFiles.push_back(new TFile(fullRootFileName.c_str(), "READ"));
     if(!(rootFiles.at(i))->IsOpen()) exit(-1);
     
@@ -199,7 +203,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     TH1F* histo = new TH1F(histoName.c_str(), "", nBins, m_xRangeMin, m_xRangeMax);    
     for(unsigned int jj = 0; jj < variableNames.size(); ++jj)
     {
-      //std::cout << "Draw::Dumping tree variable " << (variableNames.at(jj)+">>"+histoName).c_str() << std::endl;
+      //std::cout << "Draw::Dumping tree variable " << (variableNames.at(jj)+">>"+histoName).c_str() << std::endl;//
       
       if(cut == NULL)
       {
@@ -219,10 +223,9 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     }
     
     
-    
     // Draw::get event histogram
     std::string eventsHistoName = "events";
-    //std::cout << "getting histogram " << eventsHistoName << std::endl;
+    //std::cout << "getting histogram " << eventsHistoName << std::endl;//
     
     TH1F* eventsHisto = NULL;
     rootFiles.at(i) -> GetObject(eventsHistoName.c_str(), eventsHisto);
@@ -233,7 +236,6 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     }
     
     
-    
     // Draw::scale histograms normalizing to lumi (1. pb^-1)
     // Draw::if data do not apply any scale factor
     histo -> Sumw2();
@@ -241,6 +243,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     linestyle_summed[vecIt->second] = m_linestyle[vecIt->first];
     fillstyle_summed[vecIt->second] = m_fillstyle[vecIt->first];
     dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
+    mH_summed[vecIt->second] = m_mH[vecIt->first];
     
     if( (histo->GetEntries() > 0.) && (m_dataFlag[vecIt->first] != 1) )
     {
@@ -336,6 +339,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   //---------------------------------------------
   
   THStack* hs = new THStack("hs", "hs");
+  THStack* hs_signal = new THStack("hs_signal", "hs_signal");
   int nHists = 0;
   
   globalGlobalHisto = NULL;
@@ -351,7 +355,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   legend.SetFillStyle(4000);
   
   char lumiBuffer[50];
-  sprintf(lumiBuffer, "CMS Preliminary 2010");
+  sprintf(lumiBuffer, "CMS Preliminary 2011");
   
   char lumiBuffer2[50];
   sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.1f pb^{-1}", lumi);
@@ -360,16 +364,8 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   TLatex *latex2 = NULL;
   if( mode == "eventsScaled" )
     latex2 = new TLatex(0.76, 0.86, lumiBuffer2);
-  if( mode == "sameAreaStack" )
+  else
     latex2 = new TLatex(0.76, 0.86, "norm. to same area");
-  if( mode == "sameAreaNoStack" )
-    latex2 = new TLatex(0.76, 0.86, "#splitline{each histo normalized}{to unit area}");
-  //if( mode == "eventsScaled" )
-  //  latex = new TLatex(0.76, 0.50, lumiBuffer);
-  //if( mode == "sameAreaStack" )
-  //  latex = new TLatex(0.76, 0.50, "norm. to same area");
-  //if( mode == "sameAreaNoStack" )
-  //  latex = new TLatex(0.76, 0.50, "#splitline{each histo norm.}{to unit area}");
   
   latex->SetNDC();
   latex->SetTextFont(42);
@@ -420,7 +416,10 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       //globalHisto -> SetLineWidth(2);
       globalHisto -> SetLineWidth(1);
       
-      hs -> Add(globalHisto);
+      if(mH_summed[mapIt->first] <= 0.)
+        hs -> Add(globalHisto);
+      else
+        hs_signal -> Add(globalHisto);
       ++nHists;
       legend.AddEntry(globalHisto, (mapIt->first).c_str(), "F");
     }
@@ -430,9 +429,12 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     if( (mode == "sameAreaNoStack") )
     {
       globalHisto -> Scale(1./globalHisto->Integral(1, globalHisto->GetNbinsX()));
-      globalHisto -> SetLineColor(color_summed[mapIt->first]);
-      globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
-      globalHisto -> SetLineWidth(4);
+      if( dataFlag_summed[mapIt->first] != 1 )
+      {
+        globalHisto -> SetLineColor(color_summed[mapIt->first]);
+        globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
+        globalHisto -> SetLineWidth(4);
+      }
       
       if(globalHisto->GetMaximum() > globalMaximum)
         globalMaximum = globalHisto -> GetMaximum();
@@ -444,6 +446,31 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
         hs -> Add(globalHisto);      
         ++nHists;
        legend.AddEntry(globalHisto, (mapIt->first).c_str(), "L");      
+      }
+    }
+    
+    
+    
+    if( (mode == "integral") )
+    {
+      TH1F* integralHisto = (TH1F*)(globalHisto->Clone());
+      
+      for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)
+        integralHisto -> SetBinContent(bin,globalHisto->Integral(1,bin)/globalHisto->Integral()); 
+      
+      integralHisto -> SetLineColor(color_summed[mapIt->first]);
+      integralHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
+      integralHisto -> SetLineWidth(4);
+      
+      globalMaximum = 1.;
+      if(MyGetMinimum(integralHisto, 1.E-15, binMin, binMax) < globalMinimum)
+        globalMinimum = MyGetMinimum(integralHisto, 1.E-15, binMin, binMax);
+      
+      if( dataFlag_summed[mapIt->first] != 1 ) 
+      {
+        hs -> Add(integralHisto);      
+        ++nHists;
+       legend.AddEntry(integralHisto, (mapIt->first).c_str(), "L");      
       }
     }
     
@@ -466,7 +493,10 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       //globalHisto -> SetLineWidth(2);
       globalHisto -> SetLineWidth(1);
       
-      hs -> Add(globalHisto);      
+      if(mH_summed[mapIt->first] <= 0.)
+        hs -> Add(globalHisto);      
+      else
+        hs_signal -> Add(globalHisto);      
       ++nHists;
       legend.AddEntry(globalHisto, (mapIt->first).c_str(), "F");      
     }
@@ -498,7 +528,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   
   
   
-  if( (globalGlobalHisto != NULL) && (mode != "sameAreaNoStack") )
+  if( (globalGlobalHisto != NULL) && (mode != "sameAreaNoStack") && (mode != "integral") )
   {
     if(globalGlobalHisto->GetMaximum() > globalMaximum)
       globalMaximum = globalGlobalHisto -> GetMaximum();
@@ -506,7 +536,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     //  globalMinimum = MyGetMinimum(globalGlobalHisto, 1.E-15, binMin, binMax);
   }
   
-  if( (dataGlobalGlobalHisto != NULL) && (mode != "sameAreaNoStack") )
+  if( (dataGlobalGlobalHisto != NULL) && (mode != "sameAreaNoStack") && (mode != "integral") )
   {
     if(dataGlobalGlobalHisto->GetMaximum() > globalMaximum)
       globalMaximum = dataGlobalGlobalHisto -> GetMaximum();
@@ -562,19 +592,71 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     if(logy) p1 -> SetLogy();
     
     hs -> Draw("HISTO");
-    if(dataGlobalGlobalHisto != NULL) dataGlobalGlobalHisto -> Draw("P,same");
+    hs_signal -> Draw("HISTO,same");
+    DrawTStackError(hs);
+    if(dataGlobalGlobalHisto != NULL)
+    {
+      for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
+        dataGlobalGlobalHisto -> SetBinError(bin,0.);
+      dataGlobalGlobalHisto -> Draw("P,same");
+    }
     
     hs->GetYaxis()->SetTitle(("events / " + std::string(binWidthBuffer)+" "+m_unit).c_str());
     
     if(dataGlobalGlobalHisto != NULL)
     {
       TH1F* ratioHisto = (TH1F*)(dataGlobalGlobalHisto -> Clone());
+      ratioHisto -> GetYaxis() -> SetTitleSize(0.09);
+      ratioHisto -> GetYaxis() -> SetTitleOffset(1.0);
+      ratioHisto -> GetYaxis() -> SetTitle("data/MC");
+      
+      TObjArray* histos = hs -> GetStack();
+      int nHistos = histos -> GetEntries();
+      TH1F* lastHisto = (TH1F*)(histos->At(nHistos-1))->Clone();
+      
+      int nPoints = lastHisto->GetNbinsX();
+      TGraph* ratioGraph1s = new TGraph(2*nPoints);
+      TGraph* ratioGraph2s = new TGraph(2*nPoints);
+
       for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
       {
         if(globalGlobalHisto->GetBinContent(bin) == 0.) continue;
         ratioHisto -> SetBinContent(bin, 1.*dataGlobalGlobalHisto->GetBinContent(bin)/globalGlobalHisto->GetBinContent(bin));
         ratioHisto -> SetBinError(bin, 1.*dataGlobalGlobalHisto->GetBinError(bin)/globalGlobalHisto->GetBinContent(bin));
       }
+      
+      int point = 0;
+      for(int bin = 1; bin <= lastHisto->GetNbinsX(); ++bin)
+      {
+        float binCenter = lastHisto->GetBinCenter(bin);
+        float binError = sqrt(lastHisto->GetBinError(bin)*lastHisto->GetBinError(bin) + 
+                              lastHisto->GetBinContent(bin));
+        float binErrorM;
+        float binErrorP;
+        float binError2M;
+        float binError2P;
+        if( lastHisto->GetBinContent(bin) != 0 )
+        {
+          binErrorM = 1. - binError/lastHisto->GetBinContent(bin);
+          binErrorP = 1. + binError/lastHisto->GetBinContent(bin);
+          binError2M = 1. - 2.*binError/lastHisto->GetBinContent(bin);
+          binError2P = 1. + 2.*binError/lastHisto->GetBinContent(bin);
+        }
+        else
+        {
+          binErrorM = 1.;
+          binErrorP = 1.;
+          binError2M = 1.;
+          binError2P = 1.;
+        }
+        ratioGraph1s -> SetPoint(point,binCenter,binErrorM);
+        ratioGraph1s -> SetPoint(2*nPoints-point-1,binCenter,binErrorP);
+        ratioGraph2s -> SetPoint(point,binCenter,binError2M);
+        ratioGraph2s -> SetPoint(2*nPoints-point-1,binCenter,binError2P);
+        
+        ++point;
+      }
+      
       
       p2 -> cd();
       p2 -> SetGridx();
@@ -583,6 +665,16 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       ratioHisto -> GetYaxis() -> SetRangeUser(0., 2.);
       ratioHisto -> Draw("P");
       
+      ratioGraph2s -> SetFillColor(kYellow);
+      ratioGraph2s -> SetLineColor(kYellow);
+      ratioGraph2s -> Draw("F,same");
+      
+      ratioGraph1s -> SetFillColor(kGreen);
+      ratioGraph1s -> SetLineColor(kGreen);
+      ratioGraph1s -> Draw("F,same");
+      
+      ratioHisto -> Draw("P,same");
+        
       TF1* line = new TF1("line", "1.", -1000000., 1000000.);
       line -> SetLineWidth(2);
       line -> SetLineColor(kRed);
@@ -602,6 +694,13 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     }
     
     hs->GetYaxis()->SetTitle(("event fraction / " + std::string(binWidthBuffer)+" "+m_unit).c_str());
+  }
+  
+  
+  if( mode == "integral" )
+  {
+    hs -> Draw("nostack,HISTO");
+    hs->GetYaxis()->SetTitle(("event integral / " + std::string(binWidthBuffer)+" "+m_unit).c_str());
   }
   
   
@@ -691,16 +790,67 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     p3 -> SetLogy();
     
     hs -> Draw("HISTO");
-    if(dataGlobalGlobalHisto != NULL) dataGlobalGlobalHisto -> Draw("P,same");
-    
+    hs_signal -> Draw("HISTO,same");
+    DrawTStackError(hs);
     if(dataGlobalGlobalHisto != NULL)
     {
+      for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
+        dataGlobalGlobalHisto -> SetBinError(bin,0.);
+      dataGlobalGlobalHisto -> Draw("P,same");
+    }
+    
+    if(dataGlobalGlobalHisto != NULL)
+    {    
       TH1F* ratioHisto = (TH1F*)(dataGlobalGlobalHisto -> Clone());
+      ratioHisto -> GetYaxis() -> SetTitleSize(0.09);
+      ratioHisto -> GetYaxis() -> SetTitleOffset(1.0);
+      ratioHisto -> GetYaxis() -> SetTitle("data/MC");
+      
+      TObjArray* histos = hs -> GetStack();
+      int nHistos = histos -> GetEntries();
+      TH1F* lastHisto = (TH1F*)(histos->At(nHistos-1))->Clone();
+      
+      int nPoints = lastHisto->GetNbinsX();
+      TGraph* ratioGraph1s = new TGraph(2*nPoints);
+      TGraph* ratioGraph2s = new TGraph(2*nPoints);
+
       for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
       {
         if(globalGlobalHisto->GetBinContent(bin) == 0.) continue;
         ratioHisto -> SetBinContent(bin, 1.*dataGlobalGlobalHisto->GetBinContent(bin)/globalGlobalHisto->GetBinContent(bin));
         ratioHisto -> SetBinError(bin, 1.*dataGlobalGlobalHisto->GetBinError(bin)/globalGlobalHisto->GetBinContent(bin));
+      }
+      
+      int point = 0;
+      for(int bin = 1; bin <= lastHisto->GetNbinsX(); ++bin)
+      {
+        float binCenter = lastHisto->GetBinCenter(bin);
+	float binError = sqrt(lastHisto->GetBinError(bin)*lastHisto->GetBinError(bin) +
+                              lastHisto->GetBinContent(bin));
+        float binErrorM;
+        float binErrorP;
+        float binError2M;
+        float binError2P;
+        if( lastHisto->GetBinContent(bin) != 0 )
+        {
+          binErrorM = 1. - binError/lastHisto->GetBinContent(bin);
+          binErrorP = 1. + binError/lastHisto->GetBinContent(bin);
+          binError2M = 1. - 2.*binError/lastHisto->GetBinContent(bin);
+          binError2P = 1. + 2.*binError/lastHisto->GetBinContent(bin);
+        }
+        else
+        {
+          binErrorM = 1.;
+          binErrorP = 1.;
+          binError2M = 1.;
+          binError2P = 1.;
+        }
+        ratioGraph1s -> SetPoint(point,binCenter,binErrorM);
+        ratioGraph1s -> SetPoint(2*nPoints-point-1,binCenter,binErrorP);
+        ratioGraph2s -> SetPoint(point,binCenter,binError2M);
+        ratioGraph2s -> SetPoint(2*nPoints-point-1,binCenter,binError2P);
+        
+        ++point;
       }
       
       p4 -> cd();
@@ -709,6 +859,16 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       
       ratioHisto -> GetYaxis() -> SetRangeUser(0., 2.);
       ratioHisto -> Draw("P");
+      
+      ratioGraph2s -> SetFillColor(kYellow);
+      ratioGraph2s -> SetLineColor(kYellow);
+      ratioGraph2s -> Draw("F,same");
+      
+      ratioGraph1s -> SetFillColor(kGreen);
+      ratioGraph1s -> SetLineColor(kGreen);
+      ratioGraph1s -> Draw("F,same");
+      
+      ratioHisto -> Draw("P,same");
       
       TF1* line = new TF1("line", "1.", -1000000., 1000000.);
       line -> SetLineWidth(2);
@@ -727,6 +887,15 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       dataGlobalGlobalHisto -> Scale(1./dataGlobalGlobalHisto->Integral(1, dataGlobalGlobalHisto->GetNbinsX()));
       dataGlobalGlobalHisto -> Draw("P,same");
     }
+    
+    hs->GetYaxis()->SetTitle(("event fraction / " + std::string(binWidthBuffer)+" "+m_unit).c_str());
+  }
+  
+  
+  
+  if( mode == "integral" )
+  {
+    hs -> Draw("nostack,HISTO");
     
     hs->GetYaxis()->SetTitle(("event fraction / " + std::string(binWidthBuffer)+" "+m_unit).c_str());
   }
@@ -803,13 +972,14 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   
   
   THStack* hs = new THStack("hs", "hs");
+  THStack* hs_signal = new THStack("hs_signal", "hs_signal");
   int nHists = 0;
   TLegend legend(m_xLowLegend, m_yLowLegend, m_xHighLegend, m_yHighLegend);
   legend.SetFillColor(kWhite);
   legend.SetFillStyle(4000);
   
   char lumiBuffer[50];
-  sprintf(lumiBuffer, "CMS Preliminary 2010");
+  sprintf(lumiBuffer, "CMS Preliminary 2011");
 
   char lumiBuffer2[100];
   sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.1f pb^{-1}", lumi);
@@ -863,7 +1033,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
 
   std::vector<TFile*> rootFiles;
   bool isFirstSample_data = true;
-  TH1F* histoData = NULL;
+  TH1F* dataHisto = NULL;
   TH1F* globalGlobalHisto = NULL;
   int i = 0;
   int binMin = -1;
@@ -888,12 +1058,16 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       exit(-1);
     }
     
+    if( mode == "eventsScaledStack" )
+      histo -> Sumw2();
+    
     color_summed[vecIt->second] = m_color[vecIt->first];
     linestyle_summed[vecIt->second] = m_linestyle[vecIt->first];
     fillstyle_summed[vecIt->second] = m_fillstyle[vecIt->first];
     mH_summed[vecIt->second] = m_mH[vecIt->first];
     dataFlag_summed[vecIt->second] = m_dataFlag[vecIt->first];
     crossSection_summed[vecIt->second] += m_crossSection[vecIt->first];
+    
     if(m_mH[vecIt->first] > 0)
       isSignal_summed[vecIt->second] = true;
     
@@ -904,7 +1078,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
         (mode == "efficienciesRelative") ||
         (mode == "significance") )
     {
-      if( m_dataFlag[vecIt->first] != 1 )
+      if( m_crossSection[vecIt->first] != 1. )
         histo -> Scale(lumi*m_crossSection[vecIt->first]/histo->GetBinContent(1));
      }
     
@@ -926,16 +1100,15 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     // save data histogram
     if( (isFirstSample_data == false) && (dataFlag_summed[vecIt->second] == 1) )
     {
-      histoData -> Add(histo);
+      dataHisto -> Add(histo);
     }
     if( (isFirstSample_data == true) && (dataFlag_summed[vecIt->second] == 1) )
     {
-      histoData = (TH1F*)(histo -> Clone());
+      dataHisto = (TH1F*)(histo -> Clone());
       isFirstSample_data = false;
     }
-
-    //if(m_dataFlag[vecIt->first] == 1)
-    // histoData = histo;
+    
+    
     
     ++i;
   }
@@ -977,6 +1150,48 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   TH1F* stepHisto = new TH1F("stepHisto", "", nSamples, 0., 1.*nSamples);
   
   
+  
+  
+  
+  
+  //----------------
+  // data histograms
+  //----------------
+  
+  if( dataHisto != NULL )
+  {
+    if(mode == "efficiencies")
+    {
+      float totalEvents = dataHisto -> GetBinContent(1);
+      for(int bin = 1; bin <= dataHisto->GetNbinsX(); ++bin)
+        dataHisto->SetBinContent(bin, 1.*dataHisto->GetBinContent(bin)/totalEvents);
+    }
+    
+    if(mode == "efficienciesRelative")
+    {
+      std::map<int, float> totalEvents;
+      totalEvents[0] = dataHisto->GetBinContent(1);
+      for(int bin = 1; bin <= dataHisto->GetNbinsX(); ++bin)
+        totalEvents[bin] = dataHisto->GetBinContent(bin);
+      
+      for(int bin = 1; bin <= dataHisto->GetNbinsX(); ++bin)
+      {        
+        if(totalEvents[bin-1] > 0.)
+          dataHisto->SetBinContent(bin, 1.*dataHisto->GetBinContent(bin)/totalEvents[bin-1]);
+        else
+          dataHisto->SetBinContent(bin, 0.);
+      }
+    }
+  }
+  
+  
+  
+  
+  
+  
+  //-------------------------
+  // loop over summed samples
+  //-------------------------
   
   i = 0;
   std::map<int, float> nEventsScaled_sig;
@@ -1034,11 +1249,15 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     }
     
     
-    globalHisto -> SetLineColor(color_summed[mapIt->first]);
-    globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
-    globalHisto -> SetLineWidth(4);
-    globalHisto -> SetFillColor(color_summed[mapIt->first]);
-    globalHisto -> SetFillStyle(0);
+    if( dataFlag_summed[mapIt->first] != 1 )
+    {
+      globalHisto -> SetLineColor(color_summed[mapIt->first]);
+      globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
+      globalHisto -> SetLineWidth(4);
+      globalHisto -> SetFillColor(color_summed[mapIt->first]);
+      globalHisto -> SetFillStyle(0);
+    }
+    
     if( mode == "eventsScaledStack")
     {
       globalHisto -> SetLineColor(kBlack);
@@ -1070,12 +1289,14 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     
     
     
-    if( ( (mode != "eventsScaled") && (mode != "eventsScaledStack") ) ||
-        ( (mode == "eventsScaled")      && (dataFlag_summed[mapIt->first] != 1) ) || 
-        ( (mode == "eventsScaledStack") && (dataFlag_summed[mapIt->first] != 1) ) )
+    if( dataFlag_summed[mapIt->first] != 1 )
     {
-      hs -> Add(globalHisto);
-     
+      if( ( (mode == "eventsScaledStack") && (mH_summed[mapIt->first] <= 0.) ) ||
+          ( mode != "eventsScaledStack" ) )
+        hs -> Add(globalHisto);
+      if( (mode == "eventsScaledStack") && (mH_summed[mapIt->first] > 0.) )
+	hs_signal -> Add(globalHisto);
+                 
       ++nHists;
       
       if(globalGlobalHisto != NULL)
@@ -1084,7 +1305,8 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
         globalGlobalHisto = (TH1F*)(globalHisto -> Clone());
     }
     
-
+    
+    
     if( (mode != "eventsScaledStack") && (dataFlag_summed[mapIt->first] != 1) )
       legend.AddEntry(globalHisto, (mapIt->first).c_str(), "L");
     else if( (mode == "eventsScaledStack") && (dataFlag_summed[mapIt->first] != 1) )
@@ -1172,7 +1394,11 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     if(logy) p1 -> SetLogy();
     
     if( hs->GetHists()->GetEntries() > 0 )
+    {
       hs -> Draw("HISTO");
+      hs_signal -> Draw("HISTO,same");
+      DrawTStackError(hs);
+    }
   }
 
   legend.SetTextFont(42);  
@@ -1220,6 +1446,15 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       hs->GetYaxis()->SetTitle("events left"); 
     stepHisto->GetYaxis()->SetTitle("events left");
     
+    if(dataHisto != NULL)
+    {
+      dataHisto -> SetMarkerStyle(20);
+      if(nHists > 0)
+        dataHisto -> Draw("P,same");
+      else
+        dataHisto -> Draw("P");
+    }
+    
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
@@ -1238,13 +1473,13 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     latex->Draw("same");
     latex2->Draw("same");
     
-    if(histoData != NULL)
+    if(dataHisto != NULL)
     {
-      histoData -> SetMarkerStyle(20);  
+      dataHisto -> SetMarkerStyle(20);
       if(nHists > 0)
-        histoData -> Draw("P,same");
+        dataHisto -> Draw("P,same");
       else
-        histoData -> Draw("P");
+        dataHisto -> Draw("P");
     }
     
     struct stat st;
@@ -1261,11 +1496,11 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     (*outFile) << "\n";
     for(unsigned int bin = 1; bin <= nEventsScaled_sig.size(); ++bin)
     {
-      (*outFile) << "bin " << bin << ":   S = " 
-                               << nEventsScaled_sig[bin]
-                               << ":   B = " 
-                               << nEventsScaled_bkg[bin]
-                               << std::endl;
+      (*outFile) << "bin = "          << std::setw(2) << bin
+                 << "   S = "         << nEventsScaled_sig[bin]
+                 << "   B = "         << nEventsScaled_bkg[bin]
+                 << "   S/sqrt(B) = " << nEventsScaled_sig[bin]/sqrt(nEventsScaled_bkg[bin])
+                 << std::endl;
     }
   }
   
@@ -1280,23 +1515,64 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     latex->Draw("same");
     latex2->Draw("same");
     
-    if(histoData != NULL)
+    if(dataHisto != NULL)
     {
-      histoData -> SetMarkerStyle(20);
+      dataHisto -> SetMarkerStyle(20);
       
-      for(int bin = 1; bin <= histoData->GetNbinsX(); ++bin)
-        histoData->SetBinError(bin, sqrt(histoData->GetBinContent(bin)));
+      for(int bin = 1; bin <= dataHisto->GetNbinsX(); ++bin)
+        dataHisto->SetBinError(bin,0.); 
       
-      histoData -> Draw("P,same");
+      dataHisto -> Draw("P,same");
       
       
       
-      TH1F* ratioHisto = (TH1F*)(histoData -> Clone());
-      for(int bin = 1; bin <= histoData->GetNbinsX(); ++bin)
+      TH1F* ratioHisto = (TH1F*)(dataHisto -> Clone());
+      
+      TObjArray* histos = hs -> GetStack();
+      int nHistos = histos -> GetEntries();
+      TH1F* lastHisto = (TH1F*)(histos->At(nHistos-1))->Clone();
+
+      int nPoints = lastHisto->GetNbinsX();
+      TGraph* ratioGraph1s = new TGraph(2*nPoints);
+      TGraph* ratioGraph2s = new TGraph(2*nPoints);
+      
+      for(int bin = 1; bin <= dataHisto->GetNbinsX(); ++bin)
       {
         if(globalGlobalHisto->GetBinContent(bin) == 0.) continue;
-        ratioHisto -> SetBinContent(bin, 1.*histoData->GetBinContent(bin)/globalGlobalHisto->GetBinContent(bin));
-        ratioHisto -> SetBinError(bin, 1.*histoData->GetBinError(bin)/globalGlobalHisto->GetBinContent(bin));
+        ratioHisto -> SetBinContent(bin, 1.*dataHisto->GetBinContent(bin)/globalGlobalHisto->GetBinContent(bin));
+        ratioHisto -> SetBinError(bin, 1.*dataHisto->GetBinError(bin)/globalGlobalHisto->GetBinContent(bin));
+      }
+      
+      int point = 0;
+      for(int bin = 1; bin <= lastHisto->GetNbinsX(); ++bin)
+      {
+        float binCenter = lastHisto->GetBinCenter(bin);
+        float binError = sqrt(lastHisto->GetBinError(bin)*lastHisto->GetBinError(bin) +
+                              lastHisto->GetBinContent(bin));
+        float binErrorM;
+        float binErrorP;
+        float binError2M;
+        float binError2P;
+        if( lastHisto->GetBinContent(bin) != 0 )
+        {
+          binErrorM = 1. - binError/lastHisto->GetBinContent(bin);
+          binErrorP = 1. + binError/lastHisto->GetBinContent(bin);
+          binError2M = 1. - 2.*binError/lastHisto->GetBinContent(bin);
+          binError2P = 1. + 2.*binError/lastHisto->GetBinContent(bin);
+        }
+        else
+        {
+          binErrorM = 1.;
+          binErrorP = 1.;
+          binError2M = 1.;
+          binError2P = 1.;
+        }
+        ratioGraph1s -> SetPoint(point,binCenter,binErrorM);
+        ratioGraph1s -> SetPoint(2*nPoints-point-1,binCenter,binErrorP);
+        ratioGraph2s -> SetPoint(point,binCenter,binError2M);
+        ratioGraph2s -> SetPoint(2*nPoints-point-1,binCenter,binError2P);
+        
+        ++point;
       }
       
       p2 -> cd();
@@ -1305,6 +1581,16 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       
       ratioHisto -> GetYaxis() -> SetRangeUser(0., 2.);
       ratioHisto -> Draw("P");
+      
+      ratioGraph2s -> SetFillColor(kYellow);
+      ratioGraph2s -> SetLineColor(kYellow);
+      ratioGraph2s -> Draw("F,same");
+      
+      ratioGraph1s -> SetFillColor(kGreen);
+      ratioGraph1s -> SetLineColor(kGreen);
+      ratioGraph1s -> Draw("F,same");
+      
+      ratioHisto -> Draw("P,same");
       
       TF1* line = new TF1("line", "1.", -1000000., 1000000.);
       line -> SetLineWidth(2);
@@ -1334,6 +1620,15 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       hs->GetYaxis()->SetTitle("efficiency");
     stepHisto->GetYaxis()->SetTitle("efficiency");
     
+    if(dataHisto != NULL)
+    {
+      dataHisto -> SetMarkerStyle(20);
+      if(nHists > 0)
+        dataHisto -> Draw("P,same");
+      else
+        dataHisto -> Draw("P");
+    }
+    
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
@@ -1350,6 +1645,15 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     if(nHists > 0)
       hs->GetYaxis()->SetTitle("relative efficiency");
     stepHisto->GetYaxis()->SetTitle("relative efficiency");
+    
+    if(dataHisto != NULL)
+    {
+      dataHisto -> SetMarkerStyle(20);
+      if(nHists > 0)
+        dataHisto -> Draw("P,same");
+      else
+        dataHisto -> Draw("P");
+    }
     
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
@@ -1525,4 +1829,30 @@ double MyGetMinimum(const TH1F* histo, const double& minval, int binMin, int bin
   }
 
   return minimum;
+}
+
+
+
+
+
+
+void drawTStack::DrawTStackError(THStack* hs)
+{
+  TObjArray* histos = hs -> GetStack();
+  int nHistos = histos -> GetEntries();
+  TH1F* lastHisto = (TH1F*)(histos->At(nHistos-1))->Clone();
+  
+  lastHisto -> SetFillStyle(3005);
+  lastHisto -> SetFillColor(kBlack);
+  lastHisto -> SetMarkerSize(0);
+ 
+  for(int bin = 0; bin <= lastHisto->GetNbinsX(); ++bin)
+  {
+    double oldErr = lastHisto -> GetBinError(bin);
+    double poissonErr = sqrt(lastHisto -> GetBinContent(bin));
+    lastHisto -> SetBinError(bin,sqrt(oldErr*oldErr + poissonErr*poissonErr));
+    //std::cout << "bin: " << bin << "   err: " << std::setprecision(4) << lastHisto -> GetBinError(bin) << std::endl;
+  }
+  
+  lastHisto -> DrawClone("same,E2");
 }
