@@ -70,7 +70,7 @@ while (<LISTOFSamples>)
   
   chomp($_);
   
-  ($sample,$dummy,$color,$linestyle,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
+  ($sample,$dummy,$color,$linestyle,$fillstyle,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
   $subsample = substr($sample,0,1);
   if($subsample eq "#")
   {
@@ -159,7 +159,7 @@ while (<LISTOFSamples>)
     $command = "cd ".$BASEDir ;
     print SAMPLEJOBFILE $command."\n";
 
-    $command = "source ./scripts/setup.csh" ;
+    $command = "source ./scripts/setup.sh" ;
     print SAMPLEJOBFILE $command."\n";
     
     $command = "cd ".$jobDir ;
