@@ -134,8 +134,7 @@ int main(int argc, char** argv)
   float WJJDphiMAX = gConfigParser -> readFloatOption("Cuts::WJJDphiMAX");
   
   float lepZeppMAX = gConfigParser -> readFloatOption("Cuts::lepZeppMAX");
-  float WJJMaxZeppMAX = gConfigParser -> readFloatOption("Cuts::WJJMaxZeppMAX");
-  float WJJMinZeppMAX = gConfigParser -> readFloatOption("Cuts::WJJMinZeppMAX");
+  float lepNuWZeppMAX = gConfigParser -> readFloatOption("Cuts::lepNuWZeppMAX");
   
   float lepMetWDphiMIN = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMIN");
   float lepMetWDphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMAX");
@@ -146,6 +145,15 @@ int main(int argc, char** argv)
   float lepWJJPt2MIN = gConfigParser -> readFloatOption("Cuts::lepWJJPt2MIN");
   float lepWJJPt3MIN = gConfigParser -> readFloatOption("Cuts::lepWJJPt3MIN");
   
+  float lepCthetaMIN = gConfigParser -> readFloatOption("Cuts::lepCthetaMIN");
+  float lepCthetaMAX = gConfigParser -> readFloatOption("Cuts::lepCthetaMAX");
+  float WJ1CthetaMIN = gConfigParser -> readFloatOption("Cuts::WJ1CthetaMIN");
+  float WJ1CthetaMAX = gConfigParser -> readFloatOption("Cuts::WJ1CthetaMAX");
+  float lepNuCthetaMIN = gConfigParser -> readFloatOption("Cuts::lepNuCthetaMIN");
+  float lepNuCthetaMAX = gConfigParser -> readFloatOption("Cuts::lepNuCthetaMAX");
+  float lepWJ1DphiMIN = gConfigParser -> readFloatOption("Cuts::lepWJ1DphiMIN");
+  float lepWJ1DphiMAX = gConfigParser -> readFloatOption("Cuts::lepWJ1DphiMAX");
+    
   float MVAMIN = gConfigParser -> readFloatOption("Cuts::MVAMIN");
   
   std::map<int, int> totalEvents = GetTotalEvents("events", inputFileList.c_str()); 
@@ -176,7 +184,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 21;
+  int nStep = 22;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_plus_int  = new TH1F("events_plus_int",  "events_plus_int",  nStep, 0., 1.*nStep);
@@ -275,8 +283,8 @@ int main(int argc, char** argv)
   
   
   
-  //*******************************
-  // STEP 2 - Skim: 1 lepton 2 jets
+  //*************
+  // STEP 2 - HLT
   step = 2;
   stepEvents[step] = totalEvents[7];
   stepEvents_plus_int[step] = totalEvents[7];
@@ -286,23 +294,42 @@ int main(int argc, char** argv)
     (stepEvents_plus[njetBin])[step] = totalEvents[7];
     (stepEvents_minus[njetBin])[step] = totalEvents[7];
   }
-  stepNames[step] = "2) 1! lepton && >= 2 cnt jets";
+  stepNames[step] = "2) HLT";
   
   
   
-  //*************
-  // STEP 3 - HLT
+  //**********************
+  // STEP 3 - Preselection
   step = 3;
-  stepEvents[step] = totalEvents[9];
-  stepEvents_plus_int[step] = totalEvents[9];
-  stepEvents_minus_int[step] = totalEvents[9];
+  stepEvents[step] = totalEvents[11];
+  stepEvents_plus_int[step] = totalEvents[11];
+  stepEvents_minus_int[step] = totalEvents[11];
   for(int njetBin = jetNMIN; njetBin <= jetNMAX; ++njetBin)
   {
-    (stepEvents_plus[njetBin])[step] = totalEvents[9];
-    (stepEvents_minus[njetBin])[step] = totalEvents[9];
+    (stepEvents_plus[njetBin])[step] = totalEvents[11];
+    (stepEvents_minus[njetBin])[step] = totalEvents[11];
   }
-  stepNames[step] = "3) HLT";
+  stepNames[step] = "3) Preselection";
   
+  stepNames[4]  = "4) lepton pt/eta";
+  stepNames[5]  = "5) lepton ID";
+  stepNames[6]  = "6) lepton isolation";
+  stepNames[7]  = "7) lepton 3D I.P.";
+  stepNames[8]  = "8) met";
+  stepNames[9]  = "9) 2 W-jets";
+  stepNames[10] = "10) b-tag veto";
+  stepNames[11] = "11) lep. W cuts";
+  stepNames[12] = "12) had. W cuts";
+  stepNames[13] = "13) pt max cuts";
+  stepNames[14] = "14) Helicity angles";
+  stepNames[15] = "15) Higgs mass";
+  stepNames[16] = "16) < 4 jets";
+  stepNames[17] = "17) >= 4 jets";
+  stepNames[18] = "18) W-W cuts";
+  stepNames[19] = "19) VBF cuts";
+  stepNames[20] = "20) zepp. cuts";
+  stepNames[21] = "21) jet veto";
+  stepNames[22] = "22) MVA";
   
   
   
@@ -339,17 +366,11 @@ int main(int argc, char** argv)
     vars.WJJ = *(vars.p_WJ1) + *(vars.p_WJ2);
     vars.tagJ1 = *(vars.p_tagJ1);
     vars.tagJ2 = *(vars.p_tagJ2);
-    GetJacksonAngle(vars.lepNu_ctheta,
-                    vars.lep,vars.nu);
-    GetJacksonAngle(vars.WJJ_ctheta,
-                    vars.WJ1,vars.WJ2);
-    GetJacksonAngle(vars.lepNuW_ctheta,
-                    vars.lepNu,vars.WJJ);
-    GetLNuJJAngles(vars.lepNuW_cphi,vars.lep_ctheta,vars.WJ1_ctheta,
+    vars.thirdJ = *(vars.p_thirdJ);
+    
+    GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
                    vars.lep,vars.nu,vars.WJ1,vars.WJ2);
-    
-    
-    // check with kalanand functions
+    /*// check with kalanand functions
     TLorentzVector k_lep(vars.lep.Px(),vars.lep.Py(),vars.lep.Pz(),vars.lep.E());
     TLorentzVector k_nu(vars.nu.Px(),vars.nu.Py(),vars.nu.Pz(),vars.nu.E());
     TLorentzVector k_WJ1(vars.WJ1.Px(),vars.WJ1.Py(),vars.WJ1.Pz(),vars.WJ1.E());
@@ -374,7 +395,7 @@ int main(int argc, char** argv)
     
     std::cout << "lepNuW_cphi:   io: " << vars.lepNuW_cphi  << "   kalanand: " << k_lepNuW_cphi << std::endl;
     std::cout << "lep_ctheta:    io: " << vars.lep_ctheta   << "   kalanand: " << k_lep_ctheta << std::endl;
-    std::cout << "WJ1_ctheta:    io: " << vars.WJ1_ctheta   << "   kalanand: " << k_WJ1_ctheta << std::endl;
+    std::cout << "WJ1_ctheta:    io: " << vars.WJ1_ctheta   << "   kalanand: " << k_WJ1_ctheta << std::endl;*/
      
     
     
@@ -402,7 +423,7 @@ int main(int argc, char** argv)
     //***********************
     // STEP 4 - lepton pt/eta
     step = 4;
-    SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
+    //SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
     
     if( (vars.lep_flavour == 11) && (vars.lep.pt() < elePtMIN) ) continue;
     if( (vars.lep_flavour == 11) && (vars.lep.pt() > elePtMAX) ) continue;
@@ -448,7 +469,7 @@ int main(int argc, char** argv)
     //**********************************
     // STEP 5 - Initial cuts - lepton ID
     step += 1;
-    SetStepNames(stepNames, "lepton ID", step, verbosity);
+    //SetStepNames(stepNames, "lepton ID", step, verbosity);
     
     
     bool isId = true;
@@ -517,7 +538,7 @@ int main(int argc, char** argv)
     //******************************************
     // STEP 6 - Initial cuts - lepton isolation
     step += 1;
-    SetStepNames(stepNames, "lepton isolation", step, verbosity);
+    //SetStepNames(stepNames, "lepton isolation", step, verbosity);
     
     
     bool isIsolated = true;
@@ -576,7 +597,7 @@ int main(int argc, char** argv)
     //***************************************
     // STEP 7 - Initial cuts - lepton 3D I.P.
     step += 1;
-    SetStepNames(stepNames, "lepton 3D I.P.", step, verbosity);
+    //SetStepNames(stepNames, "lepton 3D I.P.", step, verbosity);
     
     
     bool is3DIP = true;
@@ -615,7 +636,7 @@ int main(int argc, char** argv)
     //****************************
     // STEP 8 - Initial cuts - met
     step += 1;
-    SetStepNames(stepNames, "met", step, verbosity);
+    //SetStepNames(stepNames, "met", step, verbosity);
     
     
     if( metCUT == 1 )
@@ -638,7 +659,7 @@ int main(int argc, char** argv)
     //**********************************
     // STEP 9 - Initial cuts - 2 W-jets
     step += 1;
-    SetStepNames(stepNames, "2 W-jets", step, verbosity);
+    //SetStepNames(stepNames, "2 W-jets", step, verbosity);
     
     
     //if( vars.nJets > 3 ) continue;
@@ -662,18 +683,23 @@ int main(int argc, char** argv)
     //************************************
     // STEP 10 - Initial cuts - b-tag veto
     step += 1;
-    SetStepNames(stepNames, "b-tag veto", step, verbosity);
+    //SetStepNames(stepNames, "b-tag veto", step, verbosity);
     
     
     bool isBTagged = false;
+    bool isAntiBTagged = true;
     //for(unsigned int jetIt = 0; jetIt < vars.nJets; ++jetIt)
     //{
     //  if( vars.jets_bTag.at(jetIt) > 2.5 ) isBTagged = true;
     //}
     
-    if( (vars.nJets >=1) && (vars.jets_bTag1 > 2.50) ) isBTagged = true;
-    if( (vars.nJets >=2) && (vars.jets_bTag2 > 2.00) ) isBTagged = true;
+    if( (vars.nJets >=1) && (vars.jets_bTag1 > 4.00) ) isBTagged = true;
+    if( (vars.nJets >=2) && (vars.jets_bTag2 > 2.50) ) isBTagged = true;
+    if( (vars.nJets >=1) && (vars.jets_bTag1 < 4.00) ) isAntiBTagged = false;
+    if( (vars.nJets >=2) && (vars.jets_bTag2 < 2.50) ) isAntiBTagged = false;
+    
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isAntiBTagged == false) ) continue;
     
     
     // fill distributions
@@ -693,7 +719,7 @@ int main(int argc, char** argv)
     //*************************************
     // STEP 11 - Initial cuts - lep. W cuts
     step += 1;
-    SetStepNames(stepNames, "lep. W cuts", step, verbosity);
+    //SetStepNames(stepNames, "lep. W cuts", step, verbosity);
     
 
     if( metCUT == 1 )    
@@ -728,7 +754,7 @@ int main(int argc, char** argv)
     //*************************************
     // STEP 12 - Initial cuts - had. W cuts
     step += 1;
-    SetStepNames(stepNames, "had. W cuts", step, verbosity);
+    //SetStepNames(stepNames, "had. W cuts", step, verbosity);
     
     
     // mjj cut
@@ -759,34 +785,10 @@ int main(int argc, char** argv)
     
     
     
-    //**********************************
-    // STEP 13 - Initial cuts - W-W cuts
-    step += 1;
-    SetStepNames(stepNames, "W-W cuts", step, verbosity);
-    
-    
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMetW_Dphi) < lepMetWDphiMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMetW_Dphi) > lepMetWDphiMAX) ) continue;
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
     //**************************************
-    // STEP 14 - Initial cuts - pt max  cuts
+    // STEP 13 - Initial cuts - pt max  cuts
     step += 1;
-    SetStepNames(stepNames, "pt max cuts", step, verbosity);
+    //SetStepNames(stepNames, "pt max cuts", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN) ) continue;
@@ -808,10 +810,40 @@ int main(int argc, char** argv)
     
     
     
+    //*****************************************
+    // STEP 14 - Initial cuts - Helicity angles
+    step += 1;
+    //SetStepNames(stepNames, "Helicity angles", step, verbosity);
+    
+    
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.lep_ctheta < lepCthetaMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.lep_ctheta > lepCthetaMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.WJ1_ctheta < WJ1CthetaMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.WJ1_ctheta > WJ1CthetaMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.lepNu_ctheta < lepNuCthetaMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.lepNu_ctheta > lepNuCthetaMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (std::min(vars.WJ1_lep_Dphi,vars.WJ2_lep_Dphi) < lepWJ1DphiMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (std::min(vars.WJ1_lep_Dphi,vars.WJ2_lep_Dphi) > lepWJ1DphiMAX) ) continue;
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
     //************************************
     // STEP 15 - Initial cuts - Higgs mass
     step += 1;
-    SetStepNames(stepNames, "Higgs mass", step, verbosity);
+    //SetStepNames(stepNames, "Higgs mass", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m) < lepNuWMMIN) ) continue;
@@ -835,7 +867,7 @@ int main(int argc, char** argv)
     //**********************************
     // STEP 16 - Initial cuts - < 4 jets
     step += 1;
-    SetStepNames(stepNames, "< 4 jets", step, verbosity);
+    //SetStepNames(stepNames, "< 4 jets", step, verbosity);
     
     
     if( vars.nJets < 4 )
@@ -855,10 +887,10 @@ int main(int argc, char** argv)
     
     
     
-    //************************************
-    // STEP 17 - Initial cuts - 2 tag-jets
+    //***********************************
+    // STEP 17 - Initial cuts - >= 4 jets
     step += 1;
-    SetStepNames(stepNames, "2 tag-jets", step, verbosity);
+    //SetStepNames(stepNames, ">= 4 jets", step, verbosity);
     
     
     // at least 1 tag jet
@@ -882,11 +914,34 @@ int main(int argc, char** argv)
     
     
     
-
-    //**************************************
-    // STEP 18 - Initial cuts - tag-jet cuts
+    //**********************************
+    // STEP 18 - Initial cuts - W-W cuts
     step += 1;
-    SetStepNames(stepNames, "tag-jet cuts", step, verbosity);
+    //SetStepNames(stepNames, "W-W cuts", step, verbosity);
+    
+    
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMetW_Dphi) < lepMetWDphiMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMetW_Dphi) > lepMetWDphiMAX) ) continue;
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //**************************************
+    // STEP 19 - Initial cuts - tag-jet cuts
+    step += 1;
+    //SetStepNames(stepNames, "tag-jet cuts", step, verbosity);
     
 
     if( std::max(vars.tagJ1.Et(),vars.tagJ2.Et()) < tagJJMaxEtMIN ) continue;
@@ -912,14 +967,13 @@ int main(int argc, char** argv)
     
     
     //*****************************************
-    // STEP 19 - Initial cuts - zeppenfeld cuts
+    // STEP 20 - Initial cuts - zeppenfeld cuts
     step += 1;
-    SetStepNames(stepNames, "zeppenfeld cuts", step, verbosity);
+    //SetStepNames(stepNames, "zeppenfeld cuts", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lep_zepp) > lepZeppMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (std::max(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMaxZeppMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (std::min(fabs(vars.WJ1_zepp),fabs(vars.WJ2_zepp)) > WJJMinZeppMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_zepp) > lepNuWZeppMAX) ) continue;
     
     // fill distributions
     stepEvents[step] += 1;
@@ -936,9 +990,9 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 20 - Initial cuts - jet veto
+    // STEP 21 - Initial cuts - jet veto
     step += 1;
-    SetStepNames(stepNames, "jet veto", step, verbosity);
+    //SetStepNames(stepNames, "jet veto", step, verbosity);
     
     
     if( (vars.nJets_btw_et20) > 1 ) continue;    
@@ -966,9 +1020,9 @@ int main(int argc, char** argv)
     
     
     //*****************************
-    // STEP 21 - Initial cuts - MVA
+    // STEP 22 - Initial cuts - MVA
     step += 1;
-    SetStepNames(stepNames, "MVA", step, verbosity);
+    //SetStepNames(stepNames, "MVA", step, verbosity);
     
     
     if( vars.mva < MVAMIN ) continue;    
