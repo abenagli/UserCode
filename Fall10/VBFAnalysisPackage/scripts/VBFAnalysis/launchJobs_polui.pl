@@ -36,7 +36,7 @@ $INPUTFILEName         = $User_Preferences{"INPUTFILEName"};
 $OUTPUTSaveDir         = $User_Preferences{"OUTPUTSaveDir"};
 
 $SELECTIONSCfgTemplate = $BASEDir."/".$SELECTIONSCfgTemplate;
-$SAMPLESListFile       = $BASEDir."/".$SAMPLESListFile;
+$SAMPLESListFile       = $BASEDir."/".$OUTPUTSaveDir."/".$SAMPLESListFile;
 $OUTPUTSaveDir         = $BASEDir."/".$OUTPUTSaveDir;
 
 print "BASEDir = "          .$BASEDir."\n" ;
@@ -53,9 +53,9 @@ print "OUTPUTSaveDir = ".$OUTPUTSaveDir."\n";
 
 
 
-$command = "mkdir ".$OUTPUTSaveDir;
-print("\n".$command."\n");
-system($command);
+#$command = "mkdir ".$OUTPUTSaveDir;
+#print("\n".$command."\n");
+#system($command);
 
 
 $sampleJobListFile = "./lancia.sh";
@@ -77,7 +77,7 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$color,$linestyle,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
+  ($sample,$sampleName,$color,$linestyle,$fillstyle,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
