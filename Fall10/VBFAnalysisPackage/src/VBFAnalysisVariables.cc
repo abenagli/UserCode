@@ -198,11 +198,9 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
 
 void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
 {
-  reducedTree -> Branch("lepNu_ctheta",  &vars.lepNu_ctheta,   "lepNu_ctheta/F");
-  reducedTree -> Branch("WJJ_ctheta",    &vars.WJJ_ctheta,       "WJJ_ctheta/F");
-  reducedTree -> Branch("lepNuW_ctheta", &vars.lepNuW_ctheta, "lepNuW_ctheta/F");
-  
-  reducedTree -> Branch("lepNuW_cphi", &vars.lepNuW_cphi, "lepNuW_cphi/F");
-  reducedTree -> Branch("lep_ctheta",  &vars.lep_ctheta,   "lep_ctheta/F");
-  reducedTree -> Branch("WJ1_ctheta",  &vars.WJ1_ctheta,   "WJ1_ctheta/F");
+  reducedTree -> Branch("lepNuW_cphi",  &vars.lepNuW_cphi,   "lepNuW_cphi/F");
+  reducedTree -> Branch("lepNuZ_cphi",  &vars.lepNuZ_cphi,   "lepNuZ_cphi/F");
+  reducedTree -> Branch("lep_ctheta",   &vars.lep_ctheta,     "lep_ctheta/F");
+  reducedTree -> Branch("WJ1_ctheta",   &vars.WJ1_ctheta,     "WJ1_ctheta/F");
+  reducedTree -> Branch("lepNu_ctheta", &vars.lepNu_ctheta, "lepNu_ctheta/F");
 }
