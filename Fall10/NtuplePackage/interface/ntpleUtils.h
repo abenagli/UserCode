@@ -229,13 +229,11 @@ void Print4JetCombination(const std::vector<int>& combination);
 void Print4V(const ROOT::Math::XYZTVector& p);
 
 /** get lnujj angles  */
-void GetJacksonAngle(float& ctheta,
-                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& p1,
-                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& p2);
-
 void GetLNuJJAngles(float& cphi_lvjj,
+                    float& cphi_lvz,
                     float& ctheta_l,
                     float& ctheta_j1,
+                    float& ctheta_lv,
                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& l,
                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& v,
                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& j1,

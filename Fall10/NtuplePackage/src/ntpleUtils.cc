@@ -1138,34 +1138,15 @@ void Print4V(const ROOT::Math::XYZTVector& p)
             << std::endl;
 }
 
+
+
 //  ------------------------------------------------------------
-void GetJacksonAngle(float& ctheta,
-                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& p1,
-                     ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& p2)
-{
-  ROOT::Math::XYZTVector p1_lab   = p1;
-  ROOT::Math::XYZTVector p2_lab   = p2;
-  ROOT::Math::XYZTVector p1p2_lab = p1_lab+p2_lab;
-  
-  
-  // define boost in the 1-2 system
-  ROOT::Math::Boost boost_12;
-  boost_12.SetComponents(-1./p1p2_lab.E()*p1p2_lab.Vect());
-  
-  
-  // boost momenta in the 1-2 system
-  ROOT::Math::XYZTVector p1_12 = boost_12 * p1_lab;
-  
-  
-  // get the result
-  ctheta = p1_12.Vect().Dot(p1_lab.Vect()) /  ( p1_12.Vect().R() * p1_lab.Vect().R() );
-}
-
-
 void GetLNuJJAngles(float& cphi_lvjj,
+                    float& cphi_lvz,
                     float& ctheta_l,
                     float& ctheta_j1,
-		    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& l,
+                    float& ctheta_lv,
+       		    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& l,
 		    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& v,
 		    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& j1,
 		    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& j2)
@@ -1174,15 +1155,14 @@ void GetLNuJJAngles(float& cphi_lvjj,
   ROOT::Math::XYZTVector v_lab  = v;
   ROOT::Math::XYZTVector j1_lab = j1;
   ROOT::Math::XYZTVector j2_lab = j2;
-  if( j2.E() > j1.E() )
-  {
-    j1_lab = j2;
-    j2_lab = j1;
-  }
   
   ROOT::Math::XYZTVector lvjj_lab = l_lab+v_lab+j1_lab+j2_lab;
   ROOT::Math::XYZTVector lv_lab = l_lab+v_lab;
   ROOT::Math::XYZTVector jj_lab = j1_lab+j2_lab;
+  
+  
+  
+  
   
   
   // define boost in the Higgs system
@@ -1198,11 +1178,30 @@ void GetLNuJJAngles(float& cphi_lvjj,
   ROOT::Math::XYZTVector j2_h = boost_h * j2_lab;
   ROOT::Math::XYZTVector jj_h = boost_h * jj_lab;
   
+  if( j2_h.E() > j1_h.E() )
+  {
+    j1_h = boost_h * j2_lab;;
+    j2_h = boost_h * j1_lab;;
+  }
   
-  // find the two decay planes
+  
+  
+  
+  
+  
+  // find the angle between the two decay planes
   ROOT::Math::XYZVector lvplane_h = l_h.Vect().Cross(v_h.Vect());
   ROOT::Math::XYZVector jjplane_h = j1_h.Vect().Cross(j2_h.Vect());
   cphi_lvjj = lvplane_h.Dot(jjplane_h) / ( lvplane_h.R() * jjplane_h.R() );
+  
+  
+  
+  // find the angle between the production and the decay planes
+  ROOT::Math::XYZVector z_lab(0.,0.,1.);
+  
+  ROOT::Math::XYZVector prodplane_h = z_lab.Cross(lv_h.Vect());
+  ROOT::Math::XYZVector decplane_h = lv_h.Vect().Cross(l_h.Vect());
+  cphi_lvz = prodplane_h.Dot(decplane_h) / ( prodplane_h.R() * decplane_h.R() );
   
   
   
@@ -1214,7 +1213,7 @@ void GetLNuJJAngles(float& cphi_lvjj,
   ROOT::Math::XYZVector z_h = lv_h.Vect();
   z_h /= z_h.R();
   
-  ROOT::Math::XYZVector x_h = j1_lab.Vect() - (j1_lab.Vect().Dot(z_h))*z_h;
+  ROOT::Math::XYZVector x_h = j1_h.Vect() - (j1_h.Vect().Dot(z_h))*z_h;
   x_h /= x_h.R();
   
   ROOT::Math::XYZVector y_h = z_h.Cross(x_h);
@@ -1244,12 +1243,17 @@ void GetLNuJJAngles(float& cphi_lvjj,
   
   
   
-  // get the result
-  ctheta_l  =  l_h_lv.Vect().Dot(z_h) /  l_h_lv.Vect().R();
-  ctheta_j1 = j1_h_jj.Vect().Dot(z_h) / j1_h_jj.Vect().R();
   
-  //std::cout << "ctheta(l-z) = "  << ctheta_l  << std::endl;
-  //std::cout << "ctheta(j1-z) = " << ctheta_j1 << std::endl;
+  
+  
+  // get the result
+  ctheta_l  =  l_h_lv.Vect().Dot(+1.*z_h) /  l_h_lv.Vect().R();
+  ctheta_j1 = j1_h_jj.Vect().Dot(-1.*z_h) / j1_h_jj.Vect().R();
+  ctheta_lv = lv_h.Vect().Z() / lv_h.Vect().R();
+  
+  //std::cout << "ctheta(l-z')  = " << ctheta_l  << std::endl;
+  //std::cout << "ctheta(j1-z') = " << ctheta_j1 << std::endl;
+  //std::cout << "ctheta(lv-z)  = " << ctheta_lv << std::endl;
 }
 
 
