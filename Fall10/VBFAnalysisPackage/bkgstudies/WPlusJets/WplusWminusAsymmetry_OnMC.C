@@ -30,23 +30,15 @@ void WplusWminusAsymmetry_OnMC()
   char treeName[50];
   sprintf(treeName, "ntu_%d", step);
   
-  float lumi = 300.;
+  float lumi = 500.;
   
-  int nBins = 30;
+  int nBins = 20;
   double xMin = 0.;
   double xMax = 300.;
   
-  
-  
-  
-  
-    
   // get the background shape histograms
   TH1F* BKGShapeHisto = new TH1F("BKGShapeHisto", "BKGShapeHisto", nBins, xMin, xMax);
   BKGShapeHisto -> Sumw2();
-
-  TH1F* BKGShapeHisto_test = new TH1F("BKGShapeHisto_test", "BKGShapeHisto_test", nBins, xMin, xMax);
-  BKGShapeHisto_test -> Sumw2();
   
   TH1F* BKGShapeHisto_p = new TH1F("BKGShapeHisto_p", "BKGShapeHisto_p", nBins, xMin, xMax);
   BKGShapeHisto_p -> Sumw2();
@@ -64,8 +56,36 @@ void WplusWminusAsymmetry_OnMC()
   TH1F* BKGShapeHisto_diff_corr = new TH1F("BKGShapeHisto_diff_corr", "BKGShapeHisto_diff_corr", nBins, xMin, xMax);
   BKGShapeHisto_diff_corr -> Sumw2();
   
+  //Histograms to get the second half of the sample (want something statistically indipendent)
+  TH1F* BKGShapeHisto_test = new TH1F("BKGShapeHisto_test", "BKGShapeHisto_test", nBins, xMin, xMax);
+  BKGShapeHisto_test -> Sumw2();
+
+  TH1F* BKGShapeHisto_test_p = new TH1F("BKGShapeHisto_test_p", "BKGShapeHisto_test_p", nBins, xMin, xMax);
+  BKGShapeHisto_test_p -> Sumw2();
+
+  TH1F* BKGShapeHisto_test_m = new TH1F("BKGShapeHisto_test_m", "BKGShapeHisto_test_m", nBins, xMin, xMax);
+  BKGShapeHisto_test_m -> Sumw2();
   
-  int nBKG = 11;
+  TH1F* WShapeHisto_test = new TH1F("WShapeHisto_test", "WShapeHisto_test", nBins, xMin, xMax);
+  WShapeHisto_test -> Sumw2();
+
+  //Histograms to test on the method with the expected statistic
+  TH1F* BKGShapeHisto_truestat = new TH1F("BKGShapeHisto_truestat", "BKGShapeHisto_truestat", nBins, xMin, xMax);
+  BKGShapeHisto_truestat -> Sumw2();
+
+  TH1F* BKGShapeHisto_truestat_p = new TH1F("BKGShapeHisto_truestat_p", "BKGShapeHisto_truestat_p", nBins, xMin, xMax);
+  BKGShapeHisto_truestat_p -> Sumw2();
+
+  TH1F* BKGShapeHisto_truestat_m = new TH1F("BKGShapeHisto_truestat_m", "BKGShapeHisto_truestat_m", nBins, xMin, xMax);
+  BKGShapeHisto_truestat_m -> Sumw2();
+
+  TH1F* BKGShapeHisto_truestat_diff = new TH1F("BKGShapeHisto_truestat_diff", "BKGShapeHisto_truestat_diff", nBins, xMin, xMax);
+  BKGShapeHisto_truestat_diff -> Sumw2();
+ 
+  TH1F* BKGShapeHisto_truestat_diff_corr = new TH1F("BKGShapeHisto_truestat_diff_corr", "BKGShapeHisto_truestat_diff_corr", nBins, xMin, xMax);
+  BKGShapeHisto_truestat_m -> Sumw2();
+
+  const int nBKG = 11;
   std::string* BKGNames = new std::string[nBKG];
   BKGNames[0]  = BKGPath+WJetsFolder+"VBFAnalysis_AK5PF.root";
 //  BKGNames[1]  = BKGPath+ZJetsFolder+"VBFAnalysis_AK5PF.root";
@@ -94,7 +114,6 @@ void WplusWminusAsymmetry_OnMC()
   BKGShortNames[9]  = "TJets_tchannel";
   BKGShortNames[10] = "TJets_tWchannel";
   
-  
   for(int i = 0; i < nBKG; ++i)
   {
     TFile* inFile_BKGShape = TFile::Open((BKGNames[i]).c_str());
@@ -106,8 +125,7 @@ void WplusWminusAsymmetry_OnMC()
     TH1F* eventsHisto;
     inFile_BKGShape -> GetObject("events", eventsHisto);
     float totEvents = eventsHisto -> GetBinContent(1);
-    
-    
+        
     // set branch addresses
     float crossSection;
     float theVariable;
@@ -115,9 +133,7 @@ void WplusWminusAsymmetry_OnMC()
     BKGShapeTree -> SetBranchAddress("crossSection",       &crossSection);
     BKGShapeTree -> SetBranchAddress(variableName.c_str(), &theVariable);
     BKGShapeTree -> SetBranchAddress("lep_charge",         &lep_charge);
-    
-    
-    
+
     // loop over the entries
     for(int entry = 0; entry < BKGShapeTree->GetEntries(); ++entry)
     {
@@ -142,12 +158,21 @@ void WplusWminusAsymmetry_OnMC()
           WShapeHisto_m -> Fill(theVariable, 1./totEvents*crossSection*lumi);
       }
       
-      
-      if( (entry > int(BKGShapeTree->GetEntries()/2)) &&
+      // Fill the histograms to test the method
+      if( (entry > int(BKGShapeTree->GetEntries()/2)) && 
           (BKGShortNames[i] == "WJets") )
       {
         // all events - test
         BKGShapeHisto_test -> Fill(theVariable, 1./totEvents*crossSection*lumi);
+        // + events
+        if( lep_charge > 0. )
+          BKGShapeHisto_test_p -> Fill(theVariable, 1./totEvents*crossSection*lumi);
+        // - events
+        if( lep_charge < 0. )
+          BKGShapeHisto_test_m -> Fill(theVariable, 1./totEvents*crossSection*lumi);
+        // Ws
+        if( BKGShortNames[i] == "WJets" )
+          WShapeHisto_test -> Fill(theVariable, 1./totEvents*crossSection*lumi); 
       }
       
       
@@ -155,6 +180,27 @@ void WplusWminusAsymmetry_OnMC()
   }
   
   
+  //-----------------------
+  //Setup RooFit variable to perfom the test of the method on MC
+  // define the RooRealVars
+  RooRealVar x("x", variableName.c_str(), xMin, xMax);
+  x.setBins(nBins);
+  // define the RooDataHist
+  RooDataHist rooBKGShapeHisto("rooBKGShapeHisto", "BKG", RooArgList(x), BKGShapeHisto_test);
+  RooDataHist rooBKGShapeHisto_p("rooBKGShapeHisto_p", "BKG_P", RooArgList(x), BKGShapeHisto_test_p);
+  // define the RooPDFs
+  RooHistPdf BKGPdf("BKGPdf", "BKG", x, rooBKGShapeHisto, 0) ;
+  RooHistPdf BKGPdf_p("BKGPdf_p", "BKG_P", x, rooBKGShapeHisto_p, 0) ;
+  // now generate to histograms using as pdfs the whole 1/2 MC statistic with the expected number of events for this lumi
+  RooRealVar NBKG("NBKG","NBKG",(int)(BKGShapeHisto_test -> Integral() + 0.5),0.,1000000.);
+  RooRealVar NBKG_P("NBKG_P","NBKG_P",(int)(BKGShapeHisto_test_p -> Integral() + 0.5),0.,1000000.);
+
+  RooDataHist *gen_rooBKGShapeHisto = BKGPdf.generateBinned(RooArgSet(x),NBKG.getVal(),RooFit::Extended(1));
+  RooDataHist *gen_rooBKGShapeHisto_p = BKGPdf_p.generateBinned(RooArgSet(x),NBKG_P.getVal(),RooFit::Extended(1));
+  // now go back to the histograms
+  BKGShapeHisto_truestat = (TH1F*)gen_rooBKGShapeHisto->createHistogram("x");
+  BKGShapeHisto_truestat_p = (TH1F*)gen_rooBKGShapeHisto_p->createHistogram("x");
+  BKGShapeHisto_truestat_m -> Add (BKGShapeHisto_truestat,BKGShapeHisto_truestat_p,1.,-1.);
   
   //-----------------------
   // get the bin population
@@ -176,8 +222,8 @@ void WplusWminusAsymmetry_OnMC()
   // subtract plus - minus
   BKGShapeHisto_diff -> Add(BKGShapeHisto_p,BKGShapeHisto_m,1.,-1.);
   
-  
-  
+  // subtract plus - minus - for testing the method
+  BKGShapeHisto_truestat_diff -> Add(BKGShapeHisto_truestat_p,BKGShapeHisto_truestat_m,1.,-1.);
   
   //-----------------------------
   // apply the correction factors
@@ -191,12 +237,30 @@ void WplusWminusAsymmetry_OnMC()
       R = events_p[bin-1]/events_m[bin-1];
     float newval;
 
+    //If the number of events in the bin is equal for the positive and negative histos DO NOT apply the correction
     if ( (events_p[bin-1] > 0.) && (events_m[bin-1] > 0.) && (events_p[bin-1] == events_m[bin-1]) ) newval = old;
     else newval = old * (1 + 2. / (R - 1.) );
     std::cout << " new is " << newval<< std::endl;
     BKGShapeHisto_diff_corr -> SetBinContent(bin, newval);
   }
   
+  // apply the correction factors - for testing
+  BKGShapeHisto_truestat_diff_corr = (TH1F*)(BKGShapeHisto_truestat_diff -> Clone());
+  for(int bin = 1; bin <= BKGShapeHisto_truestat_diff_corr->GetNbinsX(); ++bin)
+  {
+    float old = BKGShapeHisto_truestat_diff_corr -> GetBinContent(bin);
+    
+    float R = -1.;
+    if( (events_p[bin-1] > 0.) && (events_m[bin-1] > 0.) )
+      R = events_p[bin-1]/events_m[bin-1];
+    float newval;
+
+    //If the number of events in the bin is equal for the positive and negative histos DO NOT apply the correction
+    if ( (events_p[bin-1] > 0.) && (events_m[bin-1] > 0.) && (events_p[bin-1] == events_m[bin-1]) ) newval = old;
+    else newval = old * (1 + 2. / (R - 1.) );
+    std::cout << " new is " << newval<< std::endl;
+    BKGShapeHisto_truestat_diff_corr -> SetBinContent(bin, newval);
+  }
   
   
   //--------------------
@@ -222,11 +286,32 @@ void WplusWminusAsymmetry_OnMC()
   BKGShapeHisto -> Draw("HIST");
   BKGShapeHisto_diff_corr -> Draw("same");
   
-  TCanvas* c1_diff_test = new TCanvas((variableName + "_diff_test").c_str(),(variableName + "_diff_test").c_str());
-  BKGShapeHisto_test -> SetFillColor(kBlue);
-  BKGShapeHisto_test -> SetFillStyle(3003);
-  BKGShapeHisto_test -> Draw("HIST");
-  BKGShapeHisto_diff_corr -> Draw("same");
+  //Test of the method
+  TCanvas* c1_test = new TCanvas((variableName + "_truestat").c_str(),(variableName + "_truestat").c_str());
+  BKGShapeHisto_truestat -> SetFillColor(kBlue);
+  BKGShapeHisto_truestat -> SetLineColor(kBlue);
+  BKGShapeHisto_truestat -> SetFillStyle(3003);
+  BKGShapeHisto_truestat -> Draw("HIST");
   
+  TCanvas* c1_test_p = new TCanvas((variableName + "_truestat_plus").c_str(),(variableName + "_truestat_plus").c_str());
+  BKGShapeHisto_truestat_p -> Draw();
+  
+  TCanvas* c1_test_m = new TCanvas((variableName + "_truestat_minus").c_str(),(variableName + "_truestat_minus").c_str());
+  BKGShapeHisto_truestat_m -> Draw();
+  
+  TCanvas* c1_test_diff = new TCanvas((variableName + "_truestat_diff").c_str(),(variableName + "_truestat_diff").c_str());
+  BKGShapeHisto_truestat_diff -> Draw();
+  
+  TCanvas* c1_test_diff_corr = new TCanvas((variableName + "_truestat_diff_corr").c_str(),(variableName + "_truestat_diff_corr").c_str());
+  BKGShapeHisto_truestat_diff_corr -> SetMarkerColor(kRed);
+  BKGShapeHisto_truestat_diff_corr -> SetLineColor(kRed);
+//   BKGShapeHisto_truestat -> Draw("HIST"); // Compare with initial pseudodata for selected lumi
+  WShapeHisto_test -> Draw("HIST"); // Compare with W plus Jets
+  BKGShapeHisto_truestat_diff_corr -> Draw("same");
+  
+  //Normalization check
+  std::cout << "Number of W events from MC = " << WShapeHisto_test -> Integral() << std::endl;
+  std::cout << "Number of W events from DD = " << BKGShapeHisto_truestat_diff_corr -> Integral() << std::endl;
+    
 
 }
