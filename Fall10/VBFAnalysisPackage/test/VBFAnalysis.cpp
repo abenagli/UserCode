@@ -447,7 +447,6 @@ int main(int argc, char** argv)
     if( (vars.dataFlag == 0) && (vars.lep_flavour == 11) ) HLTPathNames = HLTPathNames_e_MC;
     if( (vars.dataFlag == 0) && (vars.lep_flavour == 13) ) HLTPathNames = HLTPathNames_mu_MC;
     
-    std::cout << "dataFlag = " << vars.dataFlag << std::endl;
     for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
     {
       if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt)) == true )
