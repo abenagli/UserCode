@@ -41,6 +41,11 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("rhoForJets",      &vars.rhoForJets,           "rhoForJets/F");
   
   
+  // HLT variables
+  vars.m_reducedTree -> Branch("HLT_Names",  "std::vector<std::string>", &vars.p_HLT_Names);
+  vars.m_reducedTree -> Branch("HLT_Accept", "std::vector<float>",       &vars.p_HLT_Accept);
+  
+  
   // PV variables
   vars.m_reducedTree -> Branch("PV_n",              &vars.PV_n,                           "PV_n/I");
   vars.m_reducedTree -> Branch("PV_d0",             &vars.PV_d0,                         "PV_d0/F");
@@ -509,6 +514,16 @@ void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
   
   vars.rhoForIsolation = reader.GetFloat("rho_isolation")->at(0);
   vars.rhoForJets = reader.GetFloat("rho_jets")->at(0);
+}
+
+
+
+void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader)
+{
+  vars.HLT_Names =  *(reader.GetString("HLT_Names"));
+  vars.p_HLT_Names = &(vars.HLT_Names);
+  vars.HLT_Accept =  *(reader.GetFloat("HLT_Accept"));
+  vars.p_HLT_Accept = &(vars.HLT_Accept);
 }
 
 
