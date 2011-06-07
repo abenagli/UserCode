@@ -2,7 +2,6 @@
 #include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
-#include "readJSONFile.h"
 
 #include <iomanip>
 
@@ -11,7 +10,7 @@
 
 
 void SetStepNames(std::map<int, std::string>&, const std::string&, const int&, const int&);
-bool AcceptHLTPath(treeReader&, const std::string&);
+
 
 
 
@@ -34,7 +33,6 @@ int main(int argc, char** argv)
   std::string inputFileList = gConfigParser -> readStringOption("Input::inputFileList");
   std::string jetAlgorithm  = gConfigParser -> readStringOption("Input::jetAlgorithm");
   std::string jetType       = gConfigParser -> readStringOption("Input::jetType");
-  std::string jsonFileName  = gConfigParser -> readStringOption("Input::jsonFileName");
   std::string higgsMass     = gConfigParser -> readStringOption("Input::higgsMass");
     
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
@@ -92,16 +90,6 @@ int main(int argc, char** argv)
   
   
   
-  // Get run/LS map from JSON file
-  std::cout << ">>> VBFPreselection::Get run/LS map from JSON file" << std::endl;
-  std::map<int, std::vector<std::pair<int, int> > > jsonMap;
-  jsonMap = readJSONFile(jsonFileName);
-  
-  
-  
-  
-  
-  
   // Open old tree
   std::cout << ">>> VBFPreselection::Open old tree" << std::endl;
   std::string treeName = "MiBiCommonNTOneLeptonTwoJets"+jetAlgorithm+"/SimpleNtuple";
@@ -116,7 +104,7 @@ int main(int argc, char** argv)
   
   // define histograms
   std::cout << ">>> VBFPreselection::Define histograms" << std::endl;
-  int nStep = 11;
+  int nStep = 10;
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepNames;
@@ -135,23 +123,9 @@ int main(int argc, char** argv)
   
   
   
-  // define HLT paths
-  std::vector<std::string> HLTPathNames;
   
-  if( (leptonFLAVOUR == "e") || (leptonFLAVOUR == "emu") )
-  {
-    HLTPathNames.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3");
-  }
-  if( (leptonFLAVOUR == "mu") || (leptonFLAVOUR == "emu") )
-  {
-    HLTPathNames.push_back("HLT_IsoMu17_v4");
-  }
     
     
-  
-  
-  
-  
   //********************
   // STEP 1 - all events
   int step = 1;
@@ -217,6 +191,7 @@ int main(int argc, char** argv)
     vars.eventNaiveId += 1;
     
     SetPUVariables(vars, reader, dataFlag);
+    SetHLTVariables(vars, reader);
     SetPVVariables(vars, reader);
     
     //if( vars.eventId != 101101 ) continue;
@@ -269,22 +244,13 @@ int main(int argc, char** argv)
     
     
     
-    //**************************
-    // STEP 6 - run/LS selection
+    //********************
+    // STEP 6 - HCAL noise
     step = 6;
-    SetStepNames(stepNames, "Run/LS selection", step, verbosity);
+    SetStepNames(stepNames, "HCAL noise", step, verbosity);
     
     
-    bool skipEvent = false;
-    if( vars.dataFlag == 1 )
-    {
-      if(AcceptEventByRunAndLumiSection(vars.runId, vars.lumiId, jsonMap) == false) skipEvent = true;      
-      
-      // HCAL noise
-      if( reader.GetInt("HCAL_noise")->at(0) == 0 ) skipEvent = true;
-    }
-    
-    if( skipEvent == true ) continue;
+    if( reader.GetInt("HCAL_noise")->at(0) == 0 ) continue;
     
     
     // fill event counters
@@ -295,42 +261,8 @@ int main(int argc, char** argv)
     
     
         
-    //***********************
-    // STEP 7 - HLT selection
-    step = step+1;
-    SetStepNames(stepNames, "HLT", step, verbosity);
-    
-    
-    skipEvent = true;
-
-    if( verbosity == 1)    
-    {
-      std::vector<std::string> HLT_names = *(reader.GetString("HLT_Names"));
-      for(unsigned int HLTIt = 0; HLTIt < HLT_names.size(); ++HLTIt)
-	std::cout << "HLTbit " << HLTIt << "   " << HLT_names.at(HLTIt) << std::endl;    
-    }
-        
-    for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
-    {
-      if( AcceptHLTPath(reader, HLTPathNames.at(HLTIt)) == true )
-        skipEvent = false;
-    }
-        
-    //if( (dataFlag == 1) && (skipEvent == true) ) continue;
-    if( (dataFlag == 0) && (skipEvent == true) ) continue;
-    
-    
-    // fill event counters
-    stepEvents[step] += 1;
-    
-    
-    
-    
-    
-    
-    
     //*********************
-    // STEP 8 - >= 1 lepton
+    // STEP 7 - >= 1 lepton
     step += 1;
     SetStepNames(stepNames, ">= 1 lepton", step, verbosity);
     
@@ -560,7 +492,7 @@ int main(int argc, char** argv)
     
     
     //*******************
-    // STEP 9 - muon veto
+    // STEP 8 - muon veto
     
     step += 1;
     SetStepNames(stepNames, "muon veto", step, verbosity);
@@ -579,7 +511,7 @@ int main(int argc, char** argv)
     
     
     //***********************
-    // STEP 10 - electron veto
+    // STEP 9 - electron veto
     step += 1;
     SetStepNames(stepNames, "electron veto", step, verbosity);
     
@@ -638,7 +570,7 @@ int main(int argc, char** argv)
     
     
     //*************************
-    // STEP 11 -  >= 2 cnt jets
+    // STEP 10 -  >= 2 cnt jets
     step += 1;
     char stepName[50]; sprintf(stepName, ">= %d cnt jet(s)", nJetCntMIN);
     SetStepNames(stepNames, std::string(stepName), step, verbosity);
@@ -854,7 +786,7 @@ int main(int argc, char** argv)
     {
       if( vars.nJets < 4 )
       {
-        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5, 500.);
+        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5, 9999.);
         
         std::vector<int> blacklistIt_W;
         blacklistIt_W.push_back(vars.selectIt_W.at(0));
@@ -871,11 +803,11 @@ int main(int argc, char** argv)
           std::vector<int> blacklistIt_tag;
           blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
           blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5., 500., &blacklistIt_tag);
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5., 9999., &blacklistIt_tag);
         }
         else
         {
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5, 500.);
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 9, 9999.);
           
           std::vector<int> blacklistIt_W;
           blacklistIt_W.push_back(vars.selectIt_W.at(0));
@@ -965,22 +897,4 @@ void SetStepNames(std::map<int, std::string>& stepNames, const std::string& step
   
   if(verbosity)
     std::cout << ">>>>>>>>> " << stepNames[step] << std::endl;
-}
-
-
-
-
-
-
-bool AcceptHLTPath(treeReader& reader, const std::string& HLTPathName)
-{
-  bool acceptEvent = false;
-  
-  std::vector<std::string> HLT_names = *(reader.GetString("HLT_Names"));
-  for(unsigned int HLTIt = 0; HLTIt < HLT_names.size(); ++HLTIt)
-    if( (reader.GetString("HLT_Names")->at(HLTIt) == HLTPathName) &&
-        (reader.GetFloat("HLT_Accept")->at(HLTIt) == 1) )
-      acceptEvent = true;
-  
-  return acceptEvent;
 }
