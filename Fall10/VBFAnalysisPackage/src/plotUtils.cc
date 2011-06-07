@@ -130,7 +130,7 @@ drawTStack::~drawTStack()
 void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string& histoName,
                       const std::string& mode,
                       const float& lumi, const int& step,
-                      const int& nBins, const bool& logy,
+                      const int& nBins,
                       const bool& PURescale,
                       std::vector<std::string>* cut)
 { 
@@ -589,7 +589,6 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     p1 -> cd();
     p1 -> SetGridx();
     p1 -> SetGridy();
-    if(logy) p1 -> SetLogy();
     
     hs -> Draw("HISTO");
     hs_signal -> Draw("HISTO,same");
@@ -737,11 +736,6 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   
   hs->SetMinimum(0.);
   hs->SetMaximum(globalMaximum+0.1*globalMaximum);
-  if(logy)
-  {
-    hs->SetMinimum(pow(10., log10(globalMinimum) - 0.1));
-    hs->SetMaximum(pow(10., log10(globalMaximum) + 0.1));
-  }
   
   if(m_yAxisRange)
   {

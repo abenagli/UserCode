@@ -46,7 +46,7 @@ class drawTStack
   void Draw(std::vector<std::string>& variableNames, const std::string& histoName,
             const std::string& mode,
             const float& lumi, const int& step,
-            const int& nBins, const bool& logy,
+            const int& nBins,
             const bool& PURescale = false,
             std::vector<std::string>* cut = NULL);
   
