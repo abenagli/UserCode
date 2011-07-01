@@ -921,7 +921,7 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   m2(2,2) = 0.01; // phi
   
   TFitParticleEtEtaPhi* l = new TFitParticleEtEtaPhi("lepton","lepton",&vl,&ml);
-  TFitParticleEtEtaPhi* m = new TFitParticleEtEtaPhi("nu","nu",&vm,&mm);
+  TFitParticleEtEtaPhi* m = new TFitParticleEtEtaPhi("met","met",&vm,&mm);
   TFitParticleEtEtaPhi* jet1 = new TFitParticleEtEtaPhi("Jet1","Jet1",&v1,&m1);
   TFitParticleEtEtaPhi* jet2 = new TFitParticleEtEtaPhi("Jet2","Jet2",&v2,&m2);
   
@@ -930,20 +930,23 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   mCons1->addParticles1( jet1, jet2 );
   TFitConstraintM *mCons2 = new TFitConstraintM( "W1MassConstraint", "W1Mass-Constraint", 0, 0 , 80.398);
   mCons2->addParticles1( l, m );
-  TFitConstraintM *mCons3 = new TFitConstraintM( "NuMassConstraint", "NuMass-Constraint", 0, 0 , 0.);
-  mCons3->addParticle1( m );
+  TFitConstraintM *mCons3 = new TFitConstraintM( "LepMassConstraint", "LepMass-Constraint", 0, 0 , 0.1056);
+  mCons3->addParticle1( l );
+  TFitConstraintM *mCons4 = new TFitConstraintM( "NuMassConstraint", "NuMass-Constraint", 0, 0 , 0.);
+  mCons4->addParticle1( m );
   
   //Definition of the fitter
   //Add three measured particles(jets)
   //Add two constraints
   TKinFitter* fitter = new TKinFitter("fitter", "fitter");
-  fitter->addMeasParticle( l );
-  fitter->addMeasParticle( m );
+  //fitter->addMeasParticle( l );
+  //fitter->addMeasParticle( m );
   fitter->addMeasParticle( jet1 );
   fitter->addMeasParticle( jet2 );
   fitter->addConstraint( mCons1 );
-  fitter->addConstraint( mCons2 );
-  fitter->addConstraint( mCons3 );
+  //fitter->addConstraint( mCons2 );
+  //fitter->addConstraint( mCons3 );
+  //fitter->addConstraint( mCons4 );
   
   //Set convergence criteria
   fitter->setMaxNbIter( 30 );
@@ -952,12 +955,12 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   fitter->setVerbosity(2);
 
   //Perform the fit
-  //fitter->fit();
+  fitter->fit();
   
   
   // update the higgs mass after kinematic fit
-  vars.lepNuW_m_KF = ( (*(jet1->getCurr4Vec())) + (*(jet2->getCurr4Vec())) + (*(l->getCurr4Vec())) + (*(m->getCurr4Vec())) ).M();
-  //vars.lepNuW_m_KF = ( (*(jet1->getCurr4Vec())) + (*(jet2->getCurr4Vec())) + vl + vn ).M();
+  //vars.lepNuW_m_KF = ( (*(jet1->getCurr4Vec())) + (*(jet2->getCurr4Vec())) + (*(l->getCurr4Vec())) + (*(m->getCurr4Vec())) ).M();
+  vars.lepNuW_m_KF = ( (*(jet1->getCurr4Vec())) + (*(jet2->getCurr4Vec())) + vl + vn ).M();
 }
 
 

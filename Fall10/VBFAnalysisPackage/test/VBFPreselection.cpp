@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 
   
   int nJetCntMIN = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
-  float jetEtMIN  = gConfigParser -> readFloatOption("Cuts::jetEtMIN");
+  float jetPtMIN  = gConfigParser -> readFloatOption("Cuts::jetPtMIN");
   float jetEtaCNT = gConfigParser -> readFloatOption("Cuts::jetEtaCNT");
   float jetEtaFWD = gConfigParser -> readFloatOption("Cuts::jetEtaFWD");
   
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
   
   // define histograms
   std::cout << ">>> VBFPreselection::Define histograms" << std::endl;
-  int nStep = 10;
+  int nStep = 12;
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepNames;
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
     SetHLTVariables(vars, reader);
     SetPVVariables(vars, reader);
     
-    //if( vars.eventId != 101101 ) continue;
+    //if( vars.eventId != 1000112 ) continue;
     
     
         
@@ -250,7 +250,26 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "HCAL noise", step, verbosity);
     
     
-    if( reader.GetInt("HCAL_noise")->at(0) == 0 ) continue;
+    //if( reader.GetInt("HCAL_noise")->at(0) == 0 ) continue;
+    
+    
+    // fill event counters
+    stepEvents[step] += 1;
+    
+    
+    
+    
+    
+
+    //*****************
+    // STEP 7 - Good PV
+    step += 1;
+    SetStepNames(stepNames, "Good PV", step, verbosity);
+    
+    
+    if( vars.PV_ndof     <  4  ) continue;
+    if( fabs(vars.PV_z)  > 24. ) continue;
+    if( fabs(vars.PV_d0) >  2. ) continue;
     
     
     // fill event counters
@@ -262,7 +281,7 @@ int main(int argc, char** argv)
     
         
     //*********************
-    // STEP 7 - >= 1 lepton
+    // STEP 8 - >= 1 lepton
     step += 1;
     SetStepNames(stepNames, ">= 1 lepton", step, verbosity);
     
@@ -332,7 +351,7 @@ int main(int argc, char** argv)
           ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&
           ( ( (isEB == 1) && (DphiIn < 0.060) )        || ( (isEB == 0) && (DphiIn < 0.030) ) ) &&
           ( ( (isEB == 1) && (DetaIn < 0.004) )        || ( (isEB == 0) && (DetaIn < 0.007) ) ) &&
-          //( ( (isEB == 1) && (HOverE < 0.040) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&
+          ( ( (isEB == 1) && (HOverE < 0.040) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&
           ( mishits == 0 ) &&
           ( ( fabs(dist) > 0.02 ) || ( fabs(dcot) > 0.02 ) ) )
       {
@@ -421,7 +440,7 @@ int main(int argc, char** argv)
       // tight selection
       bool isTightMuon = false;
       if( ( pt > 20. ) &&
-          ( fabs(eta) < 2.5 ) &&
+          ( fabs(eta) < 2.1 ) &&
 	  ( tkIso/pt < 0.05 ) &&
           ( fabs(z-vars.PV_z) < 1. ) && 
           ( fabs(dxy) < 0.02 ) &&
@@ -492,7 +511,7 @@ int main(int argc, char** argv)
     
     
     //*******************
-    // STEP 8 - muon veto
+    // STEP 9 - muon veto
     
     step += 1;
     SetStepNames(stepNames, "muon veto", step, verbosity);
@@ -511,7 +530,7 @@ int main(int argc, char** argv)
     
     
     //***********************
-    // STEP 9 - electron veto
+    // STEP 10 - electron veto
     step += 1;
     SetStepNames(stepNames, "electron veto", step, verbosity);
     
@@ -570,9 +589,10 @@ int main(int argc, char** argv)
     
     
     //*************************
-    // STEP 10 -  >= 2 cnt jets
+    // STEP 11 -  >= 2 cnt jets
     step += 1;
-    char stepName[50]; sprintf(stepName, ">= %d cnt jet(s)", nJetCntMIN);
+    char stepName[50]; 
+    sprintf(stepName, ">= %d cnt jet(s)", nJetCntMIN);
     SetStepNames(stepNames, std::string(stepName), step, verbosity);
     
     //*****************
@@ -592,16 +612,16 @@ int main(int argc, char** argv)
       ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);
       
       // jet et min
-      if( jet.pt() < jetEtMIN ) continue;
+      if( jet.pt() < jetPtMIN ) continue;
       
       // clean jets from selected lepton
       float DR = deltaR(jet.eta(), jet.phi(), vars.lep.eta(), vars.lep.phi());
       
       if( (leptonFLAVOUR == "e")  && (DR < 0.3) ) continue;
-      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 11) && (DR < 0.5) ) continue;
+      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 11) && (DR < 0.3) ) continue;
       
-      if( (leptonFLAVOUR == "mu") && (DR < 0.1) ) continue;
-      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 13) && (DR < 0.5) ) continue;
+      if( (leptonFLAVOUR == "mu") && (DR < 0.3) ) continue;
+      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 13) && (DR < 0.3) ) continue;
             
       
       // jetID
@@ -641,20 +661,15 @@ int main(int argc, char** argv)
       if( vars.jets_bTagOrdered.size() > 1 )
     vars.jets_bTag2 = vars.jets_bTagOrdered.at(1);
     
-    
-    
-    //**************
-    // >= n cnt jets 
-    if( vars.nJets_cnt < nJetCntMIN ) continue;
-    
-    SetLeadingJetVariables(vars, reader, jetEtaCNT);
-    
-    
+
+
+
+
     /*std::cout << std::fixed << std::setprecision(6)
               << "eventId: " << vars.eventId << " "
               << vars.lep_pt << " "
               << vars.lep_eta << " "
-              << std::endl;*/
+              << std::endl;
     
     for(unsigned int jetIt = 0; jetIt < (reader.Get4V("jets")->size()); ++jetIt)
     {
@@ -662,13 +677,16 @@ int main(int argc, char** argv)
       ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);
       
       // jet et min
-      if( jet.pt() < jetEtMIN ) continue;
+      if( jet.pt() < 10. ) continue;
       
       // clean jets from selected lepton
       float DR = deltaR(jet.eta(), jet.phi(), vars.lep.eta(), vars.lep.phi());
       
       if( (leptonFLAVOUR == "e")  && (DR < 0.3) ) continue;
-      if( (leptonFLAVOUR == "mu") && (DR < 0.1) ) continue;
+      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 11) && (DR < 0.3) ) continue;
+      
+      if( (leptonFLAVOUR == "mu") && (DR < 0.3) ) continue;
+      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 13) && (DR < 0.3) ) continue;
       
       
       // jetID
@@ -695,14 +713,34 @@ int main(int argc, char** argv)
         if( (fabs(jet.eta()) >= 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) + reader.GetInt("jets_neutralMultiplicity")->at(jetIt) <= 1) ) continue;
       }
       
-      /*std::cout << std::fixed << std::setprecision(6)
+      std::cout << std::fixed << std::setprecision(6)
                 << ">>> jet: " << jetIt << " "
 		<< jet.pt() << " "
 		<< jet.eta() << " "
+		<< jet.phi() << " "
 		<< DR << " "
-		<< std::endl;*/
+		<< std::endl;
       
     } // loop on jets
+      */
+
+
+
+
+    
+    
+    //**************
+    // >= n cnt jets 
+    if( vars.nJets_cnt < nJetCntMIN ) continue;
+    
+    SetLeadingJetVariables(vars, reader, jetEtaCNT);
+    
+    
+    // fIll event counters
+    stepEvents[step] += 1;
+    
+    
+    
     
     
     
@@ -780,39 +818,49 @@ int main(int argc, char** argv)
     
     
     
+    
+    
+    //***********************
+    // STEP 12 -  select jets
+    step += 1;
+    sprintf(stepName, "select jets");
+    SetStepNames(stepNames, std::string(stepName), step, verbosity);
+    
+    
+    
     //******************
     // select W/tag jets
     if( TMVA4JetTraining == 0 )
     {
       if( vars.nJets < 4 )
       {
-        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5, 9999.);
+        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999.);
         
         std::vector<int> blacklistIt_W;
         blacklistIt_W.push_back(vars.selectIt_W.at(0));
         blacklistIt_W.push_back(vars.selectIt_W.at(1));
-        SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0., &blacklistIt_W);
+        SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0., &blacklistIt_W);
       }
       
       if( vars.nJets >= 4 )
       {
         if( tagFIRST == 1)
         {
-          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0.);
+          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0.);
           
           std::vector<int> blacklistIt_tag;
           blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
           blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 5., 9999., &blacklistIt_tag);
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5., 9999., &blacklistIt_tag);
         }
         else
         {
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetEtMIN, jetEtaCNT, 9, 9999.);
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 9, 9999.);
           
           std::vector<int> blacklistIt_W;
           blacklistIt_W.push_back(vars.selectIt_W.at(0));
           blacklistIt_W.push_back(vars.selectIt_W.at(1));
-          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetEtMIN, 0., 0., &blacklistIt_W);
+          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0., &blacklistIt_W);
         }
       }
       

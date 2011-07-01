@@ -134,27 +134,27 @@ int main(int argc, char** argv)
   
 
   // Define variables
-  factory -> AddVariable("jets_bTag1",    'F');
-  factory -> AddVariable("jets_bTag2",    'F');
-  factory -> AddVariable("lep_eta",       'F');
-  factory -> AddVariable("met_et",        'F');
-  factory -> AddVariable("lepMet_mt",     'F');
-  factory -> AddVariable("lepMet_Dphi",   'F');
-  factory -> AddVariable("WJJ_m",         'F');
-  factory -> AddVariable("WJJ_DR",        'F');
-
-  factory -> AddVariable("lepMetW_Dphi",  'F');
-  factory -> AddVariable("lepWJJ_pt1",    'F');
-  factory -> AddVariable("lepWJJ_pt2",    'F');
-  factory -> AddVariable("lepWJJ_pt3",    'F');
-  factory -> AddVariable("lepNuW_m",      'F');
-
+  //factory -> AddVariable("jets_bTag1",    'F');
+  //factory -> AddVariable("jets_bTag2",    'F');
+  //factory -> AddVariable("lep_eta",       'F');
+  //factory -> AddVariable("met_et",        'F');
+  //factory -> AddVariable("lepMet_mt",     'F');
+  //factory -> AddVariable("lepMet_Dphi",   'F');
+  //factory -> AddVariable("WJJ_m",         'F');
+  //factory -> AddVariable("WJJ_DR",        'F');
+  //
+  //factory -> AddVariable("lepMetW_Dphi",  'F');
+  //factory -> AddVariable("lepWJJ_pt1",    'F');
+  //factory -> AddVariable("lepWJJ_pt2",    'F');
+  //factory -> AddVariable("lepWJJ_pt3",    'F');
+  //factory -> AddVariable("lepNuW_m",      'F');
+  //
   factory -> AddVariable("tagJJ_Deta",    'F');
   factory -> AddVariable("tagJJ_m",       'F');
-
-  factory -> AddVariable("abs(WJ1_zepp)", 'F');
-  factory -> AddVariable("abs(WJ2_zepp)", 'F');
-  factory -> AddVariable("abs(lep_zepp)", 'F');
+  //
+  //factory -> AddVariable("abs(WJ1_zepp)", 'F');
+  //factory -> AddVariable("abs(WJ2_zepp)", 'F');
+  //factory -> AddVariable("abs(lep_zepp)", 'F');
   
   factory -> PrepareTrainingAndTestTree("", "SplitMode=Random");
   
@@ -165,13 +165,13 @@ int main(int argc, char** argv)
   std::cout << "******************************************************" << std::endl;
   char methodName[50];
   //factory -> BookMethod(TMVA::Types::kCuts, "kCuts");
-  //factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood");
-  //factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
-  //factory -> BookMethod(TMVA::Types::kKNN, "kKNN");
-  //factory -> BookMethod(TMVA::Types::kFisher, "kFisher");
-  //factory -> BookMethod(TMVA::Types::kLD, "kLD");
-  //factory -> BookMethod(TMVA::Types::kCFMlpANN, "kCFMlpANN");
-  //factory -> BookMethod(TMVA::Types::kTMlpANN, "kTMlpANN");
+  factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood_H"+higgsMass);
+  factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
+  //factory -> BookMethod(TMVA::Types::kKNN, "kKNN_H"+higgsMass);
+  factory -> BookMethod(TMVA::Types::kFisher, "kFisher");
+  factory -> BookMethod(TMVA::Types::kLD, "kLD");
+  factory -> BookMethod(TMVA::Types::kCFMlpANN, "kCFMlpANN_H"+higgsMass);
+  //factory -> BookMethod(TMVA::Types::kTMlpANN, "kTMlpANN_H"+higgsMass);
   //factory -> BookMethod(TMVA::Types::kMLP, "kMLP");
   //factory -> BookMethod(TMVA::Types::kSVM, "kSVM");
   factory -> BookMethod(TMVA::Types::kBDT,"kBDT_H"+higgsMass);

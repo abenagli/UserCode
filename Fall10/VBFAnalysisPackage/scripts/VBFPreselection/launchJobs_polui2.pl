@@ -226,7 +226,7 @@ while (<LISTOFSamples>)
     # submit job
     ############
     
-    $command = "sleep 0.5\n";
+    $command = "sleep 1\n";
     print SAMPLEJOBLISTFILE $command."\n";
     
     $command = "echo \"/opt/exp_soft/cms/t3/t3submit -q cms ".$tempBjob."\"\n" ;  

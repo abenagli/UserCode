@@ -751,10 +751,10 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "WJJ_m";
   histoName = "WJJ_m";
-  stack -> SetXaxisRange(0., 400.);
+  stack -> SetXaxisRange(44., 300.);
   stack -> SetXaxisTitle("m(WJet_{1}+WJet_{2})");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 32, PURescale);
   
   variableNames.at(0) = "WJJ_et";
   histoName = "WJJ_et";
@@ -921,10 +921,10 @@ int main(int argc, char** argv)
     
   variableNames.at(0) = "lepNuW_m";
   histoName = "lepNuW_m";
-  stack -> SetXaxisRange(0., 800);
+  stack -> SetXaxisRange(100., 700);
   stack -> SetXaxisTitle("m(lepton+neutrino+WJets)");
   stack -> SetUnit("GeV/c2");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale);
   
   variableNames.at(0) = "lepMetW_pt/lepNuW_m";
   histoName = "lepMetW_jacobian";

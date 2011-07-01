@@ -142,8 +142,8 @@ void higgsMassFit(const int& mH, const std::string& mode = "exclusion", const bo
   
   TH1F* SIGShapeHisto = new TH1F("SIGShapeHisto","",4*nBins,xMin,xMax);
   SIGShapeHisto -> Sumw2();
-  SIGShapeHisto -> SetLineWidth(2);
-  SIGShapeHisto -> SetLineStyle(2);
+  SIGShapeHisto -> SetLineWidth(1);
+  SIGShapeHisto -> SetLineStyle(1);
   RooDataSet* rooSIGDataSet = new RooDataSet("rooSIGDataSet","",RooArgSet(x,w),WeightVar(w));
   
   std::string* SIGNames = new std::string[nSIG];
@@ -322,7 +322,7 @@ void higgsMassFit(const int& mH, const std::string& mode = "exclusion", const bo
     color = (enum EColor)(BKGColors[1]);
     rooBKGTotPdf -> plotOn(rooBKGPlot,Components(("rooBKGPdf_"+BKGShortNames[1]).c_str()),LineColor(color));
     
-    rooSIGPdf -> plotOn(rooBKGPlot,LineColor(kBlack),LineStyle(2));
+    rooSIGPdf -> plotOn(rooBKGPlot,LineColor(kBlack),LineStyle(1),LineWidth(1));
     
     rooBKGPlot->Draw();
     
@@ -389,7 +389,7 @@ void higgsMassFit(const int& mH, const std::string& mode = "exclusion", const bo
     c3 -> SetGridy();
     
     RooPlot* rooTOYPlot = x.frame();
-    rooBKGToyDataSet -> plotOn(rooTOYPlot);
+    rooBKGToyDataSet -> plotOn(rooTOYPlot,MarkerSize(0.7));
     rooTotPdf -> plotOn(rooTOYPlot, LineColor(kRed));
     rooTotPdf -> plotOn(rooTOYPlot, Components("rooSIGPdf"), LineColor(kRed));
     rooTOYPlot->Draw();
@@ -500,5 +500,4 @@ void SetXSignal(double& xMin_signal, double& xMax_signal, const int& mH)
     xMin_signal = 450.;
     xMax_signal = 800.;
   }
-
 }

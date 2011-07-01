@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 #include "TH1F.h"
@@ -25,7 +26,7 @@ int main(int argc, char** argv)
   
   for(int bin = 1; bin <= events->GetNbinsX(); ++bin)
   {
-    std::cout << events->GetXaxis()->GetBinLabel(bin) << "   : "  << events->GetBinContent(bin) << std::endl;
+    std::cout << std::setw(20) << events->GetXaxis()->GetBinLabel(bin) << "   : "  << std::fixed << std::setprecision(0) << std::setw(7) << events->GetBinContent(bin) << std::endl;
   }
   
   
