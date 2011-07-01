@@ -251,7 +251,7 @@ double deltaR(const double& eta1, const double& phi1,
 
 double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                   const std::string& method,
-                  const double& etMin,
+                  const double& ptMin,
                   const std::vector<int>* blacklist)
 {
   // initialize vector with result
@@ -268,18 +268,18 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
   double maxMJJ = -999999.;
   double tempMJJ = 0.;
   
-  double maxEt = -999999.;
-  double tempEt = 0.;
+  double maxPt = -999999.;
+  double tempPt = 0.;
   
-  double maxSumEt = -999999.;
-  double tempSumEt = 0.;
+  double maxSumPt = -999999.;
+  double tempSumPt = 0.;
   
   
   
   // loop over 1st jet
   for(unsigned int i = 0; i < jets.size(); ++i)
   {
-    if(jets.at(i).Et() < etMin) continue;
+    if(jets.at(i).pt() < ptMin) continue;
     
     bool skipJet1 = false;
     if(blacklist)
@@ -292,7 +292,7 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
     // loop over 2nd jet
     for(unsigned int j = i+1; j < jets.size(); ++j)
     {
-      if(jets.at(j).Et() < etMin) continue;
+      if(jets.at(j).pt() < ptMin) continue;
       
       bool skipJet2 = false;
       if(blacklist)
@@ -333,12 +333,12 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
       }
       
       // -------------------------------------
-      else if(method == "maxEt")
+      else if(method == "maxPt")
       {
-        tempEt = sqrt( (jets.at(i) + jets.at(j)).perp2() );
-        if(tempEt > maxEt)
+        tempPt = sqrt( (jets.at(i) + jets.at(j)).perp2() );
+        if(tempPt > maxPt)
         {
-          maxEt = tempEt;
+          maxPt = tempPt;
           
 	        it.at(0) = i;
 	        it.at(1) = j;
@@ -347,12 +347,12 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
       
       // -------------------------------------
       
-      else if(method == "maxSumEt")
+      else if(method == "maxSumPt")
       {
-        tempSumEt = sqrt(jets.at(i).perp2()) + sqrt(jets.at(j).perp2());
-        if(tempSumEt > maxSumEt)
+        tempSumPt = sqrt(jets.at(i).perp2()) + sqrt(jets.at(j).perp2());
+        if(tempSumPt > maxSumPt)
         {
-          maxSumEt = tempSumEt;
+          maxSumPt = tempSumPt;
           
    	      it.at(0) = i;
 	        it.at(1) = j;
@@ -371,11 +371,11 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
   if(method == "maxMJJ")
     return maxMJJ;
   
-  else if(method == "maxEt")
-    return maxEt;
+  else if(method == "maxPt")
+    return maxPt;
   
-  else if(method == "maxSumEt")
-    return maxSumEt;
+  else if(method == "maxSumPt")
+    return maxSumPt;
   
   else return -1.;
 }
@@ -384,7 +384,7 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
 
 double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                   const std::string& method,
-                  const double& etMin,
+                  const double& ptMin,
                   const double& DetaMin,
                   const double& DetaMax,
                   const std::vector<int>* blacklist)
@@ -403,18 +403,18 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
   double maxMJJ = -999999.;
   double tempMJJ = 0.;
   
-  double maxEt = -999999.;
-  double tempEt = 0.;
+  double maxPt = -999999.;
+  double tempPt = 0.;
   
-  double maxSumEt = -999999.;
-  double tempSumEt = 0.;
+  double maxSumPt = -999999.;
+  double tempSumPt = 0.;
   
   
   
   // loop over 1st jet
   for(unsigned int i = 0; i < jets.size(); ++i)
   {
-    if(jets.at(i).Et() < etMin) continue;
+    if(jets.at(i).pt() < ptMin) continue;
     
     bool skipJet1 = false;
     if(blacklist)
@@ -427,7 +427,7 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
     // loop over 2nd jet
     for(unsigned int j = i+1; j < jets.size(); ++j)
     {
-      if(jets.at(j).Et() < etMin) continue;
+      if(jets.at(j).pt() < ptMin) continue;
       
       bool skipJet2 = false;
       if(blacklist)
@@ -474,15 +474,15 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
       }
       
       // -------------------------------------
-      else if(method == "maxEt")
+      else if(method == "maxPt")
       {
-        tempEt = sqrt( (jets.at(i) + jets.at(j)).perp2() );
+        tempPt = sqrt( (jets.at(i) + jets.at(j)).perp2() );
         tempDeta = deltaEta(jets.at(i).Eta(), jets.at(j).Eta());
-        if( (tempEt > maxEt) &&
+        if( (tempPt > maxPt) &&
             (tempDeta > DetaMin) &&
             (tempDeta < DetaMax) )
         {
-          maxEt = tempEt;
+          maxPt = tempPt;
           
 	        it.at(0) = i;
 	        it.at(1) = j;
@@ -491,15 +491,15 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
       
       // -------------------------------------
       
-      else if(method == "maxSumEt")
+      else if(method == "maxSumPt")
       {
-        tempSumEt = sqrt(jets.at(i).perp2()) + sqrt(jets.at(j).perp2());
+        tempSumPt = sqrt(jets.at(i).perp2()) + sqrt(jets.at(j).perp2());
         tempDeta = deltaEta(jets.at(i).Eta(), jets.at(j).Eta());
-        if( (tempSumEt > maxSumEt) &&
+        if( (tempSumPt > maxSumPt) &&
             (tempDeta > DetaMin) &&
             (tempDeta < DetaMax) )
         {
-          maxSumEt = tempSumEt;
+          maxSumPt = tempSumPt;
           
    	      it.at(0) = i;
 	        it.at(1) = j;
@@ -518,11 +518,11 @@ double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jet
   if(method == "maxMJJ")
     return maxMJJ;
   
-  else if(method == "maxEt")
-    return maxEt;
+  else if(method == "maxPt")
+    return maxPt;
   
-  else if(method == "maxSumEt")
-    return maxSumEt;
+  else if(method == "maxSumPt")
+    return maxSumPt;
   
   else return -1.;
 }
@@ -595,7 +595,7 @@ int SelectLepton(std::vector<ROOT::Math::XYZTVector>& leptons,
 
 double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                      const std::string& method,
-                     const double& etMin,
+                     const double& ptMin,
                      const double& DetaMIN,
                      const double& mjjMIN,
                      const std::vector<int>* blacklist)
@@ -610,10 +610,10 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
   // initialize the selection variable
   double maxMjj = -999999.;
   double maxDeta = -999999.;
-  double maxSumEt = -999999.;
+  double maxSumPt = -999999.;
   double tempMjj = 0.;
   double tempDeta = 0.; 
-  double tempSumEt = 0.;
+  double tempSumPt = 0.;
   double prodEta = 0.;
   
   
@@ -621,7 +621,7 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
   // loop over 1st jet
   for(unsigned int i = 0; i < jets.size(); ++i)
   {
-    if(jets.at(i).Et() < etMin) continue;
+    if(jets.at(i).pt() < ptMin) continue;
     
     bool skipJet1 = false;
     if(blacklist)
@@ -634,7 +634,7 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
     // loop over 2nd jet
     for(unsigned int j = i+1; j < jets.size(); ++j)
     {
-      if(jets.at(j).Et() < etMin) continue;
+      if(jets.at(j).pt() < ptMin) continue;
       
       bool skipJet2 = false;
       if(blacklist)
@@ -650,7 +650,7 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
       
       tempMjj = (jets.at(i) + jets.at(j)).mass();
       tempDeta = deltaEta(jets.at(i).eta(), jets.at(j).eta());
-      tempSumEt = jets.at(i).Et() + jets.at(j).Et();  
+      tempSumPt = jets.at(i).pt() + jets.at(j).pt();  
       prodEta = jets.at(i).eta() * jets.at(j).eta(); 
       
       if(method == "maxMjj")
@@ -707,27 +707,27 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
         }
       }
       
-      if(method == "maxSumEt")
+      if(method == "maxSumPt")
       {
-        if( (tempSumEt > maxSumEt) && 
+        if( (tempSumPt > maxSumPt) && 
             (tempDeta > DetaMIN) &&
             (tempMjj > mjjMIN) )
         {
-          maxSumEt = tempSumEt;
+          maxSumPt = tempSumPt;
           
           it.at(0) = i;
           it.at(1) = j;
         }
       }
       
-      if(method == "maxSumEtEtaOpposite")
+      if(method == "maxSumPtEtaOpposite")
       {
-        if( (tempSumEt > maxSumEt) && 
+        if( (tempSumPt > maxSumPt) && 
             (tempDeta > DetaMIN) &&
             (tempMjj > mjjMIN) && 
             (prodEta < 0.) )
         {
-          maxSumEt = tempSumEt;
+          maxSumPt = tempSumPt;
           
           it.at(0) = i;
           it.at(1) = j;
@@ -750,7 +750,7 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
 
 
 double SelectTagJet(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
-                    const double& etMin,
+                    const double& ptMin,
                     const double& etaMin,
                     const std::vector<int>* blacklist)
 {
@@ -769,7 +769,7 @@ double SelectTagJet(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& j
   // loop over jets
   for(unsigned int i = 0; i < jets.size(); ++i)
   {
-    if(jets.at(i).Et() < etMin) continue;
+    if(jets.at(i).pt() < ptMin) continue;
     if(fabs(jets.at(i).eta()) < etaMin) continue;
     
     bool skipJet1 = false;
@@ -809,7 +809,7 @@ double SelectTagJet(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& j
 double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag, 
                    std::vector<ROOT::Math::XYZTVector>& jets,
                    const std::string& method,
-                   const double& etMin,
+                   const double& ptMin,
                    const double& etaMAX,
                    const double& DetaMAX,
                    const double& mjjMAX)
@@ -842,14 +842,14 @@ double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
   // loop over 1st jet
   for(unsigned int i = 0; i < jets.size(); ++i)
   {
-    if(jets.at(i).Et() < etMin) continue;
+    if(jets.at(i).pt() < ptMin) continue;
     if(fabs(jets.at(i).eta()) > etaMAX) continue;
     
     
     // loop over 2nd jet
     for(unsigned int j = i+1; j < jets.size(); ++j)
     {
-      if(jets.at(j).Et() < etMin) continue;
+      if(jets.at(j).pt() < ptMin) continue;
       if(fabs(jets.at(j).eta()) > etaMAX) continue;      
       
       
@@ -860,8 +860,8 @@ double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
       
       tempDeta = (tempDeta_W / 2.5);
       
-      //std::cout << "1st jet: " << i << "   et = " << jet1_W.Et() << "   eta = " << jet1_W.eta() << std::endl;
-      //std::cout << "2nd jet: " << j << "   et = " << jet2_W.Et() << "   eta = " << jet2_W.eta() << std::endl;
+      //std::cout << "1st jet: " << i << "   et = " << jet1_W.pt() << "   eta = " << jet1_W.eta() << std::endl;
+      //std::cout << "2nd jet: " << j << "   et = " << jet2_W.pt() << "   eta = " << jet2_W.eta() << std::endl;
       //std::cout << "mJJ = " << (jet1_W+jet2_W).mass() << "   Deta = " << deltaEta(jet1_W.eta(),jet2_W.eta()) << std::endl; 
       bool isTagJetFound = false;
       
@@ -871,7 +871,7 @@ double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
       {
         if(k == i) continue;
         if(k == j) continue;
-        if(jets.at(k).Et() < etMin) continue;
+        if(jets.at(k).pt() < ptMin) continue;
         
         
         // loop over 4th jet
@@ -879,7 +879,7 @@ double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
         {
           if(l == i) continue;
           if(l == j) continue;          
-          if(jets.at(l).Et() < etMin) continue;
+          if(jets.at(l).pt() < ptMin) continue;
           
           
           jet1_tag = jets.at(k);
@@ -889,8 +889,8 @@ double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
           
           tempDeta += 1. / (tempMjj_tag / 80.399);
 	  
-          //std::cout << "3rd jet: " << k << "   et = " << jet1_tag.Et() << "   eta = " << jet1_tag.eta() << std::endl;
-          //std::cout << "4th jet: " << l << "   et = " << jet2_tag.Et() << "   eta = " << jet2_tag.eta() << std::endl;
+          //std::cout << "3rd jet: " << k << "   et = " << jet1_tag.pt() << "   eta = " << jet1_tag.eta() << std::endl;
+          //std::cout << "4th jet: " << l << "   et = " << jet2_tag.pt() << "   eta = " << jet2_tag.eta() << std::endl;
           //std::cout << "mJJ = " << (jet1_tag+jet2_tag).mass() << "   Deta = " << deltaEta(jet1_tag.eta(),jet2_tag.eta()) << std::endl;           
 
           if(method == "minDeta")
@@ -946,7 +946,7 @@ double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
 
 double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                    const std::string& method,
-                   const double& etMin,
+                   const double& ptMin,
                    const double& etaMAX,
                    const double& DetaMAX,
                    const double& mjjMAX,
@@ -961,9 +961,9 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
   
   // initialize the selection variable
   double minDeta = 999999.;
-  double maxSumEt = -999999.;
+  double maxSumPt = -999999.;
   double minDMjj = 999999.;
-  double tempSumEt = 0.;
+  double tempSumPt = 0.;
   double tempMjj = 0.;
   double tempDMjj = 0.;
   double tempDeta = 0.; 
@@ -973,7 +973,7 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
   // loop over 1st jet
   for(unsigned int i = 0; i < jets.size(); ++i)
   {
-    if(jets.at(i).Et() < etMin) continue;
+    if(jets.at(i).pt() < ptMin) continue;
     if(fabs(jets.at(i).eta()) > etaMAX) continue;
     
     bool skipJet1 = false;
@@ -987,7 +987,7 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
     // loop over 2nd jet
     for(unsigned int j = i+1; j < jets.size(); ++j)
     {
-      if(jets.at(j).Et() < etMin) continue;
+      if(jets.at(j).pt() < ptMin) continue;
       if(fabs(jets.at(j).eta()) > etaMAX) continue;      
 
       bool skipJet2 = false;
@@ -1001,18 +1001,18 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
       // -------------------------------------
       // select jets with different techniques
       // -------------------------------------
-      tempSumEt = jets.at(i).Et() + jets.at(j).Et();
+      tempSumPt = jets.at(i).pt() + jets.at(j).pt();
       tempDeta = deltaEta(jets.at(i).Eta(), jets.at(j).Eta());
       tempMjj = (jets.at(i) + jets.at(j)).mass();
       tempDMjj = fabs((jets.at(i) + jets.at(j)).mass() - 80.399);
       
-      if(method == "maxSumEt")
+      if(method == "maxSumPt")
       {
-        if( (tempSumEt > maxSumEt) &&
+        if( (tempSumPt > maxSumPt) &&
             (tempDeta < DetaMAX) &&
             (tempMjj < mjjMAX) )
         {
-          maxSumEt = tempSumEt;
+          maxSumPt = tempSumPt;
           
           it.at(0) = i;
           it.at(1) = j;
@@ -1052,7 +1052,7 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
   
   
   
-  return maxSumEt;
+  return maxSumPt;
 }
 
 

@@ -168,13 +168,13 @@ int GetMatching(const std::vector<T1>& collection1, //---- RECO
 /** select jet pairs */
 double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                   const std::string& method,
-                  const double& etMin,
+                  const double& ptMin,
                   const std::vector<int>* blacklist = 0);
 
 /** select jet pairs with Deta cut*/
 double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                   const std::string& method,
-                  const double& etMin,
+                  const double& ptMin,
                   const double& DetaMin,
                   const double& DetaMax,
                   const std::vector<int>* blacklist = 0);
@@ -187,14 +187,14 @@ int SelectLepton(std::vector<ROOT::Math::XYZTVector>& leptons,
 
 /** select tag jet */
 double SelectTagJet(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
-                     const double& etMin,
+                     const double& ptMin,
                      const double& etaMIN,
                      const std::vector<int>* blacklist = 0);
 
 /** select tag jets */
 double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                      const std::string& method,
-                     const double& etMin,
+                     const double& ptMin,
                      const double& DetaMIN,
                      const double& mjjMIN,                     
                      const std::vector<int>* blacklist = 0);
@@ -202,7 +202,7 @@ double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& 
 /** select W jets */
 double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
                    const std::string& method,
-                   const double& etMin,
+                   const double& ptMin,
                    const double& etaMAX,
                    const double& DetaMAX,
                    const double& mjjMAX,                     
@@ -212,7 +212,7 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
 double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
                    std::vector<ROOT::Math::XYZTVector>& jets,
                    const std::string& method,
-                   const double& etMin,
+                   const double& ptMin,
                    const double& etaMAX,
                    const double& DetaMAX,
                    const double& mjjMAX);
