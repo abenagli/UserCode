@@ -1042,8 +1042,13 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     
     
     // get histogram
-    std::string fullHistoName = "events";
+    std::string fullHistoName;
+    if( mode == "events" )
+      fullHistoName = "events";
+    else
+      fullHistoName = "events_PURescaled";      
     //std::cout << "getting histogram " << fullHistoName << std::endl;
+    
     TH1F* histo = NULL;
     rootFiles.at(i) -> GetObject(fullHistoName.c_str(), histo);
     if(histo == NULL)
@@ -1052,8 +1057,10 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
       exit(-1);
     }
     
-    if( mode == "eventsScaledStack" )
+    if( mode == "eventsScaledStack" || mode == "eventsScaled" )
       histo -> Sumw2();
+    
+    
     
     color_summed[vecIt->second] = m_color[vecIt->first];
     linestyle_summed[vecIt->second] = m_linestyle[vecIt->first];
@@ -1111,13 +1118,7 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
   
   std::ofstream* outFile = NULL;
   std::ofstream* outFile_CoLeMIB = NULL;
-  std::ofstream* outFile_CoLeMIB_err = NULL;
 
-  if(mode == "events")
-  {
-    outFile = new std::ofstream((m_outputDir+"events.txt").c_str(), std::ios::out);  
-    outFile_CoLeMIB_err = new std::ofstream((m_outputDir+"events_CoLeMIB_err.csv").c_str(), std::ios::out);
-  }
   if(mode == "eventsScaled")
   {
     outFile = new std::ofstream((m_outputDir+"eventsScaled.txt").c_str(), std::ios::out);
@@ -1274,9 +1275,9 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     {
       for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)
       {
-        if( mH_summed[mapIt->first] > 0. )
+        if( mH_summed[mapIt->first] > 0. && dataFlag_summed[mapIt->first] != 1 )
           nEventsScaled_sig[bin] += globalHisto->GetBinContent(bin);
-        else
+        else if( mH_summed[mapIt->first] <= 0. && dataFlag_summed[mapIt->first] != 1 )
           nEventsScaled_bkg[bin] += globalHisto->GetBinContent(bin);
       }
     }
@@ -1339,13 +1340,9 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     
     if(outFile_CoLeMIB)
     {
-      (*outFile_CoLeMIB) << mapIt->first << ",\t\t\t"<< 1.*globalHisto -> GetBinContent(step) << std::endl;
-    }
-    
-    if(outFile_CoLeMIB_err)
-    {
-      double scale = lumi*mapIt->second/globalHisto->GetBinContent(1);
-      (*outFile_CoLeMIB_err) << mapIt->first << ",\t\t\t"<< 1.*sqrt(globalHisto -> GetBinContent(step)) * scale << std::endl;
+      (*outFile_CoLeMIB) << std::setw(20) << mapIt->first << ",   " 
+                         << std::scientific << std::setprecision(3) << std::setw(10) << 1.*globalHisto -> GetBinContent(step) << " "
+                         << std::scientific << std::setprecision(2) << std::setw(10) << 1.*globalHisto -> GetBinError(step) << std::endl;
     }
     
     ++i;
@@ -1728,8 +1725,6 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     outFile -> close();
   if(outFile_CoLeMIB)
     outFile_CoLeMIB -> close();
-  if(outFile_CoLeMIB_err)
-    outFile_CoLeMIB_err -> close();
   
   for(unsigned int i = 0; i < rootFiles.size(); ++i)
   {
