@@ -263,9 +263,10 @@ int main(int argc, char** argv)
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v7");
   
   // mc
-  //HLTPathNames_e_MC.push_back("any");
+  if( HLTCUT == 0) HLTPathNames_e_MC.push_back("any");
   HLTPathNames_e_MC.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3");
-  //HLTPathNames_mu_MC.push_back("any");
+  
+  if( HLTCUT == 0) HLTPathNames_mu_MC.push_back("any");
   HLTPathNames_mu_MC.push_back("HLT_IsoMu17_v4");
   
   
@@ -979,8 +980,8 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "Higgs mass cut", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m) < lepNuWMMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m) > lepNuWMMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m_KF) < lepNuWMMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m_KF) > lepNuWMMAX) ) continue;
     
     
     // fill distributions

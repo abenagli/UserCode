@@ -4,6 +4,7 @@
 #include "hFactory.h"
 #include "h2Factory.h"
 #include "stdHisto.h"
+#include "TKinFitterUtils.h"
 
 #include "TH1F.h"
 #include "TProfile.h"
@@ -11,6 +12,7 @@
 #include "TTree.h"
 
 #include "TFitConstraintM.h"
+#include "TFitConstraintEp.h"
 #include "TFitParticleEtEtaPhi.h"
 #include "TKinFitter.h"
 
@@ -111,6 +113,9 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector lep;
   ROOT::Math::XYZTVector* p_lep;
   
+  ROOT::Math::XYZTVector lep_KF;
+  ROOT::Math::XYZTVector* p_lep_KF;
+  
   float lep_charge;
   int lep_flavour;
   float lep_pt;
@@ -152,6 +157,8 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector* p_met;
   ROOT::Math::XYZTVector nu;
   ROOT::Math::XYZTVector* p_nu;
+  ROOT::Math::XYZTVector nu_KF;
+  ROOT::Math::XYZTVector* p_nu_KF;
   
   float met_et;  
   
@@ -230,6 +237,11 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector WJ2;
   ROOT::Math::XYZTVector* p_WJ2;
   
+  ROOT::Math::XYZTVector WJ1_KF;
+  ROOT::Math::XYZTVector* p_WJ1_KF;
+  ROOT::Math::XYZTVector WJ2_KF;
+  ROOT::Math::XYZTVector* p_WJ2_KF;
+  
   ROOT::Math::XYZTVector WJJ;
   ROOT::Math::XYZTVector* p_WJJ;
   
@@ -272,8 +284,11 @@ struct VBFPreselectionVariables
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNuW_m;
-  float lepNuW_m_KF;
   float lepNuW_zepp;
+  
+  float lepNuW_m_KF;
+  float chi2_KF;
+  int ndf_KF;
   
   
   

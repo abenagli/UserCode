@@ -170,7 +170,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 20;
+  int nStep = 21;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_plus_int  = new TH1F("events_plus_int",  "events_plus_int",  nStep, 0., 1.*nStep);
@@ -238,20 +238,30 @@ int main(int argc, char** argv)
   std::vector<std::string> HLTPathNames_e_MC;
   std::vector<std::string> HLTPathNames_mu_MC;
   
-  // data
-  HLTPathNames_e_DATA.push_back("any");
-  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
-  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
-  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
   
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v5");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v6");
+  // data
+  //HLTPathNames_e_DATA.push_back("any");
+  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
+  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
+  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
+  HLTPathNames_e_DATA.push_back("HLT_Ele17_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT15_v2");
+  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+  HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  
+  //HLTPathNames_mu_DATA.push_back("any");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v1");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v2");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v4");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v5");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v6");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v7");
+  
   
   // mc
-  HLTPathNames_e_MC.push_back("any");
-  //HLTPathNames_e_MC.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3");
-  HLTPathNames_mu_MC.push_back("any");
-  //HLTPathNames_mu_MC.push_back("HLT_IsoMu17_v4");
+  //HLTPathNames_e_MC.push_back("any");
+  HLTPathNames_e_MC.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3");
+  //HLTPathNames_mu_MC.push_back("any");
+  HLTPathNames_mu_MC.push_back("HLT_IsoMu17_v4");
   
   
   
@@ -300,25 +310,26 @@ int main(int argc, char** argv)
     stepEvents_minus[njetBin] = tempMap;
   }
   stepNames[step] = "1) All events";
-  stepNames[2]  = "2) preselection";
+  stepNames[2]  = "2) Preselection";
   stepNames[3]  = "3) HLT";
-  stepNames[4]  = "4) lepton ID+iso";
-  stepNames[5]  = "5) lepton 3D I.P.";
-  stepNames[6]  = "6) lepton pt/eta";
-  stepNames[7]  = "7) met";
-  stepNames[8]  = "8) 2 W-jets";
-  stepNames[9]  = "9) b-tag veto";
-  stepNames[10] = "10) lep. W cuts";
-  stepNames[11] = "11) had. W cuts";
-  stepNames[12] = "12) pt max cuts";
-  stepNames[13] = "13) Helicity angles";
-  stepNames[14] = "14) Higgs mass";
-  stepNames[15] = "15) < 4 jets";
-  stepNames[16] = "16) >= 4 jets";
-  stepNames[17] = "17) W-W cuts";
-  stepNames[18] = "18) VBF cuts";
-  stepNames[19] = "19) zepp. cuts";
-  stepNames[20] = "20) jet veto";
+  stepNames[4]  = "4) Lepton ID+iso";
+  stepNames[5]  = "5) Lepton 3D I.P.";
+  stepNames[6]  = "6) Lepton pt/eta";
+  stepNames[6]  = "7) Lepton mt";
+  stepNames[7]  = "8) Met";
+  stepNames[8]  = "9) 2! W-jets";
+  stepNames[9]  = "10) b-tag veto";
+  stepNames[10] = "11) lep-met angle cuts";
+  stepNames[11] = "12) WJ1-WJ2 angle cuts";
+  stepNames[12] = "13) Pt max cuts";
+  stepNames[13] = "14) Helicity angles cuts";
+  stepNames[14] = "15) W mass cut";
+  stepNames[15] = "16) Higgs mass cut";
+  stepNames[17] = "17) >= 4 jets";
+  stepNames[18] = "18) W-W cuts";
+  stepNames[19] = "19) VBF cuts";
+  stepNames[20] = "20) zepp. cuts";
+  stepNames[21] = "21) jet veto";
   //stepNames[22] = "22) MVA";
   
   
@@ -443,8 +454,44 @@ int main(int argc, char** argv)
       if( HLTPathNames.at(HLTIt) == "any" )
         skipEvent = false;
     }
-        
-    if( skipEvent == true ) continue;
+    
+    /*if( skipEvent == true ) continue;
+    
+    
+    // electron trigger emulation
+    if( (vars.lep_flavour == 11) && (vars.lep.pt() < 30.) ) continue;
+    if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > 2.5) ) continue;
+    if( (vars.lep_flavour == 11) && (vars.lep_isEB == 1) )
+    {
+      if( vars.lep_tkIso/vars.lep.pt()  > 0.125 ) continue;
+      if( vars.lep_emIso/vars.lep.pt()  > 0.125 ) continue;
+      if( vars.lep_hadIso/vars.lep.pt() > 0.125 ) continue;
+      
+      if( vars.lep_sigmaIetaIeta > 0.011 ) continue;
+      if( fabs(vars.lep_DphiIn)  > 0.070 ) continue;
+      if( fabs(vars.lep_DetaIn)  > 0.008 ) continue;
+      if( vars.lep_HOverE        > 0.050 ) continue;
+    }
+    if( (vars.lep_flavour == 11) && (vars.lep_isEB == 0) )
+    {
+      if( vars.lep_tkIso/vars.lep.pt()  > 0.075 ) continue;
+      if( vars.lep_emIso/vars.lep.pt()  > 0.075 ) continue;
+      if( vars.lep_hadIso/vars.lep.pt() > 0.075 ) continue;
+      
+      if( vars.lep_sigmaIetaIeta  > 0.031 ) continue;
+      if( fabs(vars.lep_DphiIn)   > 0.020 ) continue;
+      if( fabs(vars.lep_DetaIn)   > 0.005 ) continue;
+      if( vars.lep_HOverE         > 0.025 ) continue;
+    }        
+    if( (vars.lep_flavour == 11) && (vars.met.Et() < 30.) ) continue;
+    if( (vars.lep_flavour == 11) && (std::max(vars.WJ1.pt(),vars.WJ2.pt()) < 35.) ) continue;
+    if( (vars.lep_flavour == 11) && (std::min(vars.WJ1.pt(),vars.WJ2.pt()) < 30.) ) continue;
+    
+    
+    // muon trigger emulation
+    if( (vars.lep_flavour == 13) && (vars.lep.pt() < 27.) ) continue;
+    if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > 2.1) ) continue;
+    if( vars.lep_tkIso > 1.000 ) continue;    
     
     
     // fill distributions
@@ -454,7 +501,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP ) cloneTrees[step] -> Fill();    
+    if( step >= firstSTEP ) cloneTrees[step] -> Fill();*/    
     
     
     
@@ -516,8 +563,8 @@ int main(int argc, char** argv)
     bool isIsolated = true;
     bool isAntiIsolated = true;
     
-    //float rho = vars.rhoForIsolation;
-    float rho = 0.;
+    float rho = vars.rhoForIsolation;
+    //float rho = 0.;
     
     if( vars.lep_flavour == 11 )
     {
@@ -589,7 +636,7 @@ int main(int argc, char** argv)
     
     
     // normal isolation cut
-    //if( is3DIP == false ) continue; 
+    if( is3DIP == false ) continue; 
     
     
     // fill distributions
@@ -606,11 +653,11 @@ int main(int argc, char** argv)
     
     
 
-    //***********************
-    // STEP 6 - lepton pt/eta
+    //**************************
+    // STEP 6 - lepton pt/eta/mt
     step += 1;
     //SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
-    
+     
     if( (vars.lep_flavour == 11) && (vars.lep.pt() < elePtMIN) ) continue;
     if( (vars.lep_flavour == 11) && (vars.lep.pt() > elePtMAX) ) continue;
     if( (vars.lep_flavour == 13) && (vars.lep.pt() < muPtMIN) ) continue;
@@ -650,14 +697,45 @@ int main(int argc, char** argv)
     
     
     
+    //**************************
+    // STEP 7 - lepton mt
+    step += 1;
+    //SetStepNames(stepNames, "lepton mt", step, verbosity);
+    
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
+    
+    if( vars.lep_flavour == 11 )    
+    {
+      if( (fabs(vars.lep_etaSC) > 1.4442) && (fabs(vars.lep_etaSC) < 1.566) ) continue;
+    }
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
     //****************************
-    // STEP 7 - Initial cuts - met
+    // STEP 8 - Initial cuts - met
     step += 1;
     //SetStepNames(stepNames, "met", step, verbosity);
     
     
     if( metCUT == 1 )
-      if( vars.met.Et() < 25. ) continue;
+    {
+      if( vars.met.Et() < metEtMIN ) continue;
+      if( vars.met.Et() > metEtMAX ) continue;
+    }
+    
     
     // fill distributions
     stepEvents[step] += 1;
@@ -674,16 +752,19 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 8 - Initial cuts - 2 W-jets
+    // STEP 9 - Initial cuts - 2! W-jets
     step += 1;
-    //SetStepNames(stepNames, "2 W-jets", step, verbosity);
+    //SetStepNames(stepNames, "2! W-jets", step, verbosity);
     
     
     //if( vars.nJets > 3 ) continue;
-    if( vars.nJets_et30 > 2 ) continue;
+    if( vars.nJets_cnt_et30 > 2 ) continue;
     if( vars.nJets_cnt_et30 < 2 ) continue;
     if( (vars.WJ1.pt() <= 30.) || (vars.WJ2.pt() <= 30.) ) continue;
-      
+    if( std::max(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMaxPtMIN ) continue;
+    if( std::min(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMinPtMIN ) continue;
+    
+    
     // Fill distributions
     stepEvents[step] += 1;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
@@ -699,7 +780,7 @@ int main(int argc, char** argv)
     
     
     //************************************
-    // STEP 9 - Initial cuts - b-tag veto
+    // STEP 10 - Initial cuts - b-tag veto
     step += 1;
     //SetStepNames(stepNames, "b-tag veto", step, verbosity);
     
@@ -711,8 +792,12 @@ int main(int argc, char** argv)
     //  if( vars.jets_bTag.at(jetIt) > 2.5 ) isBTagged = true;
     //}
     
-    if( (vars.nJets >=1) && (vars.jets_bTag1 > 4.00) ) isBTagged = true;
-    if( (vars.nJets >=2) && (vars.jets_bTag2 > 2.50) ) isBTagged = true;
+    //if( (vars.nJets >=1) && (vars.jets_bTag1 > 4.00) ) isBTagged = true;
+    //if( (vars.nJets >=2) && (vars.jets_bTag2 > 2.50) ) isBTagged = true;
+    
+    if( vars.WJ1_bTag > 3.30 ) isBTagged = true;
+    if( vars.WJ2_bTag > 3.30 ) isBTagged = true;
+    
     if( (vars.nJets >=1) && (vars.jets_bTag1 < 4.00) ) isAntiBTagged = false;
     if( (vars.nJets >=2) && (vars.jets_bTag2 < 2.50) ) isAntiBTagged = false;
     
@@ -734,18 +819,12 @@ int main(int argc, char** argv)
     
     
     
-    //*************************************
-    // STEP 10 - Initial cuts - lep. W cuts
+    //********************************************
+    // STEP 11 - Initial cuts - lep-met angle cuts
     step += 1;
-    //SetStepNames(stepNames, "lep. W cuts", step, verbosity);
+    //SetStepNames(stepNames, "lep-met angle cuts", step, verbosity);
     
-
-    if( metCUT == 1 )    
-    {
-      if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.met.Et() < metEtMIN) ) continue;
-      if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.met.Et() > metEtMAX) ) continue;
-    }
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
+    
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepMet_Dphi) > lepMetDphiMAX) ) continue;
     
@@ -769,17 +848,12 @@ int main(int argc, char** argv)
     
     
     
-    //*************************************
-    // STEP 11 - Initial cuts - had. W cuts
+    //********************************************
+    // STEP 12 - Initial cuts - WJ1-WJ2 angle cuts
     step += 1;
-    //SetStepNames(stepNames, "had. W cuts", step, verbosity);
+    //SetStepNames(stepNames, "WJ1-WJ2 angle cuts", step, verbosity);
     
     
-    // mjj cut
-    if( std::max(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMaxPtMIN ) continue;
-    if( std::min(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMinPtMIN ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).Pt() < WJJPtMIN) ) continue;
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX) ) continue;
@@ -804,7 +878,7 @@ int main(int argc, char** argv)
     
     
     //**************************************
-    // STEP 12 - Initial cuts - pt max  cuts
+    // STEP 13 - Initial cuts - pt max  cuts
     step += 1;
     //SetStepNames(stepNames, "pt max cuts", step, verbosity);
     
@@ -829,7 +903,7 @@ int main(int argc, char** argv)
     
     
     //*****************************************
-    // STEP 13 - Initial cuts - Helicity angles
+    // STEP 14 - Initial cuts - Helicity angles
     step += 1;
     //SetStepNames(stepNames, "Helicity angles", step, verbosity);
     
@@ -857,11 +931,35 @@ int main(int argc, char** argv)
     
     
     
-    
+
     //************************************
-    // STEP 14 - Initial cuts - Higgs mass
+    // STEP 15 - Initial cuts - W mass cut
     step += 1;
-    //SetStepNames(stepNames, "Higgs mass", step, verbosity);
+    //SetStepNames(stepNames, "W mass cut", step, verbosity);
+    
+    
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+        
+    //****************************************
+    // STEP 16 - Initial cuts - Higgs mass cut
+    step += 1;
+    //SetStepNames(stepNames, "Higgs mass cut", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m) < lepNuWMMIN) ) continue;
@@ -882,31 +980,8 @@ int main(int argc, char** argv)
     
     
     
-    //**********************************
-    // STEP 15 - Initial cuts - < 4 jets
-    step += 1;
-    //SetStepNames(stepNames, "< 4 jets", step, verbosity);
-    
-    
-    if( vars.nJets_et30 < 4 )
-    {
-      // fill distributions
-      stepEvents[step] += 1;
-      if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-      if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-      if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-      if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-      
-      if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    }
-    
-    
-    
-    
-    
-    
     //***********************************
-    // STEP 16 - Initial cuts - >= 4 jets
+    // STEP 17 - Initial cuts - >= 4 jets
     step += 1;
     //SetStepNames(stepNames, ">= 4 jets", step, verbosity);
     
@@ -933,7 +1008,7 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 17 - Initial cuts - W-W cuts
+    // STEP 18 - Initial cuts - W-W cuts
     step += 1;
     //SetStepNames(stepNames, "W-W cuts", step, verbosity);
     
@@ -957,7 +1032,7 @@ int main(int argc, char** argv)
     
     
     //**************************************
-    // STEP 18 - Initial cuts - tag-jet cuts
+    // STEP 19 - Initial cuts - tag-jet cuts
     step += 1;
     //SetStepNames(stepNames, "tag-jet cuts", step, verbosity);
     
@@ -985,7 +1060,7 @@ int main(int argc, char** argv)
     
     
     //*****************************************
-    // STEP 19 - Initial cuts - zeppenfeld cuts
+    // STEP 20 - Initial cuts - zeppenfeld cuts
     step += 1;
     //SetStepNames(stepNames, "zeppenfeld cuts", step, verbosity);
     
@@ -1008,7 +1083,7 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 20 - Initial cuts - jet veto
+    // STEP 21 - Initial cuts - jet veto
     step += 1;
     //SetStepNames(stepNames, "jet veto", step, verbosity);
     

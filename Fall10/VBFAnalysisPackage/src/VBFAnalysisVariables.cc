@@ -39,9 +39,12 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   // lepton variables
   vars.p_lep = new ROOT::Math::XYZTVector;
+  vars.p_lep_KF = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("lep",         &vars.p_lep);
+  reducedTree -> SetBranchAddress("lep_KF",      &vars.p_lep_KF);
   reducedTree -> SetBranchAddress("lep_charge",  &vars.lep_charge);
   reducedTree -> SetBranchAddress("lep_flavour", &vars.lep_flavour);
+  reducedTree -> SetBranchAddress("lep_pt",      &vars.lep_pt);
   reducedTree -> SetBranchAddress("lep_eta",     &vars.lep_eta);
   reducedTree -> SetBranchAddress("lep_zepp",    &vars.lep_zepp);
   reducedTree -> SetBranchAddress("lep_z",       &vars.lep_z);
@@ -75,8 +78,10 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   // met variables
   vars.p_met = new ROOT::Math::XYZTVector;
   vars.p_nu = new ROOT::Math::XYZTVector;
-  reducedTree -> SetBranchAddress("met", &vars.p_met);
-  reducedTree -> SetBranchAddress("nu", &vars.p_nu);
+  vars.p_nu_KF = new ROOT::Math::XYZTVector;
+  reducedTree -> SetBranchAddress("met",   &vars.p_met);
+  reducedTree -> SetBranchAddress("nu",    &vars.p_nu);
+  reducedTree -> SetBranchAddress("nu_KF", &vars.p_nu_KF);
   reducedTree -> SetBranchAddress("met_et",      &vars.met_et);
   reducedTree -> SetBranchAddress("lepMet_mt",   &vars.lepMet_mt);
   reducedTree -> SetBranchAddress("lepMet_Dphi", &vars.lepMet_Dphi);
@@ -115,11 +120,15 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   
   // W-jet variables
-  vars.p_WJ1 = new ROOT::Math::XYZTVector;
-  vars.p_WJ2 = new ROOT::Math::XYZTVector;
-  vars.p_WJJ = new ROOT::Math::XYZTVector;
+  vars.p_WJ1    = new ROOT::Math::XYZTVector;
+  vars.p_WJ2    = new ROOT::Math::XYZTVector;
+  vars.p_WJ1_KF = new ROOT::Math::XYZTVector;
+  vars.p_WJ2_KF = new ROOT::Math::XYZTVector;
+  vars.p_WJJ    = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("WJ1",                     &vars.p_WJ1);
   reducedTree -> SetBranchAddress("WJ2",                     &vars.p_WJ2);
+  reducedTree -> SetBranchAddress("WJ1_KF",                  &vars.p_WJ1_KF);
+  reducedTree -> SetBranchAddress("WJ2_KF",                  &vars.p_WJ2_KF);
   reducedTree -> SetBranchAddress("WJJ",                     &vars.p_WJJ);
   reducedTree -> SetBranchAddress("WJ1_charge",              &vars.WJ1_charge);
   reducedTree -> SetBranchAddress("WJ2_charge",              &vars.WJ2_charge);
@@ -156,6 +165,10 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lepMetW_Dphi", &vars.lepMetW_Dphi);
   reducedTree -> SetBranchAddress("lepNuW_m",     &vars.lepNuW_m);
   reducedTree -> SetBranchAddress("lepNuW_zepp",  &vars.lepNuW_zepp);
+  
+  reducedTree -> SetBranchAddress("lepNuW_m_KF", &vars.lepNuW_m_KF);
+  reducedTree -> SetBranchAddress("chi2_KF",     &vars.chi2_KF);
+  reducedTree -> SetBranchAddress("ndf_KF",      &vars.ndf_KF);
   
   
   // tag-jet variables

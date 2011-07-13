@@ -137,7 +137,7 @@ while(<SAMPLESListFile>)
   $command = "cd ".$sampleDir;
   print SAMPLEJOBFILE $command."\n";
 
-  $command = "unbuffer ".$EXEName." ./selections.cfg >> ".$sampleDir."/out.txt";
+  $command = $EXEName." ./selections.cfg >> ".$sampleDir."/out.txt";
   print SAMPLEJOBFILE $command."\n";
   
   
@@ -146,9 +146,9 @@ while(<SAMPLESListFile>)
   #print($command."\n\n\n");
   system($command);
   
-  print SAMPLEJOBLISTFILE "\nsleep 0.5\n";
-  print SAMPLEJOBLISTFILE "echo \"/opt/exp_soft/cms/t3/t3submit -q cms ".$sampleJobFile."\"\n";
-  print SAMPLEJOBLISTFILE "/opt/exp_soft/cms/t3/t3submit -q cms ".$sampleJobFile."\n";
+  print SAMPLEJOBLISTFILE "\nsleep 2.0\n";
+  print SAMPLEJOBLISTFILE "echo \"/opt/exp_soft/cms/t3/t3submit -q llr ".$sampleJobFile."\"\n";
+  print SAMPLEJOBLISTFILE "/opt/exp_soft/cms/t3/t3submit -q llr ".$sampleJobFile."\n";
   
   ++$type;
 }

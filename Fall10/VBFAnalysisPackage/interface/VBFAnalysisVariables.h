@@ -63,12 +63,15 @@ struct VBFAnalysisVariables
   // lepton variables
   ROOT::Math::XYZTVector* p_lep;
   ROOT::Math::XYZTVector lep;
+  ROOT::Math::XYZTVector* p_lep_KF;
+  ROOT::Math::XYZTVector lep_KF;
   
   ROOT::Math::XYZTVector* p_lepNu;
   ROOT::Math::XYZTVector lepNu;
   
   float lep_charge;
   int lep_flavour;
+  float lep_pt;
   float lep_eta;
   float lep_zepp;
   float lep_z;
@@ -105,6 +108,8 @@ struct VBFAnalysisVariables
   ROOT::Math::XYZTVector met;
   ROOT::Math::XYZTVector* p_nu;
   ROOT::Math::XYZTVector nu;
+  ROOT::Math::XYZTVector* p_nu_KF;
+  ROOT::Math::XYZTVector nu_KF;
   float met_et;
   
   float lepMet_mt;
@@ -146,9 +151,13 @@ struct VBFAnalysisVariables
   // W-jet variables
   ROOT::Math::XYZTVector* p_WJ1;
   ROOT::Math::XYZTVector WJ1;
-  
   ROOT::Math::XYZTVector* p_WJ2;
   ROOT::Math::XYZTVector WJ2;
+
+  ROOT::Math::XYZTVector* p_WJ1_KF;
+  ROOT::Math::XYZTVector WJ1_KF;
+  ROOT::Math::XYZTVector* p_WJ2_KF;
+  ROOT::Math::XYZTVector WJ2_KF;
   
   ROOT::Math::XYZTVector* p_WJJ;
   ROOT::Math::XYZTVector WJJ;
@@ -189,6 +198,10 @@ struct VBFAnalysisVariables
   float lepMetW_Dphi;
   float lepNuW_m;
   float lepNuW_zepp;
+  
+  float lepNuW_m_KF;
+  float chi2_KF;
+  int ndf_KF;
   
   float lepNuW_cphi;
   float lepNuZ_cphi;

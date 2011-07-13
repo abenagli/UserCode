@@ -751,10 +751,10 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "WJJ_m";
   histoName = "WJJ_m";
-  stack -> SetXaxisRange(44., 300.);
+  stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("m(WJet_{1}+WJet_{2})");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 32, PURescale);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale);
   
   variableNames.at(0) = "WJJ_et";
   histoName = "WJJ_et";
