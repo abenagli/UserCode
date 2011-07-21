@@ -83,14 +83,14 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep_mishits",           &vars.lep_mishits,                     "lep_mishits/I");
   vars.m_reducedTree -> Branch("lep_dist",              &vars.lep_dist,                           "lep_dist/F");
   vars.m_reducedTree -> Branch("lep_dcot",              &vars.lep_dcot,                           "lep_dcot/F");
-  vars.m_reducedTree -> Branch("lep_tracker",                   &vars.lep_tracker,                                       "lep_tracker/I");
-  vars.m_reducedTree -> Branch("lep_standalone",                &vars.lep_standalone,                                 "lep_standalone/I");
-  vars.m_reducedTree -> Branch("lep_global",                    &vars.lep_global,                                         "lep_global/I");
-  vars.m_reducedTree -> Branch("lep_normalizedChi2",            &vars.lep_normalizedChi2,                         "lep_normalizedChi2/F");
-  vars.m_reducedTree -> Branch("lep_numberOfMatches",           &vars.lep_numberOfMatches,                       "lep_numberOfMatches/I");
-  vars.m_reducedTree -> Branch("lep_numberOfValidTrackerHits",  &vars.lep_numberOfValidTrackerHits,     "lep_numberOfValidTrackerHits/I");
-  vars.m_reducedTree -> Branch("lep_numberOfValidMuonHits",     &vars.lep_numberOfValidMuonHits,           "lep_numberOfValidMuonHits/I");
-  vars.m_reducedTree -> Branch("lep_pixelLayerWithMeasurement", &vars.lep_pixelLayersWithMeasurement, "lep_pixelLayersWithMeasurement/I");
+  vars.m_reducedTree -> Branch("lep_tracker",                    &vars.lep_tracker,                                       "lep_tracker/I");
+  vars.m_reducedTree -> Branch("lep_standalone",                 &vars.lep_standalone,                                 "lep_standalone/I");
+  vars.m_reducedTree -> Branch("lep_global",                     &vars.lep_global,                                         "lep_global/I");
+  vars.m_reducedTree -> Branch("lep_normalizedChi2",             &vars.lep_normalizedChi2,                         "lep_normalizedChi2/F");
+  vars.m_reducedTree -> Branch("lep_numberOfMatches",            &vars.lep_numberOfMatches,                       "lep_numberOfMatches/I");
+  vars.m_reducedTree -> Branch("lep_numberOfValidTrackerHits",   &vars.lep_numberOfValidTrackerHits,     "lep_numberOfValidTrackerHits/I");
+  vars.m_reducedTree -> Branch("lep_numberOfValidMuonHits",      &vars.lep_numberOfValidMuonHits,           "lep_numberOfValidMuonHits/I");
+  vars.m_reducedTree -> Branch("lep_pixelLayesrWithMeasurement", &vars.lep_pixelLayersWithMeasurement, "lep_pixelLayersWithMeasurement/I");
   
   
   // met variables
@@ -867,8 +867,8 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
   vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
   
-  vars.nu = *GetNeutrino(vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
-  vars.p_nu = &vars.nu;
+  int nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
+  vars.p_nu = &(vars.nu);
   vars.lepNuW = vars.lepW + vars.nu;
   vars.lepNuW_m = vars.lepNuW.mass();
   
@@ -880,6 +880,7 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   // kinematic fit
   if( vars.WJ1.pt() <= 0. ) return;
   if( vars.WJ2.pt() <= 0. ) return;
+  //if( nSolutions == 1 ) return;
   
   
   
@@ -919,7 +920,7 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   // neutrino
   PFMETResolution(vars.met.Et(),EtRes,etaRes,phiRes);
   mv(0,0) = EtRes*EtRes;
-  mv(1,1) = 9999.;
+  mv(1,1) = 25.;
   mv(2,2) = phiRes*phiRes;
   
   // jets
@@ -934,19 +935,29 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   
   
   // define the constraints
-  TFitParticleEtEtaPhi* l  = new TFitParticleEtEtaPhi("lepton","lepton",&vl,&ml);
-  TFitParticleEtEtaPhi* v  = new TFitParticleEtEtaPhi("neutrino","neutrino",&vv,&mv);
-  TFitParticleEtEtaPhi* j1 = new TFitParticleEtEtaPhi("WJet1","WJet1",&v1,&m1);
-  TFitParticleEtEtaPhi* j2 = new TFitParticleEtEtaPhi("WJet2","WJet2",&v2,&m2);
-    
-  TFitConstraintM* mCons1 = new TFitConstraintM( "W1MassConstraint", "W1Mass-Constraint", 0, 0 , 80.398);
+  TLorentzVector tmpl = vl;
+  TLorentzVector tmpv = vv;
+  TLorentzVector tmp1 = v1;
+  TLorentzVector tmp2 = v2;
+  
+  TFitParticleEtEtaPhi* l  = new TFitParticleEtEtaPhi("lepton","lepton",&tmpl,&ml);
+  TFitParticleEtEtaPhi* v  = new TFitParticleEtEtaPhi("neutrino","neutrino",&tmpv,&mv);
+  TFitParticleEtEtaPhi* j1 = new TFitParticleEtEtaPhi("WJet1","WJet1",&tmp1,&m1);
+  TFitParticleEtEtaPhi* j2 = new TFitParticleEtEtaPhi("WJet2","WJet2",&tmp2,&m2);
+  
+  //std::cout << "l: " << tmpl.Pz() << "   mass: " << tmpl.M() << std::endl;
+  //std::cout << "v: " << tmpv.Pz() << "   mass: " << tmpv.M() << std::endl;
+  //std::cout << "nSolutions: " << nSolutions << std::endl;
+  //std::cout << "lv: mass: " << (tmpl+tmpv).M() << std::endl;
+  //std::cout << "jj: mass: " << (tmp1+tmp2).M() << std::endl;
+  TFitConstraintMGaus* mCons1 = new TFitConstraintMGaus( "W1MassConstraint", "W1Mass-Constraint", 0, 0 , 80.399, 2.085);
   mCons1->addParticles1( l, v );
-  TFitConstraintM* mCons2 = new TFitConstraintM( "W2MassConstraint", "W2Mass-Constraint", 0, 0 , 80.398);
+  TFitConstraintMGaus* mCons2 = new TFitConstraintMGaus( "W2MassConstraint", "W2Mass-Constraint", 0, 0 , 80.399, 2.085);
   mCons2->addParticles1( j1, j2 );
   TFitConstraintEp* pxCons = new TFitConstraintEp( "PxConstraint", "Px-Constraint", 0, TFitConstraintEp::pX , u_x );
   pxCons->addParticles( l, v, j1, j2 );
   TFitConstraintEp* pyCons = new TFitConstraintEp( "PyConstraint", "Py-Constraint", 0, TFitConstraintEp::pY , u_y );
-  pxCons->addParticles( l, v, j1, j2 );
+  pyCons->addParticles( l, v, j1, j2 );
   
   
   //Definition of the fitter
@@ -959,15 +970,15 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   fitter->addMeasParticle( j2 );
   fitter->addConstraint( mCons1 );
   fitter->addConstraint( mCons2 );
-  fitter->addConstraint( pxCons );
-  fitter->addConstraint( pyCons );
+  //fitter->addConstraint( pxCons );
+  //fitter->addConstraint( pyCons );
     
   //Set convergence criteria
   fitter->setMaxNbIter( 30 );
   fitter->setMaxDeltaS( 1e-2 );
   fitter->setMaxF( 1e-1 );
-  fitter->setVerbosity(2);
-
+  fitter->setVerbosity(0);
+  
   //Perform the fit
   fitter->fit();
   
@@ -994,9 +1005,12 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJ2_KF.SetPxPyPzE(j2->getCurr4Vec()->Px(),j2->getCurr4Vec()->Py(),j2->getCurr4Vec()->Pz(),j2->getCurr4Vec()->E()  );
   vars.p_WJ2_KF = &vars.WJ2_KF;
   
-  vars.lepNuW_m_KF = ( (*(v->getCurr4Vec())) + (*(v->getCurr4Vec())) + (*(j1->getCurr4Vec())) + (*(j2->getCurr4Vec())) ).M();
+  vars.lepNuW_m_KF = ( (*(l->getCurr4Vec())) + (*(v->getCurr4Vec())) + (*(j1->getCurr4Vec())) + (*(j2->getCurr4Vec())) ).M();
   vars.chi2_KF = fitter->getS();
   vars.ndf_KF = fitter->getNDF();
+  
+  //std::cout << "lv: mass after KF: " << (vars.lep_KF+vars.nu_KF).M() << std::endl;
+  //std::cout << "jj: mass after KF: " << (vars.WJ1_KF+vars.WJ2_KF).M() << std::endl;  
 }
 
 

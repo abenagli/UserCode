@@ -142,6 +142,18 @@ int main(int argc, char** argv)
   
   
   
+  variableNames.at(0) = "chi2_KF/ndf_KF";
+  histoName = "chi2_KF";
+  stack -> SetXaxisRange(0., 100.);
+  stack -> SetXaxisTitle("(#chi^{2}/ndf)_{KF}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale);
+  
+  
+  
+  
+  
+  
   variableNames.at(0) = "lepNuW_cphi";
   histoName = "lepNuW_cphi";
   stack -> SetXaxisRange(-1., 1.);
@@ -909,6 +921,13 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("min #Delta#phi(WJet-met)");
   stack -> SetUnit("rad");
   stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale);
+  
+  variableNames.at(0) = "min(WJ1.pt(),WJ2.pt())/WJJ_m";
+  histoName = "WJ2_pt_over_WJJ_m";
+  stack -> SetXaxisRange(0., 2.);
+  stack -> SetXaxisTitle("pt(WJet_{2})/m(WJet_{1}+WJet_{2})");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale);
   
   variableNames.at(0) = "abs(WJJ_zepp)";
   histoName = "WJJ_zepp";

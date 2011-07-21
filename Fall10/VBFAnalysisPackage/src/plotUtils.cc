@@ -959,7 +959,11 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
 
 
 
-void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy)
+void drawTStack::DrawEvents(const std::string& mode,
+                            const float& lumi,
+                            const int& step,
+                            const bool& logy,
+			    const bool& PURescale)
 { 
   std::cout << "\n>>>plotUtils::Drawing " << mode;
   
@@ -1046,7 +1050,12 @@ void drawTStack::DrawEvents(const std::string& mode, const float& lumi, const in
     if( mode == "events" )
       fullHistoName = "events";
     else
-      fullHistoName = "events_PURescaled";      
+    {
+      if( PURescale == true )
+        fullHistoName = "events_PURescaled";
+      else
+        fullHistoName = "events";
+    }
     //std::cout << "getting histogram " << fullHistoName << std::endl;
     
     TH1F* histo = NULL;

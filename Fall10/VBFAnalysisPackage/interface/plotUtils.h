@@ -47,11 +47,14 @@ class drawTStack
             const std::string& mode,
             const float& lumi, const int& step,
             const int& nBins,
-            const bool& PURescale = false,
+            const bool& PURescale = true,
             std::vector<std::string>* cut = NULL);
   
-  void DrawEvents(const std::string& mode, const float& lumi, const int& step, const bool& logy);
-  void DrawEventRatio_nJets(const std::string& histoName, const float& lumi, const int& step, const bool& logy);
+  void DrawEvents(const std::string& mode,
+                  const float& lumi,
+                  const int& step,
+                  const bool& logy,
+                  const bool& PURescale = true);
   
   void SetXaxisRange(const double& xMin, const double& xMax);
   void SetXaxisTitle(const std::string& xTitle);
