@@ -1140,6 +1140,47 @@ void Print4V(const ROOT::Math::XYZTVector& p)
 
 
 
+
+
+
+int GetNeutrino(ROOT::Math::XYZTVector& nu,
+                const ROOT::Math::XYZTVector& lep,
+                const ROOT::Math::XYZTVector& met,
+                const ROOT::Math::XYZTVector& WJ1,
+                const ROOT::Math::XYZTVector& WJ2,
+                const float& mH)
+{
+  // neutrino                                                                                                                                                                      
+  float alpha = lep.px()*met.px() + lep.py()*met.py();
+
+  float delta = (alpha + 0.5*80.399*80.399)*(alpha + 0.5*80.399*80.399) - lep.pt()*lep.pt()*met.pt()*met.pt();
+
+  if( alpha - lep.pt()*met.pt() + 0.5*80.399*80.399 < 0 )
+    delta = 0.;
+
+  float pz1 = ( lep.pz()*(alpha + 0.5*80.399*80.399) + lep.energy()*sqrt(delta) ) / lep.pt() / lep.pt();
+  float pz2 = ( lep.pz()*(alpha + 0.5*80.399*80.399) - lep.energy()*sqrt(delta) ) / lep.pt() / lep.pt();
+
+  ROOT::Math::XYZTVector* nu1 = new ROOT::Math::XYZTVector(met.px(), met.py(), pz1, sqrt(met.px()*met.px() + met.py()*met.py() + pz1*pz1));
+  ROOT::Math::XYZTVector* nu2 = new ROOT::Math::XYZTVector(met.px(), met.py(), pz2, sqrt(met.px()*met.px() + met.py()*met.py() + pz2*pz2));
+  
+  if( fabs(mH - (lep+(*nu1)+WJ1+WJ2).mass()) < fabs(mH - (lep+(*nu2)+WJ1+WJ2).mass()) )
+  {
+    delete nu2;
+    nu = *nu1;
+  }
+  else
+  {
+    delete nu1;
+    nu = *nu2;
+  }
+  
+  if( delta > 0. ) return 2;
+  else return 1;
+}
+
+
+
 //  ------------------------------------------------------------
 void GetLNuJJAngles(float& cphi_lvjj,
                     float& cphi_lvz,
