@@ -442,9 +442,9 @@ int main(int argc, char** argv)
       for(unsigned int HLTIt = 0; HLTIt < (*HLT_Names).size(); ++HLTIt)
       {
         std::cout << "HLT_Bit: "       << std::setw(3)  << HLTIt
-                  << "   HLT_Name: "   << std::setw(50) << (*HLT_Names).at(HLTIt)
-                  << "   HLT_Accept: " << std::setw(2)  <<(*HLT_Accept).at(HLTIt)
-                  << std::endl;    
+            << "   HLT_Name: "   << std::setw(50) << (*HLT_Names).at(HLTIt)
+            << "   HLT_Accept: " << std::setw(2)  <<(*HLT_Accept).at(HLTIt)
+            << std::endl;    
       }
     }
     
@@ -767,8 +767,8 @@ int main(int argc, char** argv)
     step += 1;
     //SetStepNames(stepNames, "Jet == 2", step, verbosity);
     
-    float DR_thirdJ = deltaR(vars.thirdJ.eta(), vars.thirdJ.phi(), vars.lep.eta(), vars.lep.phi());
-    if ( DR_thirdJ < DRLepJetMin && fabs(vars.thirdJ.eta()) < jetAbsEtaMAX && vars.thirdJ.pt() > jetPtMIN ) continue;
+    //float DR_thirdJ = deltaR(vars.thirdJ.eta(), vars.thirdJ.phi(), vars.lep.eta(), vars.lep.phi());
+    if ( vars.nJets_cnt_et30 > 2 ) continue;
     
     // Fill distributions
     stepEvents[step] += 1;
@@ -1075,7 +1075,7 @@ bool AcceptHLTPath(const std::vector<std::string>& HLT_Names,
   
   for(unsigned int HLTIt = 0; HLTIt < HLT_Names.size(); ++HLTIt)
     if( (HLT_Names.at(HLTIt) == HLTPathName) &&
-        (HLT_Accept.at(HLTIt) == 1) )
+         (HLT_Accept.at(HLTIt) == 1) )
       acceptEvent = true;
   
   return acceptEvent;
