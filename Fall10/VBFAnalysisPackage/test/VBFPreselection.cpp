@@ -194,7 +194,7 @@ int main(int argc, char** argv)
     SetHLTVariables(vars, reader);
     SetPVVariables(vars, reader);
     
-    //if( vars.eventId != 1000112 ) continue;
+    //if( vars.eventId != 177044 ) continue;
     
     
         
@@ -624,11 +624,11 @@ int main(int argc, char** argv)
       // clean jets from selected lepton
       float DR = deltaR(jet.eta(), jet.phi(), vars.lep.eta(), vars.lep.phi());
       
-      if( (leptonFLAVOUR == "e")  && (DR < 0.3) ) continue;
-      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 11) && (DR < 0.3) ) continue;
+      if( (leptonFLAVOUR == "e")  && (DR < 0.5) ) continue;
+      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 11) && (DR < 0.5) ) continue;
       
-      if( (leptonFLAVOUR == "mu") && (DR < 0.3) ) continue;
-      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 13) && (DR < 0.3) ) continue;
+      if( (leptonFLAVOUR == "mu") && (DR < 0.5) ) continue;
+      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 13) && (DR < 0.5) ) continue;
             
       
       // jetID
@@ -661,7 +661,7 @@ int main(int argc, char** argv)
     if( verbosity == 1)
       std::cout << "jet end" << std::endl;
     
-    std::sort(vars.jets_etOrdered.begin(), vars.jets_etOrdered.end(), maggiore);
+    std::sort(vars.jets_ptOrdered.begin(), vars.jets_ptOrdered.end(), maggiore);
     std::sort(vars.jets_bTagOrdered.begin(), vars.jets_bTagOrdered.end(), maggiore);
       if( vars.jets_bTagOrdered.size() > 0 )
     vars.jets_bTag1 = vars.jets_bTagOrdered.at(0);
@@ -841,33 +841,33 @@ int main(int argc, char** argv)
     {
       if( vars.nJets < 4 )
       {
-        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999.);
+        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, 30., jetEtaCNT, 5, 9999.);
         
         std::vector<int> blacklistIt_W;
         blacklistIt_W.push_back(vars.selectIt_W.at(0));
         blacklistIt_W.push_back(vars.selectIt_W.at(1));
-        SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0., &blacklistIt_W);
+        SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, 30., 0., 0., &blacklistIt_W);
       }
       
       if( vars.nJets >= 4 )
       {
         if( tagFIRST == 1)
         {
-          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0.);
+          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, 30., 0., 0.);
           
           std::vector<int> blacklistIt_tag;
           blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
           blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5., 9999., &blacklistIt_tag);
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, 30., jetEtaCNT, 5., 9999., &blacklistIt_tag);
         }
         else
         {
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 9, 9999.);
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, 30., jetEtaCNT, 9, 9999.);
           
           std::vector<int> blacklistIt_W;
           blacklistIt_W.push_back(vars.selectIt_W.at(0));
           blacklistIt_W.push_back(vars.selectIt_W.at(1));
-          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0., &blacklistIt_W);
+          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, 30., 0., 0., &blacklistIt_W);
         }
       }
       

@@ -735,8 +735,8 @@ int main(int argc, char** argv)
     
     
     //if( vars.nJets > 3 ) continue;
-    if( vars.nJets_cnt_et30 > 2 ) continue;
-    if( vars.nJets_cnt_et30 < 2 ) continue;
+    if( vars.nJets_cnt_pt30 > 2 ) continue;
+    if( vars.nJets_cnt_pt30 < 2 ) continue;
     if( (vars.WJ1.pt() <= 30.) || (vars.WJ2.pt() <= 30.) ) continue;
     if( std::max(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMaxPtMIN ) continue;
     if( std::min(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMinPtMIN ) continue;

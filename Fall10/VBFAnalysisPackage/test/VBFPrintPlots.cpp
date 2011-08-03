@@ -299,13 +299,13 @@ int main(int argc, char** argv)
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi,step, 25, PURescale);
   
-  variableNames.at(0) = "abs(lep_zepp)";
-  histoName = "lep_zepp";
-  cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  stack -> SetXaxisRange(0., 1.);
-  stack -> SetXaxisTitle("zepp(lepton)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi,step, 20, PURescale, cuts);
+  //variableNames.at(0) = "abs(lep_zepp)";
+  //histoName = "lep_zepp";
+  //cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  //stack -> SetXaxisRange(0., 1.);
+  //stack -> SetXaxisTitle("zepp(lepton)");
+  //stack -> SetUnit("");
+  //stack -> Draw(variableNames, histoName, method, lumi,step, 20, PURescale, cuts);
   
   variableNames.at(0) = "abs(lep_dxy_PV)/lep_edxy_PV";
   histoName = "lep_3DipSig";
@@ -336,6 +336,13 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale);
   
   
+  
+  variableNames.at(0) = "lepMet_pt";
+  histoName = "lepMet_pt";
+  stack -> SetXaxisRange(0., 300.);
+  stack -> SetXaxisTitle("pt(lepton+met)");
+  stack -> SetUnit("GeV/c");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale);
   
   variableNames.at(0) = "lepMet_mt";
   histoName = "lepMet_mt";
@@ -625,7 +632,7 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi,step, 50, PURescale, cuts);
   
   variableNames.at(0) = "abs(lep_dxy_PV)/lep_edxy_PV";
-  histoName = "lep_3DipSig";
+  histoName = "mu_3DipSig";
   cuts -> at(0) = "( lep_flavour == 13 )";
   stack -> SetXaxisRange(0., 5.);
   stack -> SetXaxisTitle("3D ip(muon)");
@@ -880,10 +887,10 @@ int main(int argc, char** argv)
   stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale);
   
-  variableNames.at(0) = "WJJ_et";
-  histoName = "WJJ_et";
+  variableNames.at(0) = "WJJ_pt";
+  histoName = "WJJ_pt";
   stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("et(WJet_{1}+WJet_{2})");
+  stack -> SetXaxisTitle("pt(WJet_{1}+WJet_{2})");
   stack -> SetUnit("GeV");
   stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale);  
   
@@ -929,12 +936,12 @@ int main(int argc, char** argv)
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale);
   
-  variableNames.at(0) = "abs(WJJ_zepp)";
-  histoName = "WJJ_zepp";
-  stack -> SetXaxisRange(0., 1.);
-  stack -> SetXaxisTitle("zepp(WJet_{1}+WJet_{2})");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale);
+  //variableNames.at(0) = "abs(WJJ_zepp)";
+  //histoName = "WJJ_zepp";
+  //stack -> SetXaxisRange(0., 1.);
+  //stack -> SetXaxisTitle("zepp(WJet_{1}+WJet_{2})");
+  //stack -> SetUnit("");
+  //stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale);
   
   
   
@@ -986,31 +993,31 @@ int main(int argc, char** argv)
   
   
   
-  variableNames2.at(0) = "abs(WJ1_zepp)";
-  variableNames2.at(1) = "abs(WJ2_zepp)";
-  histoName = "WJJ_zepp_min+WJJ_zepp_max";
-  cuts2 -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  cuts2 -> at(1) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  stack -> SetXaxisRange(0, 1.);
-  stack -> SetXaxisTitle("zepp(WJets)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 20, PURescale, cuts2);
+  //variableNames2.at(0) = "abs(WJ1_zepp)";
+  //variableNames2.at(1) = "abs(WJ2_zepp)";
+  //histoName = "WJJ_zepp_min+WJJ_zepp_max";
+  //cuts2 -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  //cuts2 -> at(1) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  //stack -> SetXaxisRange(0, 1.);
+  //stack -> SetXaxisTitle("zepp(WJets)");
+  //stack -> SetUnit("");
+  //stack -> Draw(variableNames2, histoName, method, lumi, step, 20, PURescale, cuts2);
   
-  variableNames.at(0) = "max(abs(WJ1_zepp), abs(WJ2_zepp))";
-  histoName = "WJJ_zepp_max";
-  cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  stack -> SetXaxisRange(0, 1.);
-  stack -> SetXaxisTitle("max zepp(WJets)");
-  stack -> SetUnit(""); 
-  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, cuts);
+  //variableNames.at(0) = "max(abs(WJ1_zepp), abs(WJ2_zepp))";
+  //histoName = "WJJ_zepp_max";
+  //cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  //stack -> SetXaxisRange(0, 1.);
+  //stack -> SetXaxisTitle("max zepp(WJets)");
+  //stack -> SetUnit(""); 
+  //stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, cuts);
   
-  variableNames.at(0) = "min(abs(WJ1_zepp), abs(WJ2_zepp))";
-  histoName = "WJJ_zepp_min";
-  cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  stack -> SetXaxisRange(0, 1.);
-  stack -> SetXaxisTitle("min zepp(WJets)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, cuts);
+  //variableNames.at(0) = "min(abs(WJ1_zepp), abs(WJ2_zepp))";
+  //histoName = "WJJ_zepp_min";
+  //cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  //stack -> SetXaxisRange(0, 1.);
+  //stack -> SetXaxisTitle("min zepp(WJets)");
+  //stack -> SetUnit("");
+  //stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, cuts);
   
   
   
@@ -1118,12 +1125,12 @@ int main(int argc, char** argv)
   stack -> SetUnit("GeV/c2");
   stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale);
   
-  variableNames.at(0) = "abs(lepNuW_zepp)";
-  histoName = "lepNuW_zepp";
-  stack -> SetXaxisRange(0., 1.);
-  stack -> SetXaxisTitle("zepp(lepton+neutrino+WJets)");
-  stack -> SetUnit("GeV/c2");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale);
+  //variableNames.at(0) = "abs(lepNuW_zepp)";
+  //histoName = "lepNuW_zepp";
+  //stack -> SetXaxisRange(0., 1.);
+  //stack -> SetXaxisTitle("zepp(lepton+neutrino+WJets)");
+  ///stack -> SetUnit("GeV/c2");
+  //stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale);
   
   variableNames.at(0) = "lepMetW_pt/lepNuW_m";
   histoName = "lepMetW_jacobian";
@@ -1170,6 +1177,7 @@ int main(int argc, char** argv)
   
   
   
+  /*
   //---------------------------------------------
   // tag-Jets
   //---------------------------------------------
@@ -1270,7 +1278,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("charged multiplicity(tagJets)");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, cuts);
-  
+  */
   
   
   //variableNames2.at(0) = "tagJ1_dzAvg-PV_z";

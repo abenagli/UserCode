@@ -90,7 +90,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep_numberOfMatches",            &vars.lep_numberOfMatches,                       "lep_numberOfMatches/I");
   vars.m_reducedTree -> Branch("lep_numberOfValidTrackerHits",   &vars.lep_numberOfValidTrackerHits,     "lep_numberOfValidTrackerHits/I");
   vars.m_reducedTree -> Branch("lep_numberOfValidMuonHits",      &vars.lep_numberOfValidMuonHits,           "lep_numberOfValidMuonHits/I");
-  vars.m_reducedTree -> Branch("lep_pixelLayesrWithMeasurement", &vars.lep_pixelLayersWithMeasurement, "lep_pixelLayersWithMeasurement/I");
+  vars.m_reducedTree -> Branch("lep_pixelLayersWithMeasurement", &vars.lep_pixelLayersWithMeasurement, "lep_pixelLayersWithMeasurement/I");
   
   
   // met variables
@@ -98,6 +98,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("nu",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu);
   vars.m_reducedTree -> Branch("nu_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu_KF);
   vars.m_reducedTree -> Branch("met_et",       &vars.met_et,             "met_et/F");
+  vars.m_reducedTree -> Branch("lepMet_pt",    &vars.lepMet_pt,       "lepMet_pt/F");
   vars.m_reducedTree -> Branch("lepMet_mt",    &vars.lepMet_mt,       "lepMet_mt/F");
   vars.m_reducedTree -> Branch("lepMet_Dphi",  &vars.lepMet_Dphi,   "lepMet_Dphi/F");
   
@@ -107,18 +108,18 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("nJets_cnt", &vars.nJets_cnt, "nJets_cnt/I");
   vars.m_reducedTree -> Branch("nJets_fwd", &vars.nJets_fwd, "nJets_fwd/I");
   
-  vars.m_reducedTree -> Branch("nJets_et20",     &vars.nJets_et20,         "nJets_et20/I");
-  vars.m_reducedTree -> Branch("nJets_cnt_et20", &vars.nJets_cnt_et20, "nJets_cnt_et20/I");
-  vars.m_reducedTree -> Branch("nJets_fwd_et20", &vars.nJets_fwd_et20, "nJets_fwd_et20/I");
-  vars.m_reducedTree -> Branch("nJets_btw_et20", &vars.nJets_btw_et20, "nJets_btw_et20/I");
-  vars.m_reducedTree -> Branch("nJets_et25",     &vars.nJets_et25,         "nJets_et25/I");
-  vars.m_reducedTree -> Branch("nJets_cnt_et25", &vars.nJets_cnt_et25, "nJets_cnt_et25/I");
-  vars.m_reducedTree -> Branch("nJets_fwd_et25", &vars.nJets_fwd_et25, "nJets_fwd_et25/I");
-  vars.m_reducedTree -> Branch("nJets_btw_et25", &vars.nJets_btw_et25, "nJets_btw_et25/I");
-  vars.m_reducedTree -> Branch("nJets_et30",     &vars.nJets_et30,         "nJets_et30/I");
-  vars.m_reducedTree -> Branch("nJets_cnt_et30", &vars.nJets_cnt_et30, "nJets_cnt_et30/I");
-  vars.m_reducedTree -> Branch("nJets_fwd_et30", &vars.nJets_fwd_et30, "nJets_fwd_et30/I");
-  vars.m_reducedTree -> Branch("nJets_btw_et30", &vars.nJets_btw_et30, "nJets_btw_et30/I");
+  vars.m_reducedTree -> Branch("nJets_pt20",     &vars.nJets_pt20,         "nJets_pt20/I");
+  vars.m_reducedTree -> Branch("nJets_cnt_pt20", &vars.nJets_cnt_pt20, "nJets_cnt_pt20/I");
+  vars.m_reducedTree -> Branch("nJets_fwd_pt20", &vars.nJets_fwd_pt20, "nJets_fwd_pt20/I");
+  vars.m_reducedTree -> Branch("nJets_btw_pt20", &vars.nJets_btw_pt20, "nJets_btw_pt20/I");
+  vars.m_reducedTree -> Branch("nJets_pt25",     &vars.nJets_pt25,         "nJets_pt25/I");
+  vars.m_reducedTree -> Branch("nJets_cnt_pt25", &vars.nJets_cnt_pt25, "nJets_cnt_pt25/I");
+  vars.m_reducedTree -> Branch("nJets_fwd_pt25", &vars.nJets_fwd_pt25, "nJets_fwd_pt25/I");
+  vars.m_reducedTree -> Branch("nJets_btw_pt25", &vars.nJets_btw_pt25, "nJets_btw_pt25/I");
+  vars.m_reducedTree -> Branch("nJets_pt30",     &vars.nJets_pt30,         "nJets_pt30/I");
+  vars.m_reducedTree -> Branch("nJets_cnt_pt30", &vars.nJets_cnt_pt30, "nJets_cnt_pt30/I");
+  vars.m_reducedTree -> Branch("nJets_fwd_pt30", &vars.nJets_fwd_pt30, "nJets_fwd_pt30/I");
+  vars.m_reducedTree -> Branch("nJets_btw_pt30", &vars.nJets_btw_pt30, "nJets_btw_pt30/I");
   
   vars.m_reducedTree -> Branch("jets_bTag1", &vars.jets_bTag1, "jets_bTag1/F"); 
   vars.m_reducedTree -> Branch("jets_bTag2", &vars.jets_bTag2, "jets_bTag2/F"); 
@@ -158,7 +159,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("WJJ_Deta",   &vars.WJJ_Deta,     "WJJ_Deta/F");
   vars.m_reducedTree -> Branch("WJJ_Dphi",   &vars.WJJ_Dphi,     "WJJ_Dphi/F");
   vars.m_reducedTree -> Branch("WJJ_DR",     &vars.WJJ_DR,         "WJJ_DR/F");
-  vars.m_reducedTree -> Branch("WJJ_et",     &vars.WJJ_et,         "WJJ_et/F");
+  vars.m_reducedTree -> Branch("WJJ_pt",     &vars.WJJ_pt,         "WJJ_pt/F");
   vars.m_reducedTree -> Branch("WJJ_m",      &vars.WJJ_m,           "WJJ_m/F");
   vars.m_reducedTree -> Branch("WJJ_zepp",   &vars.WJJ_zepp,     "WJJ_zepp/F");
 
@@ -340,6 +341,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   
   vars.lepMet = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   
+  vars.lepMet_pt = -1.;
   vars.lepMet_mt = -1.;
   vars.lepMet_Dphi = -1.;
   
@@ -363,7 +365,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.jets_chargedMultiplicity.clear();
   vars.jets_neutralMultiplicity.clear();
   vars.jets_muonMultiplicity.clear();  
-  vars.jets_etOrdered.clear();
+  vars.jets_ptOrdered.clear();
   vars.jets_bTag.clear();
   vars.jets_bTagOrdered.clear();
   vars.jets_dzAvg.clear();
@@ -373,18 +375,18 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.nJets_cnt = 0;
   vars.nJets_fwd = 0;
   
-  vars.nJets_et20 = 0;
-  vars.nJets_cnt_et20 = 0;
-  vars.nJets_fwd_et20 = 0;
-  vars.nJets_btw_et20 = 0;
-  vars.nJets_et25 = 0;
-  vars.nJets_cnt_et25 = 0;
-  vars.nJets_fwd_et25 = 0;
-  vars.nJets_btw_et25 = 0;
-  vars.nJets_et30 = 0;
-  vars.nJets_cnt_et30 = 0;
-  vars.nJets_fwd_et30 = 0;
-  vars.nJets_btw_et30 = 0;
+  vars.nJets_pt20 = 0;
+  vars.nJets_cnt_pt20 = 0;
+  vars.nJets_fwd_pt20 = 0;
+  vars.nJets_btw_pt20 = 0;
+  vars.nJets_pt25 = 0;
+  vars.nJets_cnt_pt25 = 0;
+  vars.nJets_fwd_pt25 = 0;
+  vars.nJets_btw_pt25 = 0;
+  vars.nJets_pt30 = 0;
+  vars.nJets_cnt_pt30 = 0;
+  vars.nJets_fwd_pt30 = 0;
+  vars.nJets_btw_pt30 = 0;
   
   vars.jets_bTag1 = -99.;
   vars.jets_bTag2 = -99.;
@@ -437,7 +439,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.WJJ_Deta = -99.;
   vars.WJJ_Dphi = -99.;
   vars.WJJ_DR = -99.;
-  vars.WJJ_et = -99.;
+  vars.WJJ_pt = -99.;
   vars.WJJ_m = -99.;
   vars.WJJ_zepp = -99.;
   
@@ -701,6 +703,7 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
   vars.lepMet = vars.lep + vars.met;
   
   vars.lepMet_Dphi = deltaPhi(vars.lep.phi(), vars.met.phi());
+  vars.lepMet_pt = vars.lepMet.pt();
   vars.lepMet_mt = sqrt( vars.lep.mass() * vars.lep.mass() +
 			 2. * vars.lep.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lep.phi(), vars.met.phi()) ) ) );
 }
@@ -717,23 +720,23 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
   if( fabs(jet.eta()) < jetEtaCNT )  ++vars.nJets_cnt;  
   if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd;  
   
-  if( jet.Et() > 20.)
+  if( jet.pt() > 20.)
   {
-    ++vars.nJets_et20;
-    if( fabs(jet.eta()) < jetEtaCNT )  ++vars.nJets_cnt_et20;
-    if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd_et20;
+    ++vars.nJets_pt20;
+    if( fabs(jet.eta()) < jetEtaCNT )  ++vars.nJets_cnt_pt20;
+    if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd_pt20;
   }
-  if( jet.Et() > 25.)
+  if( jet.pt() > 25.)
   {
-    ++vars.nJets_et25;
-    if( fabs(jet.eta()) < jetEtaCNT )  ++vars.nJets_cnt_et25;
-    if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd_et25;
+    ++vars.nJets_pt25;
+    if( fabs(jet.eta()) < jetEtaCNT )  ++vars.nJets_cnt_pt25;
+    if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd_pt25;
   }
-  if( jet.Et() > 30.)
+  if( jet.pt() > 30.)
   {
-    ++vars.nJets_et30;
-    if( fabs(jet.eta()) < jetEtaCNT )  ++vars.nJets_cnt_et30;
-    if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd_et30;
+    ++vars.nJets_pt30;
+    if( fabs(jet.eta()) < jetEtaCNT )  ++vars.nJets_cnt_pt30;
+    if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd_pt30;
   }
 
   vars.jets_charge.push_back( reader.GetFloat("jets_charge")->at(jetIt) );
@@ -779,7 +782,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     //vars.jets_dzAvgCut.push_back( reader.GetFloat("jets_dzAvgCut")->at(jetIt) );
   }
   
-  vars.jets_etOrdered.push_back( reader.Get4V("jets")->at(jetIt).Et() );
+  vars.jets_ptOrdered.push_back( reader.Get4V("jets")->at(jetIt).pt() );
   vars.jets_bTag.push_back( reader.GetFloat("trackCountingHighEffBJetTags")->at(jetIt) );
   vars.jets_bTagOrdered.push_back( reader.GetFloat("trackCountingHighEffBJetTags")->at(jetIt) );
   
@@ -789,14 +792,14 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
 
 void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT)
 {
-  float jetEtMAX = -9999.;
+  float jetPtMAX = -9999.;
   for(unsigned int jetIt = 0; jetIt < vars.jets.size(); ++jetIt)
   {
-    if( ( (vars.jets.at(jetIt)).Et() > jetEtMAX ) &&
+    if( ( (vars.jets.at(jetIt)).pt() > jetPtMAX ) &&
         ( fabs((vars.jets.at(jetIt)).eta()) < jetEtaCNT ) )
     {
       vars.selectIt_leadingJet = jetIt;
-      jetEtMAX = (vars.jets.at(jetIt)).Et();
+      jetPtMAX = (vars.jets.at(jetIt)).pt();
     }
   }
   
@@ -844,12 +847,12 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJJ_Deta = deltaEta(vars.WJ1.eta(),vars.WJ2.eta());
   vars.WJJ_Dphi = deltaPhi(vars.WJ1.phi(),vars.WJ2.phi());
   vars.WJJ_DR = deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi());
-  vars.WJJ_et = (vars.WJ1+vars.WJ2).Et();
+  vars.WJJ_pt = (vars.WJ1+vars.WJ2).pt();
   vars.WJJ_m = (vars.WJ1+vars.WJ2).mass();
   
   vars.lepWJJ_ptOrdered.push_back( vars.lep.pt() );
-  vars.lepWJJ_ptOrdered.push_back( vars.WJ1.Et() );
-  vars.lepWJJ_ptOrdered.push_back( vars.WJ2.Et() );
+  vars.lepWJJ_ptOrdered.push_back( vars.WJ1.pt() );
+  vars.lepWJJ_ptOrdered.push_back( vars.WJ2.pt() );
   std::sort(vars.lepWJJ_ptOrdered.begin(), vars.lepWJJ_ptOrdered.end(), maggiore);
   vars.lepWJJ_pt1 = vars.lepWJJ_ptOrdered.at(0);
   vars.lepWJJ_pt2 = vars.lepWJJ_ptOrdered.at(1);
@@ -867,7 +870,7 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
   vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
   
-  int nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
+  //int nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
   vars.p_nu = &(vars.nu);
   vars.lepNuW = vars.lepW + vars.nu;
   vars.lepNuW_m = vars.lepNuW.mass();
@@ -1055,17 +1058,17 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
       float tagEtaMin = std::min(vars.tagJ1.eta(), vars.tagJ2.eta());
       float tagEtaMax = std::max(vars.tagJ1.eta(), vars.tagJ2.eta());
       
-      if( jet.Et() > 20.)
+      if( jet.pt() > 20.)
       {
-        if( (jet.eta() > tagEtaMin) && (jet.eta() < tagEtaMax) ) ++vars.nJets_btw_et20;
+        if( (jet.eta() > tagEtaMin) && (jet.eta() < tagEtaMax) ) ++vars.nJets_btw_pt20;
       }
-      if( jet.Et() > 25.)
+      if( jet.pt() > 25.)
       {
-        if( (jet.eta() > tagEtaMin) && (jet.eta() < tagEtaMax) ) ++vars.nJets_btw_et25;
+        if( (jet.eta() > tagEtaMin) && (jet.eta() < tagEtaMax) ) ++vars.nJets_btw_pt25;
       }
-      if( jet.Et() > 30.)
+      if( jet.pt() > 30.)
       {
-        if( (jet.eta() > tagEtaMin) && (jet.eta() < tagEtaMax) ) ++vars.nJets_btw_et30;
+        if( (jet.eta() > tagEtaMin) && (jet.eta() < tagEtaMax) ) ++vars.nJets_btw_pt30;
       }
     }
     
@@ -1109,17 +1112,17 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
-  float jetEtMAX = -9999.;
+  float jetPtMAX = -9999.;
   for(int jetIt = 0; jetIt < (int)vars.jets.size(); ++jetIt)
   {
-    if( ( (vars.jets.at(jetIt)).Et() > jetEtMAX ) &&
+    if( ( (vars.jets.at(jetIt)).pt() > jetPtMAX ) &&
         ( jetIt != vars.selectIt_W.at(0) ) &&
         ( jetIt != vars.selectIt_W.at(1) ) &&
         ( jetIt != vars.selectIt_tag.at(0) ) &&
         ( jetIt != vars.selectIt_tag.at(1) ) )
     {
       vars.selectIt_thirdJet = jetIt;
-      jetEtMAX = (vars.jets.at(jetIt)).Et();
+      jetPtMAX = (vars.jets.at(jetIt)).pt();
     }
   }
   

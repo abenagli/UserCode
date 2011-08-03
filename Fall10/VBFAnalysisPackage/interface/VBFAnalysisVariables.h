@@ -112,6 +112,7 @@ struct VBFAnalysisVariables
   ROOT::Math::XYZTVector nu_KF;
   float met_et;
   
+  float lepMet_pt;
   float lepMet_mt;
   float lepMet_Dphi;
   
@@ -121,18 +122,18 @@ struct VBFAnalysisVariables
   int nJets;
   int nJets_cnt;
   int nJets_fwd;
-  int nJets_et20;
-  int nJets_cnt_et20;
-  int nJets_fwd_et20;
-  int nJets_btw_et20;
-  int nJets_et25;
-  int nJets_cnt_et25;
-  int nJets_fwd_et25;
-  int nJets_btw_et25;
-  int nJets_et30;
-  int nJets_cnt_et30;
-  int nJets_fwd_et30;
-  int nJets_btw_et30;
+  int nJets_pt20;
+  int nJets_cnt_pt20;
+  int nJets_fwd_pt20;
+  int nJets_btw_pt20;
+  int nJets_pt25;
+  int nJets_cnt_pt25;
+  int nJets_fwd_pt25;
+  int nJets_btw_pt25;
+  int nJets_pt30;
+  int nJets_cnt_pt30;
+  int nJets_fwd_pt30;
+  int nJets_btw_pt30;
 
   float jets_bTag1;
   float jets_bTag2;
@@ -182,7 +183,7 @@ struct VBFAnalysisVariables
   float WJJ_Deta;
   float WJJ_Dphi;
   float WJJ_DR;
-  float WJJ_et;
+  float WJJ_pt;
   float WJJ_m;
   float WJJ_zepp;
   
