@@ -42,7 +42,6 @@ int main(int argc, char** argv)
   std::string jetAlgorithm   = gConfigParser -> readStringOption("Input::jetAlgorithm");
   std::string jetType        = gConfigParser -> readStringOption("Input::jetType");
   std::string higgsMass      = gConfigParser -> readStringOption("Input::higgsMass");
-  std::string jsonFileName   = gConfigParser -> readStringOption("Input::jsonFileName");
   std::string MVAWeightsFile = gConfigParser -> readStringOption("Input::MVAWeightsFile");
   
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
@@ -184,7 +183,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 18;
+  int nStep = 19;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_PURescaled = new TH1F("events_PURescaled", "events_PURescaled", nStep, 0., 1.*nStep);
@@ -232,14 +231,6 @@ int main(int argc, char** argv)
     cloneTrees[step] -> SetName(treeName); 
     AddVBFAnalysisTreeBranches(vars,cloneTrees[step]);
   }
-  
-  
-  
-  // define run/LS map from JSON file
-  std::cout << ">>> VBFPreselection::Get run/LS map from JSON file" << std::endl;
-  std::map<int, std::vector<std::pair<int, int> > > jsonMap;
-  jsonMap = readJSONFile(jsonFileName);
-  
   
   
   // define HLT paths
@@ -324,21 +315,22 @@ int main(int argc, char** argv)
   stepNames[1]  = "1) All events";
   stepNames[2]  = "2) Preselection";
   stepNames[3]  = "3) HLT";
-  stepNames[4]  = "4) Lepton ID+iso";
-  stepNames[5]  = "5) Lepton 3D I.P.";
-  stepNames[6]  = "6) Lepton pt/eta";
-  stepNames[7]  = "7) Jet-Lep deltaR";
-  stepNames[8]  = "8) Jet pt/eta";
-  stepNames[9]  = "9) Jet == 2";
-  stepNames[10] = "10) Met:EOF baseline";
-  stepNames[11] = "11) b-tag veto";
-  stepNames[12] = "12) Lepton mt";
-  stepNames[13] = "13) WJ1-WJ2 angle cuts";
-  stepNames[14] = "14) Wjj pt cut";
-  stepNames[15] = "15) pt/mjj cut";
-  stepNames[16] = "16) chi2 KF cut";
-  stepNames[17] = "17) W mass cut";
-  stepNames[18] = "18) Jackson angle cut";
+  stepNames[4]  = "4) Jet == 2";
+  stepNames[5]  = "5) Jet pt";
+  stepNames[6]  = "6) Jet eta";
+  stepNames[7] =  "7) Met";
+  stepNames[8]  = "8) Lepton 3D I.P.";
+  stepNames[9]  = "9) Lepton pt";
+  stepNames[10] = "10) Lepton eta";
+  stepNames[11] = "11) Lepton ID+iso:EOF baseline";
+  stepNames[12] = "12) b-tag veto";
+  stepNames[13] = "13) Lepton mt";
+  stepNames[14] = "14) WJ1-WJ2 angle cuts";
+  stepNames[15] = "15) Wjj pt cut";
+  stepNames[16] = "16) pt/mjj cut";
+  stepNames[17] = "17) chi2 KF cut";
+  stepNames[18] = "18) W mass cut";
+  stepNames[19] = "19) Jackson angle cut";
   
   
   
@@ -387,21 +379,6 @@ int main(int argc, char** argv)
     // JSON FILE AND DUPLIACTES IN DATA
     
     bool skipEvent = false;
-    if( vars.dataFlag == 1 )
-    {
-      if(AcceptEventByRunAndLumiSection(vars.runId, vars.lumiId, jsonMap) == false) skipEvent = true;      
-      
-      std::pair<int,int> eventLSandID(vars.lumiId, vars.eventId);
-      std::pair<int,std::pair<int,int> > eventRUNandLSandID(vars.runId, eventLSandID);
-      if( eventsMap[eventRUNandLSandID] == 1 ) skipEvent = true;
-      else eventsMap[eventRUNandLSandID] = 1;
-    }
-    
-    if( skipEvent == true ) continue;
-    
-    
-    
-    
     
     
     //**********************
@@ -516,13 +493,183 @@ int main(int argc, char** argv)
     
     if( step >= firstSTEP ) cloneTrees[step] -> Fill();    
     
+
+    //**********************************
+    // STEP 4 - Jet == 2
+    step += 1;
+    //SetStepNames(stepNames, "Jet == 2", step, verbosity);
+    
+    //float DR_thirdJ = deltaR(vars.thirdJ.eta(), vars.thirdJ.phi(), vars.lep.eta(), vars.lep.phi());
+    if ( vars.nJets_cnt != 2 ) continue;
+    
+    // Fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+
+
+
+    //**********************************
+    // STEP 5 - Jet pt
+    step += 1;
+    //SetStepNames(stepNames, "Jet pt", step, verbosity);
+        
+    if ( vars.WJ1.pt() < jetPtMIN ) continue;
+    if ( vars.WJ2.pt() < jetPtMIN ) continue;
+    
+    // Fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+
+
+
+    //**********************************
+    // STEP 6 - Jet eta
+    step += 1;
+    //SetStepNames(stepNames, "Jet eta", step, verbosity);
+    
+    
+    if ( fabs(vars.WJ1.eta()) > jetAbsEtaMAX ) continue;
+    if ( fabs(vars.WJ2.eta()) > jetAbsEtaMAX ) continue;
+    
+    // Fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+
+    
+
+    //**********************************
+    // STEP 7 - Met
+    step += 1;
+    //SetStepNames(stepNames, "Met:EOF baseline", step, verbosity);
+    
+    if( vars.met.Et() < metEtMIN ) continue;
+    if( vars.met.Et() > metEtMAX ) continue;
+    
+    // Fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+
+    
+    
+    //***************************************
+    // STEP 8 - Initial cuts - lepton 3D I.P.
+    step += 1;
+    //SetStepNames(stepNames, "lepton 3D I.P.", step, verbosity);
+    
+    
+    bool is3DIP = true;
+    
+    if( vars.lep_flavour == 11 )
+    {
+      //FIXME
+      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > ele3DipMAX ) is3DIP = false;
+    }
+    
+    if( vars.lep_flavour == 13 )
+    {
+      //FIXME
+      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > mu3DipMAX ) is3DIP = false;
+    }    
+    
+    
+    // normal isolation cut
+    if( is3DIP == false ) continue;
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
     
     
+
+    //***********************
+    // STEP 9 - lepton pt
+    step += 1;
+    //SetStepNames(stepNames, "lepton pt", step, verbosity);
+     
+    if( (vars.lep_flavour == 11) && (vars.lep.pt() < elePtMIN) ) continue;
+    if( (vars.lep_flavour == 11) && (vars.lep.pt() > elePtMAX) ) continue;
+    if( (vars.lep_flavour == 13) && (vars.lep.pt() < muPtMIN) ) continue;
+    if( (vars.lep_flavour == 13) && (vars.lep.pt() > muPtMAX) ) continue;
+    
+    if( vars.lep_flavour == 11 )    
+    {
+      if( (fabs(vars.lep_etaSC) > 1.4442) && (fabs(vars.lep_etaSC) < 1.566) ) continue;
+    }
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+    
+
+
+    //***********************
+    // STEP 10 - lepton eta
+    step += 1;
+    //SetStepNames(stepNames, "lepton eta", step, verbosity);
+     
+    if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
+    if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
+    
+    if( vars.lep_flavour == 11 )    
+    {
+      if( (fabs(vars.lep_etaSC) > 1.4442) && (fabs(vars.lep_etaSC) < 1.566) ) continue;
+    }
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+
+
     //**************************************
-    // STEP 4 - Initial cuts - lepton ID+iso
+    // STEP 11 - Lepton ID+iso:EOF baseline
     step += 1;
     //SetStepNames(stepNames, "lepton ID+iso", step, verbosity);
     
@@ -629,182 +776,9 @@ int main(int argc, char** argv)
     if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
-    
-    
-    
-    
-    //***************************************
-    // STEP 5 - Initial cuts - lepton 3D I.P.
-    step += 1;
-    //SetStepNames(stepNames, "lepton 3D I.P.", step, verbosity);
-    
-    
-    bool is3DIP = true;
-    
-    if( vars.lep_flavour == 11 )
-    {
-      //FIXME
-      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > ele3DipMAX ) is3DIP = false;
-    }
-    
-    if( vars.lep_flavour == 13 )
-    {
-      //FIXME
-      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > mu3DipMAX ) is3DIP = false;
-    }    
-    
-    
-    // normal isolation cut
-    if( is3DIP == false ) continue;
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-
-    //***********************
-    // STEP 6 - lepton pt/eta
-    step += 1;
-    //SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
-     
-    if( (vars.lep_flavour == 11) && (vars.lep.pt() < elePtMIN) ) continue;
-    if( (vars.lep_flavour == 11) && (vars.lep.pt() > elePtMAX) ) continue;
-    if( (vars.lep_flavour == 13) && (vars.lep.pt() < muPtMIN) ) continue;
-    if( (vars.lep_flavour == 13) && (vars.lep.pt() > muPtMAX) ) continue;
-    if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
-    if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
-    
-    if( vars.lep_flavour == 11 )    
-    {
-      if( (fabs(vars.lep_etaSC) > 1.4442) && (fabs(vars.lep_etaSC) < 1.566) ) continue;
-    }
-    
-    // correct for mu trigger efficiency
-    //if( (dataFlag == 0) && (vars.lep_flavour == 13) )
-    //{
-    //  float effMax = 1.; 
-    //  if( (fabs(vars.lep.eta()) < 0.9) ) effMax = 0.977;
-    //  if( (fabs(vars.lep.eta()) >= 0.9) && (fabs(vars.lep.eta()) < 1.2) ) effMax = 0.825;
-    //  if( (fabs(vars.lep.eta()) >= 1.2) && (fabs(vars.lep.eta()) < 2.1) ) effMax = 0.945;
-    //  
-    //  float eff = r.Uniform(0., 1.);
-    //  if( eff > effMax) continue; 
-    //}
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
-    
-
-
-    
-    //**********************************
-    // STEP 7 - Jet-Lep deltaR
-    step += 1;
-    //SetStepNames(stepNames, "Jet-Lep deltaR", step, verbosity);
-    
-    
-    float DR_WJ1 = deltaR(vars.WJ1.eta(), vars.WJ1.phi(), vars.lep.eta(), vars.lep.phi());
-    float DR_WJ2 = deltaR(vars.WJ2.eta(), vars.WJ2.phi(), vars.lep.eta(), vars.lep.phi());
-    if ( DR_WJ1 < DRLepJetMin || DR_WJ2 < DRLepJetMin ) continue;
-    
-    // Fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-
-
-
-    //**********************************
-    // STEP 8 - Jet pt/eta
-    step += 1;
-    //SetStepNames(stepNames, "Jet pt/eta", step, verbosity);
-    
-    
-    if ( fabs(vars.WJ1.eta()) > jetAbsEtaMAX ) continue;
-    if ( vars.WJ1.pt() < jetPtMIN ) continue;
-    if ( fabs(vars.WJ2.eta()) > jetAbsEtaMAX ) continue;
-    if ( vars.WJ2.pt() < jetPtMIN ) continue;
-    
-    // Fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-
-
-
-    
-    //**********************************
-    // STEP 9 - Jet == 2
-    step += 1;
-    //SetStepNames(stepNames, "Jet == 2", step, verbosity);
-    
-    //float DR_thirdJ = deltaR(vars.thirdJ.eta(), vars.thirdJ.phi(), vars.lep.eta(), vars.lep.phi());
-    if ( vars.nJets_cnt_et30 > 2 ) continue;
-    
-    // Fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-
-
-
-    //**********************************
-    // STEP 10 - Met:EOF baseline
-    step += 1;
-    //SetStepNames(stepNames, "Met:EOF baseline", step, verbosity);
-    
-    if( vars.met.Et() < metEtMIN ) continue;
-    if( vars.met.Et() > metEtMAX ) continue;
-    
-    // Fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-
-
 
     //************************************
-    // STEP 11 - Initial cuts - b-tag veto
+    // STEP 12 - Initial cuts - b-tag veto
     step += 1;
     //SetStepNames(stepNames, "b-tag veto", step, verbosity);
     
@@ -841,7 +815,7 @@ int main(int argc, char** argv)
 
 
     //*******************
-    // STEP 12 - lepton mt
+    // STEP 13 - lepton mt
     step += 1;
     //SetStepNames(stepNames, "lepton mt", step, verbosity);
     
@@ -865,7 +839,7 @@ int main(int argc, char** argv)
     
     
     //********************************************
-    // STEP 13 - Initial cuts - WJ1-WJ2 angle cuts
+    // STEP 14 - Initial cuts - WJ1-WJ2 angle cuts
     step += 1;
     //SetStepNames(stepNames, "WJ1-WJ2 angle cuts", step, verbosity);
     
@@ -888,7 +862,7 @@ int main(int argc, char** argv)
 
 
     //************************************
-    // STEP 14 - Initial cuts - Wjj pt cut
+    // STEP 15 - Initial cuts - Wjj pt cut
     step += 1;
     //SetStepNames(stepNames, "Wjj pt cut", step, verbosity);
     
@@ -907,7 +881,7 @@ int main(int argc, char** argv)
 
 
     //************************************
-    // STEP 15 - Initial cuts - pt/mjj cut
+    // STEP 16 - Initial cuts - pt/mjj cut
     step += 1;
     //SetStepNames(stepNames, "pt/mjj cut", step, verbosity);
     
@@ -926,7 +900,7 @@ int main(int argc, char** argv)
 
     
     //*********************************
-    // STEP 16 - Initial cuts - chi2 KF
+    // STEP 17 - Initial cuts - chi2 KF
     step += 1;
     //SetStepNames(stepNames, "chi2 KF", step, verbosity);
     
@@ -948,7 +922,7 @@ int main(int argc, char** argv)
 
 
     //************************************
-    // STEP 17 - Initial cuts - W mass cut
+    // STEP 18 - Initial cuts - W mass cut
     step += 1;
     //SetStepNames(stepNames, "W mass cut", step, verbosity);
     
@@ -970,7 +944,7 @@ int main(int argc, char** argv)
     
     
     //*****************************************
-    // STEP 18 - Jackson angle cut
+    // STEP 19 - Jackson angle cut
     step += 1;
     //SetStepNames(stepNames, "Jackson angle cut", step, verbosity);
     
