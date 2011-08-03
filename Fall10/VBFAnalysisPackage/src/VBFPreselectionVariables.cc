@@ -870,7 +870,7 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
   vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
   
-  //int nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
+  int nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
   vars.p_nu = &(vars.nu);
   vars.lepNuW = vars.lepW + vars.nu;
   vars.lepNuW_m = vars.lepNuW.mass();
