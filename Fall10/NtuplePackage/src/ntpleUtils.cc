@@ -42,11 +42,58 @@ std::map<int, int> GetTotalEvents(const std::string& histoName, const std::strin
       totalEvents[bin] += int(histo -> GetBinContent(bin));
     
     f -> Close();
-    
     delete f;
   }
 
   return totalEvents;
+}
+
+//  ------------------------------------------------------------
+
+
+
+TH1F* GetTotalHisto(const std::string& histoName, const std::string& inputFileList)
+{
+  std::ifstream inFile(inputFileList.c_str());
+  std::string buffer;
+  TH1F* totalHisto = NULL;
+  
+  if(!inFile.is_open())
+  {
+    std::cerr << "** ERROR: Can't open '" << inputFileList << "' for input" << std::endl;
+    return totalHisto;
+  }
+  
+  bool isFirstFile = true;
+  while(1)
+  {
+    inFile >> buffer;
+    if(!inFile.good()) break;
+
+    TFile* f = TFile::Open(buffer.c_str());
+    TH1F* histo = NULL;
+    f -> GetObject(histoName.c_str(), histo);
+    if(histo == NULL)
+    {
+      std::cout << ">>>ntpleUtils::Error in getting object " << histoName << std::endl;
+      exit(-1);
+    }
+    
+    if( isFirstFile )
+    {
+      totalHisto = (TH1F*)(histo->Clone());
+      isFirstFile = false;
+    }
+    else
+    {
+      totalHisto -> Add(histo);
+    }
+    
+    f -> Close();
+    delete f;
+  }
+
+  return totalHisto;
 }
 
 //  ------------------------------------------------------------
@@ -84,7 +131,6 @@ std::map<int, std::string> GetBinLabels(const std::string& histoName, const std:
       binLabels[bin] = std::string(histo -> GetXaxis() -> GetBinLabel(bin));
     
     f -> Close();
-    
     delete f;
   }
 
