@@ -60,7 +60,7 @@ TH1F* GetTotalHisto(const std::string& histoName, const std::string& inputFileLi
   
   if(!inFile.is_open())
   {
-    std::cerr << "** ERROR: Can't open '" << inputFileList << "' for input" << std::endl;
+    std::cerr << ">>>ntpleUtils::GetTotalHisto::can't open file " << inputFileList << " for input" << std::endl;
     return totalHisto;
   }
   
@@ -69,28 +69,28 @@ TH1F* GetTotalHisto(const std::string& histoName, const std::string& inputFileLi
   {
     inFile >> buffer;
     if(!inFile.good()) break;
-
+    
+    //std::cout << "ntpleUtils::GetTotalHisto::getting histogram " << histoName << " from file " << buffer << std::endl;
     TFile* f = TFile::Open(buffer.c_str());
     TH1F* histo = NULL;
     f -> GetObject(histoName.c_str(), histo);
     if(histo == NULL)
     {
-      std::cout << ">>>ntpleUtils::Error in getting object " << histoName << std::endl;
+      std::cout << ">>>ntpleUtils::GetTotalHisto::Error in getting object " << histoName << std::endl;
       exit(-1);
     }
     
     if( isFirstFile )
-    {
       totalHisto = (TH1F*)(histo->Clone());
+    else
+      totalHisto -> Add(histo);
+    
+    if( !isFirstFile )
+    {
+      f -> Close();
+      delete f;
       isFirstFile = false;
     }
-    else
-    {
-      totalHisto -> Add(histo);
-    }
-    
-    f -> Close();
-    delete f;
   }
 
   return totalHisto;
