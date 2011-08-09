@@ -562,7 +562,7 @@ void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
   if( dataFlag == 0 )
   {
     vars.PUit_n = (int)(reader.GetInt("mc_PUit_NumInteractions")->at(0));
-    vars.PUoot_n = (int)(reader.GetInt("mc_PUoot_NumInteractions")->at(0));
+    vars.PUoot_n = (int)(reader.GetInt("mc_PUoot_NumInteractions")->at(0)+reader.GetInt("mc_PUoot_NumInteractions")->at(1));
   }
   
   vars.rhoForIsolation = reader.GetFloat("rho_isolation")->at(0);
