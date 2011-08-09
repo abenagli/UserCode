@@ -36,7 +36,7 @@ $INPUTFILEName         = $User_Preferences{"INPUTFILEName"};
 $OUTPUTSaveDir         = $User_Preferences{"OUTPUTSaveDir"};
 
 $SELECTIONSCfgTemplate = $BASEDir."/".$SELECTIONSCfgTemplate;
-$SAMPLESListFile       = $BASEDir."/".$SAMPLESListFile;
+$SAMPLESListFile       = $BASEDir."/".$OUTPUTSaveDir."/".$SAMPLESListFile;
 $OUTPUTSaveDir         = $BASEDir."/".$OUTPUTSaveDir;
 
 print "BASEDir = "          .$BASEDir."\n" ;
@@ -53,9 +53,9 @@ print "OUTPUTSaveDir = ".$OUTPUTSaveDir."\n";
 
 
 
-$command = "mkdir ".$OUTPUTSaveDir;
-print("\n".$command."\n");
-system($command);
+#$command = "mkdir ".$OUTPUTSaveDir;
+#print("\n".$command."\n");
+#system($command);
 
 
 $sampleJobListFile = "./lancia.sh";
@@ -77,7 +77,7 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$color,$linestyle,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
+  ($sample,$sampleName,$color,$linestyle,$fillstyle,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
   $nullSample = "";
   if($sample eq $nullSample)
   {
@@ -137,7 +137,7 @@ while(<SAMPLESListFile>)
   $command = "cd ".$sampleDir;
   print SAMPLEJOBFILE $command."\n";
 
-  $command = "unbuffer ".$EXEName." ./selections.cfg >> ".$sampleDir."/out.txt";
+  $command = $EXEName." ./selections.cfg >> ".$sampleDir."/out.txt";
   print SAMPLEJOBFILE $command."\n";
   
   
@@ -146,9 +146,8 @@ while(<SAMPLESListFile>)
   #print($command."\n\n\n");
   system($command);
   
-  print SAMPLEJOBLISTFILE "\nsleep 0.5\n";
-  print SAMPLEJOBLISTFILE "echo \"qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\"\n";  
-  print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\n";
+  print SAMPLEJOBLISTFILE "echo \"qsub -V -d ".$sampleDir." -q longcms ".$sampleJobFile."\"\n";  
+  print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q longcms ".$sampleJobFile."\n";
   
   ++$type;
 }

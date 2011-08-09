@@ -38,6 +38,8 @@ struct VBFPreselectionVariables
   int eventId; 
   int eventNaiveId; 
   
+  float eventWeight;
+  
   
   
   // mva variables  
@@ -47,6 +49,7 @@ struct VBFPreselectionVariables
   
   // PU variables
   int PUit_n;
+  int PUoot_n;
   float rhoForIsolation;
   float rhoForJets;
   
@@ -171,7 +174,31 @@ struct VBFPreselectionVariables
   
   
   
-  // jet variables
+  // b-tag variables
+  int nBTag_TCHEL_pt20;
+  int nBTag_TCHEM_pt20;
+  int nBTag_TCHPM_pt20;
+  int nBTag_TCHPT_pt20;
+  int nBTag_SSVHEM_pt20;
+  int nBTag_SSVHPT_pt20;
+  
+  int nBTag_TCHEL_pt25;
+  int nBTag_TCHEM_pt25;
+  int nBTag_TCHPM_pt25;
+  int nBTag_TCHPT_pt25;
+  int nBTag_SSVHEM_pt25;
+  int nBTag_SSVHPT_pt25;
+  
+  int nBTag_TCHEL_pt30;
+  int nBTag_TCHEM_pt30;
+  int nBTag_TCHPM_pt30;
+  int nBTag_TCHPT_pt30;
+  int nBTag_SSVHEM_pt30;
+  int nBTag_SSVHPT_pt30;
+  
+  
+  
+  // jet variables  
   std::vector<ROOT::Math::XYZTVector> jets;
   
   std::vector<float> jets_charge;
@@ -182,6 +209,7 @@ struct VBFPreselectionVariables
   std::vector<float> jets_fHPD;
   std::vector<float> jets_fRBX;
   std::vector<float> jets_n90Hits;
+  std::vector<float> jets_ptD;
   std::vector<float> jets_chargedHadronEnergyFraction;
   std::vector<float> jets_neutralHadronEnergyFraction;
   std::vector<float> jets_chargedEmEnergyFraction;
@@ -193,8 +221,6 @@ struct VBFPreselectionVariables
   std::vector<float> jets_ptOrdered;
   std::vector<float> jets_bTag;
   std::vector<float> jets_bTagOrdered;  
-  std::vector<float> jets_dzAvg;
-  std::vector<float> jets_dzAvgCut;
   
   int nJets;
   int nJets_cnt;
@@ -223,11 +249,10 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector leadingJ;
   ROOT::Math::XYZTVector* p_leadingJ;
   
-  float leadingJ_charge;
   float leadingJ_bTag;
-  float leadingJ_dzAvg;
-  float leadingJ_dzAvgCut;
+  float leadingJ_ptD;
   int leadingJ_chargedMultiplicity;
+  int leadingJ_neutralMultiplicity;
   
   
   
@@ -247,8 +272,6 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector WJJ;
   ROOT::Math::XYZTVector* p_WJJ;
   
-  float WJ1_charge;
-  float WJ2_charge;
   float WJ1_zepp;
   float WJ2_zepp;
   float WJ1_lep_Dphi;
@@ -257,12 +280,12 @@ struct VBFPreselectionVariables
   float WJ2_met_Dphi;
   float WJ1_bTag;
   float WJ2_bTag;
-  float WJ1_dzAvg;
-  float WJ2_dzAvg;
-  float WJ1_dzAvgCut;
-  float WJ2_dzAvgCut;
+  float WJ1_ptD;
+  float WJ2_ptD;
   int WJ1_chargedMultiplicity;
   int WJ2_chargedMultiplicity;
+  int WJ1_neutralMultiplicity;
+  int WJ2_neutralMultiplicity;
   
   float WJJ_Deta;
   float WJJ_Dphi;
@@ -304,16 +327,14 @@ struct VBFPreselectionVariables
   
   ROOT::Math::XYZTVector tagJJ;
   
-  float tagJ1_charge;
-  float tagJ2_charge;
   float tagJ1_bTag;
   float tagJ2_bTag;
-  float tagJ1_dzAvg;
-  float tagJ2_dzAvg;
-  float tagJ1_dzAvgCut;
-  float tagJ2_dzAvgCut;
+  float tagJ1_ptD;
+  float tagJ2_ptD;
   int tagJ1_chargedMultiplicity;
   int tagJ2_chargedMultiplicity;
+  int tagJ1_neutralMultiplicity;
+  int tagJ2_neutralMultiplicity;
   
   float tagJJ_Deta;
   float tagJJ_Dphi;
@@ -328,10 +349,7 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector thirdJ;
   ROOT::Math::XYZTVector* p_thirdJ;
   
-  float thirdJ_charge;
   float thirdJ_bTag;
-  float thirdJ_dzAvg;
-  float thirdJ_dzAvgCut;
   float thirdJ_WJJDeta;
   float thirdJ_WJJDphi;
   float thirdJ_WJJDR;
@@ -356,6 +374,7 @@ void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, co
 void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
 void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType);
+void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT);
 void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD);
 void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT);
 void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader);

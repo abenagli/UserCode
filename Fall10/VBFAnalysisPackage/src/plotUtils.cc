@@ -132,6 +132,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
                       const float& lumi, const int& step,
                       const int& nBins,
                       const bool& PURescale,
+                      const bool& weightEvent,
                       std::vector<std::string>* cut)
 { 
   std::cout << "\n>>>plotUtils::Draw::Drawing histogram " << histoName;
@@ -208,17 +209,37 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       if(cut == NULL)
       {
         if(PURescale)
-          tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), "PURescaleFactor(PUit_n)");
+        {
+          if(weightEvent)
+            tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), "eventWeight * PURescaleFactor((PUit_n+PUoot_n)/3.)");
+	  else
+            tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), "PURescaleFactor((PUit_n+PUoot_n)/3.)");
+	}
         else
-          tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str());
-       }
+        {
+         if(weightEvent) 
+           tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(),"eventWeight");
+         else
+	   tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str());
+	}
+      }
       
       else
       {
         if(PURescale)
-          tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), ("PURescaleFactor(PUit_n) * "+cut->at(jj)).c_str() );
+        {
+         if(weightEvent)
+           tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), ("eventWeight * PURescaleFactor((PUit_n+PUoot_n)/3.) * "+cut->at(jj)).c_str() );
+         else
+	   tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), ("PURescaleFactor((PUit_n+PUoot_n)/3.) * "+cut->at(jj)).c_str() );
+	}
         else
-          tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), (cut->at(jj)).c_str() );
+        {
+         if(weightEvent)
+           tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), ("eventWeight * "+cut->at(jj)).c_str() );
+         else
+	   tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), (cut->at(jj)).c_str() );
+	}
       }
     }
     
@@ -595,8 +616,8 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     DrawTStackError(hs);
     if(dataGlobalGlobalHisto != NULL)
     {
-      for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
-        dataGlobalGlobalHisto -> SetBinError(bin,0.);
+      //for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
+      //  dataGlobalGlobalHisto -> SetBinError(bin,0.);
       dataGlobalGlobalHisto -> Draw("P,same");
     }
     
@@ -788,8 +809,8 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     DrawTStackError(hs);
     if(dataGlobalGlobalHisto != NULL)
     {
-      for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
-        dataGlobalGlobalHisto -> SetBinError(bin,0.);
+      //for(int bin = 1; bin <= dataGlobalGlobalHisto->GetNbinsX(); ++bin)
+      //  dataGlobalGlobalHisto -> SetBinError(bin,0.);
       dataGlobalGlobalHisto -> Draw("P,same");
     }
     
@@ -1519,8 +1540,8 @@ void drawTStack::DrawEvents(const std::string& mode,
     {
       dataHisto -> SetMarkerStyle(20);
       
-      for(int bin = 1; bin <= dataHisto->GetNbinsX(); ++bin)
-        dataHisto->SetBinError(bin,0.); 
+      //for(int bin = 1; bin <= dataHisto->GetNbinsX(); ++bin)
+      //  dataHisto->SetBinError(bin,0.); 
       
       dataHisto -> Draw("P,same");
       
@@ -1847,7 +1868,8 @@ void drawTStack::DrawTStackError(THStack* hs)
   for(int bin = 0; bin <= lastHisto->GetNbinsX(); ++bin)
   {
     double oldErr = lastHisto -> GetBinError(bin);
-    double poissonErr = sqrt(lastHisto -> GetBinContent(bin));
+    //double poissonErr = sqrt(lastHisto -> GetBinContent(bin));
+    double poissonErr = 0.;
     lastHisto -> SetBinError(bin,sqrt(oldErr*oldErr + poissonErr*poissonErr));
     //std::cout << "bin: " << bin << "   err: " << std::setprecision(4) << lastHisto -> GetBinError(bin) << std::endl;
   }

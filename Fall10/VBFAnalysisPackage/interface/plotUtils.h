@@ -48,6 +48,7 @@ class drawTStack
             const float& lumi, const int& step,
             const int& nBins,
             const bool& PURescale = true,
+            const bool& weightEvent = true,
             std::vector<std::string>* cut = NULL);
   
   void DrawEvents(const std::string& mode,

@@ -70,7 +70,7 @@ while (<LISTOFSamples>)
   
   chomp($_);
   
-  ($sample,$dummy,$color,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
+  ($sample,$dummy,$color,$linestyle,$fillstyle,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
   $subsample = substr($sample,0,1);
   if($subsample eq "#")
   {
@@ -148,8 +148,38 @@ while (<LISTOFSamples>)
     
     
     
+    
+    
+    
+    ######################
+    # make job files
+    ######################    
+    
+    open (SAMPLEJOBFILE, ">", $tempBjob) or die "Can't open file ".$tempBjob;
+    $command = "cd ".$BASEDir ;
+    print SAMPLEJOBFILE $command."\n";
+
+    $command = "source ./scripts/setup.sh" ;
+    print SAMPLEJOBFILE $command."\n";
+    
+    $command = "cd ".$jobDir ;
+    print SAMPLEJOBFILE $command."\n";
+    
+    $command = "mkdir ".$OUTPUTSAVEPath."/".$sample;
+    print SAMPLEJOBFILE $command."\n";
+    
+    #$command = "mkdir /data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/";
+    #print SAMPLEJOBFILE $command."\n";
+    
+    #$command = "chmod 777 /data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/";
+    #print SAMPLEJOBFILE $command."\n";
+    
+    
+    
+    
+    
     $it = 0;
-    $JOBLISTOFFiles = $jobDir."/list_".$sample.".txt";
+    $JOBLISTOFFiles = $jobDir."/list.txt";
     open (JOBLISTOFFiles, ">", $JOBLISTOFFiles) or die "Can't open file ".$JOBLISTOFFiles;
 
     open (LISTOFFiles2,$LISTOFFiles) ;
@@ -163,7 +193,11 @@ while (<LISTOFSamples>)
       
       if( ($it >= ($jobIt - 1)*$JOBModulo) && ($it < ($jobIt)*$JOBModulo) )
       { 
-	print JOBLISTOFFiles $INPUTSAVEPath."/".$sample."/".$file."\n";
+        #$command = "rfcp ".$INPUTSAVEPath."/".$sample."/".$file." /data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/";
+        #print SAMPLEJOBFILE $command."\n";
+	
+        print JOBLISTOFFiles $INPUTSAVEPath."/".$sample."/".$file."\n";
+        #print JOBLISTOFFiles "root://polgrid4.in2p3.fr/".$INPUTSAVEPath."/".$sample."/".$file."\n";
       }
       ++$it;
     }
@@ -183,23 +217,6 @@ while (<LISTOFSamples>)
     
     
     
-    ######################
-    # make job files
-    ######################    
-    
-    open (SAMPLEJOBFILE, ">", $tempBjob) or die "Can't open file ".$tempBjob;
-    $command = "cd ".$BASEDir ;
-    print SAMPLEJOBFILE $command."\n";
-
-    $command = "source ./scripts/setup.csh" ;
-    print SAMPLEJOBFILE $command."\n";
-    
-    $command = "cd ".$jobDir ;
-    print SAMPLEJOBFILE $command."\n";
-    
-    $command = "mkdir ".$OUTPUTSAVEPath."/".$sample;
-    print SAMPLEJOBFILE $command."\n";
-    
     $command = "unbuffer ".$EXEName." ".$JOBCfgFile." >> ".$jobDir."/out.txt" ;
     print SAMPLEJOBFILE $command."\n";    
     
@@ -209,7 +226,10 @@ while (<LISTOFSamples>)
     # submit job
     ############
     
-    $command = "qsub -V -q production -d ".$jobDir." ".$tempBjob."\n" ;  
+    $command = "echo \"qsub -V -q production -d ".$jobDir." ".$tempBjob."\"\n" ;
+    print SAMPLEJOBLISTFILE $command."\n";
+    
+    $command = "qsub -V -q production -d ".$jobDir." ".$tempBjob."\n" ; 
     print SAMPLEJOBLISTFILE $command."\n";
     
     #print "\n" ;

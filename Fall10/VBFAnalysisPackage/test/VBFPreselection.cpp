@@ -82,7 +82,7 @@ int main(int argc, char** argv)
   stepName = "LeptonsFilterEvents/passedEvents";
   std::map<int,int> leptonFilterEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
-  stepName = "JetFilterAK5PFEvents/passedEvents";
+  stepName = "JetFilter"+jetAlgorithm+"Events/passedEvents";
   std::map<int,int> jetFilterEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
   
@@ -105,7 +105,12 @@ int main(int argc, char** argv)
   // define histograms
   std::cout << ">>> VBFPreselection::Define histograms" << std::endl;
   int nStep = 12;
-  TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
+  
+  TH1F* nPU    = GetTotalHisto("PUDumper/nPU",   inputFileList.c_str());
+  TH1F* nPUit  = GetTotalHisto("PUDumper/nPUit", inputFileList.c_str());
+  TH1F* nPUoot = GetTotalHisto("PUDumper/nPUoot",inputFileList.c_str());
+  
+  TH1F* events = new TH1F("events","events",nStep,0.,1.*nStep);
   std::map<int, int> stepEvents;
   std::map<int, std::string> stepNames;
   
@@ -189,6 +194,8 @@ int main(int argc, char** argv)
     vars.lumiId  = reader.GetInt("lumiId")->at(0);
     vars.eventId = reader.GetInt("eventId")->at(0);
     vars.eventNaiveId += 1;
+    
+    vars.eventWeight = 1.;
     
     SetPUVariables(vars, reader, dataFlag);
     SetHLTVariables(vars, reader);
@@ -606,6 +613,8 @@ int main(int argc, char** argv)
     // met and neutrino
     SetMetVariables(vars, reader, jetType);
     
+    //****************
+    SetBTagVariables(vars, reader, jetType, jetEtaCNT);
     
     
     //************
@@ -841,33 +850,33 @@ int main(int argc, char** argv)
     {
       if( vars.nJets < 4 )
       {
-        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, 30., jetEtaCNT, 5, 9999.);
+        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999.);
         
         std::vector<int> blacklistIt_W;
         blacklistIt_W.push_back(vars.selectIt_W.at(0));
         blacklistIt_W.push_back(vars.selectIt_W.at(1));
-        SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, 30., 0., 0., &blacklistIt_W);
+        SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0., &blacklistIt_W);
       }
       
       if( vars.nJets >= 4 )
       {
         if( tagFIRST == 1)
         {
-          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, 30., 0., 0.);
+          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0.);
           
           std::vector<int> blacklistIt_tag;
           blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
           blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, 30., jetEtaCNT, 5., 9999., &blacklistIt_tag);
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5., 9999., &blacklistIt_tag);
         }
         else
         {
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, 30., jetEtaCNT, 9, 9999.);
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 9, 9999.);
           
           std::vector<int> blacklistIt_W;
           blacklistIt_W.push_back(vars.selectIt_W.at(0));
           blacklistIt_W.push_back(vars.selectIt_W.at(1));
-          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, 30., 0., 0., &blacklistIt_W);
+          SelectTagJets(vars.selectIt_tag, vars.jets, tagSelectionMETHOD, jetPtMIN, 0., 0., &blacklistIt_W);
         }
       }
       
@@ -931,6 +940,9 @@ int main(int argc, char** argv)
     events -> GetXaxis() -> SetBinLabel(step, stepNames[step].c_str());
   }
   
+  nPU    -> Write();
+  nPUit  -> Write();
+  nPUoot -> Write();
   events -> Write();
   outputRootFile.Close();
   
