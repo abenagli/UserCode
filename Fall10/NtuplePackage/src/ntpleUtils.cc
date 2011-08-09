@@ -189,12 +189,12 @@ int parseConfigFile (const TString& config)
 
 
 
-double PURescaleFactor(const int& nPU_MC)
+double PURescaleFactor(const double& nPU_MC)
 {
-  if(nPU_MC < 0)
+  if(nPU_MC < 0.)
     return 1.;
   
-  else if(nPU_MC > 24)
+  else if(nPU_MC > 24.)
     return 0.;
   
   else
@@ -305,7 +305,7 @@ double PURescaleFactor(const int& nPU_MC)
       1.63229e-06 // 24*/
     };
     
-    return 1. * distrPU_DATA[nPU_MC] / distrPU_MC[nPU_MC];
+    return 1. * distrPU_DATA[int(nPU_MC)] / distrPU_MC[int(nPU_MC)];
   }
 }
 
