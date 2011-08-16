@@ -749,14 +749,14 @@ void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
   {
     ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);
     
-    // jet eta max                                                                                                                                                                
+    // jet eta max
     if( fabs(jet.eta()) > jetEtaCNT ) continue;
     
     // clean jets from selected lepton
     float DR = deltaR(jet.eta(), jet.phi(), vars.lep.eta(), vars.lep.phi());
     if( DR < 0.5 ) continue;
     
-    // jetID                                                                                                                                                                     
+    // jetID
     if(jetType == "Calo")
     {
       if( (fabs(jet.eta()) < 2.6) && (reader.GetFloat("jets_emEnergyFraction")->at(jetIt) < 0.01) ) continue;

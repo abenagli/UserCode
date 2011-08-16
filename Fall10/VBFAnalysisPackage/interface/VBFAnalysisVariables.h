@@ -203,6 +203,8 @@ struct VBFAnalysisVariables
   int WJ2_chargedMultiplicity;
   int WJ1_neutralMultiplicity;
   int WJ2_neutralMultiplicity;
+  float WJ1_QGLikelihood;
+  float WJ2_QGLikelihood;
   
   float WJJ_Deta;
   float WJJ_Dphi;
@@ -218,6 +220,8 @@ struct VBFAnalysisVariables
   
   
   // Higgs variables
+  float lepW_pt;
+  
   float lepMetW_pt;
   float lepMetW_mt;
   float lepMetW_Dphi;
