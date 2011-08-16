@@ -2,6 +2,7 @@
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
 #include "readJSONFile.h"
+#include "QGLikelihoodCalculator.h"
 
 #include <iomanip>
 
@@ -114,7 +115,6 @@ int main(int argc, char** argv)
   
   float WJJMassMIN = gConfigParser -> readFloatOption("Cuts::WJJMassMIN");
   float WJJMassMAX = gConfigParser -> readFloatOption("Cuts::WJJMassMAX");
-  float WJJPtMIN = gConfigParser -> readFloatOption("Cuts::WJJPtMIN");
   float WJJMaxPtMIN = gConfigParser -> readFloatOption("Cuts::WJJMaxPtMIN");
   float WJJMinPtMIN = gConfigParser -> readFloatOption("Cuts::WJJMinPtMIN");
   float WJJDRMIN = gConfigParser -> readFloatOption("Cuts::WJJDRMIN");
@@ -123,6 +123,8 @@ int main(int argc, char** argv)
   float WJJDetaMAX = gConfigParser -> readFloatOption("Cuts::WJJDetaMAX");
   float WJJDphiMIN = gConfigParser -> readFloatOption("Cuts::WJJDphiMIN");
   float WJJDphiMAX = gConfigParser -> readFloatOption("Cuts::WJJDphiMAX");
+  
+  float WPtMIN = gConfigParser -> readFloatOption("Cuts::WPtMIN");
   
   float lepZeppMAX = gConfigParser -> readFloatOption("Cuts::lepZeppMAX");
   float lepNuWZeppMAX = gConfigParser -> readFloatOption("Cuts::lepNuWZeppMAX");
@@ -269,6 +271,11 @@ int main(int argc, char** argv)
   
   
   
+  // define the quark-gluon likelihood
+  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator();
+  
+  
+  
   // define MVA reader
   TMVA::Reader* MVAReader = new TMVA::Reader();
   if( applyMVA == 1 )
@@ -367,13 +374,22 @@ int main(int argc, char** argv)
     vars.WJ1 = *(vars.p_WJ1);
     vars.WJ2 = *(vars.p_WJ2);
     vars.WJJ = *(vars.p_WJ1) + *(vars.p_WJ2);
+    vars.lepW_pt = (vars.lep+vars.WJJ).pt();
     vars.tagJ1 = *(vars.p_tagJ1);
     vars.tagJ2 = *(vars.p_tagJ2);
     vars.thirdJ = *(vars.p_thirdJ);
     
     GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
                    vars.lep,vars.nu,vars.WJ1,vars.WJ2);
-     
+    
+    vars.WJ1_QGLikelihood = -1.;
+    vars.WJ2_QGLikelihood = -1.;
+    
+    //if( vars.WJ1.pt() > 0. )
+    //  vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForJets,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    //if( vars.WJ2.pt() > 0. )
+    //  vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForJets,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    
     
     
     
@@ -941,8 +957,8 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "W pt cuts", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.WJ1+vars.WJ2).Pt() < WJJPtMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.lep+vars.met).Pt() < WJJPtMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.WJ1+vars.WJ2).Pt() < WPtMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.lep+vars.met).Pt() < WPtMIN) ) continue;
     
     
     // fill distributions

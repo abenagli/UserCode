@@ -113,11 +113,12 @@ int main(int argc, char** argv)
 
   stack -> DrawEvents("events", lumi, step, true);
   stack -> DrawEvents("eventsScaled", lumi, step, true);
-  //stack -> DrawEvents("eventsScaledStack", lumi, step, true);
+  stack -> DrawEvents("eventsScaledStack", lumi, step, true);
   stack -> DrawEvents("efficiencies", lumi, step, true);
   stack -> SetYaxisRange(0.01, 1.1);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true);
-  //stack -> DrawEvents("significance", lumi, step, false);
+  stack -> SetYaxisRange(0., 1.5);
+  stack -> DrawEvents("significance", lumi, step, false);
   //stack -> DrawEventRatio_nJets("int", lumi, step, false);
   //stack -> DrawEventRatio_nJets("0jets", lumi, step, false);
   //stack -> DrawEventRatio_nJets("1jets", lumi, step, false);
@@ -141,6 +142,27 @@ int main(int argc, char** argv)
   
   std::string histoName;
   
+  variableNames.at(0) = "max(WJ1_QGLikelihood,WJ2_QGLikelihood)";
+  histoName = "WJ1_QGLikelihood";
+  stack -> SetXaxisRange(0., 1.);
+  stack -> SetXaxisTitle("quark-gluon likelihood(WJet_{1})");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent);
+    
+  variableNames.at(0) = "min(WJ1_QGLikelihood,WJ2_QGLikelihood)";
+  histoName = "WJ2_QGLikelihood";
+  stack -> SetXaxisRange(0., 1.);
+  stack -> SetXaxisTitle("quark-gluon likelihood(WJet_{2})");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent);
+    
+  variableNames.at(0) = "WJ1_QGLikelihood * WJ2_QGLikelihood";
+  histoName = "WJJ_QGLikelihood";
+  stack -> SetXaxisRange(0., 1.);
+  stack -> SetXaxisTitle("quark-gluon likelihood(WJet_{1})*likelihood(WJet_{2})");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent);  
+
   
   
   variableNames.at(0) = "chi2_KF/ndf_KF";
@@ -845,13 +867,6 @@ int main(int argc, char** argv)
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 10, PURescale, weightEvent);
   
-  variableNames.at(0) = "nJets_btw_et20";
-  histoName = "jets_btw";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("n(between jets)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, PURescale, weightEvent);
-  
   variableNames.at(0) = "max(WJ1_bTag,WJ2_bTag)";
   histoName = "WJets_bTag1";
   stack -> SetXaxisRange(-5., 10.);
@@ -994,31 +1009,31 @@ int main(int argc, char** argv)
   
   
   
-  //variableNames2.at(0) = "abs(WJ1_zepp)";
-  //variableNames2.at(1) = "abs(WJ2_zepp)";
-  //histoName = "WJJ_zepp_min+WJJ_zepp_max";
-  //cuts2 -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  //cuts2 -> at(1) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  //stack -> SetXaxisRange(0, 1.);
-  //stack -> SetXaxisTitle("zepp(WJets)");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames2, histoName, method, lumi, step, 20, PURescale, weightEvent, cuts2);
+  variableNames2.at(0) = "abs(WJ1_zepp)";
+  variableNames2.at(1) = "abs(WJ2_zepp)";
+  histoName = "WJJ_zepp_min+WJJ_zepp_max";
+  cuts2 -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  cuts2 -> at(1) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  stack -> SetXaxisRange(0, 1.);
+  stack -> SetXaxisTitle("zepp(WJets)");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames2, histoName, method, lumi, step, 20, PURescale, weightEvent, cuts2);
   
-  //variableNames.at(0) = "max(abs(WJ1_zepp), abs(WJ2_zepp))";
-  //histoName = "WJJ_zepp_max";
-  //cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  //stack -> SetXaxisRange(0, 1.);
-  //stack -> SetXaxisTitle("max zepp(WJets)");
-  //stack -> SetUnit(""); 
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, cuts);
+  variableNames.at(0) = "max(abs(WJ1_zepp), abs(WJ2_zepp))";
+  histoName = "WJJ_zepp_max";
+  cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  stack -> SetXaxisRange(0, 1.);
+  stack -> SetXaxisTitle("max zepp(WJets)");
+  stack -> SetUnit(""); 
+  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, cuts);
   
-  //variableNames.at(0) = "min(abs(WJ1_zepp), abs(WJ2_zepp))";
-  //histoName = "WJJ_zepp_min";
-  //cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
-  //stack -> SetXaxisRange(0, 1.);
-  //stack -> SetXaxisTitle("min zepp(WJets)");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, cuts);
+  variableNames.at(0) = "min(abs(WJ1_zepp), abs(WJ2_zepp))";
+  histoName = "WJJ_zepp_min";
+  cuts -> at(0) = "( tagJ1.Et() > 0. && tagJ2.Et() > 0. )";
+  stack -> SetXaxisRange(0, 1.);
+  stack -> SetXaxisTitle("min zepp(WJets)");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, cuts);
   
   
   
@@ -1028,48 +1043,6 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("bTag(WJet_{1})+bTag(WJet_{2})");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent);
-  
-  variableNames.at(0) = "-1.*lep_charge*(WJ1_charge+WJ2_charge)";
-  histoName = "WJJ_charge";
-  stack -> SetXaxisRange(-3.5, 3.5);
-  stack -> SetXaxisTitle("charge(WJets)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 7, PURescale, weightEvent);
-  
-  variableNames.at(0) = "WJ1_chargedMultiplicity+WJ2_chargedMultiplicity";
-  histoName = "WJJ_chargedMultiplicity";
-  stack -> SetXaxisRange(0., 40.);
-  stack -> SetXaxisTitle("charged multiplicity(WJets)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent);
-  
-  
-  
-  //variableNames2.at(0) = "WJ1_dzAvg-PV_z";
-  //variableNames2.at(1) = "WJ2_dzAvg-PV_z";
-  //histoName = "WJJ_dzAvg_max+WJJ_dzAvg_min";
-  //cuts2->at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && WJ1_dzAvg > -99. && WJ2_dzAvg > -99.";
-  //cuts2->at(1) = "WJ1.Et() > 0. && WJ2.Et() > 0. && WJ1_dzAvg > -99. && WJ2_dzAvg > -99.";
-  //stack -> SetXaxisRange(-10., 10.);
-  //stack -> SetXaxisTitle("dz(WJets)");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames2, histoName, method, lumi, step, 100, false, cuts2);
-  
-  //variableNames.at(0) = "max(abs(WJ1_dzAvg-PV_z),abs(WJ2_dzAvg-PV_z))";
-  //histoName = "WJJ_dzAvg_max";
-  //cuts -> at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && WJ1_dzAvg > -99. && WJ2_dzAvg > -99.";
-  //stack -> SetXaxisRange(0., 10.);
-  //stack -> SetXaxisTitle("max dz(WJets)");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
-  
-  //variableNames.at(0) = "min(abs(WJ1_dzAvg-PV_z),abs(WJ2_dzAvg-PV_z))";
-  //histoName = "WJJ_dzAvg_min";
-  //cuts -> at(0) = "WJ1.Et() > 0. && WJ2.Et() > 0. && WJ1_dzAvg > -99. && WJ2_dzAvg > -99.";
-  //stack -> SetXaxisRange(0., 10.);
-  //stack -> SetXaxisTitle("min dz(WJets)");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 50, false, cuts);
   
   
   
@@ -1114,7 +1087,7 @@ int main(int argc, char** argv)
     
   variableNames.at(0) = "lepNuW_m";
   histoName = "lepNuW_m";
-  stack -> SetXaxisRange(0., 800);
+  stack -> SetXaxisRange(0., 1000);
   stack -> SetXaxisTitle("m(lepton+neutrino+WJets)");
   stack -> SetUnit("GeV/c2");
   stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent);
@@ -1141,6 +1114,13 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi, step, 100, PURescale, weightEvent);
   
   
+  
+  variableNames.at(0) = "lepW_pt";
+  histoName = "lepW_pt";
+  stack -> SetXaxisRange(0., 200);
+  stack -> SetXaxisTitle("pt(lepton+WJets)");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent);
   
   variableNames.at(0) = "lepMetW_pt";
   histoName = "lepMetW_pt";
@@ -1178,7 +1158,7 @@ int main(int argc, char** argv)
   
   
   
-  /*
+  
   //---------------------------------------------
   // tag-Jets
   //---------------------------------------------
@@ -1279,7 +1259,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("charged multiplicity(tagJets)");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, cuts);
-  */
+  
   
   
   //variableNames2.at(0) = "tagJ1_dzAvg-PV_z";

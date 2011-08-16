@@ -19,6 +19,7 @@
 #include "THStack.h"
 #include "TLegend.h"
 #include "TAxis.h"
+//#include "TF1.h"
 #include "TLatex.h"
 
 
@@ -42,8 +43,6 @@ class drawTStack
   
   
   //! methods
-  void Initialize();
-  
   void Draw(std::vector<std::string>& variableNames, const std::string& histoName,
             const std::string& mode,
             const float& lumi, const int& step,
@@ -82,26 +81,13 @@ class drawTStack
   std::string m_imgFormat;
   
   std::vector<std::pair<std::string, std::string> > m_list;
-  std::vector<std::pair<std::string, std::string> > m_jetAlgorithm;
-  std::map<std::string, double> m_crossSection;
   std::map<std::string, int> m_color;
   std::map<std::string, int> m_linestyle;
   std::map<std::string, int> m_fillstyle;
-  std::map<std::string, double> m_mH;
   std::map<std::string, int> m_dataFlag;
-
-  std::map<std::string, bool> m_isFirstSample_summed;
-  std::map<std::string, double> m_crossSection_summed;
-  std::map<std::string, int> m_color_summed;
-  std::map<std::string, int> m_linestyle_summed;
-  std::map<std::string, int> m_fillstyle_summed;
-  std::map<std::string, double> m_mH_summed;
-  std::map<std::string, int> m_dataFlag_summed;
-  
-  std::map<std::string, TH1F*> m_histo_summed;
-  std::map<std::string, TH1F*> m_bkgHisto_summed;
-  std::map<std::string, TH1F*> m_sigHisto_summed;
-  std::map<std::string, TH1F*> m_dataHisto_summed;
+  std::map<std::string, double> m_mH;
+  std::map<std::string, double> m_crossSection;
+  std::vector<std::pair<std::string, std::string> > m_jetAlgorithm;
   
   bool m_xAxisRange;
   double m_xRangeMin;
