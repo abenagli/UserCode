@@ -341,7 +341,7 @@ int main(int argc, char** argv)
   stepNames[16] = "16) Helicity angles cuts";
   stepNames[17] = "17) W mass cut";
   stepNames[18] = "18) Kinematic Fit";
-  stepNames[19] = "18) Higgs mass cut";
+  stepNames[19] = "19) Higgs mass cut";
   
   
   
@@ -1043,6 +1043,7 @@ int main(int argc, char** argv)
     
     //***************************************
     // STEP 18 - Initial cuts - Kinematic Fit
+    step += 1;
     //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
     
     
