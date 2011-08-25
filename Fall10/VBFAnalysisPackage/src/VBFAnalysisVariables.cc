@@ -42,9 +42,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   // lepton variables
   vars.p_lep = new ROOT::Math::XYZTVector;
-  vars.p_lep_KF = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("lep",         &vars.p_lep);
-  reducedTree -> SetBranchAddress("lep_KF",      &vars.p_lep_KF);
   reducedTree -> SetBranchAddress("lep_charge",  &vars.lep_charge);
   reducedTree -> SetBranchAddress("lep_flavour", &vars.lep_flavour);
   reducedTree -> SetBranchAddress("lep_pt",      &vars.lep_pt);
@@ -101,10 +99,8 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   // met variables
   vars.p_met = new ROOT::Math::XYZTVector;
   vars.p_nu = new ROOT::Math::XYZTVector;
-  vars.p_nu_KF = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("met",   &vars.p_met);
   reducedTree -> SetBranchAddress("nu",    &vars.p_nu);
-  reducedTree -> SetBranchAddress("nu_KF", &vars.p_nu_KF);
   reducedTree -> SetBranchAddress("met_et",      &vars.met_et);
   reducedTree -> SetBranchAddress("lepMet_pt",   &vars.lepMet_pt);
   reducedTree -> SetBranchAddress("lepMet_mt",   &vars.lepMet_mt);
@@ -145,13 +141,9 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   // W-jet variables
   vars.p_WJ1    = new ROOT::Math::XYZTVector;
   vars.p_WJ2    = new ROOT::Math::XYZTVector;
-  vars.p_WJ1_KF = new ROOT::Math::XYZTVector;
-  vars.p_WJ2_KF = new ROOT::Math::XYZTVector;
   vars.p_WJJ    = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("WJ1",                     &vars.p_WJ1);
   reducedTree -> SetBranchAddress("WJ2",                     &vars.p_WJ2);
-  reducedTree -> SetBranchAddress("WJ1_KF",                  &vars.p_WJ1_KF);
-  reducedTree -> SetBranchAddress("WJ2_KF",                  &vars.p_WJ2_KF);
   reducedTree -> SetBranchAddress("WJJ",                     &vars.p_WJJ);
   reducedTree -> SetBranchAddress("WJ1_lep_Dphi",            &vars.WJ1_lep_Dphi);
   reducedTree -> SetBranchAddress("WJ1_met_Dphi",            &vars.WJ1_met_Dphi);
@@ -181,15 +173,14 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   
   // Higgs variables
-  reducedTree -> SetBranchAddress("lepMetW_pt",   &vars.lepMetW_pt);
-  reducedTree -> SetBranchAddress("lepMetW_mt",   &vars.lepMetW_mt);
-  reducedTree -> SetBranchAddress("lepMetW_Dphi", &vars.lepMetW_Dphi);
-  reducedTree -> SetBranchAddress("lepNuW_m",     &vars.lepNuW_m);
-  reducedTree -> SetBranchAddress("lepNuW_zepp",  &vars.lepNuW_zepp);
-  
-  reducedTree -> SetBranchAddress("lepNuW_m_KF", &vars.lepNuW_m_KF);
-  reducedTree -> SetBranchAddress("chi2_KF",     &vars.chi2_KF);
-  reducedTree -> SetBranchAddress("ndf_KF",      &vars.ndf_KF);
+  reducedTree -> SetBranchAddress("lepMetW_pt",       &vars.lepMetW_pt);
+  reducedTree -> SetBranchAddress("lepMetW_mt",       &vars.lepMetW_mt);
+  reducedTree -> SetBranchAddress("lepMetW_Dphi",     &vars.lepMetW_Dphi);
+  reducedTree -> SetBranchAddress("lepNu_m",          &vars.lepNu_m);
+  reducedTree -> SetBranchAddress("lepNu_nSolutions", &vars.lepNu_nSolutions);
+  reducedTree -> SetBranchAddress("lepW_pt",          &vars.lepW_pt);
+  reducedTree -> SetBranchAddress("lepNuW_m",         &vars.lepNuW_m);
+  reducedTree -> SetBranchAddress("lepNuW_zepp",      &vars.lepNuW_zepp);
   
   
   // tag-jet variables
@@ -227,8 +218,6 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
 
 void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
 {
-  reducedTree -> Branch("lepW_pt", &vars.lepW_pt);
-  
   reducedTree -> Branch("lepNuW_cphi",  &vars.lepNuW_cphi,   "lepNuW_cphi/F");
   reducedTree -> Branch("lepNuZ_cphi",  &vars.lepNuZ_cphi,   "lepNuZ_cphi/F");
   reducedTree -> Branch("lep_ctheta",   &vars.lep_ctheta,     "lep_ctheta/F");
@@ -237,4 +226,18 @@ void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
   
   reducedTree -> Branch("WJ1_QGLikelihood", &vars.WJ1_QGLikelihood);
   reducedTree -> Branch("WJ2_QGLikelihood", &vars.WJ2_QGLikelihood);
+  
+  vars.p_lep_KF = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("lep_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_lep_KF);
+  vars.p_nu_KF = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("nu_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu_KF);
+  vars.p_WJ1_KF = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("WJ1_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1_KF);
+  vars.p_WJ2_KF = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("WJ2_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2_KF);
+  
+  reducedTree -> Branch("lepNuW_m_KF", &vars.lepNuW_m_KF, "lepNuW_m_KF/F");
+  reducedTree -> Branch("chi2_KF",     &vars.chi2_KF,         "chi2_KF/F");
+  reducedTree -> Branch("ndf_KF",      &vars.ndf_KF,           "ndf_KF/I");
+  reducedTree -> Branch("status_KF",   &vars.status_KF,     "status_KF/I");
 }

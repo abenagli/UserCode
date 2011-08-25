@@ -60,7 +60,6 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   // lepton variables
   vars.m_reducedTree -> Branch("lep",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_lep);
-  vars.m_reducedTree -> Branch("lep_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_lep_KF);
   vars.m_reducedTree -> Branch("lep_charge",  &vars.lep_charge,   "lep_charge/F");
   vars.m_reducedTree -> Branch("lep_flavour", &vars.lep_flavour, "lep_flavour/I");
   vars.m_reducedTree -> Branch("lep_pt",      &vars.lep_pt,           "lep_pt/F");
@@ -99,7 +98,6 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   // met variables
   vars.m_reducedTree -> Branch("met",   "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_met);
   vars.m_reducedTree -> Branch("nu",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu);
-  vars.m_reducedTree -> Branch("nu_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu_KF);
   vars.m_reducedTree -> Branch("met_et",       &vars.met_et,             "met_et/F");
   vars.m_reducedTree -> Branch("lepMet_pt",    &vars.lepMet_pt,       "lepMet_pt/F");
   vars.m_reducedTree -> Branch("lepMet_mt",    &vars.lepMet_mt,       "lepMet_mt/F");
@@ -159,8 +157,6 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   // W-jet variables
   vars.m_reducedTree -> Branch("WJ1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1);
   vars.m_reducedTree -> Branch("WJ2",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2);
-  vars.m_reducedTree -> Branch("WJ1_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1_KF);
-  vars.m_reducedTree -> Branch("WJ2_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2_KF);
   vars.m_reducedTree -> Branch("WJJ", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJJ);
   vars.m_reducedTree -> Branch("WJ1_zepp",                &vars.WJ1_zepp,                               "WJ1_zepp/F");
   vars.m_reducedTree -> Branch("WJ2_zepp",                &vars.WJ2_zepp,                               "WJ2_zepp/F");
@@ -189,15 +185,14 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   
   // Higgs variables
-  vars.m_reducedTree -> Branch("lepMetW_pt",   &vars.lepMetW_pt,     "lepMetW_pt/F");
-  vars.m_reducedTree -> Branch("lepMetW_mt",   &vars.lepMetW_mt,     "lepMetW_mt/F");
-  vars.m_reducedTree -> Branch("lepMetW_Dphi", &vars.lepMetW_Dphi, "lepMetW_Dphi/F");
-  vars.m_reducedTree -> Branch("lepNuW_m",     &vars.lepNuW_m,         "lepNuW_m/F");
-  vars.m_reducedTree -> Branch("lepNuW_zepp",  &vars.lepNuW_zepp,   "lepNuW_zepp/F");
-  
-  vars.m_reducedTree -> Branch("lepNuW_m_KF", &vars.lepNuW_m_KF, "lepNuW_m_KF/F");
-  vars.m_reducedTree -> Branch("chi2_KF",     &vars.chi2_KF,         "chi2_KF/F");
-  vars.m_reducedTree -> Branch("ndf_KF",      &vars.ndf_KF,           "ndf_KF/I");
+  vars.m_reducedTree -> Branch("lepMetW_pt",       &vars.lepMetW_pt,             "lepMetW_pt/F");
+  vars.m_reducedTree -> Branch("lepMetW_mt",       &vars.lepMetW_mt,             "lepMetW_mt/F");
+  vars.m_reducedTree -> Branch("lepMetW_Dphi",     &vars.lepMetW_Dphi,         "lepMetW_Dphi/F");
+  vars.m_reducedTree -> Branch("lepNu_m",          &vars.lepNu_m,                   "lepNu_m/F");
+  vars.m_reducedTree -> Branch("lepNu_nSolutions", &vars.lepNu_nSolutions, "lepNu_nSolutions/I");
+  vars.m_reducedTree -> Branch("lepW_pt",          &vars.lepW_pt,                   "lepW_pt/F");
+  vars.m_reducedTree -> Branch("lepNuW_m",         &vars.lepNuW_m,                 "lepNuW_m/F");
+  vars.m_reducedTree -> Branch("lepNuW_zepp",      &vars.lepNuW_zepp,           "lepNuW_zepp/F");
   
   
   // tag-jet variables
@@ -307,8 +302,6 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
 
   vars.lep = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_lep = NULL;
-  vars.lep_KF = ROOT::Math::XYZTVector(0., 0., 0., 0.);
-  vars.p_lep_KF = NULL;
   
   vars.lep_charge = -1.;
   vars.lep_flavour = -1;
@@ -351,8 +344,6 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.p_met = NULL;
   vars.nu = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_nu = NULL;
-  vars.nu_KF = ROOT::Math::XYZTVector(0., 0., 0., 0.);
-  vars.p_nu_KF = NULL;
   vars.met_et = -1.;
   
   vars.lepMet = ROOT::Math::XYZTVector(0., 0., 0., 0.);
@@ -448,10 +439,6 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.p_WJ1 = NULL;
   vars.WJ2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_WJ2 = NULL;
-  vars.WJ1_KF = ROOT::Math::XYZTVector(0., 0., 0., 0.);
-  vars.p_WJ1_KF = NULL;
-  vars.WJ2_KF = ROOT::Math::XYZTVector(0., 0., 0., 0.);
-  vars.p_WJ2_KF = NULL;
   
   vars.WJJ = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_WJJ = NULL;
@@ -492,12 +479,11 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lepMetW_pt = -1.;
   vars.lepMetW_mt = -1.;
   vars.lepMetW_Dphi = -1.;
+  vars.lepNu_m = -1.;
+  vars.lepNu_nSolutions = -1;
+  vars.lepW_pt = -1.;
   vars.lepNuW_m = -1.;
   vars.lepNuW_zepp = -99.;
-  
-  vars.lepNuW_m_KF = -1.;
-  vars.chi2_KF = -1.;
-  vars.ndf_KF = -1;
   
   
   
@@ -916,8 +902,6 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJJ = vars.WJ1 + vars.WJ2;
   vars.p_WJJ = &vars.WJJ;
   
-  vars.lepW = vars.lep + vars.WJJ;
-  
   vars.WJ1_lep_Dphi = deltaPhi(vars.WJ1.phi(),vars.lep.phi());
   vars.WJ2_lep_Dphi = deltaPhi(vars.WJ2.phi(),vars.lep.phi());
   vars.WJ1_met_Dphi = deltaPhi(vars.WJ1.phi(),vars.met.phi());
@@ -957,150 +941,15 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
   vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
   
-  int nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
+  vars.lepNu_nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
   vars.p_nu = &(vars.nu);
+  vars.lepNu_m = (vars.lep+vars.nu).mass();
+  vars.lepW = vars.lep + vars.WJJ;
+  vars.lepW_pt = vars.lepW.pt();
   vars.lepNuW = vars.lepW + vars.nu;
   vars.lepNuW_m = vars.lepNuW.mass();
   
   //std::cout << "Higgs mt = " << vars.lepMetW_mt << "   Higgs m = " << vars.lepNuW_m << std::endl;
-  
-  
-  
-  //--------------
-  // kinematic fit
-  if( vars.WJ1.pt() <= 0. ) return;
-  if( vars.WJ2.pt() <= 0. ) return;
-  //if( nSolutions == 1 ) return;
-  
-  
-  
-  // lepton
-  TLorentzVector vl(vars.lep.px(),vars.lep.py(),vars.lep.pz(),vars.lep.energy());
-  // neutrino
-  TLorentzVector vv(vars.nu.px(),vars.nu.py(),vars.nu.pz(),vars.nu.energy());
-  // W-jet 1
-  TLorentzVector v1(vars.WJ1.px(),vars.WJ1.py(),vars.WJ1.pz(),vars.WJ1.energy());
-  // W-jet 2
-  TLorentzVector v2(vars.WJ2.px(),vars.WJ2.py(),vars.WJ2.pz(),vars.WJ2.energy());
-  // unclusterized met
-  double u_x = (vars.met+vars.lep+vars.WJ1+vars.WJ2).Px();
-  double u_y = (vars.met+vars.lep+vars.WJ1+vars.WJ2).Py();
-  
-  
-  
-  // define error matrices
-  TMatrixD ml(3,3);
-  TMatrixD mv(3,3);
-  TMatrixD m1(3,3);
-  TMatrixD m2(3,3);
-  ml.Zero();
-  mv.Zero();
-  m1.Zero();
-  m2.Zero();
-  
-  double EtRes,etaRes,phiRes;
-  
-  // lepton
-  if(vars.lep_flavour == 11) electronResolution(vars.lep.Et(),vars.lep.eta(),EtRes,etaRes,phiRes);
-  if(vars.lep_flavour == 13)     muonResolution(vars.lep.Et(),vars.lep.eta(),EtRes,etaRes,phiRes);
-  ml(0,0) = EtRes*EtRes;
-  ml(1,1) = etaRes*etaRes;
-  ml(2,2) = phiRes*phiRes;
-  
-  // neutrino
-  PFMETResolution(vars.met.Et(),EtRes,etaRes,phiRes);
-  mv(0,0) = EtRes*EtRes;
-  mv(1,1) = 25.;
-  mv(2,2) = phiRes*phiRes;
-  
-  // jets
-  m1(0,0) = ErrEt (vars.WJ1.Et(),vars.WJ1.eta());
-  m1(1,1) = ErrEta(vars.WJ1.Et(),vars.WJ1.eta());;
-  m1(2,2) = ErrPhi(vars.WJ1.Et(),vars.WJ1.eta());;
-  
-  m2(0,0) = ErrEt (vars.WJ2.Et(),vars.WJ2.eta());
-  m2(1,1) = ErrEta(vars.WJ2.Et(),vars.WJ2.eta());;
-  m2(2,2) = ErrPhi(vars.WJ2.Et(),vars.WJ2.eta());;
-  
-  
-  
-  // define the constraints
-  TLorentzVector tmpl = vl;
-  TLorentzVector tmpv = vv;
-  TLorentzVector tmp1 = v1;
-  TLorentzVector tmp2 = v2;
-  
-  TFitParticleEtEtaPhi* l  = new TFitParticleEtEtaPhi("lepton","lepton",&tmpl,&ml);
-  TFitParticleEtEtaPhi* v  = new TFitParticleEtEtaPhi("neutrino","neutrino",&tmpv,&mv);
-  TFitParticleEtEtaPhi* j1 = new TFitParticleEtEtaPhi("WJet1","WJet1",&tmp1,&m1);
-  TFitParticleEtEtaPhi* j2 = new TFitParticleEtEtaPhi("WJet2","WJet2",&tmp2,&m2);
-  
-  //std::cout << "l: " << tmpl.Pz() << "   mass: " << tmpl.M() << std::endl;
-  //std::cout << "v: " << tmpv.Pz() << "   mass: " << tmpv.M() << std::endl;
-  //std::cout << "nSolutions: " << nSolutions << std::endl;
-  //std::cout << "lv: mass: " << (tmpl+tmpv).M() << std::endl;
-  //std::cout << "jj: mass: " << (tmp1+tmp2).M() << std::endl;
-  TFitConstraintMGaus* mCons1 = new TFitConstraintMGaus( "W1MassConstraint", "W1Mass-Constraint", 0, 0 , 80.399, 2.085);
-  mCons1->addParticles1( l, v );
-  TFitConstraintMGaus* mCons2 = new TFitConstraintMGaus( "W2MassConstraint", "W2Mass-Constraint", 0, 0 , 80.399, 2.085);
-  mCons2->addParticles1( j1, j2 );
-  TFitConstraintEp* pxCons = new TFitConstraintEp( "PxConstraint", "Px-Constraint", 0, TFitConstraintEp::pX , u_x );
-  pxCons->addParticles( l, v, j1, j2 );
-  TFitConstraintEp* pyCons = new TFitConstraintEp( "PyConstraint", "Py-Constraint", 0, TFitConstraintEp::pY , u_y );
-  pyCons->addParticles( l, v, j1, j2 );
-  
-  
-  //Definition of the fitter
-  //Add three measured particles(jets)
-  //Add two constraints
-  TKinFitter* fitter = new TKinFitter("fitter", "fitter");
-  fitter->addMeasParticle( l );
-  fitter->addMeasParticle( v );
-  fitter->addMeasParticle( j1 );
-  fitter->addMeasParticle( j2 );
-  fitter->addConstraint( mCons1 );
-  fitter->addConstraint( mCons2 );
-  //fitter->addConstraint( pxCons );
-  //fitter->addConstraint( pyCons );
-    
-  //Set convergence criteria
-  fitter->setMaxNbIter( 30 );
-  fitter->setMaxDeltaS( 1e-2 );
-  fitter->setMaxF( 1e-1 );
-  fitter->setVerbosity(0);
-  
-  //Perform the fit
-  fitter->fit();
-  
-  
-  // update the higgs mass after kinematic fit
-  ////vars.lepNuW_m_KF = ( (*(jet1->getCurr4Vec())) + (*(jet2->getCurr4Vec())) + (*(l->getCurr4Vec())) + (*(m->getCurr4Vec())) ).M();
-  //vm += (v1 + v2 - (*(jet1->getCurr4Vec())) - (*(jet2->getCurr4Vec())) );
-  //ROOT::Math::XYZTVector met_new(vm.Px(),vm.Py(),0.,vm.E());
-  //ROOT::Math::XYZTVector WJ1_new((jet1->getCurr4Vec())->Px(),(jet1->getCurr4Vec())->Py(),(jet1->getCurr4Vec())->Pz(),(jet1->getCurr4Vec())->E());
-  //ROOT::Math::XYZTVector WJ2_new((jet2->getCurr4Vec())->Px(),(jet2->getCurr4Vec())->Py(),(jet2->getCurr4Vec())->Pz(),(jet2->getCurr4Vec())->E());
-  //ROOT::Math::XYZTVector nu_new = *GetNeutrino(vars.lep,met_new,WJ1_new,WJ2_new,vars.mH);
-  //
-  //TLorentzVector vn_new(nu_new.px(),nu_new.py(),nu_new.pz(),nu_new.energy());
-  
-  vars.lep_KF.SetPxPyPzE(l->getCurr4Vec()->Px(),l->getCurr4Vec()->Py(),l->getCurr4Vec()->Pz(),l->getCurr4Vec()->E()  );
-  vars.p_lep_KF = &vars.lep_KF;
-  
-  vars.nu_KF.SetPxPyPzE(v->getCurr4Vec()->Px(),v->getCurr4Vec()->Py(),v->getCurr4Vec()->Pz(),v->getCurr4Vec()->E()  );
-  vars.p_nu_KF = &vars.nu_KF;
-  
-  vars.WJ1_KF.SetPxPyPzE(j1->getCurr4Vec()->Px(),j1->getCurr4Vec()->Py(),j1->getCurr4Vec()->Pz(),j1->getCurr4Vec()->E()  );
-  vars.p_WJ1_KF = &vars.WJ1_KF;
-  
-  vars.WJ2_KF.SetPxPyPzE(j2->getCurr4Vec()->Px(),j2->getCurr4Vec()->Py(),j2->getCurr4Vec()->Pz(),j2->getCurr4Vec()->E()  );
-  vars.p_WJ2_KF = &vars.WJ2_KF;
-  
-  vars.lepNuW_m_KF = ( (*(l->getCurr4Vec())) + (*(v->getCurr4Vec())) + (*(j1->getCurr4Vec())) + (*(j2->getCurr4Vec())) ).M();
-  vars.chi2_KF = fitter->getS();
-  vars.ndf_KF = fitter->getNDF();
-  
-  //std::cout << "lv: mass after KF: " << (vars.lep_KF+vars.nu_KF).M() << std::endl;
-  //std::cout << "jj: mass after KF: " << (vars.WJ1_KF+vars.WJ2_KF).M() << std::endl;  
 }
 
 

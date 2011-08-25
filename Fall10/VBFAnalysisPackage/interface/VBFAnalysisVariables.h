@@ -1,9 +1,8 @@
+#ifndef VBFAnalysisVariables_h
+#define VBFAnalysisVariables_h
+
 #include "treeReader.h"
-#include "ConfigParser.h"
 #include "ntpleUtils.h"
-#include "hFactory.h"
-#include "h2Factory.h"
-#include "stdHisto.h"
 
 #include "TH1F.h"
 #include "TProfile.h"
@@ -225,12 +224,15 @@ struct VBFAnalysisVariables
   float lepMetW_pt;
   float lepMetW_mt;
   float lepMetW_Dphi;
+  float lepNu_m;
+  int lepNu_nSolutions;
   float lepNuW_m;
   float lepNuW_zepp;
   
   float lepNuW_m_KF;
   float chi2_KF;
   int ndf_KF;
+  int status_KF;
   
   float lepNuW_cphi;
   float lepNuZ_cphi;
@@ -243,7 +245,6 @@ struct VBFAnalysisVariables
   // tag-jet variables
   ROOT::Math::XYZTVector* p_tagJ1;
   ROOT::Math::XYZTVector tagJ1;
-  
   ROOT::Math::XYZTVector* p_tagJ2;
   ROOT::Math::XYZTVector tagJ2;
   
@@ -264,8 +265,8 @@ struct VBFAnalysisVariables
   
   
   // third jet variables
-  ROOT::Math::XYZTVector thirdJ;
   ROOT::Math::XYZTVector* p_thirdJ;
+  ROOT::Math::XYZTVector thirdJ;
   
   float thirdJ_bTag;
   float thirdJ_WJJDeta;
@@ -282,3 +283,5 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables&, TTree*);
 void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree*);
 void InitialiseVBFAnalysisTree(VBFAnalysisVariables& vars, TFile* outputRootFile, const int& nStep, const int& firstStep);
 void FillVBFAnalysisTree(VBFAnalysisVariables& vars, const int&);
+
+#endif
