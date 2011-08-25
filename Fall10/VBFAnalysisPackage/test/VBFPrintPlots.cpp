@@ -113,12 +113,12 @@ int main(int argc, char** argv)
 
   stack -> DrawEvents("events", lumi, step, true);
   stack -> DrawEvents("eventsScaled", lumi, step, true);
-  stack -> DrawEvents("eventsScaledStack", lumi, step, true);
-  stack -> DrawEvents("efficiencies", lumi, step, true);
-  stack -> SetYaxisRange(0.01, 1.1);
+  //stack -> DrawEvents("eventsScaledStack", lumi, step, true);
+  //stack -> DrawEvents("efficiencies", lumi, step, true);
+  //stack -> SetYaxisRange(0.01, 1.1);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true);
   stack -> SetYaxisRange(0., 1.5);
-  stack -> DrawEvents("significance", lumi, step, false);
+  //stack -> DrawEvents("significance", lumi, step, false);
   //stack -> DrawEventRatio_nJets("int", lumi, step, false);
   //stack -> DrawEventRatio_nJets("0jets", lumi, step, false);
   //stack -> DrawEventRatio_nJets("1jets", lumi, step, false);
@@ -142,14 +142,14 @@ int main(int argc, char** argv)
   
   std::string histoName;
   
-  variableNames.at(0) = "max(WJ1_QGLikelihood,WJ2_QGLikelihood)";
+  variableNames.at(0) = "WJ1_QGLikelihood";
   histoName = "WJ1_QGLikelihood";
   stack -> SetXaxisRange(0., 1.);
   stack -> SetXaxisTitle("quark-gluon likelihood(WJet_{1})");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent);
     
-  variableNames.at(0) = "min(WJ1_QGLikelihood,WJ2_QGLikelihood)";
+  variableNames.at(0) = "WJ2_QGLikelihood";
   histoName = "WJ2_QGLikelihood";
   stack -> SetXaxisRange(0., 1.);
   stack -> SetXaxisTitle("quark-gluon likelihood(WJet_{2})");

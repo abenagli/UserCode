@@ -1246,7 +1246,7 @@ int GetNeutrino(ROOT::Math::XYZTVector& nu,
                 const ROOT::Math::XYZTVector& WJ2,
                 const float& mH)
 {
-  // neutrino                                                                                                                                                                      
+  // neutrino
   float alpha = lep.px()*met.px() + lep.py()*met.py();
 
   float delta = (alpha + 0.5*80.399*80.399)*(alpha + 0.5*80.399*80.399) - lep.pt()*lep.pt()*met.pt()*met.pt();

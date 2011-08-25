@@ -4,9 +4,6 @@
 #include "treeReader.h"
 #include "ntpleUtils.h"
 
-#include "TH1F.h"
-#include "TProfile.h"
-#include "TObject.h"
 #include "TTree.h"
 
 #include "TMVA/Reader.h"
@@ -281,7 +278,6 @@ struct VBFAnalysisVariables
 
 void SetVBFPreselectionTreeBranches(VBFAnalysisVariables&, TTree*);
 void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree*);
-void InitialiseVBFAnalysisTree(VBFAnalysisVariables& vars, TFile* outputRootFile, const int& nStep, const int& firstStep);
-void FillVBFAnalysisTree(VBFAnalysisVariables& vars, const int&);
+void InitializeVBFAnalysisTree(VBFAnalysisVariables& vars);
 
 #endif

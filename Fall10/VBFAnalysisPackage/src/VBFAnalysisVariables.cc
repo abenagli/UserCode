@@ -241,3 +241,27 @@ void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
   reducedTree -> Branch("ndf_KF",      &vars.ndf_KF,           "ndf_KF/I");
   reducedTree -> Branch("status_KF",   &vars.status_KF,     "status_KF/I");
 }
+
+
+
+void InitializeVBFAnalysisTree(VBFAnalysisVariables& vars)
+{
+  vars.lepNuW_cphi = -1.;
+  vars.lepNuZ_cphi = -1.;
+  vars.lep_ctheta = -1.;
+  vars.WJ1_ctheta = -1.;
+  vars.lepNu_ctheta = -1.;
+  
+  vars.WJ1_QGLikelihood = -1.;
+  vars.WJ2_QGLikelihood = -1.;
+  
+  vars.p_lep_KF = NULL;
+  vars.p_nu_KF = NULL;
+  vars.p_WJ1_KF = NULL;
+  vars.p_WJ2_KF = NULL;
+  
+  vars.lepNuW_m_KF = -1.;
+  vars.chi2_KF = -1.;
+  vars.ndf_KF = -1;
+  vars.status_KF = -1;
+}

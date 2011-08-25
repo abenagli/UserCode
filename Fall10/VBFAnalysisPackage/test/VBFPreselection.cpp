@@ -483,7 +483,7 @@ int main(int argc, char** argv)
       bool isLooseMuon = false;
       if( ( pt > 10. ) &&
           ( fabs(eta) < 2.5 ) &&
-	  //( tkIso/pt < 0.20 ) &&
+	  ( tkIso/pt < 0.20 ) &&
           ( global == 1) )
       {
         isLooseMuon = true;

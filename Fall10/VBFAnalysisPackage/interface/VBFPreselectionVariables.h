@@ -1,21 +1,10 @@
+#ifndef VBFPreselectionVariables_h
+#define VBFPreselectionVariables_h
+
 #include "treeReader.h"
-#include "ConfigParser.h"
 #include "ntpleUtils.h"
-#include "hFactory.h"
-#include "h2Factory.h"
-#include "stdHisto.h"
-#include "TKinFitterUtils.h"
 
-#include "TH1F.h"
-#include "TProfile.h"
-#include "TObject.h"
 #include "TTree.h"
-
-#include "TFitConstraintMGaus.h"
-#include "TFitConstraintEp.h"
-#include "TFitParticleEtEtaPhi.h"
-#include "TFitParticleCart.h"
-#include "TKinFitter.h"
 
 
 
@@ -370,3 +359,5 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader);
+
+#endif

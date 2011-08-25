@@ -227,6 +227,7 @@ int main(int argc, char** argv)
     cloneTrees[step] = chain -> CloneTree(0);
     cloneTrees[step] -> SetName(treeName); 
     AddVBFAnalysisTreeBranches(vars,cloneTrees[step]);
+    InitializeVBFAnalysisTree(vars);
   }
   
   
@@ -251,13 +252,12 @@ int main(int argc, char** argv)
   std::vector<std::string> HLTPathNames_mu_MC;
   
   // data
-  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
-  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
-  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
-  //HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  //HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
-  //HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v1");
+  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
+  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
+  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
+  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+  HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
   
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v1");
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v2");
@@ -367,6 +367,8 @@ int main(int argc, char** argv)
     
     //*******************
     // SET SOME VARIABLES
+    for(int step = firstSTEP; step <= nStep; ++step)
+      InitializeVBFAnalysisTree(vars);
     
     vars.totEvents = stepEvents[1];
     vars.lep = *(vars.p_lep);
@@ -377,12 +379,9 @@ int main(int argc, char** argv)
     vars.WJ1 = *(vars.p_WJ1);
     vars.WJ2 = *(vars.p_WJ2);
     vars.WJJ = *(vars.p_WJ1) + *(vars.p_WJ2);
-    vars.lepW_pt = (vars.lep+vars.WJJ).pt();
     vars.tagJ1 = *(vars.p_tagJ1);
     vars.tagJ2 = *(vars.p_tagJ2);
     vars.thirdJ = *(vars.p_thirdJ);
-    vars.WJ1_QGLikelihood = -1.;
-    vars.WJ2_QGLikelihood = -1.;
     
     GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
                    vars.lep,vars.nu,vars.WJ1,vars.WJ2);

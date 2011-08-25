@@ -678,7 +678,7 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "jet veto", step, verbosity);
     
     
-    if( vars.nJets_cnt_pt20 != 2 ) continue;
+    if( vars.nJets_cnt_pt25 != 2 ) continue;
     
     
     // Fill distributions
