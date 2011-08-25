@@ -166,12 +166,12 @@ int main(int argc, char** argv)
   char methodName[50];
   //factory -> BookMethod(TMVA::Types::kCuts, "kCuts");
   factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood_H"+higgsMass);
-  factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
-  //factory -> BookMethod(TMVA::Types::kKNN, "kKNN_H"+higgsMass);
+  //factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
+  factory -> BookMethod(TMVA::Types::kKNN, "kKNN_H"+higgsMass);
   factory -> BookMethod(TMVA::Types::kFisher, "kFisher");
   factory -> BookMethod(TMVA::Types::kLD, "kLD");
   factory -> BookMethod(TMVA::Types::kCFMlpANN, "kCFMlpANN_H"+higgsMass);
-  //factory -> BookMethod(TMVA::Types::kTMlpANN, "kTMlpANN_H"+higgsMass);
+  factory -> BookMethod(TMVA::Types::kTMlpANN, "kTMlpANN_H"+higgsMass);
   //factory -> BookMethod(TMVA::Types::kMLP, "kMLP");
   //factory -> BookMethod(TMVA::Types::kSVM, "kSVM");
   factory -> BookMethod(TMVA::Types::kBDT,"kBDT_H"+higgsMass);
