@@ -3,6 +3,7 @@
 #include "ntpleUtils.h"
 #include "readJSONFile.h"
 #include "QGLikelihoodCalculator.h"
+#include "VBFKinematicFit.h"
 
 #include <iomanip>
 
@@ -179,7 +180,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 18;
+  int nStep = 19;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_PURescaled = new TH1F("events_PURescaled", "events_PURescaled", nStep, 0., 1.*nStep);
@@ -250,12 +251,13 @@ int main(int argc, char** argv)
   std::vector<std::string> HLTPathNames_mu_MC;
   
   // data
-  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
-  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
-  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
-  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
-  HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");  
+  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
+  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
+  //HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
+  //HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  //HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+  //HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v1");
   
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v1");
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v2");
@@ -338,7 +340,8 @@ int main(int argc, char** argv)
   stepNames[15] = "15) W pt cut";
   stepNames[16] = "16) Helicity angles cuts";
   stepNames[17] = "17) W mass cut";
-  stepNames[18] = "18) Higgs mass cut";
+  stepNames[18] = "18) Kinematic Fit";
+  stepNames[19] = "18) Higgs mass cut";
   
   
   
@@ -378,17 +381,11 @@ int main(int argc, char** argv)
     vars.tagJ1 = *(vars.p_tagJ1);
     vars.tagJ2 = *(vars.p_tagJ2);
     vars.thirdJ = *(vars.p_thirdJ);
-    
-    GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
-                   vars.lep,vars.nu,vars.WJ1,vars.WJ2);
-    
     vars.WJ1_QGLikelihood = -1.;
     vars.WJ2_QGLikelihood = -1.;
     
-    //if( vars.WJ1.pt() > 0. )
-    //  vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForJets,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
-    //if( vars.WJ2.pt() > 0. )
-    //  vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForJets,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
+                   vars.lep,vars.nu,vars.WJ1,vars.WJ2);
     
     
     
@@ -810,6 +807,18 @@ int main(int argc, char** argv)
       vars.eventWeight *= f_metTurnOn -> Eval(vars.met_et) * f_jetTurnOn -> Eval(vars.WJ1.pt(),vars.WJ2.pt());
     */
     
+
+    if( vars.WJ1.pt() > 0. )
+      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForJets,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    if( vars.WJ2.pt() > 0. )
+      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForJets,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    if( vars.WJ2.pt() > vars.WJ1.pt() )
+    {
+      float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
+      vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
+      vars.WJ1_QGLikelihood = QGLikelihoodDummy;
+    }
+   
     
     // Fill distributions
     stepEvents[step] += 1;
@@ -1032,8 +1041,31 @@ int main(int argc, char** argv)
     
     
     
+    //***************************************
+    // STEP 18 - Initial cuts - Kinematic Fit
+    //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
+    
+    
+    DoKinematicFit(vars);
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
     //****************************************
-    // STEP 18 - Initial cuts - Higgs mass cut
+    // STEP 19 - Initial cuts - Higgs mass cut
     step += 1;
     //SetStepNames(stepNames, "Higgs mass cut", step, verbosity);
     
