@@ -180,7 +180,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 19;
+  int nStep = 20;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_PURescaled = new TH1F("events_PURescaled", "events_PURescaled", nStep, 0., 1.*nStep);
@@ -258,6 +258,8 @@ int main(int argc, char** argv)
   HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
   HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
   HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
   
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v1");
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v2");
@@ -265,6 +267,8 @@ int main(int argc, char** argv)
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v5");
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v6");
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v7");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v8");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v9");
   
   // mc
   HLTPathNames_e_MC.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
@@ -334,14 +338,15 @@ int main(int argc, char** argv)
   stepNames[9]  = "9) jet veto";
   stepNames[10] = "10) W-jet pt cut";
   stepNames[11] = "11) b-tag veto";
-  stepNames[12] = "12) lep-met angle cuts";
-  stepNames[13] = "13) WJ1-WJ2 angle cuts";
-  stepNames[14] = "14) pt max/met cuts";
-  stepNames[15] = "15) W pt cut";
-  stepNames[16] = "16) Helicity angles cuts";
-  stepNames[17] = "17) W mass cut";
-  stepNames[18] = "18) Kinematic Fit";
-  stepNames[19] = "19) Higgs mass cut";
+  stepNames[12] = "12) WJJ Deta/Dphi cuts";
+  stepNames[13] = "13) lep-met angle cuts";
+  stepNames[14] = "14) WJ1-WJ2 angle cuts";
+  stepNames[15] = "15) pt max/met cuts";
+  stepNames[16] = "16) W pt cut";
+  stepNames[17] = "17) Kinematic Fit";
+  stepNames[18] = "18) Helicity angles cuts";
+  stepNames[19] = "19) W mass cut";
+  stepNames[20] = "20) Higgs mass cut";
   
   
   
@@ -711,6 +716,7 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "lepton mt", step, verbosity);
     
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (lepMetMtCUT == 1) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (lepMetMtCUT == 1) && (vars.lepNu_m > 110.) ) continue;
     
     
     // fill distributions
@@ -878,7 +884,32 @@ int main(int argc, char** argv)
     
     
     //********************************************
-    // STEP 12 - Initial cuts - lep-met angle cuts
+    // STEP 12 - Initial cuts - WJJ Deta/Dphi cuts
+    step += 1;
+    //SetStepNames(stepNames, "WJJ Deta/Dphi cuts", step, verbosity);
+    
+    
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) > 2.50) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) > 2.50) ) continue;
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //********************************************
+    // STEP 13 - Initial cuts - lep-met angle cuts
     step += 1;
     //SetStepNames(stepNames, "lep-met angle cuts", step, verbosity);
     
@@ -903,7 +934,7 @@ int main(int argc, char** argv)
     
     
     //********************************************
-    // STEP 13 - Initial cuts - WJ1-WJ2 angle cuts
+    // STEP 14 - Initial cuts - WJ1-WJ2 angle cuts
     step += 1;
     //SetStepNames(stepNames, "WJ1-WJ2 angle cuts", step, verbosity);
     
@@ -932,7 +963,7 @@ int main(int argc, char** argv)
     
     
     //******************************************
-    // STEP 14 - Initial cuts - pt max/met  cuts
+    // STEP 15 - Initial cuts - pt max/met  cuts
     step += 1;
     //SetStepNames(stepNames, "pt max cuts", step, verbosity);
     
@@ -960,7 +991,7 @@ int main(int argc, char** argv)
     
     
     //**********************************
-    // STEP 15 - Initial cuts - W pt cut
+    // STEP 16 - Initial cuts - W pt cut
     step += 1;
     //SetStepNames(stepNames, "W pt cuts", step, verbosity);
     
@@ -984,8 +1015,32 @@ int main(int argc, char** argv)
     
     
     
+    //***************************************
+    // STEP 17 - Initial cuts - Kinematic Fit
+    step += 1;
+    //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
+    
+    
+    DoKinematicFit(vars);
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
     //*****************************************
-    // STEP 16 - Initial cuts - Helicity angles
+    // STEP 18 - Initial cuts - Helicity angles
     step += 1;
     //SetStepNames(stepNames, "Helicity angles", step, verbosity);
     
@@ -1016,7 +1071,7 @@ int main(int argc, char** argv)
     
     
     //************************************
-    // STEP 17 - Initial cuts - W mass cut
+    // STEP 19 - Initial cuts - W mass cut
     step += 1;
     //SetStepNames(stepNames, "W mass cut", step, verbosity);
     
@@ -1040,32 +1095,8 @@ int main(int argc, char** argv)
     
     
     
-    //***************************************
-    // STEP 18 - Initial cuts - Kinematic Fit
-    step += 1;
-    //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
-    
-    
-    DoKinematicFit(vars);
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
     //****************************************
-    // STEP 19 - Initial cuts - Higgs mass cut
+    // STEP 20 - Initial cuts - Higgs mass cut
     step += 1;
     //SetStepNames(stepNames, "Higgs mass cut", step, verbosity);
     

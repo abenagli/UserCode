@@ -146,8 +146,8 @@ while(<SAMPLESListFile>)
   #print($command."\n\n\n");
   system($command);
   
-  print SAMPLEJOBLISTFILE "echo \"qsub -V -d ".$sampleDir." -q longcms ".$sampleJobFile."\"\n";  
-  print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q longcms ".$sampleJobFile."\n";
+  print SAMPLEJOBLISTFILE "echo \"qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\"\n";  
+  print SAMPLEJOBLISTFILE "qsub -V -d ".$sampleDir." -q production ".$sampleJobFile."\n";
   
   ++$type;
 }

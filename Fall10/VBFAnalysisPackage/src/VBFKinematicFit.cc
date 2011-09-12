@@ -40,7 +40,7 @@ void DoKinematicFit(VBFAnalysisVariables& vars)
   // neutrino
   PFMETResolution(vars.met.Et(),EtRes,etaRes,phiRes);
   mv(0,0) = EtRes*EtRes;
-  mv(1,1) = 0.1;
+  mv(1,1) = 25.;
   mv(2,2) = phiRes*phiRes;
   
   // jets
@@ -90,8 +90,8 @@ void DoKinematicFit(VBFAnalysisVariables& vars)
   fitter->addMeasParticle( j2 );
   fitter->addConstraint( mCons1 );
   fitter->addConstraint( mCons2 );
-  fitter->addConstraint( pxCons );
-  fitter->addConstraint( pyCons );
+  //fitter->addConstraint( pxCons );
+  //fitter->addConstraint( pyCons );
     
   //Set convergence criteria
   fitter->setMaxNbIter( 500 );

@@ -384,7 +384,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   sprintf(lumiBuffer, "CMS Preliminary 2011");
   
   char lumiBuffer2[50];
-  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.1f pb^{-1}", lumi);
+  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.2f fb^{-1}", lumi);
 
   TLatex *latex = new TLatex(0.76, 0.91, lumiBuffer); 
   TLatex *latex2 = NULL;
@@ -433,7 +433,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
     
     if( (mode == "eventsScaled") && (dataFlag_summed[mapIt->first] != 1) )
     {
-      globalHisto -> Scale(1. * lumi);
+      globalHisto -> Scale(1. * 1000 * lumi);
       globalHisto -> SetLineColor(kBlack);
       globalHisto -> SetFillColor(color_summed[mapIt->first]);
       globalHisto -> SetLineStyle(linestyle_summed[mapIt->first]);
@@ -1010,7 +1010,7 @@ void drawTStack::DrawEvents(const std::string& mode,
   sprintf(lumiBuffer, "CMS Preliminary 2011");
 
   char lumiBuffer2[100];
-  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.1f pb^{-1}", lumi);
+  sprintf(lumiBuffer2, "#sqrt{s}=7 TeV   L=%.2f fb^{-1}", lumi);
   
   TLatex* latex = new TLatex(0.76, 0.91, lumiBuffer);
   TLatex* latex2 = new TLatex(0.76, 0.88, lumiBuffer2);
@@ -1119,7 +1119,7 @@ void drawTStack::DrawEvents(const std::string& mode,
         (mode == "significance") )
     {
       if( m_crossSection[vecIt->first] != 1. )
-        histo -> Scale(lumi*m_crossSection[vecIt->first]/histo->GetBinContent(1));
+        histo -> Scale(1000*lumi*m_crossSection[vecIt->first]/histo->GetBinContent(1));
      }
     
     

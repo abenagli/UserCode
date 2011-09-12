@@ -367,6 +367,13 @@ int main(int argc, char** argv)
   stack -> SetUnit("GeV/c");
   stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent);
   
+  variableNames.at(0) = "lepNu_m";
+  histoName = "lepNu_m";
+  stack -> SetXaxisRange(0., 150.);
+  stack -> SetXaxisTitle("m(lepton+neutrino)");
+  stack -> SetUnit("GeV/c^{2}");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent);
+  
   variableNames.at(0) = "lepMet_mt";
   histoName = "lepMet_mt";
   stack -> SetXaxisRange(0., 150.);
@@ -901,7 +908,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("m(WJet_{1}+WJet_{2})");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent);
   
   variableNames.at(0) = "WJJ_pt";
   histoName = "WJJ_pt";
@@ -1090,14 +1097,14 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 1000);
   stack -> SetXaxisTitle("m(lepton+neutrino+WJets)");
   stack -> SetUnit("GeV/c2");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 100, PURescale, weightEvent);
   
   variableNames.at(0) = "lepNuW_m_KF";
   histoName = "lepNuW_m_KF";
   stack -> SetXaxisRange(0., 800);
   stack -> SetXaxisTitle("m(lepton+neutrino+WJets) after KF");
   stack -> SetUnit("GeV/c2");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 100, PURescale, weightEvent);
   
   //variableNames.at(0) = "abs(lepNuW_zepp)";
   //histoName = "lepNuW_zepp";
