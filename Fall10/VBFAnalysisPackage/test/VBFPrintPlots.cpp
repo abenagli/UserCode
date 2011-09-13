@@ -117,7 +117,7 @@ int main(int argc, char** argv)
   stack -> DrawEvents("efficiencies", lumi, step, true);
   stack -> SetYaxisRange(0.01, 1.1);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true);
-  stack -> SetYaxisRange(0., 1.5);
+  stack -> SetYaxisRange(0., 2.);
   stack -> DrawEvents("significance", lumi, step, false);
   //stack -> DrawEventRatio_nJets("int", lumi, step, false);
   //stack -> DrawEventRatio_nJets("0jets", lumi, step, false);

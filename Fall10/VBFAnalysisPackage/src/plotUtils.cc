@@ -367,6 +367,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   THStack* hs = new THStack("hs", "hs");
   THStack* hs_signal = new THStack("hs_signal", "hs_signal");
   int nHists = 0;
+  int nHists_signal = 0;
   
   globalGlobalHisto = NULL;
   dataGlobalGlobalHisto = NULL;
@@ -447,10 +448,15 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
       }
       
       if(mH_summed[mapIt->first] <= 0.)
+      {
         hs -> Add(globalHisto);
+        ++nHists;
+      }
       else
+      {
         hs_signal -> Add(globalHisto);
-      ++nHists;
+        ++nHists_signal;
+      }
       legend.AddEntry(globalHisto, (mapIt->first).c_str(), "F");
     }
     
@@ -1002,6 +1008,7 @@ void drawTStack::DrawEvents(const std::string& mode,
   THStack* hs = new THStack("hs", "hs");
   THStack* hs_signal = new THStack("hs_signal", "hs_signal");
   int nHists = 0;
+  int nHists_signal = 0;
   TLegend legend(m_xLowLegend, m_yLowLegend, m_xHighLegend, m_yHighLegend);
   legend.SetFillColor(kWhite);
   legend.SetFillStyle(4000);
@@ -1063,9 +1070,9 @@ void drawTStack::DrawEvents(const std::string& mode,
   bool isFirstSample_data = true;
   TH1F* dataHisto = NULL;
   TH1F* globalGlobalHisto = NULL;
-  int i = 0;
   int binMin = -1;
   int binMax = -1;
+  int i = 0;
   for(std::vector<std::pair<std::string, std::string> >::const_iterator vecIt = m_list.begin();
       vecIt != m_list.end(); ++vecIt)
   {
@@ -1179,7 +1186,9 @@ void drawTStack::DrawEvents(const std::string& mode,
   int nSamples = 0;
   for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
       mapIt != crossSection_summed.end(); ++mapIt)
+  {
     ++nSamples;
+  }
   
   TH1F* stepHisto = new TH1F("stepHisto", "", nSamples, 0., 1.*nSamples);
   
@@ -1227,10 +1236,10 @@ void drawTStack::DrawEvents(const std::string& mode,
   // loop over summed samples
   //-------------------------
   
-  i = 0;
   std::map<int, float> nEventsScaled_sig;
   std::map<int, float> nEventsScaled_bkg;
-  for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
+  i = 0; 
+ for(std::map<std::string, double>::const_iterator mapIt = crossSection_summed.begin();
       mapIt != crossSection_summed.end(); ++mapIt)
   {    
     TH1F* globalHisto = histo_summed[mapIt->first];
@@ -1277,9 +1286,11 @@ void drawTStack::DrawEvents(const std::string& mode,
           totalBkgHisto -> Add(globalHisto2);
       }
       
+      if( totalBkgHisto == NULL ) return;
+      
       for(int bin = 1; bin <= globalHisto->GetNbinsX(); ++bin)
         globalHisto->SetBinContent(bin, globalHisto->GetBinContent(bin) / 
-                                        sqrt(totalBkgHisto->GetBinContent(bin)) );
+                                        sqrt(globalHisto->GetBinContent(bin)+totalBkgHisto->GetBinContent(bin)) );
     }
     
     
@@ -1333,11 +1344,15 @@ void drawTStack::DrawEvents(const std::string& mode,
     {
       if( ( (mode == "eventsScaledStack") && (mH_summed[mapIt->first] <= 0.) ) ||
           ( mode != "eventsScaledStack" ) )
+      {
         hs -> Add(globalHisto);
+        ++nHists;
+      }
       if( (mode == "eventsScaledStack") && (mH_summed[mapIt->first] > 0.) )
-	hs_signal -> Add(globalHisto);
-                 
-      ++nHists;
+      {
+        hs_signal -> Add(globalHisto);
+        ++nHists_signal;
+      }
       
       if(globalGlobalHisto != NULL)
         globalGlobalHisto -> Add(globalHisto);
@@ -1395,8 +1410,6 @@ void drawTStack::DrawEvents(const std::string& mode,
   
   
   
-  
-  
   // draw the stack and save file
   c1 = new TCanvas();
   c1 -> cd();
@@ -1429,14 +1442,21 @@ void drawTStack::DrawEvents(const std::string& mode,
     p1 -> SetGridy();
     if(logy) p1 -> SetLogy();
     
-    if( hs->GetHists()->GetEntries() > 0 )
+    
+    
+    if( nHists > 0 )
     {
       hs -> Draw("HISTO");
       hs_signal -> Draw("HISTO,same");
       DrawTStackError(hs);
     }
+    else if( (nHists == 0) && (nHists_signal > 0) )
+    {
+      hs_signal -> Draw("HISTO");
+      DrawTStackError(hs_signal);
+    }
   }
-
+  
   legend.SetTextFont(42);  
   legend.SetTextSize(0.025);
   legend.Draw("same");
@@ -1450,8 +1470,8 @@ void drawTStack::DrawEvents(const std::string& mode,
     hs->SetMinimum(pow(10., log10(globalMinimum) - 0.1));
     hs->SetMaximum(pow(10., log10(globalMaximum) + 0.1));
   }
-
-  if(nHists > 0)
+  
+  if( nHists > 0 )
   {
     hs -> GetXaxis() -> SetTitleSize(0.04);
     hs -> GetXaxis() -> SetLabelSize(0.03);
@@ -1460,8 +1480,6 @@ void drawTStack::DrawEvents(const std::string& mode,
     hs -> GetYaxis() -> SetTitleSize(0.04);
     hs -> GetYaxis() -> SetLabelSize(0.03);
     hs -> GetYaxis() -> SetTitleOffset(1.50);
-    
-    
     
     if(m_xAxisRange)
     {
@@ -1472,7 +1490,26 @@ void drawTStack::DrawEvents(const std::string& mode,
       hs->SetMinimum(m_yRangeMin);
       hs->SetMaximum(m_yRangeMax);
     }
-  
+  }
+  if( (nHists == 0) && (nHists_signal > 0) )
+  {
+    hs_signal -> GetXaxis() -> SetTitleSize(0.04);
+    hs_signal -> GetXaxis() -> SetLabelSize(0.03);
+    hs_signal -> GetXaxis() -> SetTitleOffset(1.25);
+    
+    hs_signal -> GetYaxis() -> SetTitleSize(0.04);
+    hs_signal -> GetYaxis() -> SetLabelSize(0.03);
+    hs_signal -> GetYaxis() -> SetTitleOffset(1.50);
+    
+    if(m_xAxisRange)
+    {
+      hs_signal->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
+    }
+    if(m_yAxisRange)
+    {
+      hs_signal->SetMinimum(m_yRangeMin);
+      hs_signal->SetMaximum(m_yRangeMax);
+    }
   }
   
   
@@ -1532,10 +1569,10 @@ void drawTStack::DrawEvents(const std::string& mode,
     (*outFile) << "\n";
     for(unsigned int bin = 1; bin <= nEventsScaled_sig.size(); ++bin)
     {
-      (*outFile) << "bin = "          << std::setw(2) << bin
-                 << "   S = "         << nEventsScaled_sig[bin]
-                 << "   B = "         << nEventsScaled_bkg[bin]
-                 << "   S/sqrt(B) = " << nEventsScaled_sig[bin]/sqrt(nEventsScaled_bkg[bin])
+      (*outFile) << "bin = "            << std::setw(2) << bin
+                 << "   S = "           << nEventsScaled_sig[bin]
+                 << "   B = "           << nEventsScaled_bkg[bin]
+                 << "   S/sqrt(S+B) = " << nEventsScaled_sig[bin]/sqrt(nEventsScaled_sig[bin]+nEventsScaled_bkg[bin])
                  << std::endl;
     }
   }
@@ -1559,7 +1596,6 @@ void drawTStack::DrawEvents(const std::string& mode,
       //  dataHisto->SetBinError(bin,0.); 
       
       dataHisto -> Draw("P,same");
-      
       
       
       TH1F* ratioHisto = (TH1F*)(dataHisto -> Clone());
@@ -1637,7 +1673,6 @@ void drawTStack::DrawEvents(const std::string& mode,
     }
     
     
-    
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
     {
@@ -1703,7 +1738,7 @@ void drawTStack::DrawEvents(const std::string& mode,
   if(mode == "significance")
   {
     if(nHists > 0)
-    hs->GetYaxis()->SetTitle("S / #sqrt{B}");
+    hs->GetYaxis()->SetTitle("S / #sqrt{S+B}");
     
     struct stat st;
     if(stat(m_outputDir.c_str(), &st) != 0)
