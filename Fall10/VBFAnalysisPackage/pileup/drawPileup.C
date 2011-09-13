@@ -23,8 +23,8 @@ void drawPileup(const std::string& fileName)
     std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h -> GetBinContent(bin);
 
     if( bin < h->GetNbinsX() )
-      std::cout << "," << " // " << bin << std::endl;
+      std::cout << "," << " // " << h->GetBinCenter(bin) << std::endl;
     else
-      std::cout << " " << " // " << bin << std::endl;
+      std::cout << " " << " // " << h->GetBinCenter(bin) << std::endl;
   }
 }
