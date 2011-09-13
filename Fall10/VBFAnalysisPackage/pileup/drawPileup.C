@@ -1,3 +1,7 @@
+#include <iomanip>
+
+
+
 void drawPileup(const std::string& fileName)
 {
   TFile* f = TFile::Open(fileName.c_str(),"READ");
@@ -16,9 +20,11 @@ void drawPileup(const std::string& fileName)
   
   for(int bin = 1; bin <= h->GetNbinsX(); ++bin)
   {
+    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h -> GetBinContent(bin);
+
     if( bin < h->GetNbinsX() )
-      std::cout << h -> GetBinContent(bin) << "," << std::endl;
-    else
-      std::cout << h -> GetBinContent(bin) << std::endl;
+      std::cout << ",";
+    
+    std::cout << " // " << bin << std::endl;
   }
 }
