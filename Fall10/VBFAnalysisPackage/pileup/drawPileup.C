@@ -12,7 +12,9 @@ void drawPileup(const std::string& fileName)
   c -> SetGridx();
   c -> SetGridy();
   
-  h -> GetXaxis() -> SetTitle("n(PU)");
+  h -> GetXaxis() -> SetTitle("n_{PU}");
+  h -> GetXaxis() -> SetLabelSize(0.04);
+  h -> GetYaxis() -> SetLabelSize(0.04);
   h -> GetYaxis() -> SetTitle("event fraction");
   h -> Scale(1./h->GetEntries());
   h -> SetMarkerStyle(20);
