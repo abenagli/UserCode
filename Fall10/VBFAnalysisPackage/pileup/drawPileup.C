@@ -16,7 +16,7 @@ void drawPileup(const std::string& fileName)
   h -> GetXaxis() -> SetLabelSize(0.04);
   h -> GetYaxis() -> SetLabelSize(0.04);
   h -> GetYaxis() -> SetTitle("event fraction");
-  h -> Scale(1./h->GetEntries());
+  h -> Scale(1./h->Integral());
   h -> SetMarkerStyle(20);
   h -> Draw("P");
   
