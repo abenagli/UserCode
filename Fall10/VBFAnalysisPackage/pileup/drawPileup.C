@@ -12,6 +12,8 @@ void drawPileup(const std::string& fileName)
   c -> SetGridx();
   c -> SetGridy();
   
+  h -> GetXaxis() -> SetTitle("n(PU)");
+  h -> GetYaxis() -> SetTitle("event fraction");
   h -> Scale(1./h->GetEntries());
   h -> SetMarkerStyle(20);
   h -> Draw("P");
@@ -23,8 +25,8 @@ void drawPileup(const std::string& fileName)
     std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h -> GetBinContent(bin);
 
     if( bin < h->GetNbinsX() )
-      std::cout << "," << " // " << h->GetBinCenter(bin) << std::endl;
+      std::cout << "," << " // " << std::setprecision(0) << int(h->GetBinCenter(bin)) << std::endl;
     else
-      std::cout << " " << " // " << h->GetBinCenter(bin) << std::endl;
+      std::cout << " " << " // " << std::setprecision(0) << int(h->GetBinCenter(bin)) << std::endl;
   }
 }
