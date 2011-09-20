@@ -1,0 +1,46 @@
+testBkg001.cpp
+- not useful
+
+testBkg_002.cpp
+- nine four regions around the signal one, plus the signal one
+- not very useful
+- loop over events
+
+testBkg_003.cpp
+- m4 sidebands
+- loop over events 
+- PU reweighting missing
+- updated to 19/09 ntuples
+
+testBkg_004.cpp
+- m4 sidebands
+- direct fill of histos from collections
+- PU reweighting 
+- fill MC and data
+- macro_004.C = interpolation test on W+jets sample
+- macro_004_2.C = calculate scale factors from total sideband to signal
+                  as done in the note of H > ZZ > lljj
+                  get the extrapolated shape by means of the scaling  
+                  super-impose the extrapolated function to the measured one in the signal region
+- macro_004_3.C = test the Dan Green technique w/o fitting
+- macro_004_4.C = simple plot of shapes
+- macro_004_5.C = test the crystal ball fit on the MC shape in the signal region
+
+testBkg_005.cpp
+- counting events
+- direct fill of histos from collectioens
+- PU reweighting 
+
+testBkg_005.cpp
+- counting events
+- direct fill of histos from collections
+- PU reweighting 
+- base selections inserted
+
+testBkg007.cpp
+- new ntuples (19/09)
+- check side-bands in mjj
+
+testBkg_008.cpp
+- compare side-band and signal regions
+
