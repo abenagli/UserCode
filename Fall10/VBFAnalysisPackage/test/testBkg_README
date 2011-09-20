@@ -25,6 +25,7 @@ testBkg_004.cpp
 - macro_004_3.C = test the Dan Green technique w/o fitting
 - macro_004_4.C = simple plot of shapes
 - macro_004_5.C = test the crystal ball fit on the MC shape in the signal region
+- macro_004_6.C = fit the extrapolated shape
 
 testBkg_005.cpp
 - counting events
