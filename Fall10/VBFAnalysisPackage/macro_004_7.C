@@ -106,12 +106,16 @@ int macro_004_7 ()
       double min = m4_signal_DATA->GetBinLowEdge (minBin) ;
       double max = m4_signal_DATA->GetBinLowEdge (maxBin + 1) ;
       double bkg = CB_AF->Integral (min, max) ;
+
+      double error = 0. ;
+      for (int j = minBin ; j <= maxBin ; ++j) error += hint->GetBinError (j) ;
       
       cout << masses.at (i) 
            << " : (" << min
            << "," << max
            << ") : " << total //PG the bin width 
            << " : " << bkg / 10.
+           << " +- " << error
            << "\n" ;
     }
 

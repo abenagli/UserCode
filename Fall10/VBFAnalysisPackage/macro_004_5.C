@@ -46,7 +46,7 @@ int macro_004_5 ()
   CB_AF->SetParameter (4, 2) ;
   CB_AF->SetParameter (5, 200) ;
   CB_AF->SetParameter (6, 10) ;
-  m4_signal_total->Fit (CB_AF, "L+", "", 150., 600.) ;
+  m4_signal_total->Fit (CB_AF, "L+", "", 150., 1000.) ;
 
   m4_signal_total->Draw () ;
   c1.Print ("CB_fit_MC.pdf", "pdf") ;

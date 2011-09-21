@@ -58,6 +58,7 @@ int macro_004_6 ()
   //PG perform the fit
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
+//  CB_AF->SetParameter (0, m4_signal_total->Integral (m4_signal_total->FindBin (150.), m4_signal_total->FindBin (800.))) ;
   CB_AF->SetParameter (0, m4_signal_total->Integral ()) ;
   CB_AF->SetParameter (1, 200.) ;
   CB_AF->SetParameter (2, 20.) ;
@@ -65,11 +66,13 @@ int macro_004_6 ()
   CB_AF->SetParameter (4, 2) ;
   CB_AF->SetParameter (5, 200) ;
   CB_AF->SetParameter (6, 10) ;
-  extrapolated_bkg->Fit (CB_AF, "L+", "", 150., 600.) ;
-  TH1F * hint = new TH1F ("hint", "", 45, 150., 600.) ;
+  extrapolated_bkg->Fit (CB_AF, "L+", "", 100., 950.) ;
+  TH1F * hint = new TH1F ("hint", "", 85, 100., 950.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (hint, 0.68) ;
 
 
+//  c1->SetLogy () ;
+//  c1->DrawFrame (120., 6., 600., 2500.) ;
   hint->SetStats (kFALSE) ;
   hint->SetMarkerSize (0) ;
   hint->SetFillColor (kRed) ;

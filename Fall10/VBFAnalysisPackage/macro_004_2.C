@@ -46,17 +46,21 @@ int macro_004_2 ()
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TCanvas c1 ;
+  TH1F * bkg = c1.DrawFrame (100, 0.2, 1000, 1.5) ;
+  bkg->SetTitle ("") ;
+  bkg->GetXaxis ()->SetTitle ("m_{lvjj}") ;
+  bkg->GetYaxis ()->SetTitle ("signal region / sideband region") ;
   ratio_Wjet->SetMarkerStyle (4) ;
   ratio_Wjet->SetMarkerColor (kGreen+2) ;  
   ratio_Wjet->SetTitle ("") ;
-  ratio_Wjet->Draw () ;
+  ratio_Wjet->Draw ("same") ;
 
   ratio_total->SetMarkerStyle (20) ;
   ratio_total->SetMarkerColor (kBlue+2) ;  
   ratio_total->SetTitle ("") ;
   ratio_total->Draw ("same") ;
 
-  TLegend leg_ratio (0.5, 0.6, 0.9, 0.9, NULL, "brNDC") ;
+  TLegend leg_ratio (0.5, 0.7, 0.9, 0.9, NULL, "brNDC") ;
   leg_ratio.SetBorderSize (0) ;
   leg_ratio.SetTextFont (42) ;
   leg_ratio.SetTextSize (0.04) ;

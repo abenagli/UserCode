@@ -49,7 +49,7 @@ int macro_004 ()
 
       background = combination ;  
       TF1 * f_combination = new TF1 ("f_combination", ftotal, 0., 1000., 1) ;
-      m4_signal_Wjet->Fit ("f_combination","b", "", 200., 600.) ;   
+      m4_signal_Wjet->Fit ("f_combination","b", "", 200., 600.) ;   //PG limiti stretti
       double beta = f_combination->GetParameter (0) ;
       cout << "alpha: " << alpha
            << " beta: " << beta << "\n" ;
