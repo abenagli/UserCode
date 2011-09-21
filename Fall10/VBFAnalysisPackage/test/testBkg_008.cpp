@@ -108,9 +108,9 @@ int main (int argc, char** argv)
       TH1::SetDefaultSumw2 (kTRUE) ;
       int colors[11] = {kBlue+2, kRed, 10, kCyan+2, kOrange+7, kGray, kMagenta+1, kGreen+2, kOrange, kViolet+2, kRed+3} ;
     
-      hColl m4_coll ("m4", 50, 100., 600.) ;
-      hColl m4_sideband_coll ("m4_sideband", 50, 100., 600.) ;
-      hColl m4_signal_coll ("m4_signal", 50, 100., 600.) ;
+      hColl m4_coll ("m4", 90, 100., 1000.) ;
+      hColl m4_sideband_coll ("m4_sideband", 90, 100., 1000.) ;
+      hColl m4_signal_coll ("m4_signal", 90, 100., 1000.) ;
     
       TCut generalCut = "" ;
       generalCut = generalCut && "1 == 1" ;

@@ -17,7 +17,7 @@ testBkg_004.cpp
 - direct fill of histos from collections
 - PU reweighting 
 - fill MC and data
-- macro_004.C = interpolation test on W+jets sample
+- macro_004.C   = interpolation test on W+jets sample
 - macro_004_2.C = calculate scale factors from total sideband to signal
                   as done in the note of H > ZZ > lljj
                   get the extrapolated shape by means of the scaling  
