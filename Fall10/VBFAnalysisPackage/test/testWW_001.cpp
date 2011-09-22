@@ -31,9 +31,6 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "TMVA/Reader.h"
 #include "hColl.h"
 
-#include "PURescaleFactor.C"
-#pragma link C++ function PURescaleFactor (const int&);
-
 using namespace std ;
 
 
@@ -196,15 +193,15 @@ int main (int argc, char** argv)
   cout << "samples " << inputFileList << endl ;
 
   map<string, TChain *> collections ;
-  string treeName = "ntu_18" ;
+  string treeName = "ntu_15" ;
   ReadFile (collections, inputFileList, treeName) ;
   
   TH1::SetDefaultSumw2 (kTRUE) ;
   int colors[11] = {kBlue+2, kRed, 10, kCyan+2, kOrange+7, kGray, kMagenta+1, kGreen+2, kOrange, kViolet+2, kRed+3} ;
 
-  hColl m2 ("m2", 20, 30., 130.) ;
+  hColl m2 ("m2", 25, 30., 130.) ;
 
-  TH1F * m2_DATA = new TH1F ("m2_DATA", "m2_DATA", 20, 30., 130.) ;
+  TH1F * m2_DATA = new TH1F ("m2_DATA", "m2_DATA", 25, 30., 130.) ;
 
   //PG the cuts
   TCut generalCut = "" ;
@@ -261,27 +258,66 @@ int main (int argc, char** argv)
   TH1F * m2_top  = m2.collection.at (k++) ;
 
   THStack stack_bkg = m2.makeStack () ;
-  TH1F * total_bkg = (TH1F *) stack_bkg.GetStack ()->Last () ;
+
+  TH1F * m2_bkg = (TH1F *) stack_bkg.GetStack ()->Last () ;
+
+  TH1F * total_bkg = (TH1F *) m2_bkg->Clone ("total_bkg") ;
+  total_bkg->Add (m2_DY, -1) ;  
   total_bkg->Add (m2_QCD, -1) ;  
   total_bkg->Add (m2_TT, -1) ;  
   total_bkg->Add (m2_ZZ, -1) ;  
   total_bkg->Add (m2_top, -1) ;  
 
   TH1F * m2_DATA_toFit = (TH1F *) m2_DATA->Clone ("m2_DATA_toFit") ;  
+  //TH1F * m2_DATA_toFit = (TH1F *) m2_bkg->Clone ("m2_DATA_toFit") ;  
+  m2_DATA_toFit->Add (m2_DY, -1) ;  
   m2_DATA_toFit->Add (m2_QCD, -1) ;  
   m2_DATA_toFit->Add (m2_TT, -1) ;  
   m2_DATA_toFit->Add (m2_ZZ, -1) ;  
   m2_DATA_toFit->Add (m2_top, -1) ;  
   
-  histo_WW = m2_WW ;
+  TH1F* m2_VV = (TH1F * ) m2_WW -> Clone("m2_VV") ;
+  m2_VV -> Add (m2_WZ, 1.) ;
+  histo_WW = m2_VV ;
   histo_Wj = m2_Wjet ;
   
+  TF1 fitFunc_WW ("fitFunc_WW", shape_WW, 30., 130. , 3) ;
+  fitFunc_WW.SetParameter (0, 1.) ;
+  fitFunc_WW.FixParameter (1, 1.) ;
+  fitFunc_WW.FixParameter (2, 0.) ;
+  fitFunc_WW.SetLineColor(kOrange);
+  TCanvas c0_WW ;
+  m2_WW -> Draw () ;
+  fitFunc_WW.Draw ("same") ;
+  c0_WW.Print ("functioning_WW.pdf", "pdf") ;  
+  
+  TF1 fitFunc_Wjet ("fitFunc_Wjet", shape_Wj, 30., 130. , 3) ;
+  fitFunc_Wjet.SetParameter (0, 1.) ;
+  fitFunc_Wjet.FixParameter (1, 1.) ;
+  fitFunc_Wjet.FixParameter (2, 0.) ;
+  fitFunc_Wjet.SetLineColor(kBlue);
+  TCanvas c0_Wjet ;
+  m2_Wjet -> Draw () ;
+  fitFunc_Wjet.Draw ("same") ;
+  c0_Wjet.Print ("functioning_Wjet.pdf", "pdf") ;  
+  
+
+  
   TF1 fitFunc ("fitFunc", shape_Wx, 30., 130. , 6) ;
+  fitFunc.SetParameter (0, 1.) ;
   fitFunc.FixParameter (1, 1.) ;
   fitFunc.FixParameter (2, 0.) ;
+  fitFunc.SetParameter (3, 1.) ;
   fitFunc.FixParameter (4, 1.) ;
   fitFunc.FixParameter (5, 0.) ;
-
+  
+  TCanvas c0 ;
+  total_bkg -> Draw () ;
+  fitFunc.Draw ("same") ;
+  fitFunc_WW.Draw ("same") ;
+  fitFunc_Wjet.Draw ("same") ;
+  c0.Print ("functioning.pdf", "pdf") ;
+  
   m2_DATA_toFit->Fit ("fitFunc", "+") ;
 
   TCanvas c1 ;
@@ -296,7 +332,9 @@ int main (int argc, char** argv)
   TH1F * fitted_Wj = (TH1F *) histo_Wj->Clone ("fitted_Wj") ;
   fitted_Wj->Scale (fitFunc.GetParameter (3)) ;
   
-  TH1F * m2_DATA_toCheck = (TH1F *) m2_DATA->Clone ("m2_DATA_toCheck") ;  
+  TH1F * m2_DATA_toCheck = (TH1F *) m2_DATA->Clone ("m2_DATA_toCheck") ;
+  //TH1F * m2_DATA_toCheck = (TH1F *) m2_bkg->Clone ("m2_DATA_toCheck") ;
+  m2_DATA_toCheck->Add (m2_DY, -1) ;  
   m2_DATA_toCheck->Add (m2_QCD, -1) ;  
   m2_DATA_toCheck->Add (m2_TT, -1) ;  
   m2_DATA_toCheck->Add (m2_ZZ, -1) ;  
@@ -305,6 +343,7 @@ int main (int argc, char** argv)
   
   m2_DATA_toCheck->Draw () ;
   m2_WW->Draw ("samehist") ;
+  m2_DATA_toCheck->Draw ("same") ;
   c1.Print ("testing.pdf", "pdf") ;
   
   stack_bkg.Draw ("hist") ;
