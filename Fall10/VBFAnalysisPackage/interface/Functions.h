@@ -149,7 +149,6 @@ double crystalBallHigh(double* x, double* par)
     double A = pow(n/fabs(alpha), n) * exp(-0.5 * alpha*alpha);
     double B = n/fabs(alpha) - fabs(alpha);
     
-    std::cout << "N = " << par[0] * A << "   B: " << B << "   par: " << B + (xx-mean)/sigma << "   n: " << n << "   pow: " << pow(B + (xx-mean)/sigma, -1.*n) <<std::endl;
     return par[0] * A * pow(B + (xx-mean)/sigma, -1.*n);
   }
   
