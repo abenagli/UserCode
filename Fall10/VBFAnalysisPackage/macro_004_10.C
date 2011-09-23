@@ -7,7 +7,7 @@
 #include <./test/plotUtils.C>
 #include "./interface/Functions.h"
 
-int macro_004_8 ()
+int macro_004_10 ()
 {
   TFile input ("testBkg_004.root") ;
 
@@ -16,19 +16,15 @@ int macro_004_8 ()
 
   THStack * stack_m4_upper = (THStack *) input.Get ("stack_m4_upper") ;
   TH1F * m4_upper_total = (TH1F*) stack_m4_upper->GetStack ()->Last () ;
-  TH1F * m4_upper_Wjet = (TH1F *) input.Get ("m4_upper_Wjet") ;
     
   THStack * stack_m4_lower = (THStack *) input.Get ("stack_m4_lower") ;
   TH1F * m4_lower_total = (TH1F *) stack_m4_lower->GetStack ()->Last () ;
-  TH1F * m4_lower_Wjet = (TH1F *) input.Get ("m4_lower_Wjet") ;
     
   THStack * stack_m4_signal = (THStack *) input.Get ("stack_m4_signal") ;
   TH1F * m4_signal_total = (TH1F *) stack_m4_signal->GetStack ()->Last () ;
-  TH1F * m4_signal_Wjet = (TH1F *) input.Get ("m4_signal_Wjet") ;
 
   THStack * stack_m4_sideband = (THStack *) input.Get ("stack_m4_sideband") ;
   TH1F * m4_sideband_total = (TH1F *) stack_m4_sideband->GetStack ()->Last () ;
-  TH1F * m4_sideband_Wjet = (TH1F *) input.Get ("m4_sideband_Wjet") ;
 
   TH1F * m4_upper_DATA = (TH1F *) input.Get ("m4_upper_DATA") ;      
   TH1F * m4_signal_DATA = (TH1F *) input.Get ("m4_signal_DATA") ;    
@@ -37,6 +33,12 @@ int macro_004_8 ()
 
   //PG fit separately numerator and denominator
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  stack_m4_signal->Draw ("hist") ;
+  c1.Print ("numerator.pdf", "pdf") ;
+
+  stack_m4_sideband->Draw ("hist") ;
+  c1.Print ("denominator.pdf", "pdf") ;
 
   TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedCB, 0., 1000., 7) ;
   numFitFunc->SetLineWidth (1) ;
@@ -53,26 +55,83 @@ int macro_004_8 ()
   TH1F * num_fit_error = new TH1F ("num_fit_error", "", 70, 100., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (num_fit_error, 0.68) ;
 
+  TCanvas c1 ;
+  num_fit_error->SetFillColor (kGray+2) ;
+  m4_signal_total->Draw () ;
+  num_fit_error->Draw ("E3same") ;
+  m4_signal_total->Draw ("sames") ;
+  c1.Print ("numerator_fit.pdf", "pdf") ;
+
   TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedCB, 0., 1000., 7) ;
   denFitFunc->SetLineWidth (1) ;
   denFitFunc->SetLineColor (kBlue+2) ;
   denFitFunc->SetNpx (10000) ;
   denFitFunc->SetParameter (0, m4_sideband_total->Integral ()) ;
   denFitFunc->SetParameter (1, 200.) ;
-  denFitFunc->SetParameter (2, 20.) ;
+  denFitFunc->SetParameter (2, 5.) ;
   denFitFunc->SetParameter (3, 0.1) ;
-  denFitFunc->SetParameter (4, 10) ;
+  denFitFunc->SetParameter (4, 5) ;
   denFitFunc->SetParameter (5, 200) ;
   denFitFunc->SetParameter (6, 10) ;
   m4_sideband_total->Fit (denFitFunc, "L", "", 100., 800.) ;
   TH1F * den_fit_error = new TH1F ("den_fit_error", "", 70, 100., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (den_fit_error, 0.68) ;
 
-  TCanvas c1 ;
   den_fit_error->SetFillColor (kGray+2) ;
-  den_fit_error->Draw ("E3") ;
-  m4_sideband_total->Draw ("same") ;
+  m4_sideband_total->Draw () ;
+  den_fit_error->Draw ("E3same") ;
+  m4_sideband_total->Draw ("sames") ;
   c1.Print ("denominator_fit.pdf", "pdf") ;
+
+  TRandom3 r ;
+  int nToys = 1000 ;
+  TH2F * correctionPlane = new TH2F ("correctionPlane", "", 70, 100, 800, 200, 0, 3) ;
+  for (iToy = 0 ; iToy < nToys ; ++iToy)
+    {
+      if (iToy %(nToys/10) == 0) cout << "toy number " << iToy << endl ;
+
+      int nNum = r.Poisson (m4_signal_total->Integral ()) ;
+      TString name = "dummyNum_" ; name += iToy ;
+      TH1F * dummyNum = (TH1F *) m4_signal_total->Clone (name) ;
+      dummyNum->Reset () ;
+      dummyNum->FillRandom ("numFitFunc", nNum) ;
+
+      int nDen = r.Poisson (m4_sideband_total->Integral ()) ;
+      name = "dummyDen_" ; name += iToy ;
+      TH1F * dummyDen = (TH1F *) m4_sideband_total->Clone (name) ;
+      dummyDen->Reset () ;
+      dummyDen->FillRandom ("denFitFunc", nDen) ;
+
+      name = "ratio_" ; name += iToy ;
+      TH1F * ratio = (TH1F *) dummyNum->Clone (name) ;
+      ratio->Divide (dummyDen) ;
+      for (int iBin = 1 ; iBin <= ratio->GetNbinsX () ; ++iBin)
+        {
+          correctionPlane->Fill (ratio->GetBinCenter (iBin), ratio->GetBinContent (iBin)) ;
+        }
+    }
+
+  TH1F * ratio_total = (TH1F *) m4_signal_total->Clone ("ratio") ;
+  ratio_total->Divide (m4_sideband_total) ;
+  ratio_total->SetMarkerColor (kOrange) ;
+  
+  TProfile * correctionBand = correctionPlane->ProfileX ("correctionBand", 1, -1, "s") ;
+  correctionBand->SetStats (0) ;
+  correctionBand->SetFillColor (kOrange) ;
+ 
+  TObjArray aSlices;
+  correctionPlane->FitSlicesY (0, 0, -1, 0, "QNRL", &aSlices) ;
+  
+  correctionPlane->SetStats (0) ;
+//  correctionPlane->Draw ("COLZ") ;
+  aSlices.At (1)->Draw ("histo") ;
+//  correctionBand->Draw ("E3") ;
+//  gStyle->SetPalette (1) ;
+//  ratio_total->Draw ("same") ;
+  c1.Print ("correctionPlane.pdf", "pdf") ;
+
+
+
 
   //PG calculate the ratio of the functions
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -94,22 +153,13 @@ int macro_004_8 ()
   //PG look at the ratio of the functions
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
-  stack_m4_signal->Draw ("hist") ;
-  c1.Print ("numerator.pdf", "pdf") ;
-
-  stack_m4_sideband->Draw ("hist") ;
-  c1.Print ("denominator.pdf", "pdf") ;
-
-  TH1F * ratio_total = (TH1F *) m4_signal_total->Clone ("ratio") ;
-  ratio_total->Divide (m4_sideband_total) ;
-  
   func_ratio->SetLineColor (kBlue) ;
   func_ratio->SetFillStyle (0) ;
   
   c1.DrawFrame (100., 0., 1000., 2.) ;
   ratio_total->Draw ("same") ;
   func_ratio->Draw ("histE2same") ;
-  c1.Print ("ratio.pdf", "pdf") ;
+//  c1.Print ("ratio.pdf", "pdf") ;
   
   //PG extrapolate the background from side-band
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -141,7 +191,7 @@ int macro_004_8 ()
 //  m4_signal_total->SetMarkerColor (kBlack) ;
 //  m4_signal_total->Draw ("same") ;
 //  leg_compare.Draw () ;
-  c1.Print ("compare_signal_region_new.pdf", "pdf") ;
+//  c1.Print ("compare_signal_region_new.pdf", "pdf") ;
  
 }
 

@@ -57,8 +57,8 @@ int macro_004_7 ()
   fitFunc->SetParameter (0, m4_signal_total->Integral ()) ;
   fitFunc->SetParameter (1, 200.) ;
   fitFunc->SetParameter (2, 20.) ;
-  fitFunc->SetParameter (3, 0.5) ;
-  fitFunc->SetParameter (4, 2) ;
+  fitFunc->SetParameter (3, 0.1) ;
+  fitFunc->SetParameter (4, 10) ;
   fitFunc->SetParameter (5, 200) ;
   fitFunc->SetParameter (6, 10) ;
 
@@ -80,7 +80,6 @@ int macro_004_7 ()
   extrapolated_bkg->Fit (fitFunc, "L+", "", 100., 750.) ;
   TH1F * hint = new TH1F ("hint", "", 65, 100., 750.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (hint, 0.68) ;
-
 
   c1->SetLogy () ;
 //  c1->DrawFrame (120., 6., 600., 2500.) ;
