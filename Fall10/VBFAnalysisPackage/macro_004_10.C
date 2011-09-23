@@ -122,7 +122,7 @@ int macro_004_10 ()
   TObjArray aSlices;
   correctionPlane->FitSlicesY (0, 0, -1, 0, "QNRL", &aSlices) ;
   TH1F * gaussianBand = aSlices.At (1)->Clone ("gaussianBand") ;
-  for (int iBin = 1 ; iBin < gaussianBand->GetNbinsX () ; ++iBin) 
+  for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin) 
     {
       double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ;
       gaussianBand->SetBinError (iBin, sigma) ;
@@ -141,40 +141,15 @@ int macro_004_10 ()
 //PG FIXME vedere come sono distribuiti i singoli punti rispetto alla larghezza della banda
 //PG FIXME propagare la banda!!!
 
-  //PG calculate the ratio of the functions
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-  TH1F * func_ratio = (TH1F *) m4_signal_total->Clone ("func_ratio") ;
-  func_ratio->Reset () ;
-  for (int j = 1 ; j <= func_ratio->GetNbinsX () ; ++j)
-    {
-      double x = func_ratio->GetBinCenter (j) ;
-      func_ratio->SetBinContent (j, numFitFunc->Eval (x) / denFitFunc->Eval (x)) ;
-      double sqRelError = num_fit_error->GetBinError (j) * num_fit_error->GetBinError (j) / 
-                           (num_fit_error->GetBinContent (j) * num_fit_error->GetBinContent (j)) +
-                          den_fit_error->GetBinError (j) * den_fit_error->GetBinError (j) / 
-                           (den_fit_error->GetBinContent (j) * den_fit_error->GetBinContent (j)) ;
-      double error = sqrt (sqRelError) * func_ratio->GetBinContent (j) ;
-      func_ratio->SetBinError (j, error) ;
-    }
-
-  //PG look at the ratio of the functions
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-  
-  func_ratio->SetLineColor (kBlue) ;
-  func_ratio->SetFillStyle (0) ;
-  
-  c1.DrawFrame (100., 0., 1000., 2.) ;
-  ratio_total->Draw ("same") ;
-  func_ratio->Draw ("histE2same") ;
-//  c1.Print ("ratio.pdf", "pdf") ;
-  
-  //PG extrapolate the background from side-band
+  //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
 //  TH1F * extrapolated_bkg = m4_sideband_total->Clone ("extrapolated_bkg") ; //PG simil-closure test --> stats issue
   TH1F * extrapolated_bkg = m4_sideband_DATA->Clone ("extrapolated_bkg") ; //PG analysis
-  extrapolated_bkg->Multiply (func_ratio) ;
+  extrapolated_bkg->Multiply (correctionBand) ;
+
+  //PG first plot of the result
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TLegend leg_compare (0.2, 0.2, 0.6, 0.4, NULL, "brNDC") ;
   leg_compare.SetBorderSize (0) ;
@@ -193,13 +168,49 @@ int macro_004_10 ()
   extrapolated_bkg->SetStats (0) ;
   extrapolated_bkg->SetTitle ("") ;
   extrapolated_bkg->SetLineColor (kRed) ;
-  extrapolated_bkg->Draw ("same") ;
-//  m4_signal_total->SetStats (0) ;
-//  m4_signal_total->SetMarkerStyle (5) ;
-//  m4_signal_total->SetMarkerColor (kBlack) ;
-//  m4_signal_total->Draw ("same") ;
-//  leg_compare.Draw () ;
-//  c1.Print ("compare_signal_region_new.pdf", "pdf") ;
+  extrapolated_bkg->SetFillColor (kOrange) ;
+  extrapolated_bkg->Draw ("E3same") ;
+
+  m4_signal_total->SetStats (0) ;
+  m4_signal_total->SetMarkerStyle (5) ;
+  m4_signal_total->SetMarkerColor (kBlack) ;
+  m4_signal_total->Draw ("same") ;
+  leg_compare.Draw () ;
+  c1.Print ("compare_signal_region_new.pdf", "pdf") ;
+
+  //PG fit the extrapolated bkg
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  TF1 * fitFuncBkg = new TF1 ("fitFuncBkg", attenuatedCB, 0., 1000., 7) ;
+  fitFuncBkg->SetLineWidth (1) ;
+  fitFuncBkg->SetLineColor (kBlue+2) ;
+  fitFuncBkg->SetNpx (10000) ;
+  fitFuncBkg->SetParameter (0, m4_signal_total->Integral ()) ;
+  fitFuncBkg->SetParameter (1, 200.) ;
+  fitFuncBkg->SetParameter (2, 20.) ;
+  fitFuncBkg->SetParameter (3, 0.1) ;
+  fitFuncBkg->SetParameter (4, 10) ;
+  fitFuncBkg->SetParameter (5, 200) ;
+  fitFuncBkg->SetParameter (6, 10) ;
+  
+  extrapolated_bkg->Fit (fitFuncBkg, "L+", "", 100., 800.) ;
+  TH1F * extrapolated_bkg_fitBand = new TH1F ("extrapolated_bkg_fitBand", "", 70, 100., 800.) ;
+  (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (extrapolated_bkg_fitBand, 0.68) ;
+
+  //PG  plot of the result
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  extrapolated_bkg_fitBand->SetFillColor (kGray+2) ;
+//  extrapolated_bkg_fitBand->SetFillStyle (3004) ;
+  
+//  c1.DrawFrame (100, 0.1, 800, 5000) ;
+//  extrapolated_bkg->Draw ("E3same") ;
+//  extrapolated_bkg_fitBand->Draw ("E3same") ;
+//  extrapolated_bkg_fitBand->Draw () ;
+  extrapolated_bkg->Draw ("") ;
+  extrapolated_bkg_fitBand->Draw ("E3same") ;
+  c1.Print ("extrapolatedBkg.pdf", "pdf") ;
+
  
 }
 
