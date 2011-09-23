@@ -26,6 +26,8 @@ testBkg_004.cpp
 - macro_004_4.C = simple plot of shapes
 - macro_004_5.C = test the crystal ball fit on the MC shape in the signal region
 - macro_004_6.C = fit the extrapolated shape
+- macro_004_7.C = full exercise with counting
+- macro_004_8.C = ratio of fits to smooth the correction factor
 
 testBkg_005.cpp
 - counting events
@@ -44,4 +46,7 @@ testBkg007.cpp
 
 testBkg_008.cpp
 - compare side-band and signal regions
+
+testBkg_009.cpp
+- roofit tests
 

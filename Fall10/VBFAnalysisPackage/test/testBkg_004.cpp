@@ -115,15 +115,15 @@ int main (int argc, char** argv)
 //      |   +--------------------+
 //      +-------------------------------  m4
 
-  hColl m4_upper ("m4_upper", 90, 100., 1000.) ;
-  hColl m4_signal ("m4_signal", 90, 100., 1000.) ;
-  hColl m4_lower ("m4_lower", 90, 100., 1000.) ;
-  hColl m4_sideband ("m4_sideband", 90, 100., 1000.) ;
+  hColl m4_upper ("m4_upper", 70, 100., 800.) ;
+  hColl m4_signal ("m4_signal", 70, 100., 800.) ;
+  hColl m4_lower ("m4_lower", 70, 100., 800.) ;
+  hColl m4_sideband ("m4_sideband", 70, 100., 800.) ;
 
-  TH1F * m4_upper_DATA = new TH1F ("m4_upper_DATA", "m4_upper_DATA", 90, 100., 1000.) ;
-  TH1F * m4_signal_DATA = new TH1F ("m4_signal_DATA", "m4_signal_DATA", 90, 100., 1000.) ;
-  TH1F * m4_lower_DATA = new TH1F ("m4_lower_DATA", "m4_lower_DATA", 90, 100., 1000.) ;
-  TH1F * m4_sideband_DATA = new TH1F ("m4_sideband_DATA", "m4_sideband_DATA", 90, 100., 1000.) ;
+  TH1F * m4_upper_DATA = new TH1F ("m4_upper_DATA", "m4_upper_DATA", 70, 100., 800.) ;
+  TH1F * m4_signal_DATA = new TH1F ("m4_signal_DATA", "m4_signal_DATA", 70, 100., 800.) ;
+  TH1F * m4_lower_DATA = new TH1F ("m4_lower_DATA", "m4_lower_DATA", 70, 100., 800.) ;
+  TH1F * m4_sideband_DATA = new TH1F ("m4_sideband_DATA", "m4_sideband_DATA", 70, 100., 800.) ;
 
   //PG the cuts
   TCut generalCut = "" ;

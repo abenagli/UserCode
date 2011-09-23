@@ -96,14 +96,14 @@ int main (int argc, char** argv)
   TH1::SetDefaultSumw2 (kTRUE) ;
   int colors[11] = {kBlue+2, kRed, 10, kCyan+2, kOrange+7, kGray, kMagenta+1, kGreen+2, kOrange, kViolet+2, kRed+3} ;
 
-  hColl m4_coll ("m4", 90, 100., 1000.) ;
-  TH1F * m4_DATA = new TH1F ("m4_DATA", "m4_DATA", 90, 100., 1000.) ;
+  hColl m4_coll ("m4", 70, 100., 800.) ;
+  TH1F * m4_DATA = new TH1F ("m4_DATA", "m4_DATA", 70, 100., 800.) ;
 
-  hColl m4_sideband_coll ("m4_sideband", 90, 100., 1000.) ;
-  TH1F * m4_sideband_DATA = new TH1F ("m4_sideband_DATA", "m4_sideband_DATA", 90, 100., 1000.) ;
+  hColl m4_sideband_coll ("m4_sideband", 70, 100., 800.) ;
+  TH1F * m4_sideband_DATA = new TH1F ("m4_sideband_DATA", "m4_sideband_DATA", 70, 100., 800.) ;
 
-  hColl m4_signal_coll ("m4_signal", 90, 100., 1000.) ;
-  TH1F * m4_signal_DATA = new TH1F ("m4_signal_DATA", "m4_signal_DATA", 90, 100., 1000.) ;
+  hColl m4_signal_coll ("m4_signal", 70, 100., 800.) ;
+  TH1F * m4_signal_DATA = new TH1F ("m4_signal_DATA", "m4_signal_DATA", 70, 100., 800.) ;
 
   hColl m2_coll ("m2", 100, 0., 300.) ;
   TH1F * m2_DATA = new TH1F ("m2_DATA", "m2_DATA", 100, 0., 300.) ;
