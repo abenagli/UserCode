@@ -121,17 +121,25 @@ int macro_004_10 ()
  
   TObjArray aSlices;
   correctionPlane->FitSlicesY (0, 0, -1, 0, "QNRL", &aSlices) ;
+  TH1F * gaussianBand = aSlices.At (1)->Clone ("gaussianBand") ;
+  for (int iBin = 1 ; iBin < gaussianBand->GetNbinsX () ; ++iBin) 
+    {
+      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ;
+      gaussianBand->SetBinError (iBin, sigma) ;
+    }
+  gaussianBand->SetFillStyle (3002) ;
+  gaussianBand->SetFillColor (kGreen + 2) ;
   
   correctionPlane->SetStats (0) ;
 //  correctionPlane->Draw ("COLZ") ;
-  aSlices.At (1)->Draw ("histo") ;
-//  correctionBand->Draw ("E3") ;
-//  gStyle->SetPalette (1) ;
-//  ratio_total->Draw ("same") ;
+  correctionBand->Draw ("E3") ;
+  gaussianBand->Draw ("E3same") ;
+  gStyle->SetPalette (1) ;
+  ratio_total->Draw ("same") ;
   c1.Print ("correctionPlane.pdf", "pdf") ;
 
-
-
+//PG FIXME vedere come sono distribuiti i singoli punti rispetto alla larghezza della banda
+//PG FIXME propagare la banda!!!
 
   //PG calculate the ratio of the functions
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----

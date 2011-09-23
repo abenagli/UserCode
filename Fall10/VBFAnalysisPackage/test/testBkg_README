@@ -28,6 +28,8 @@ testBkg_004.cpp
 - macro_004_6.C = fit the extrapolated shape
 - macro_004_7.C = full exercise with counting
 - macro_004_8.C = ratio of fits to smooth the correction factor
+- macro_004_9.C = test the technique from one side-band to the other... does not fit well when it's too far
+- macro_004_10.C = toys from the fit to get the error on the ratio, ongoing
 
 testBkg_005.cpp
 - counting events
@@ -49,4 +51,7 @@ testBkg_008.cpp
 
 testBkg_009.cpp
 - roofit tests
+
+testBkg_009.cpp
+- create two statistically independent sub-samples in data and MCs
 
