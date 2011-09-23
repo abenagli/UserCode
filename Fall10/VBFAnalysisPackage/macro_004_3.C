@@ -82,7 +82,7 @@ int macro_004_3 ()
   leg_ratios->SetFillColor (0) ;
   leg_ratios->SetFillStyle (0) ;
 
-  c1.DrawFrame (100., 0., 1000., 5) ;
+  c1.DrawFrame (100., 0., 800., 5) ;
   for (unsigned int i = 0 ; i < comparisons.size () ; ++i) 
     {
       comparisons.at (i)->SetLineColor (50 + 2 * i) ;

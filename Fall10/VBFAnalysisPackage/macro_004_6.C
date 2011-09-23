@@ -50,24 +50,35 @@ int macro_004_6 ()
   //PG define the functions
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
-  TF1 * CB_AF = new TF1 ("CB_AF", attenuatedCB, 0., 1000., 7) ;
-  CB_AF->SetLineWidth (1) ;
-  CB_AF->SetLineColor (kBlue+2) ;
-  CB_AF->SetNpx (10000) ;
+  TF1 * fitFunc = new TF1 ("fitFunc", attenuatedCB, 0., 1000., 7) ;
+  fitFunc->SetLineWidth (1) ;
+  fitFunc->SetLineColor (kBlue+2) ;
+  fitFunc->SetNpx (10000) ;
+  fitFunc->SetParameter (0, m4_signal_total->Integral ()) ;
+  fitFunc->SetParameter (1, 200.) ;
+  fitFunc->SetParameter (2, 20.) ;
+  fitFunc->SetParameter (3, 0.5) ;
+  fitFunc->SetParameter (4, 2) ;
+  fitFunc->SetParameter (5, 200) ;
+  fitFunc->SetParameter (6, 10) ;
+
+
+//  TF1 * fitFunc = new TF1 ("fitFunc", attenuatedExponential, 100., 1000., 4) ;
+//  fitFunc->SetLineWidth (1) ;
+//  fitFunc->SetLineColor (kBlue+2) ;
+//  fitFunc->SetNpx (10000) ;
+//  fitFunc->SetParameter (0, 180.) ;
+//  fitFunc->SetParameter (1, 20.) ;
+////  fitFunc->SetParameter (2, 5.) ;
+//  fitFunc->SetParameter (2, m4_signal_total->Integral ()) ;
+//  fitFunc->SetParameter (3, 0.0012) ;
 
   //PG perform the fit
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-//  CB_AF->SetParameter (0, m4_signal_total->Integral (m4_signal_total->FindBin (150.), m4_signal_total->FindBin (800.))) ;
-  CB_AF->SetParameter (0, m4_signal_total->Integral ()) ;
-  CB_AF->SetParameter (1, 200.) ;
-  CB_AF->SetParameter (2, 20.) ;
-  CB_AF->SetParameter (3, 0.5) ;
-  CB_AF->SetParameter (4, 2) ;
-  CB_AF->SetParameter (5, 200) ;
-  CB_AF->SetParameter (6, 10) ;
-  extrapolated_bkg->Fit (CB_AF, "L+", "", 100., 950.) ;
-  TH1F * hint = new TH1F ("hint", "", 85, 100., 950.) ;
+  
+  extrapolated_bkg->Fit (fitFunc, "L+", "", 100., 750.) ;
+  TH1F * hint = new TH1F ("hint", "", 65, 100., 750.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (hint, 0.68) ;
 
 
@@ -76,7 +87,8 @@ int macro_004_6 ()
   hint->SetStats (kFALSE) ;
   hint->SetMarkerSize (0) ;
   hint->SetFillColor (kRed) ;
-  hint->Draw ("E3") ;
+  extrapolated_bkg->Draw () ;
+  hint->Draw ("E3same") ;
   hint->GetXaxis ()->SetTitle ("m_{lvjj} (GeV)") ;
   extrapolated_bkg->SetMarkerStyle (8) ;
   extrapolated_bkg->SetMarkerColor (kBlue) ;

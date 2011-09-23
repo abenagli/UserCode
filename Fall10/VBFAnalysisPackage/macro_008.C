@@ -25,7 +25,7 @@ int macro_008 ()
   leg_ratios->SetFillStyle (0) ;
 
   TCanvas * c1 = new TCanvas ;
-  c1->DrawFrame (100., 0., 1000., 2) ;
+  c1->DrawFrame (100., 0., 800., 2) ;
   for (unsigned int i = 0 ; i < comparisons.size () ; ++i) 
     {
       comparisons.at (i)->SetLineColor (25 + 2 * i) ;

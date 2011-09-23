@@ -46,7 +46,7 @@ int macro_004_2 ()
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TCanvas c1 ;
-  TH1F * bkg = c1.DrawFrame (100, 0.2, 1000, 1.5) ;
+  TH1F * bkg = c1.DrawFrame (100, 0.2, 800, 1.5) ;
   bkg->SetTitle ("") ;
   bkg->GetXaxis ()->SetTitle ("m_{lvjj}") ;
   bkg->GetYaxis ()->SetTitle ("signal region / sideband region") ;
@@ -121,7 +121,7 @@ int macro_004_2 ()
   leg_sideband->Draw () ;
   c1.Print ("sideband_region.pdf", "pdf") ;
 
-  TLegend leg_compare (0.4, 0.7, 0.9, 0.9, NULL, "brNDC") ;
+  TLegend leg_compare (0.2, 0.2, 0.6, 0.4, NULL, "brNDC") ;
   leg_compare.SetBorderSize (0) ;
   leg_compare.SetTextFont (42) ;
   leg_compare.SetTextSize (0.04) ;
@@ -133,6 +133,7 @@ int macro_004_2 ()
   leg_compare.AddEntry (m4_signal_total, "data in signal region", "lp") ;
   leg_compare.AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
 
+  c1.SetLogy () ;
   extrapolated_bkg->Draw () ;
   extrapolated_bkg->SetStats (0) ;
   m4_signal_total->SetStats (0) ;
