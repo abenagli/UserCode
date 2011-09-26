@@ -158,10 +158,6 @@ void drawTStack::Initialize()
   m_bkgGlobalIntegral = 0.;
   m_dataGlobalIntegral = 0.;
   
-  m_xAxisRange = false;
-  m_xAxisTitle = false;
-  m_yAxisRange = false;
-  m_yAxisTitle = false;
 }
 
 
@@ -933,6 +929,11 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   else
     c->Print((m_outputDir+"log_"+histoName+"."+m_imgFormat).c_str(), m_imgFormat.c_str());
   
+  
+  m_xAxisRange = false;
+  m_xAxisTitle = false;
+  m_yAxisRange = false;
+  m_yAxisTitle = false;
   
   delete c;
 }
