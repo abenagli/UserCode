@@ -397,11 +397,10 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     if( m_xAxisRange )
       histo_summed->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
     
-    if( m_unit != "" )
-      histo_summed->GetXaxis()->SetTitle((histoName+"  ("+m_unit+")").c_str());
-    else
-      histo_summed->GetXaxis()->SetTitle((histoName).c_str());
-    if( m_xAxisTitle ) histo_summed->GetXaxis()->SetTitle(m_xTitle.c_str());
+    std::string xAxisTitle = histoName;
+    if( m_xAxisTitle ) xAxisTitle = m_xTitle;
+    if( m_unit != "" ) xAxisTitle += "   ("+m_unit+")";
+    histo_summed->GetXaxis()->SetTitle(xAxisTitle.c_str());
     
     // y-axis properties
     histo_summed -> GetYaxis() -> SetTitleSize(0.04);
@@ -859,11 +858,10 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   
   
   // set x-axis properties
-  if( m_unit != "" )
-    m_bkgStack->GetXaxis()->SetTitle((histoName+"   ("+m_unit+")").c_str());
-  else
-    m_bkgStack->GetXaxis()->SetTitle((histoName).c_str());
-  if(m_xAxisTitle) m_bkgStack->GetXaxis()->SetTitle(m_xTitle.c_str());
+  std::string xAxisTitle = histoName;
+  if( m_xAxisTitle ) xAxisTitle = m_xTitle;
+  if( m_unit != "" ) xAxisTitle += "   ("+m_unit+")";
+  m_bkgStack -> GetXaxis() -> SetTitle(xAxisTitle.c_str());
   m_bkgStack -> GetXaxis() -> SetTitleSize(0.04);
   m_bkgStack -> GetXaxis() -> SetLabelSize(0.03);
   m_bkgStack -> GetXaxis() -> SetTitleOffset(1.25);
