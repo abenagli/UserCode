@@ -53,7 +53,7 @@ LDFLAGS  =  -rdynamic -shared $(ARCHL)
 SONAME	 =  libVBF.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
-GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) -lGenVector -lFoam -lMinuit -lTMVA -lMLP -lXMLIO  -lTreePlayer  $(NTUPLEPACKAGELIBS) $(KINFITTERPACKAGELIBS)
+GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) -lGenVector -lFoam -lMinuit -lRooFitCore -lRooFit -lTMVA -lMLP -lXMLIO  -lTreePlayer  $(NTUPLEPACKAGELIBS) $(KINFITTERPACKAGELIBS)
 
 
 #################################################

@@ -133,6 +133,7 @@ double shape_Wj (double* x, double* par)
 
 double shape_Wx (double* x, double* par)
 {
+  par[4] = par[1];
   return shape_WW (x,par) + shape_Wj (x,&par[3]) ;
 }
   
@@ -199,9 +200,9 @@ int main (int argc, char** argv)
   TH1::SetDefaultSumw2 (kTRUE) ;
   int colors[11] = {kBlue+2, kRed, 10, kCyan+2, kOrange+7, kGray, kMagenta+1, kGreen+2, kOrange, kViolet+2, kRed+3} ;
 
-  hColl m2 ("m2", 25, 30., 130.) ;
+  hColl m2 ("m2", 50, 30., 230.) ;
 
-  TH1F * m2_DATA = new TH1F ("m2_DATA", "m2_DATA", 25, 30., 130.) ;
+  TH1F * m2_DATA = new TH1F ("m2_DATA", "m2_DATA", 50, 30., 230.) ;
 
   //PG the cuts
   TCut generalCut = "" ;
@@ -281,7 +282,7 @@ int main (int argc, char** argv)
   histo_WW = m2_VV ;
   histo_Wj = m2_Wjet ;
   
-  TF1 fitFunc_WW ("fitFunc_WW", shape_WW, 30., 130. , 3) ;
+  TF1 fitFunc_WW ("fitFunc_WW", shape_WW, 30., 230. , 3) ;
   fitFunc_WW.SetParameter (0, 1.) ;
   fitFunc_WW.FixParameter (1, 1.) ;
   fitFunc_WW.FixParameter (2, 0.) ;
@@ -291,7 +292,7 @@ int main (int argc, char** argv)
   fitFunc_WW.Draw ("same") ;
   c0_WW.Print ("functioning_WW.pdf", "pdf") ;  
   
-  TF1 fitFunc_Wjet ("fitFunc_Wjet", shape_Wj, 30., 130. , 3) ;
+  TF1 fitFunc_Wjet ("fitFunc_Wjet", shape_Wj, 30., 230. , 3) ;
   fitFunc_Wjet.SetParameter (0, 1.) ;
   fitFunc_Wjet.FixParameter (1, 1.) ;
   fitFunc_Wjet.FixParameter (2, 0.) ;
@@ -303,9 +304,9 @@ int main (int argc, char** argv)
   
 
   
-  TF1 fitFunc ("fitFunc", shape_Wx, 30., 130. , 6) ;
+  TF1 fitFunc ("fitFunc", shape_Wx, 30., 230. , 6) ;
   fitFunc.SetParameter (0, 1.) ;
-  fitFunc.FixParameter (1, 1.) ;
+  fitFunc.SetParameter (1, 1.) ;
   fitFunc.FixParameter (2, 0.) ;
   fitFunc.SetParameter (3, 1.) ;
   fitFunc.FixParameter (4, 1.) ;
