@@ -67,7 +67,7 @@ class drawTStack
             const int& nBins,
             const bool& PURescale = true,
             const bool& weightEvent = true,
-            const bool& stackSig = false,            
+            const bool& stackSig = false,
             std::vector<std::string>* cut = NULL);
   
   void Draw(TCanvas* c, const std::string& histoName, const std::string& mode, const bool& stackSig, const bool& logy, const float& lumi);
@@ -76,7 +76,10 @@ class drawTStack
                   const float& lumi,
                   const int& step,
                   const bool& logy,
-                  const bool& PURescale = true);
+                  const bool& PURescale = true,
+                  const bool& stackSig = false);
+  
+  void CloseRootFiles();
   
   void SetXaxisRange(const double& xMin, const double& xMax);
   void SetXaxisTitle(const std::string& xTitle);

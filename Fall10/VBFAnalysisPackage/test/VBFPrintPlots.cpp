@@ -112,23 +112,19 @@ int main(int argc, char** argv)
   stack -> SetXLegend(0.76, 0.99);
   stack -> SetYLegend(0.60, 0.85);
 
-  stack -> DrawEvents("events", lumi, step, true);
-  stack -> DrawEvents("eventsScaled", lumi, step, true);
-  stack -> DrawEvents("eventsScaledStack", lumi, step, true);
-  stack -> DrawEvents("efficiencies", lumi, step, true);
+  stack -> DrawEvents("events", lumi, step, true, PURescale, stackSig);
+  stack -> DrawEvents("eventsScaled", lumi, step, true, PURescale, stackSig);
+  stack -> DrawEvents("eventsScaledStack", lumi, step, true, PURescale, stackSig);
+  stack -> SetYaxisRange(0.0000001, 1.1);
+  stack -> DrawEvents("efficiencies", lumi, step, true, PURescale, stackSig);
   stack -> SetYaxisRange(0.01, 1.1);
-  stack -> DrawEvents("efficienciesRelative", lumi, step, true);
-  stack -> SetYaxisRange(0., 2.);
-  stack -> DrawEvents("significance", lumi, step, false);
-  //stack -> DrawEventRatio_nJets("int", lumi, step, false);
-  //stack -> DrawEventRatio_nJets("0jets", lumi, step, false);
-  //stack -> DrawEventRatio_nJets("1jets", lumi, step, false);
-  //stack -> DrawEventRatio_nJets("2jets", lumi, step, false);
-    
+  stack -> DrawEvents("efficienciesRelative", lumi, step, true, PURescale, stackSig);
   
   
   
-
+  
+  
+  
   std::vector<std::string> variableNames;
   variableNames.push_back("");
   std::vector<std::string> variableNames2;
