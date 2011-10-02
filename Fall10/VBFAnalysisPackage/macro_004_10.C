@@ -83,6 +83,9 @@ int macro_004_10 ()
   m4_sideband_total->Draw ("sames") ;
   c1.Print ("denominator_fit.pdf", "pdf") ;
 
+  //PG toy experiments to determine the size of the error band on the extrapolation factor
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
   TRandom3 r ;
   int nToys = 10000 ;
   TH2F * correctionPlane = new TH2F ("correctionPlane", "", 70, 100, 800, 200, 0, 3) ;
@@ -111,14 +114,23 @@ int macro_004_10 ()
         }
     }
 
+  //PG correction factor from the ratio of histograms 
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
   TH1F * ratio_total = (TH1F *) m4_signal_total->Clone ("ratio") ;
   ratio_total->Divide (m4_sideband_total) ;
   ratio_total->SetMarkerColor (kOrange) ;
   
+  //PG correction factor from the profile of the many toys
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
   TProfile * correctionBand = correctionPlane->ProfileX ("correctionBand", 1, -1, "s") ;
   correctionBand->SetStats (0) ;
   correctionBand->SetFillColor (kOrange) ;
  
+  //PG correction factor from the gaussian fit to slices of the many toys
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
   TObjArray aSlices;
   correctionPlane->FitSlicesY (0, 0, -1, 0, "QNRL", &aSlices) ;
   TH1F * gaussianBand = aSlices.At (1)->Clone ("gaussianBand") ;
@@ -138,7 +150,8 @@ int macro_004_10 ()
   ratio_total->Draw ("same") ;
   c1.Print ("correctionPlane.pdf", "pdf") ;
 
-  //PG vedere come sono distribuiti i singoli punti rispetto alla larghezza della banda
+  //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TH1F pooPlot ("poolPlot", "", 50, -5, 5) ;
   TH1F pooPlotGaus ("poolPlotGaus", "", 50, -5, 5) ;
@@ -157,8 +170,6 @@ int macro_004_10 ()
   poolPlot.Fit ("gaus","L") ;
   c1.Print ("poolPlot.pdf", "pdf") ;
  
-//PG FIXME propagare la banda!!! ... dovrebbe essere propagata, controllo i numeri
-
   //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
@@ -181,7 +192,7 @@ int macro_004_10 ()
   leg_compare.AddEntry (m4_signal_total, "simulation in signal region", "lfp") ;
   leg_compare.AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
 
-  c1.SetLogy () ;
+//  c1.SetLogy () ;
   c1.DrawFrame (100, 0.1, 800, 5000) ;
   extrapolated_bkg->SetStats (0) ;
   extrapolated_bkg->SetTitle ("") ;
@@ -194,7 +205,7 @@ int macro_004_10 ()
   m4_signal_total->SetMarkerColor (kBlack) ;
   m4_signal_total->Draw ("same") ;
   leg_compare.Draw () ;
-  c1.Print ("compare_signal_region_new.pdf", "pdf") ;
+  c1.Print ("compare_signal_region_new_lin.pdf", "pdf") ;
 
   //PG fit the extrapolated bkg
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -229,8 +240,27 @@ int macro_004_10 ()
   extrapolated_bkg_fitBand->Draw ("E3same") ;
   c1.Print ("extrapolatedBkg.pdf", "pdf") ;
 
+  //PG prepare the windows for the fast cut-n-count thing
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+  
+
+  vector<double> mMin ;
+  vector<double> mMax ;
+  masses.push_back (250.) ;  mMin.push_back (225) ; mMax.push_back (275) ; //PG Hwindow.push_back (24.) ;
+  masses.push_back (300.) ;  mMin.push_back (270) ; mMax.push_back (330) ; //PG Hwindow.push_back (27.) ;
+  masses.push_back (350.) ;  mMin.push_back (320) ; mMax.push_back (380) ; //PG Hwindow.push_back (32.) ;
+  masses.push_back (400.) ;  mMin.push_back (360) ; mMax.push_back (440) ; //PG Hwindow.push_back (40.) ;
+  masses.push_back (450.) ;  mMin.push_back (405) ; mMax.push_back (495) ; //PG Hwindow.push_back (46.) ;
+  masses.push_back (500.) ;  mMin.push_back (445) ; mMax.push_back (565) ; //PG Hwindow.push_back (54.) ;
+  masses.push_back (550.) ;  mMin.push_back (490) ; mMax.push_back (630) ; //PG Hwindow.push_back (61.) ;
+  masses.push_back (600.) ;  mMin.push_back (530) ; mMax.push_back (700) ; //PG Hwindow.push_back (68.) ;
+
+
+
+
+
   TFile output ("output_004_10.root", "recreate") ;
-  output->cd () ;
+  output.cd () ;
   ratio_total->Write () ;
   gaussianBand->Write () ;
   pooPlot.Write () ;
