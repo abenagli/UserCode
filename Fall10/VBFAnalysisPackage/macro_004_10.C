@@ -84,7 +84,7 @@ int macro_004_10 ()
   c1.Print ("denominator_fit.pdf", "pdf") ;
 
   TRandom3 r ;
-  int nToys = 1000 ;
+  int nToys = 10000 ;
   TH2F * correctionPlane = new TH2F ("correctionPlane", "", 70, 100, 800, 200, 0, 3) ;
   for (iToy = 0 ; iToy < nToys ; ++iToy)
     {
@@ -138,8 +138,26 @@ int macro_004_10 ()
   ratio_total->Draw ("same") ;
   c1.Print ("correctionPlane.pdf", "pdf") ;
 
-//PG FIXME vedere come sono distribuiti i singoli punti rispetto alla larghezza della banda
-//PG FIXME propagare la banda!!!
+  //PG vedere come sono distribuiti i singoli punti rispetto alla larghezza della banda
+
+  TH1F pooPlot ("poolPlot", "", 50, -5, 5) ;
+  TH1F pooPlotGaus ("poolPlotGaus", "", 50, -5, 5) ;
+  for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin) 
+    {
+      double num = ratio_total->GetBinContent (iBin) ;
+      double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;
+      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ;
+      poolPlotGaus.Fill ((num - mean) / sigma) ;
+      mean = correctionBand->GetBinContent (iBin) ;
+      sigma = correctionBand->GetBinError (iBin) ;
+      poolPlot.Fill ((num - mean) / sigma) ;
+    }
+  poolPlotGaus.Fit ("gaus","L") ;
+  c1.Print ("poolPlotGaus.pdf", "pdf") ;
+  poolPlot.Fit ("gaus","L") ;
+  c1.Print ("poolPlot.pdf", "pdf") ;
+ 
+//PG FIXME propagare la banda!!! ... dovrebbe essere propagata, controllo i numeri
 
   //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -160,7 +178,7 @@ int macro_004_10 ()
   leg_compare.SetLineWidth (1) ;
   leg_compare.SetFillColor (0) ;
   leg_compare.SetFillStyle (0) ;
-  leg_compare.AddEntry (m4_signal_total, "simulation in signal region", "lp") ;
+  leg_compare.AddEntry (m4_signal_total, "simulation in signal region", "lfp") ;
   leg_compare.AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
 
   c1.SetLogy () ;
@@ -210,6 +228,18 @@ int macro_004_10 ()
   extrapolated_bkg->Draw ("") ;
   extrapolated_bkg_fitBand->Draw ("E3same") ;
   c1.Print ("extrapolatedBkg.pdf", "pdf") ;
+
+  TFile output ("output_004_10.root", "recreate") ;
+  output->cd () ;
+  ratio_total->Write () ;
+  gaussianBand->Write () ;
+  pooPlot.Write () ;
+  pooPlotGaus.Write () ;
+  extrapolated_bkg->Write () ;
+  extrapolated_bkg_fitBand->Write () ;
+  correctionPlane->Write () ;
+  correctionBand->Write () ;
+  output.Close () ;
 
  
 }
