@@ -1,9 +1,3 @@
-/* 
-- su che ntuple sto girando?
-- c'e' ancora troppo qcd
-*/
-
-
 #include <./test/plotUtils.C>
 #include "./interface/Functions.h"
 
@@ -13,6 +7,9 @@ int macro_004_10 ()
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  THStack * stack_m4_EvenHigher = (THStack *) input.Get ("stack_m4_EvenHigher") ;
+  TH1F * m4_EvenHigher_total = (TH1F*) stack_m4_EvenHigher->GetStack ()->Last () ;    
 
   THStack * stack_m4_upper = (THStack *) input.Get ("stack_m4_upper") ;
   TH1F * m4_upper_total = (TH1F*) stack_m4_upper->GetStack ()->Last () ;
@@ -26,6 +23,7 @@ int macro_004_10 ()
   THStack * stack_m4_sideband = (THStack *) input.Get ("stack_m4_sideband") ;
   TH1F * m4_sideband_total = (TH1F *) stack_m4_sideband->GetStack ()->Last () ;
 
+  TH1F * m4_EvenHigher_DATA = (TH1F *) input.Get ("m4_EvenHigher_DATA") ;      
   TH1F * m4_upper_DATA = (TH1F *) input.Get ("m4_upper_DATA") ;      
   TH1F * m4_signal_DATA = (TH1F *) input.Get ("m4_signal_DATA") ;    
   TH1F * m4_lower_DATA = (TH1F *) input.Get ("m4_lower_DATA") ;      
@@ -34,11 +32,35 @@ int macro_004_10 ()
   //PG which histograms I use
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TH1F * sidebaRegion = m4_sideband_DATA ; //PG analysis
-  TH1F * signalRegion = m4_signal_DATA ;   //PG analysis
+/*
+  //PG A'B'C'D' test with upper and EvenHigher
+  TH1F * sidebaRegionMC = m4_EvenHigher_total ; //PG analysis
+  TH1F * signalRegionMC = m4_upper_total ; //PG analysis 
+  TH1F * sidebaRegion   = m4_EvenHigher_DATA ;
+  TH1F * signalRegion   = m4_upper_DATA ;  
+*/
 
-//  TH1F * sidebaRegion = m4_sideband_total ; //PG closure test
-//  TH1F * signalRegion = m4_signal_total ;   //PG closure test
+/*
+  //PG A'B'C'D' test with upper and lower
+  TH1F * sidebaRegionMC = m4_lower_total ; //PG analysis
+  TH1F * signalRegionMC = m4_upper_total ; //PG analysis 
+  TH1F * sidebaRegion   = m4_lower_DATA ;
+  TH1F * signalRegion   = m4_upper_DATA ;  
+*/
+
+/*
+  //PG final analysis
+  TH1F * sidebaRegionMC = m4_sideband_total ; 
+  TH1F * signalRegionMC = m4_signal_total ;
+  TH1F * sidebaRegion   = m4_sideband_DATA ;
+  TH1F * signalRegion   = m4_signal_DATA ;  
+*/
+
+  //PG closure test in signal region
+  TH1F * sidebaRegionMC = m4_sideband_total ; 
+  TH1F * signalRegionMC = m4_signal_total ;  
+  TH1F * sidebaRegion   = sidebaRegionMC ; 
+  TH1F * signalRegion   = signalRegionMC ; 
 
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -53,43 +75,43 @@ int macro_004_10 ()
   numFitFunc->SetLineWidth (1) ;
   numFitFunc->SetLineColor (kBlue+2) ;
   numFitFunc->SetNpx (10000) ;
-  numFitFunc->SetParameter (0, m4_signal_total->Integral ()) ;  //PG N
+  numFitFunc->SetParameter (0, signalRegionMC->Integral ()) ;  //PG N
   numFitFunc->SetParameter (1, 200.) ;                          //PG gaussian mean
   numFitFunc->SetParameter (2, 20.) ;                           //PG gaussian sigma
   numFitFunc->SetParameter (3, 0.1) ;                           //PG joint point
   numFitFunc->SetParameter (4, 10) ;                            //PG power law exponent
   numFitFunc->SetParameter (5, 200) ;                           //PG fermi E
   numFitFunc->SetParameter (6, 10) ;                            //PG kT
-  m4_signal_total->Fit (numFitFunc, "L", "", 100., 800.) ;
+  signalRegionMC->Fit (numFitFunc, "L", "", 100., 800.) ;
   TH1F * num_fit_error = new TH1F ("num_fit_error", "", 70, 100., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (num_fit_error, 0.68) ;
 
   TCanvas c1 ;
   num_fit_error->SetFillColor (kGray+2) ;
-  m4_signal_total->Draw () ;
+  signalRegionMC->Draw () ;
   num_fit_error->Draw ("E3same") ;
-  m4_signal_total->Draw ("sames") ;
+  signalRegionMC->Draw ("sames") ;
   c1.Print ("numerator_fit.pdf", "pdf") ;
 
   TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedCB, 0., 1000., 7) ;
   denFitFunc->SetLineWidth (1) ;
   denFitFunc->SetLineColor (kBlue+2) ;
   denFitFunc->SetNpx (10000) ;
-  denFitFunc->SetParameter (0, m4_sideband_total->Integral ()) ;
+  denFitFunc->SetParameter (0, sidebaRegionMC->Integral ()) ;
   denFitFunc->SetParameter (1, 200.) ;
   denFitFunc->SetParameter (2, 5.) ;
   denFitFunc->SetParameter (3, 0.1) ;
   denFitFunc->SetParameter (4, 5) ;
   denFitFunc->SetParameter (5, 200) ;
   denFitFunc->SetParameter (6, 10) ;
-  m4_sideband_total->Fit (denFitFunc, "L", "", 100., 800.) ;
+  sidebaRegionMC->Fit (denFitFunc, "L", "", 100., 800.) ;
   TH1F * den_fit_error = new TH1F ("den_fit_error", "", 70, 100., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (den_fit_error, 0.68) ;
 
   den_fit_error->SetFillColor (kGray+2) ;
-  m4_sideband_total->Draw () ;
+  sidebaRegionMC->Draw () ;
   den_fit_error->Draw ("E3same") ;
-  m4_sideband_total->Draw ("sames") ;
+  sidebaRegionMC->Draw ("sames") ;
   c1.Print ("denominator_fit.pdf", "pdf") ;
 
   //PG toy experiments to determine the size of the error band on the extrapolation factor
@@ -102,15 +124,15 @@ int macro_004_10 ()
     {
       if (iToy %(nToys/10) == 0) cout << "toy number " << iToy << endl ;
 
-      int nNum = r.Poisson (m4_signal_total->Integral ()) ;
+      int nNum = r.Poisson (signalRegionMC->Integral ()) ;
       TString name = "dummyNum_" ; name += iToy ;
-      TH1F * dummyNum = (TH1F *) m4_signal_total->Clone (name) ;
+      TH1F * dummyNum = (TH1F *) signalRegionMC->Clone (name) ;
       dummyNum->Reset () ;
       dummyNum->FillRandom ("numFitFunc", nNum) ;
 
-      int nDen = r.Poisson (m4_sideband_total->Integral ()) ;
+      int nDen = r.Poisson (sidebaRegionMC->Integral ()) ;
       name = "dummyDen_" ; name += iToy ;
-      TH1F * dummyDen = (TH1F *) m4_sideband_total->Clone (name) ;
+      TH1F * dummyDen = (TH1F *) sidebaRegionMC->Clone (name) ;
       dummyDen->Reset () ;
       dummyDen->FillRandom ("denFitFunc", nDen) ;
 
@@ -126,8 +148,8 @@ int macro_004_10 ()
   //PG correction factor from the ratio of histograms 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TH1F * ratio_total = (TH1F *) m4_signal_total->Clone ("ratio") ;
-  ratio_total->Divide (m4_sideband_total) ;
+  TH1F * ratio_total = (TH1F *) signalRegionMC->Clone ("ratio") ;
+  ratio_total->Divide (sidebaRegionMC) ;
   ratio_total->SetMarkerColor (kOrange) ;
   
   //PG correction factor from the profile of the many toys
@@ -182,7 +204,7 @@ int macro_004_10 ()
   //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
-//  TH1F * extrapolated_bkg = m4_sideband_total->Clone ("extrapolated_bkg") ; //PG closure test
+//  TH1F * extrapolated_bkg = sidebaRegionMC->Clone ("extrapolated_bkg") ; //PG closure test
 //  TH1F * extrapolated_bkg = m4_sideband_DATA->Clone ("extrapolated_bkg") ; //PG analysis
 
   TH1F * extrapolated_bkg = sidebaRegion->Clone ("extrapolated_bkg") ;
@@ -202,7 +224,7 @@ int macro_004_10 ()
   leg_compare.SetLineWidth (1) ;
   leg_compare.SetFillColor (0) ;
   leg_compare.SetFillStyle (0) ;
-  leg_compare.AddEntry (m4_signal_total, "simulation in signal region", "lfp") ;
+  leg_compare.AddEntry (signalRegionMC, "simulation in signal region", "lfp") ;
   leg_compare.AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
 
   c1.SetLogy () ;
@@ -213,10 +235,10 @@ int macro_004_10 ()
   extrapolated_bkg->SetFillColor (kOrange) ;
   extrapolated_bkg->Draw ("E3same") ;
 
-  m4_signal_total->SetStats (0) ;
-  m4_signal_total->SetMarkerStyle (5) ;
-  m4_signal_total->SetMarkerColor (kBlack) ;
-  m4_signal_total->Draw ("same") ;
+  signalRegionMC->SetStats (0) ;
+  signalRegionMC->SetMarkerStyle (5) ;
+  signalRegionMC->SetMarkerColor (kBlack) ;
+  signalRegionMC->Draw ("same") ;
   leg_compare.Draw () ;
   c1.Print ("compare_signal_region_new.pdf", "pdf") ;
 
@@ -227,7 +249,7 @@ int macro_004_10 ()
 //  fitFuncBkg->SetLineWidth (1) ;
 //  fitFuncBkg->SetLineColor (kBlue+2) ;
 //  fitFuncBkg->SetNpx (10000) ;
-//  fitFuncBkg->SetParameter (0, m4_signal_total->Integral ()) ;
+//  fitFuncBkg->SetParameter (0, signalRegionMC->Integral ()) ;
 //  fitFuncBkg->SetParameter (1, 200.) ;
 //  fitFuncBkg->SetParameter (2, 20.) ;
 //  fitFuncBkg->SetParameter (3, 0.1) ;
@@ -290,9 +312,9 @@ int macro_004_10 ()
 //      double min = m4_signal_DATA->GetBinLowEdge (minBin) ;
 //      double max = m4_signal_DATA->GetBinLowEdge (maxBin + 1) ;
 
-//      int minBin = m4_signal_total->FindBin (mMin.at (i)) ;       //PG closure test
-//      int maxBin = m4_signal_total->FindBin (mMax.at (i)) ;       //PG closure test
-//      double total = m4_signal_total->Integral (minBin, maxBin) ; //PG closure test
+//      int minBin = signalRegionMC->FindBin (mMin.at (i)) ;       //PG closure test
+//      int maxBin = signalRegionMC->FindBin (mMax.at (i)) ;       //PG closure test
+//      double total = signalRegionMC->Integral (minBin, maxBin) ; //PG closure test
 
 //      double bkg = fitFunc->Integral (min, max) ;
 //      double error = 0. ;
