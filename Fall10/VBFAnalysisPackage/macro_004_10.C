@@ -31,7 +31,16 @@ int macro_004_10 ()
   TH1F * m4_lower_DATA = (TH1F *) input.Get ("m4_lower_DATA") ;      
   TH1F * m4_sideband_DATA = (TH1F *) input.Get ("m4_sideband_DATA") ;
 
-  //PG fit separately numerator and denominator
+  //PG which histograms I use
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  TH1F * sidebaRegion = m4_sideband_DATA ; //PG analysis
+  TH1F * signalRegion = m4_signal_DATA ;   //PG analysis
+
+//  TH1F * sidebaRegion = m4_sideband_total ; //PG closure test
+//  TH1F * signalRegion = m4_signal_total ;   //PG closure test
+
+  //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   stack_m4_signal->Draw ("hist") ;
@@ -153,8 +162,8 @@ int macro_004_10 ()
   //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TH1F pooPlot ("poolPlot", "", 50, -5, 5) ;
-  TH1F pooPlotGaus ("poolPlotGaus", "", 50, -5, 5) ;
+  TH1F poolPlot ("poolPlot", "", 50, -5, 5) ;
+  TH1F poolPlotGaus ("poolPlotGaus", "", 50, -5, 5) ;
   for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin) 
     {
       double num = ratio_total->GetBinContent (iBin) ;
@@ -173,9 +182,13 @@ int macro_004_10 ()
   //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
-//  TH1F * extrapolated_bkg = m4_sideband_total->Clone ("extrapolated_bkg") ; //PG simil-closure test --> stats issue
-  TH1F * extrapolated_bkg = m4_sideband_DATA->Clone ("extrapolated_bkg") ; //PG analysis
-  extrapolated_bkg->Multiply (correctionBand) ;
+//  TH1F * extrapolated_bkg = m4_sideband_total->Clone ("extrapolated_bkg") ; //PG closure test
+//  TH1F * extrapolated_bkg = m4_sideband_DATA->Clone ("extrapolated_bkg") ; //PG analysis
+
+  TH1F * extrapolated_bkg = sidebaRegion->Clone ("extrapolated_bkg") ;
+
+  extrapolated_bkg->Multiply (correctionBand) ; //PG profile correction
+//  extrapolated_bkg->Multiply (gaussianBand) ; //PG gaus fit correction
 
   //PG first plot of the result
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -192,7 +205,7 @@ int macro_004_10 ()
   leg_compare.AddEntry (m4_signal_total, "simulation in signal region", "lfp") ;
   leg_compare.AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
 
-//  c1.SetLogy () ;
+  c1.SetLogy () ;
   c1.DrawFrame (100, 0.1, 800, 5000) ;
   extrapolated_bkg->SetStats (0) ;
   extrapolated_bkg->SetTitle ("") ;
@@ -205,45 +218,45 @@ int macro_004_10 ()
   m4_signal_total->SetMarkerColor (kBlack) ;
   m4_signal_total->Draw ("same") ;
   leg_compare.Draw () ;
-  c1.Print ("compare_signal_region_new_lin.pdf", "pdf") ;
+  c1.Print ("compare_signal_region_new.pdf", "pdf") ;
 
   //PG fit the extrapolated bkg
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TF1 * fitFuncBkg = new TF1 ("fitFuncBkg", attenuatedCB, 0., 1000., 7) ;
-  fitFuncBkg->SetLineWidth (1) ;
-  fitFuncBkg->SetLineColor (kBlue+2) ;
-  fitFuncBkg->SetNpx (10000) ;
-  fitFuncBkg->SetParameter (0, m4_signal_total->Integral ()) ;
-  fitFuncBkg->SetParameter (1, 200.) ;
-  fitFuncBkg->SetParameter (2, 20.) ;
-  fitFuncBkg->SetParameter (3, 0.1) ;
-  fitFuncBkg->SetParameter (4, 10) ;
-  fitFuncBkg->SetParameter (5, 200) ;
-  fitFuncBkg->SetParameter (6, 10) ;
-  
-  extrapolated_bkg->Fit (fitFuncBkg, "L+", "", 100., 800.) ;
-  TH1F * extrapolated_bkg_fitBand = new TH1F ("extrapolated_bkg_fitBand", "", 70, 100., 800.) ;
-  (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (extrapolated_bkg_fitBand, 0.68) ;
+//  TF1 * fitFuncBkg = new TF1 ("fitFuncBkg", attenuatedCB, 0., 1000., 7) ;
+//  fitFuncBkg->SetLineWidth (1) ;
+//  fitFuncBkg->SetLineColor (kBlue+2) ;
+//  fitFuncBkg->SetNpx (10000) ;
+//  fitFuncBkg->SetParameter (0, m4_signal_total->Integral ()) ;
+//  fitFuncBkg->SetParameter (1, 200.) ;
+//  fitFuncBkg->SetParameter (2, 20.) ;
+//  fitFuncBkg->SetParameter (3, 0.1) ;
+//  fitFuncBkg->SetParameter (4, 10) ;
+//  fitFuncBkg->SetParameter (5, 200) ;
+//  fitFuncBkg->SetParameter (6, 10) ;
+//  
+//  extrapolated_bkg->Fit (fitFuncBkg, "L+", "", 100., 800.) ;
+//  TH1F * extrapolated_bkg_fitBand = new TH1F ("extrapolated_bkg_fitBand", "", 70, 100., 800.) ;
+//  (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (extrapolated_bkg_fitBand, 0.68) ;
 
   //PG  plot of the result
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  extrapolated_bkg_fitBand->SetFillColor (kGray+2) ;
+//  extrapolated_bkg_fitBand->SetFillColor (kGray+2) ;
 //  extrapolated_bkg_fitBand->SetFillStyle (3004) ;
   
 //  c1.DrawFrame (100, 0.1, 800, 5000) ;
 //  extrapolated_bkg->Draw ("E3same") ;
 //  extrapolated_bkg_fitBand->Draw ("E3same") ;
 //  extrapolated_bkg_fitBand->Draw () ;
-  extrapolated_bkg->Draw ("") ;
-  extrapolated_bkg_fitBand->Draw ("E3same") ;
+  extrapolated_bkg->Draw ("E3P") ;
+//  extrapolated_bkg_fitBand->Draw ("E3same") ;
   c1.Print ("extrapolatedBkg.pdf", "pdf") ;
 
   //PG prepare the windows for the fast cut-n-count thing
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-  
 
+  vector<double> masses ;
   vector<double> mMin ;
   vector<double> mMax ;
   masses.push_back (250.) ;  mMin.push_back (225) ; mMax.push_back (275) ; //PG Hwindow.push_back (24.) ;
@@ -255,20 +268,97 @@ int macro_004_10 ()
   masses.push_back (550.) ;  mMin.push_back (490) ; mMax.push_back (630) ; //PG Hwindow.push_back (61.) ;
   masses.push_back (600.) ;  mMin.push_back (530) ; mMax.push_back (700) ; //PG Hwindow.push_back (68.) ;
 
+  //PG the fast cut-n-count thing
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+  
+  TGraphErrors g_total ;
+  TGraphErrors g_background_count ;
+  TGraph g_error ;
 
+  //PG loop on the mass points
+  for (int i = 0 ; i < masses.size () ; ++i)
+    {
+      int minBin = signalRegion->FindBin (mMin.at (i)) ;       //PG analysis
+      int maxBin = signalRegion->FindBin (mMax.at (i)) ;       //PG analysis
+      double total = signalRegion->Integral (minBin, maxBin) ; //PG analysis
+      double min = signalRegion->GetBinLowEdge (minBin) ;
+      double max = signalRegion->GetBinLowEdge (maxBin + 1) ;
 
+//      int minBin = m4_signal_DATA->FindBin (mMin.at (i)) ;       //PG analysis
+//      int maxBin = m4_signal_DATA->FindBin (mMax.at (i)) ;       //PG analysis
+//      double total = m4_signal_DATA->Integral (minBin, maxBin) ; //PG analysis
+//      double min = m4_signal_DATA->GetBinLowEdge (minBin) ;
+//      double max = m4_signal_DATA->GetBinLowEdge (maxBin + 1) ;
 
+//      int minBin = m4_signal_total->FindBin (mMin.at (i)) ;       //PG closure test
+//      int maxBin = m4_signal_total->FindBin (mMax.at (i)) ;       //PG closure test
+//      double total = m4_signal_total->Integral (minBin, maxBin) ; //PG closure test
+
+//      double bkg = fitFunc->Integral (min, max) ;
+//      double error = 0. ;
+//      for (int j = minBin ; j <= maxBin ; ++j) error += extrapolated_bkg_fitBand->GetBinError (j) ;
+
+      double bkg_count_error = 0. ;
+      double bkg_count = extrapolated_bkg->IntegralAndError (minBin, maxBin, bkg_count_error) ;
+      
+      cout << masses.at (i) 
+           << " : (" << min
+           << "," << max
+           << ") : " << total //PG the bin width 
+           << " : " << bkg_count
+           << " +- " << bkg_count_error
+           << "\n" ;
+           
+      g_total.SetPoint (i, masses.at (i), total) ;
+      g_total.SetPointError (i, 50., sqrt (total)) ;
+//      g_background.SetPoint (i, masses.at (i), bkg/10.) ;
+//      g_background.SetPointError (i, 0., error) ;
+      g_background_count.SetPoint (i, masses.at (i), bkg_count) ;
+      g_background_count.SetPointError (i, 0., bkg_count_error) ;
+      g_error.SetPoint (i, masses.at (i), sqrt (bkg_count_error * bkg_count_error + total)) ;
+    } //PG loop on the mass points
+
+  c1.SetLogy () ;
+  g_total.SetMarkerStyle (6) ;
+  g_background_count.SetLineColor (kOrange) ;
+  g_background_count.SetFillColor (kOrange) ;
+  g_background_count.Draw ("AE3") ;
+  g_total.Draw ("EPsame") ;
+  c1.Print ("results.pdf", "pdf") ;
+
+  TGraph g_expectedCountings ;
+  int k = 0 ;
+  g_expectedCountings.SetPoint (k, masses.at (k++), 74.14) ;
+  g_expectedCountings.SetPoint (k, masses.at (k++), 75.13) ;
+  g_expectedCountings.SetPoint (k, masses.at (k++), 76.54) ;
+  g_expectedCountings.SetPoint (k, masses.at (k++), 65.89) ;
+  g_expectedCountings.SetPoint (k, masses.at (k++), 43.78) ;
+  g_expectedCountings.SetPoint (k, masses.at (k++), 28.21) ;
+  g_expectedCountings.SetPoint (k, masses.at (k++), 17.11) ;
+  g_expectedCountings.SetPoint (k, masses.at (k++), 10.35) ;
+
+  c1.SetLogy (0) ;
+  c1.DrawFrame (200, 0, 700, 200) ;
+  g_error.SetLineWidth (2) ;
+  g_error.Draw ("L") ;
+  g_expectedCountings.SetMarkerStyle (8) ;
+  g_expectedCountings.Draw ("LP") ;
+  c1.Print ("trivial_sensitivity.pdf", "pdf") ;
 
   TFile output ("output_004_10.root", "recreate") ;
   output.cd () ;
   ratio_total->Write () ;
   gaussianBand->Write () ;
-  pooPlot.Write () ;
-  pooPlotGaus.Write () ;
+  poolPlot.Write () ;
+  poolPlotGaus.Write () ;
   extrapolated_bkg->Write () ;
-  extrapolated_bkg_fitBand->Write () ;
+//  extrapolated_bkg_fitBand->Write () ;
   correctionPlane->Write () ;
   correctionBand->Write () ;
+  g_total.Write ("g_total") ;
+  g_background_count.Write ("g_background_count") ;
+  g_error.Write ("g_error") ;
+  g_expectedCountings.Write ("g_expectedCountings") ;
   output.Close () ;
 
  
