@@ -202,28 +202,28 @@ int macro_004_10 (int mass)
   TRandom3 r ;
   int nToys = 10000 ;
   TH2F * correctionPlane = new TH2F ("correctionPlane", "", 70, 100, 800, 200, 0, 3) ;
-  for (iToy = 0 ; iToy < nToys ; ++iToy)
+
+  TH1F * dummyNum = (TH1F *) signalRegionMC->Clone ("dummyNum") ;
+  TH1F * dummyDen = (TH1F *) sidebaRegionMC->Clone ("dummyDen") ;
+  double intSignal = signalRegionMC->Integral () ;
+  double intSideband = sidebaRegionMC->Integral () ;
+ 
+  for (int iToy = 0 ; iToy < nToys ; ++iToy)
     {
       if (iToy %(nToys/10) == 0) cout << "toy number " << iToy << endl ;
 
-      int nNum = r.Poisson (signalRegionMC->Integral ()) ;
-      TString name = "dummyNum_" ; name += iToy ;
-      TH1F * dummyNum = (TH1F *) signalRegionMC->Clone (name) ;
+      int nNum = r.Poisson (intSignal) ;
       dummyNum->Reset () ;
       dummyNum->FillRandom ("numFitFunc", nNum) ;
 
-      int nDen = r.Poisson (sidebaRegionMC->Integral ()) ;
-      name = "dummyDen_" ; name += iToy ;
-      TH1F * dummyDen = (TH1F *) sidebaRegionMC->Clone (name) ;
+      int nDen = r.Poisson (intSideband) ;
       dummyDen->Reset () ;
       dummyDen->FillRandom ("denFitFunc", nDen) ;
 
-      name = "ratio_" ; name += iToy ;
-      TH1F * ratio = (TH1F *) dummyNum->Clone (name) ;
-      ratio->Divide (dummyDen) ;
-      for (int iBin = 1 ; iBin <= ratio->GetNbinsX () ; ++iBin)
+      dummyNum->Divide (dummyDen) ;
+      for (int iBin = 1 ; iBin <= dummyNum->GetNbinsX () ; ++iBin)
         {
-          correctionPlane->Fill (ratio->GetBinCenter (iBin), ratio->GetBinContent (iBin)) ;
+          correctionPlane->Fill (dummyNum->GetBinCenter (iBin), dummyNum->GetBinContent (iBin)) ;
         }
     }
 
