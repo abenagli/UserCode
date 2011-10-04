@@ -131,6 +131,12 @@ int main (int argc, char** argv)
   TH1F * m4_lower_DATA = new TH1F ("m4_lower_DATA", "m4_lower_DATA", 70, 100., 800.) ;
   TH1F * m4_sideband_DATA = new TH1F ("m4_sideband_DATA", "m4_sideband_DATA", 70, 100., 800.) ;
 
+  TH1F * m4_EvenHigher_SIG = new TH1F ("m4_EvenHigher_SIG", "m4_EvenHigher_SIG", 70, 100., 800.) ;
+  TH1F * m4_upper_SIG = new TH1F ("m4_upper_SIG", "m4_upper_SIG", 70, 100., 800.) ;
+  TH1F * m4_signal_SIG = new TH1F ("m4_signal_SIG", "m4_signal_SIG", 70, 100., 800.) ;
+  TH1F * m4_lower_SIG = new TH1F ("m4_lower_SIG", "m4_lower_SIG", 70, 100., 800.) ;
+  TH1F * m4_sideband_SIG = new TH1F ("m4_sideband_SIG", "m4_sideband_SIG", 70, 100., 800.) ;
+
   //PG the cuts
   TCut generalCut = "" ;
   generalCut = generalCut && "1 == 1" ;
@@ -147,10 +153,6 @@ int main (int argc, char** argv)
        ++iColl)
     {
 
-      if (iColl->first.find ("ggH") != string::npos) continue ;
-      if (iColl->first.find ("qqH") != string::npos) continue ;
-//      if (iColl->first == "ggH") continue ;
-
       TCut cutLower = generalCut && lower ;
       TCut cutLowerExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutLower.GetTitle (), LUMI) ;    
 
@@ -165,6 +167,24 @@ int main (int argc, char** argv)
 
       TCut cutSideband = generalCut && (upper || lower) ;
       TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSideband.GetTitle (), LUMI) ;    
+
+      cout << " reading " << iColl->first << endl ;
+      if (iColl->first.find ("ggH") != string::npos || iColl->first.find ("qqH") != string::npos) 
+        {
+//          iColl->second->Draw ("lepNuW_m >> m4_lower_SIG", cutLower) ;
+//          iColl->second->Draw ("lepNuW_m >> m4_signal_SIG", cutSignal) ;
+//          iColl->second->Draw ("lepNuW_m >> m4_upper_SIG", cutUpper) ;
+//          iColl->second->Draw ("lepNuW_m >> m4_EvenHigher_SIG", cutEvenHigher) ;
+//          iColl->second->Draw ("lepNuW_m >> m4_sideband_SIG", cutSideband) ;
+
+          iColl->second->Draw ("lepNuW_m_KF >> m4_lower_SIG", cutLowerExtended) ;
+          iColl->second->Draw ("lepNuW_m_KF >> m4_signal_SIG", cutSignalExtended) ;
+          iColl->second->Draw ("lepNuW_m_KF >> m4_upper_SIG", cutUpperExtended) ;
+          iColl->second->Draw ("lepNuW_m_KF >> m4_EvenHigher_SIG", cutEvenHigherExtended) ;
+          iColl->second->Draw ("lepNuW_m_KF >> m4_sideband_SIG", cutSidebandExtended) ;
+          
+          continue ;
+        }
 
       if (iColl->first == "DATA")
         {
@@ -182,7 +202,6 @@ int main (int argc, char** argv)
         
           continue ;
         }  
-      cout << " reading " << iColl->first << endl ;
       
       TH1F * h_m4_lower = m4_lower.addSample (iColl->first.c_str ()) ;
       TH1F * h_m4_signal = m4_signal.addSample (iColl->first.c_str ()) ;
@@ -211,7 +230,7 @@ int main (int argc, char** argv)
     } //PG loop over samples
 
   // define out file names
-  std::string outputRootFullFileName = "testBkg_004.root" ;
+  std::string outputRootFullFileName = "testBkg_004_S350.root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF.root" ;
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
   outputRootFile->cd () ;
@@ -227,6 +246,12 @@ int main (int argc, char** argv)
   m4_signal_DATA->Write () ;  
   m4_lower_DATA->Write () ;   
   m4_sideband_DATA->Write () ;
+
+  m4_upper_SIG->Write () ;   
+  m4_EvenHigher_SIG->Write () ;   
+  m4_signal_SIG->Write () ;  
+  m4_lower_SIG->Write () ;   
+  m4_sideband_SIG->Write () ;
 
   outputRootFile->Close () ;
   delete outputRootFile ;

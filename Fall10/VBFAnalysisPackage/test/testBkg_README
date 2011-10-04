@@ -17,20 +17,22 @@ testBkg_004.cpp
 - direct fill of histos from collections
 - PU reweighting 
 - fill MC and data
-- macro_004.C   = interpolation test on W+jets sample
-- macro_004_2.C = calculate scale factors from total sideband to signal
-                  as done in the note of H > ZZ > lljj
-                  get the extrapolated shape by means of the scaling  
-                  super-impose the extrapolated function to the measured one in the signal region
-- macro_004_3.C = test the Dan Green technique w/o fitting
-- macro_004_4.C = simple plot of shapes
-- macro_004_5.C = test the crystal ball fit on the MC shape in the signal region
-- macro_004_6.C = fit the extrapolated shape
-- macro_004_7.C = full exercise with counting
-- macro_004_8.C = ratio of fits to smooth the correction factor
-- macro_004_9.C = test the technique from one side-band to the other... does not fit well when it's too far
-- macro_004_10.C = toys from the fit to get the error on the ratio, ongoing
-
+- macro_004.C   =  interpolation test on W+jets sample
+- macro_004_2.C =  calculate scale factors from total sideband to signal
+                   as done in the note of H > ZZ > lljj
+                   get the extrapolated shape by means of the scaling  
+                   super-impose the extrapolated function to the measured one in the signal region
+- macro_004_3.C =  test the Dan Green technique w/o fitting
+- macro_004_4.C =  simple plot of shapes
+- macro_004_5.C =  test the crystal ball fit on the MC shape in the signal region
+- macro_004_6.C =  fit the extrapolated shape
+- macro_004_7.C =  full exercise with counting
+- macro_004_8.C =  ratio of fits to smooth the correction factor
+- macro_004_9.C =  test the technique from one side-band to the other... does not fit well when it's too far
+- macro_004_10.C = toys from the fit to get the error on the ratio
+                   apply the correction factor to mc (closure test)
+                   apply the correction factor to data
+                   
 testBkg_005.cpp
 - counting events
 - direct fill of histos from collectioens

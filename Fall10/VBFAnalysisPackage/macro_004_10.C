@@ -3,7 +3,7 @@
 
 int macro_004_10 ()
 {
-  TFile input ("testBkg_004.root") ;
+  TFile input ("testBkg_004_S350.root") ;
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -29,6 +29,12 @@ int macro_004_10 ()
   TH1F * m4_lower_DATA = (TH1F *) input.Get ("m4_lower_DATA") ;      
   TH1F * m4_sideband_DATA = (TH1F *) input.Get ("m4_sideband_DATA") ;
 
+  TH1F * m4_EvenHigher_SIG = (TH1F *) input.Get ("m4_EvenHigher_SIG") ;      
+  TH1F * m4_upper_SIG = (TH1F *) input.Get ("m4_upper_SIG") ;      
+  TH1F * m4_signal_SIG = (TH1F *) input.Get ("m4_signal_SIG") ;    
+  TH1F * m4_lower_SIG = (TH1F *) input.Get ("m4_lower_SIG") ;      
+  TH1F * m4_sideband_SIG = (TH1F *) input.Get ("m4_sideband_SIG") ;
+
   //PG which histograms I use
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -42,10 +48,26 @@ int macro_004_10 ()
 
 /*
   //PG A'B'C'D' test with upper and lower
-  TH1F * sidebaRegionMC = m4_lower_total ; //PG analysis
-  TH1F * signalRegionMC = m4_upper_total ; //PG analysis 
+  TH1F * sidebaRegionMC = m4_lower_total ; 
+  TH1F * signalRegionMC = m4_upper_total ;  
   TH1F * sidebaRegion   = m4_lower_DATA ;
   TH1F * signalRegion   = m4_upper_DATA ;  
+*/
+
+/*
+  //PG upper sideband analysis
+  TH1F * sidebaRegionMC = m4_upper_total ; 
+  TH1F * signalRegionMC = m4_signal_total ;
+  TH1F * sidebaRegion   = m4_upper_DATA ;
+  TH1F * signalRegion   = m4_signal_DATA ;  
+*/
+
+/*
+  //PG upper sideband analysis closure test
+  TH1F * sidebaRegionMC = m4_upper_total ; 
+  TH1F * signalRegionMC = m4_signal_total ;  
+  TH1F * sidebaRegion   = sidebaRegionMC ; 
+  TH1F * signalRegion   = signalRegionMC ; 
 */
 
 /*
@@ -56,63 +78,103 @@ int macro_004_10 ()
   TH1F * signalRegion   = m4_signal_DATA ;  
 */
 
-  //PG closure test in signal region
+  //PG final analysis closure test
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ; 
   TH1F * signalRegion   = signalRegionMC ; 
 
+/*
+  //PG final analysis closure test with additional signal
+  TH1F * sidebaRegionMC = m4_sideband_total ; 
+  TH1F * signalRegionMC = m4_signal_total ;  
+  TH1F * sidebaRegion   = sidebaRegionMC ;
+  sidebaRegion->Add (m4_sideband_SIG) ; 
+  TH1F * signalRegion   = signalRegionMC ; 
+  signalRegion->Add (m4_signal_SIG) ; 
+*/
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
+  TCanvas * c1 = new TCanvas () ;
+
   stack_m4_signal->Draw ("hist") ;
-  c1.Print ("numerator.pdf", "pdf") ;
+  c1->Print ("numerator.pdf", "pdf") ;
 
   stack_m4_sideband->Draw ("hist") ;
-  c1.Print ("denominator.pdf", "pdf") ;
+  c1->Print ("denominator.pdf", "pdf") ;
+
+
+//------------------------------
+ // attenuated double exponential
+ //
+ //(*func) -> SetParameter(4,180.);
+ //(*func) -> SetParameter(5,11.);
+ //(*func) -> SetParameter(6,10.);
+ //(*func) -> SetParameter(7,0.012);
+ //(*func) -> SetParameter(8,5.);
+ //(*func) -> SetParameter(9,0.005);
+ //
+ //(*func) -> SetParLimits(4,150.,250.);
+ //(*func) -> SetParLimits(5,0.,100.);
+ //
+ //(*func) -> SetParName(4,"#mu");
+ //(*func) -> SetParName(5,"kT");
+ //(*func) -> SetParName(6,"N1");
+ //(*func) -> SetParName(7,"#lambda1");
+ //(*func) -> SetParName(8,"N2");
+ //(*func) -> SetParName(9,"#lambda2");
+
 
   TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedCB, 0., 1000., 7) ;
+  //PG                        N                             , gaus m, gaus s, joint, exp, fermi E, kT
+//  numFitFunc->SetParameters (signalRegionMC->Integral () / 5, 200.  , 20.   , 0.1  , 10 , 200    , 10) ;
+  numFitFunc->SetParameter (0, signalRegionMC->Integral () / 5.) ;
+  numFitFunc->SetParameter (1, 200.) ;
+  numFitFunc->SetParameter (2, 20.) ;
+  numFitFunc->SetParameter (3, 0.1) ;
+  numFitFunc->SetParameter (4, 10.) ;
+  numFitFunc->SetParameter (5, 200) ;
+  numFitFunc->SetParameter (6, 10) ;
+
   numFitFunc->SetLineWidth (1) ;
   numFitFunc->SetLineColor (kBlue+2) ;
   numFitFunc->SetNpx (10000) ;
-  numFitFunc->SetParameter (0, signalRegionMC->Integral ()) ;  //PG N
-  numFitFunc->SetParameter (1, 200.) ;                          //PG gaussian mean
-  numFitFunc->SetParameter (2, 20.) ;                           //PG gaussian sigma
-  numFitFunc->SetParameter (3, 0.1) ;                           //PG joint point
-  numFitFunc->SetParameter (4, 10) ;                            //PG power law exponent
-  numFitFunc->SetParameter (5, 200) ;                           //PG fermi E
-  numFitFunc->SetParameter (6, 10) ;                            //PG kT
-  signalRegionMC->Fit (numFitFunc, "L", "", 100., 800.) ;
-  TH1F * num_fit_error = new TH1F ("num_fit_error", "", 70, 100., 800.) ;
+  signalRegionMC->Fit (numFitFunc, "L", "", 160., 800.) ;
+  TH1F * num_fit_error = new TH1F ("num_fit_error", "", 64, 160., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (num_fit_error, 0.68) ;
 
-  TCanvas c1 ;
   num_fit_error->SetFillColor (kGray+2) ;
   signalRegionMC->Draw () ;
   num_fit_error->Draw ("E3same") ;
   signalRegionMC->Draw ("sames") ;
-  c1.Print ("numerator_fit.pdf", "pdf") ;
+  c1->Print ("numerator_fit.pdf", "pdf") ;
 
   TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedCB, 0., 1000., 7) ;
+  //PG                        N                              , gaus m, gaus s, joint, exp, fermi E, kT
+  //PG denFitFunc->SetParameters (sidebaRegionMC->Integral () / 5., 180.  , 23.   , 0.3  , 20., 180    , 15) ;
+  denFitFunc->SetParameter (0, sidebaRegionMC->Integral () / 5.) ;
+  denFitFunc->SetParameter (1, 180.) ;
+  denFitFunc->SetParameter (2, 23.) ;
+  denFitFunc->SetParameter (3, 0.3) ;
+  denFitFunc->SetParameter (4, 20.) ;
+  denFitFunc->SetParameter (5, 180) ;
+  denFitFunc->SetParameter (6, 15) ;
+//  denFitFunc->SetParLimits (0, sidebaRegionMC->Integral ()/10, sidebaRegionMC->Integral () * 10) ;
+//  cout << sidebaRegionMC->Integral () << endl ; 
+
   denFitFunc->SetLineWidth (1) ;
   denFitFunc->SetLineColor (kBlue+2) ;
   denFitFunc->SetNpx (10000) ;
-  denFitFunc->SetParameter (0, sidebaRegionMC->Integral ()) ;
-  denFitFunc->SetParameter (1, 200.) ;
-  denFitFunc->SetParameter (2, 5.) ;
-  denFitFunc->SetParameter (3, 0.1) ;
-  denFitFunc->SetParameter (4, 5) ;
-  denFitFunc->SetParameter (5, 200) ;
-  denFitFunc->SetParameter (6, 10) ;
-  sidebaRegionMC->Fit (denFitFunc, "L", "", 100., 800.) ;
-  TH1F * den_fit_error = new TH1F ("den_fit_error", "", 70, 100., 800.) ;
+  sidebaRegionMC->Fit (denFitFunc, "L", "", 160., 800.) ;
+  TH1F * den_fit_error = new TH1F ("den_fit_error", "", 64, 160., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (den_fit_error, 0.68) ;
 
   den_fit_error->SetFillColor (kGray+2) ;
   sidebaRegionMC->Draw () ;
   den_fit_error->Draw ("E3same") ;
   sidebaRegionMC->Draw ("sames") ;
-  c1.Print ("denominator_fit.pdf", "pdf") ;
+  c1->Print ("denominator_fit.pdf", "pdf") ;
 
   //PG toy experiments to determine the size of the error band on the extrapolation factor
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -179,7 +241,7 @@ int macro_004_10 ()
   gaussianBand->Draw ("E3same") ;
   gStyle->SetPalette (1) ;
   ratio_total->Draw ("same") ;
-  c1.Print ("correctionPlane.pdf", "pdf") ;
+  c1->Print ("correctionPlane.pdf", "pdf") ;
 
   //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -197,9 +259,9 @@ int macro_004_10 ()
       poolPlot.Fill ((num - mean) / sigma) ;
     }
   poolPlotGaus.Fit ("gaus","L") ;
-  c1.Print ("poolPlotGaus.pdf", "pdf") ;
+  c1->Print ("poolPlotGaus.pdf", "pdf") ;
   poolPlot.Fit ("gaus","L") ;
-  c1.Print ("poolPlot.pdf", "pdf") ;
+  c1->Print ("poolPlot.pdf", "pdf") ;
  
   //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -227,8 +289,8 @@ int macro_004_10 ()
   leg_compare.AddEntry (signalRegionMC, "simulation in signal region", "lfp") ;
   leg_compare.AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
 
-  c1.SetLogy () ;
-  c1.DrawFrame (100, 0.1, 800, 5000) ;
+  c1->SetLogy () ;
+  c1->DrawFrame (100, 0.1, 800, 5000) ;
   extrapolated_bkg->SetStats (0) ;
   extrapolated_bkg->SetTitle ("") ;
   extrapolated_bkg->SetLineColor (kRed) ;
@@ -240,7 +302,7 @@ int macro_004_10 ()
   signalRegionMC->SetMarkerColor (kBlack) ;
   signalRegionMC->Draw ("same") ;
   leg_compare.Draw () ;
-  c1.Print ("compare_signal_region_new.pdf", "pdf") ;
+  c1->Print ("compare_signal_region_new.pdf", "pdf") ;
 
   //PG fit the extrapolated bkg
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -267,13 +329,13 @@ int macro_004_10 ()
 //  extrapolated_bkg_fitBand->SetFillColor (kGray+2) ;
 //  extrapolated_bkg_fitBand->SetFillStyle (3004) ;
   
-//  c1.DrawFrame (100, 0.1, 800, 5000) ;
+//  c1->DrawFrame (100, 0.1, 800, 5000) ;
 //  extrapolated_bkg->Draw ("E3same") ;
 //  extrapolated_bkg_fitBand->Draw ("E3same") ;
 //  extrapolated_bkg_fitBand->Draw () ;
   extrapolated_bkg->Draw ("E3P") ;
 //  extrapolated_bkg_fitBand->Draw ("E3same") ;
-  c1.Print ("extrapolatedBkg.pdf", "pdf") ;
+  c1->Print ("extrapolatedBkg.pdf", "pdf") ;
 
   //PG prepare the windows for the fast cut-n-count thing
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -340,13 +402,13 @@ int macro_004_10 ()
       g_error.SetPoint (i, masses.at (i), sqrt (bkg_count_error * bkg_count_error + total)) ;
     } //PG loop on the mass points
 
-  c1.SetLogy () ;
+  c1->SetLogy () ;
   g_total.SetMarkerStyle (6) ;
   g_background_count.SetLineColor (kOrange) ;
   g_background_count.SetFillColor (kOrange) ;
   g_background_count.Draw ("AE3") ;
   g_total.Draw ("EPsame") ;
-  c1.Print ("results.pdf", "pdf") ;
+  c1->Print ("results.pdf", "pdf") ;
 
   TGraph g_expectedCountings ;
   int k = 0 ;
@@ -359,13 +421,13 @@ int macro_004_10 ()
   g_expectedCountings.SetPoint (k, masses.at (k++), 17.11) ;
   g_expectedCountings.SetPoint (k, masses.at (k++), 10.35) ;
 
-  c1.SetLogy (0) ;
-  c1.DrawFrame (200, 0, 700, 200) ;
+  c1->SetLogy (0) ;
+  c1->DrawFrame (200, 0, 700, 200) ;
   g_error.SetLineWidth (2) ;
   g_error.Draw ("L") ;
   g_expectedCountings.SetMarkerStyle (8) ;
   g_expectedCountings.Draw ("LP") ;
-  c1.Print ("trivial_sensitivity.pdf", "pdf") ;
+  c1->Print ("trivial_sensitivity.pdf", "pdf") ;
 
   TFile output ("output_004_10.root", "recreate") ;
   output.cd () ;
