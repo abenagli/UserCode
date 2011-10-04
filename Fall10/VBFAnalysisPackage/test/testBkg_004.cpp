@@ -78,13 +78,15 @@ int ReadFile (map<string, TChain *> & output, string inputList, string treeName)
 int main (int argc, char** argv)
 {
   //Check if all nedeed arguments to parse are there
-  if (argc != 2)
+  if (argc != 3)
     {
       std::cerr << ">>>>> VBFAnalysis::usage: " << argv[0] << " configFileName" << std::endl ;
       return 1 ;
     }
 
   float LUMI = 2145. ; //PG to have output in 1/fb
+
+  string mass = argv[2] ;
 
   string inputFileList (argv[1]) ;
   cout << "samples " << inputFileList << endl ;
@@ -171,6 +173,12 @@ int main (int argc, char** argv)
       cout << " reading " << iColl->first << endl ;
       if (iColl->first.find ("ggH") != string::npos || iColl->first.find ("qqH") != string::npos) 
         {
+          if (iColl->first.find (mass.c_str ()) == string::npos) 
+            {
+              cout << "...skipping" << endl ;
+              continue ; 
+            } 
+                
           TH1F * h_m4_lower_SIG = m4_lower_SIG.addSample (iColl->first.c_str ()) ;
           TH1F * h_m4_signal_SIG = m4_signal_SIG.addSample (iColl->first.c_str ()) ;
           TH1F * h_m4_upper_SIG = m4_upper_SIG.addSample (iColl->first.c_str ()) ;
@@ -221,7 +229,7 @@ int main (int argc, char** argv)
     } //PG loop over samples
 
   // define out file names
-  std::string outputRootFullFileName = "testBkg_004_S350.root" ;
+  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF.root" ;
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
   outputRootFile->cd () ;
@@ -246,8 +254,6 @@ int main (int argc, char** argv)
 
   outputRootFile->Close () ;
   delete outputRootFile ;
-  
-  
   
   return 0 ;
 }

@@ -1,12 +1,18 @@
 #include <./test/plotUtils.C>
 #include "./interface/Functions.h"
 
-int macro_004_10 ()
+int macro_004_10 (int mass)
 {
-  TFile input ("testBkg_004_S350.root") ;
+  TString inputFile = "testBkg_004_S" ;
+  inputFile += mass ;
+  inputFile += ".root" ;
+  cout << inputFile << endl ;
+  TFile input (inputFile) ;
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  //PG get the bkg samples
 
   THStack * stack_m4_EvenHigher = (THStack *) input.Get ("stack_m4_EvenHigher") ;
   TH1F * m4_EvenHigher_total = (TH1F*) stack_m4_EvenHigher->GetStack ()->Last () ;    
@@ -23,23 +29,36 @@ int macro_004_10 ()
   THStack * stack_m4_sideband = (THStack *) input.Get ("stack_m4_sideband") ;
   TH1F * m4_sideband_total = (TH1F *) stack_m4_sideband->GetStack ()->Last () ;
 
+  //PG get the signal samples
+
+  THStack * stack_m4_EvenHigher_SIG = (THStack *) input.Get ("stack_m4_EvenHigher_SIG") ;
+  TH1F * m4_EvenHigher_total_SIG = (TH1F*) stack_m4_EvenHigher_SIG->GetStack ()->Last () ;    
+
+  THStack * stack_m4_upper_SIG = (THStack *) input.Get ("stack_m4_upper_SIG") ;
+  TH1F * m4_upper_total_SIG = (TH1F*) stack_m4_upper_SIG->GetStack ()->Last () ;
+    
+  THStack * stack_m4_lower_SIG = (THStack *) input.Get ("stack_m4_lower_SIG") ;
+  TH1F * m4_lower_total_SIG = (TH1F *) stack_m4_lower_SIG->GetStack ()->Last () ;
+    
+  THStack * stack_m4_signal_SIG = (THStack *) input.Get ("stack_m4_signal_SIG") ;
+  TH1F * m4_signal_total_SIG = (TH1F *) stack_m4_signal_SIG->GetStack ()->Last () ;
+
+  THStack * stack_m4_sideband_SIG = (THStack *) input.Get ("stack_m4_sideband_SIG") ;
+  TH1F * m4_sideband_total_SIG = (TH1F *) stack_m4_sideband_SIG->GetStack ()->Last () ;
+
+  //PG get the data
+  
   TH1F * m4_EvenHigher_DATA = (TH1F *) input.Get ("m4_EvenHigher_DATA") ;      
   TH1F * m4_upper_DATA = (TH1F *) input.Get ("m4_upper_DATA") ;      
   TH1F * m4_signal_DATA = (TH1F *) input.Get ("m4_signal_DATA") ;    
   TH1F * m4_lower_DATA = (TH1F *) input.Get ("m4_lower_DATA") ;      
   TH1F * m4_sideband_DATA = (TH1F *) input.Get ("m4_sideband_DATA") ;
 
-  TH1F * m4_EvenHigher_SIG = (TH1F *) input.Get ("m4_EvenHigher_SIG") ;      
-  TH1F * m4_upper_SIG = (TH1F *) input.Get ("m4_upper_SIG") ;      
-  TH1F * m4_signal_SIG = (TH1F *) input.Get ("m4_signal_SIG") ;    
-  TH1F * m4_lower_SIG = (TH1F *) input.Get ("m4_lower_SIG") ;      
-  TH1F * m4_sideband_SIG = (TH1F *) input.Get ("m4_sideband_SIG") ;
-
   //PG which histograms I use
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 /*
-  //PG A'B'C'D' test with upper and EvenHigher
+  cout << " A\'B\'C\'D\' test with upper and EvenHigher" << endl ;
   TH1F * sidebaRegionMC = m4_EvenHigher_total ; //PG analysis
   TH1F * signalRegionMC = m4_upper_total ; //PG analysis 
   TH1F * sidebaRegion   = m4_EvenHigher_DATA ;
@@ -47,23 +66,21 @@ int macro_004_10 ()
 */
 
 /*
-  //PG A'B'C'D' test with upper and lower
+  cout << " A\'B\'C\'D\' test with upper and lower" << endl ;
   TH1F * sidebaRegionMC = m4_lower_total ; 
   TH1F * signalRegionMC = m4_upper_total ;  
   TH1F * sidebaRegion   = m4_lower_DATA ;
   TH1F * signalRegion   = m4_upper_DATA ;  
 */
 
-/*
-  //PG upper sideband analysis
+  cout << "upper sideband analysis" << endl ;
   TH1F * sidebaRegionMC = m4_upper_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_upper_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
-*/
 
 /*
-  //PG upper sideband analysis closure test
+  cout << "upper sideband analysis closure test" << endl ;
   TH1F * sidebaRegionMC = m4_upper_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ; 
@@ -71,28 +88,31 @@ int macro_004_10 ()
 */
 
 /*
-  //PG final analysis
+  cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_sideband_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
 */
 
-  //PG final analysis closure test
+/*
+  cout << "final analysis closure test" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ; 
   TH1F * signalRegion   = signalRegionMC ; 
+*/
 
 /*
-  //PG final analysis closure test with additional signal
+  cout << "final analysis closure test with additional signal" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ;
-  sidebaRegion->Add (m4_sideband_SIG) ; 
+  sidebaRegion->Add (m4_sideband_total_SIG) ; 
   TH1F * signalRegion   = signalRegionMC ; 
-  signalRegion->Add (m4_signal_SIG) ; 
+  signalRegion->Add (m4_signal_total_SIG) ; 
 */
+
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -266,9 +286,6 @@ int macro_004_10 ()
   //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
-//  TH1F * extrapolated_bkg = sidebaRegionMC->Clone ("extrapolated_bkg") ; //PG closure test
-//  TH1F * extrapolated_bkg = m4_sideband_DATA->Clone ("extrapolated_bkg") ; //PG analysis
-
   TH1F * extrapolated_bkg = sidebaRegion->Clone ("extrapolated_bkg") ;
 
   extrapolated_bkg->Multiply (correctionBand) ; //PG profile correction
@@ -359,6 +376,19 @@ int macro_004_10 ()
   TGraphErrors g_background_count ;
   TGraph g_error ;
 
+  cout << "mass" 
+       << " : (" << "min"
+       << "," << "max"
+       << ") : " << "total" //PG the bin width 
+       << " : " << "bkg_count"
+       << " +- " << "bkg_count_error"
+       << " | "
+       << "expSignal" << " : "
+       << "bkg_count" << " : "
+       << "bkg_count_error / bkg_count" << " : "
+       << "total" << " : "
+       << "\n" ;
+
   //PG loop on the mass points
   for (int i = 0 ; i < masses.size () ; ++i)
     {
@@ -368,35 +398,25 @@ int macro_004_10 ()
       double min = signalRegion->GetBinLowEdge (minBin) ;
       double max = signalRegion->GetBinLowEdge (maxBin + 1) ;
 
-//      int minBin = m4_signal_DATA->FindBin (mMin.at (i)) ;       //PG analysis
-//      int maxBin = m4_signal_DATA->FindBin (mMax.at (i)) ;       //PG analysis
-//      double total = m4_signal_DATA->Integral (minBin, maxBin) ; //PG analysis
-//      double min = m4_signal_DATA->GetBinLowEdge (minBin) ;
-//      double max = m4_signal_DATA->GetBinLowEdge (maxBin + 1) ;
-
-//      int minBin = signalRegionMC->FindBin (mMin.at (i)) ;       //PG closure test
-//      int maxBin = signalRegionMC->FindBin (mMax.at (i)) ;       //PG closure test
-//      double total = signalRegionMC->Integral (minBin, maxBin) ; //PG closure test
-
-//      double bkg = fitFunc->Integral (min, max) ;
-//      double error = 0. ;
-//      for (int j = minBin ; j <= maxBin ; ++j) error += extrapolated_bkg_fitBand->GetBinError (j) ;
-
       double bkg_count_error = 0. ;
       double bkg_count = extrapolated_bkg->IntegralAndError (minBin, maxBin, bkg_count_error) ;
+      double expSignal = m4_signal_total_SIG->Integral (minBin, maxBin) ;
       
-      cout << masses.at (i) 
+      cout << "MH | " << masses.at (i) 
            << " : (" << min
            << "," << max
            << ") : " << total //PG the bin width 
            << " : " << bkg_count
            << " +- " << bkg_count_error
+           << " | "
+           << expSignal << " : "
+           << bkg_count << " : "
+           << bkg_count_error / bkg_count << " : "
+           << total << " : "
            << "\n" ;
            
       g_total.SetPoint (i, masses.at (i), total) ;
       g_total.SetPointError (i, 50., sqrt (total)) ;
-//      g_background.SetPoint (i, masses.at (i), bkg/10.) ;
-//      g_background.SetPointError (i, 0., error) ;
       g_background_count.SetPoint (i, masses.at (i), bkg_count) ;
       g_background_count.SetPointError (i, 0., bkg_count_error) ;
       g_error.SetPoint (i, masses.at (i), sqrt (bkg_count_error * bkg_count_error + total)) ;
@@ -445,6 +465,7 @@ int macro_004_10 ()
   g_expectedCountings.Write ("g_expectedCountings") ;
   output.Close () ;
 
+  gApplication->Terminate (0) ;
  
 }
 

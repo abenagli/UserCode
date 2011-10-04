@@ -17,6 +17,7 @@ testBkg_004.cpp
 - direct fill of histos from collections
 - PU reweighting 
 - fill MC and data
+- chose the signal on which to run, insert the mass
 - macro_004.C   =  interpolation test on W+jets sample
 - macro_004_2.C =  calculate scale factors from total sideband to signal
                    as done in the note of H > ZZ > lljj
@@ -32,6 +33,7 @@ testBkg_004.cpp
 - macro_004_10.C = toys from the fit to get the error on the ratio
                    apply the correction factor to mc (closure test)
                    apply the correction factor to data
+                   inject signal in the MC - choose the mass to be used
                    
 testBkg_005.cpp
 - counting events
