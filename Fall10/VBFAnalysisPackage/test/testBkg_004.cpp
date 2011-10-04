@@ -120,30 +120,30 @@ int main (int argc, char** argv)
 //      +-------------------------------  m4
 
   hColl m4_EvenHigher ("m4_EvenHigher", 70, 100., 800.) ;
-  hColl m4_upper ("m4_upper", 70, 100., 800.) ;
-  hColl m4_signal ("m4_signal", 70, 100., 800.) ;
-  hColl m4_lower ("m4_lower", 70, 100., 800.) ;
-  hColl m4_sideband ("m4_sideband", 70, 100., 800.) ;
+  hColl m4_upper      ("m4_upper",      70, 100., 800.) ;
+  hColl m4_signal     ("m4_signal",     70, 100., 800.) ;
+  hColl m4_lower      ("m4_lower",      70, 100., 800.) ;
+  hColl m4_sideband   ("m4_sideband",   70, 100., 800.) ;
 
   TH1F * m4_EvenHigher_DATA = new TH1F ("m4_EvenHigher_DATA", "m4_EvenHigher_DATA", 70, 100., 800.) ;
-  TH1F * m4_upper_DATA = new TH1F ("m4_upper_DATA", "m4_upper_DATA", 70, 100., 800.) ;
-  TH1F * m4_signal_DATA = new TH1F ("m4_signal_DATA", "m4_signal_DATA", 70, 100., 800.) ;
-  TH1F * m4_lower_DATA = new TH1F ("m4_lower_DATA", "m4_lower_DATA", 70, 100., 800.) ;
-  TH1F * m4_sideband_DATA = new TH1F ("m4_sideband_DATA", "m4_sideband_DATA", 70, 100., 800.) ;
+  TH1F * m4_upper_DATA      = new TH1F ("m4_upper_DATA",      "m4_upper_DATA",      70, 100., 800.) ;
+  TH1F * m4_signal_DATA     = new TH1F ("m4_signal_DATA",     "m4_signal_DATA",     70, 100., 800.) ;
+  TH1F * m4_lower_DATA      = new TH1F ("m4_lower_DATA",      "m4_lower_DATA",      70, 100., 800.) ;
+  TH1F * m4_sideband_DATA   = new TH1F ("m4_sideband_DATA",   "m4_sideband_DATA",   70, 100., 800.) ;
 
-  TH1F * m4_EvenHigher_SIG = new TH1F ("m4_EvenHigher_SIG", "m4_EvenHigher_SIG", 70, 100., 800.) ;
-  TH1F * m4_upper_SIG = new TH1F ("m4_upper_SIG", "m4_upper_SIG", 70, 100., 800.) ;
-  TH1F * m4_signal_SIG = new TH1F ("m4_signal_SIG", "m4_signal_SIG", 70, 100., 800.) ;
-  TH1F * m4_lower_SIG = new TH1F ("m4_lower_SIG", "m4_lower_SIG", 70, 100., 800.) ;
-  TH1F * m4_sideband_SIG = new TH1F ("m4_sideband_SIG", "m4_sideband_SIG", 70, 100., 800.) ;
+  hColl m4_EvenHigher_SIG ("m4_EvenHigher_SIG", 70, 100., 800.) ;
+  hColl m4_upper_SIG      ("m4_upper_SIG",      70, 100., 800.) ;
+  hColl m4_signal_SIG     ("m4_signal_SIG",     70, 100., 800.) ;
+  hColl m4_lower_SIG      ("m4_lower_SIG",      70, 100., 800.) ;
+  hColl m4_sideband_SIG   ("m4_sideband_SIG",   70, 100., 800.) ;
 
   //PG the cuts
   TCut generalCut = "" ;
   generalCut = generalCut && "1 == 1" ;
   
-  TCut lower = "WJJ_m > 50 && WJJ_m < 65" ;
-  TCut signal = "WJJ_m > 65 && WJJ_m < 95" ;
-  TCut upper = "WJJ_m > 95 && WJJ_m < 130" ;
+  TCut lower      = "WJJ_m > 50  && WJJ_m < 65" ;
+  TCut signal     = "WJJ_m > 65  && WJJ_m < 95" ;
+  TCut upper      = "WJJ_m > 95  && WJJ_m < 130" ;
   TCut EvenHigher = "WJJ_m > 130 && WJJ_m < 400" ;
 
   //PG loop over samples
@@ -171,29 +171,27 @@ int main (int argc, char** argv)
       cout << " reading " << iColl->first << endl ;
       if (iColl->first.find ("ggH") != string::npos || iColl->first.find ("qqH") != string::npos) 
         {
-//          iColl->second->Draw ("lepNuW_m >> m4_lower_SIG", cutLower) ;
-//          iColl->second->Draw ("lepNuW_m >> m4_signal_SIG", cutSignal) ;
-//          iColl->second->Draw ("lepNuW_m >> m4_upper_SIG", cutUpper) ;
-//          iColl->second->Draw ("lepNuW_m >> m4_EvenHigher_SIG", cutEvenHigher) ;
-//          iColl->second->Draw ("lepNuW_m >> m4_sideband_SIG", cutSideband) ;
-
-          iColl->second->Draw ("lepNuW_m_KF >> m4_lower_SIG", cutLowerExtended) ;
-          iColl->second->Draw ("lepNuW_m_KF >> m4_signal_SIG", cutSignalExtended) ;
-          iColl->second->Draw ("lepNuW_m_KF >> m4_upper_SIG", cutUpperExtended) ;
-          iColl->second->Draw ("lepNuW_m_KF >> m4_EvenHigher_SIG", cutEvenHigherExtended) ;
-          iColl->second->Draw ("lepNuW_m_KF >> m4_sideband_SIG", cutSidebandExtended) ;
+          TH1F * h_m4_lower_SIG = m4_lower_SIG.addSample (iColl->first.c_str ()) ;
+          TH1F * h_m4_signal_SIG = m4_signal_SIG.addSample (iColl->first.c_str ()) ;
+          TH1F * h_m4_upper_SIG = m4_upper_SIG.addSample (iColl->first.c_str ()) ;
+          TH1F * h_m4_EvenHigher_SIG = m4_EvenHigher_SIG.addSample (iColl->first.c_str ()) ;
+          TH1F * h_m4_sideband_SIG = m4_sideband_SIG.addSample (iColl->first.c_str ()) ;
+    
+          TChain * chain = iColl->second ;
+          VBFAnalysisVariables vars ;
+          SetVBFPreselectionTreeBranches (vars, chain) ;
+    
+          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_lower_SIG->GetName (), cutLowerExtended) ;
+          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_signal_SIG->GetName (), cutSignalExtended) ;
+          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_upper_SIG->GetName (), cutUpperExtended) ;
+          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_EvenHigher_SIG->GetName (), cutEvenHigherExtended) ;
+          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_sideband_SIG->GetName (), cutSidebandExtended) ;
           
           continue ;
         }
 
       if (iColl->first == "DATA")
         {
-//          iColl->second->Draw ("lepNuW_m >> m4_lower_DATA", cutLower) ;
-//          iColl->second->Draw ("lepNuW_m >> m4_signal_DATA", cutSignal) ;
-//          iColl->second->Draw ("lepNuW_m >> m4_upper_DATA", cutUpper) ;
-//          iColl->second->Draw ("lepNuW_m >> m4_EvenHigher_DATA", cutEvenHigher) ;
-//          iColl->second->Draw ("lepNuW_m >> m4_sideband_DATA", cutSideband) ;
-
           iColl->second->Draw ("lepNuW_m_KF >> m4_lower_DATA", cutLower) ;
           iColl->second->Draw ("lepNuW_m_KF >> m4_signal_DATA", cutSignal) ;
           iColl->second->Draw ("lepNuW_m_KF >> m4_upper_DATA", cutUpper) ;
@@ -212,13 +210,6 @@ int main (int argc, char** argv)
       TChain * chain = iColl->second ;
       VBFAnalysisVariables vars ;
       SetVBFPreselectionTreeBranches (vars, chain) ;
-
-      // rivedi come era fatto con amax
-//      iColl->second->Draw (TString ("lepNuW_m >> ") + h_m4_lower->GetName (), cutLowerExtended) ;
-//      iColl->second->Draw (TString ("lepNuW_m >> ") + h_m4_signal->GetName (), cutSignalExtended) ;
-//      iColl->second->Draw (TString ("lepNuW_m >> ") + h_m4_upper->GetName (), cutUpperExtended) ;
-//      iColl->second->Draw (TString ("lepNuW_m >> ") + h_m4_EvenHigher->GetName (), cutEvenHigherExtended) ;
-//      iColl->second->Draw (TString ("lepNuW_m >> ") + h_m4_sideband->GetName (), cutSidebandExtended) ;
 
       iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_lower->GetName (), cutLowerExtended) ;
       iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_signal->GetName (), cutSignalExtended) ;
@@ -247,11 +238,11 @@ int main (int argc, char** argv)
   m4_lower_DATA->Write () ;   
   m4_sideband_DATA->Write () ;
 
-  m4_upper_SIG->Write () ;   
-  m4_EvenHigher_SIG->Write () ;   
-  m4_signal_SIG->Write () ;  
-  m4_lower_SIG->Write () ;   
-  m4_sideband_SIG->Write () ;
+  m4_upper_SIG.save (outputRootFile) ;   
+  m4_EvenHigher_SIG.save (outputRootFile) ;   
+  m4_signal_SIG.save (outputRootFile) ;  
+  m4_lower_SIG.save (outputRootFile) ;   
+  m4_sideband_SIG.save (outputRootFile) ;
 
   outputRootFile->Close () ;
   delete outputRootFile ;
