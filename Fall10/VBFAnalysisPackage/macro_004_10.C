@@ -1,16 +1,21 @@
 #include <./test/plotUtils.C>
 #include "./interface/Functions.h"
 
-void scaleErrors (TH1F * histo, double scaleFactor)
+TH1F * dumpProfile (TString outputName, TProfile * input)
 {
-  for (int iBin = 0 ; iBin < histo->GetNBinsX () ; ++iBin)
+  TH1F * output = new TH1F (outputName, outputName, input->GetNbinsX (), input->GetXaxis ()->GetXmin (), input->GetXaxis ()->GetXmax ()) ;
+  for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
     {
-      histo->SetBinError (iBin, scaleFactor * histo->GetBinError (iBin)) ;
+      double val = input->GetBinContent (iBin) ;
+      output->SetBinContent (iBin, val) ;
+      double err = input->GetBinError (iBin) ;
+      output->SetBinError (iBin, err) ;
     }
+  return output ;  
 }
 
 
-// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
 int macro_004_10 (int mass)
@@ -234,7 +239,7 @@ int macro_004_10 (int mass)
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TRandom3 r ;
-  int nToys = 10000 ;
+  int nToys = 10 ;
   TH2F * correctionPlane = new TH2F ("correctionPlane", "", 70, 100, 800, 600, 0, 9) ;
 
   TH1F * dummyNum = (TH1F *) signalRegionMC->Clone ("dummyNum") ;
@@ -272,8 +277,9 @@ int macro_004_10 (int mass)
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TProfile * correctionBand = correctionPlane->ProfileX ("correctionBand", 1, -1, "s") ;
-  correctionBand->SetStats (0) ;
-  correctionBand->SetFillColor (kOrange) ;
+  TH1F * h_correctionBand = dumpProfile ("h_correctionBand", correctionBand) ;
+  h_correctionBand->SetStats (0) ;
+  h_correctionBand->SetFillColor (kOrange) ;
  
   //PG correction factor from the gaussian fit to slices of the many toys
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -291,7 +297,7 @@ int macro_004_10 (int mass)
   
   correctionPlane->SetStats (0) ;
 //  correctionPlane->Draw ("COLZ") ;
-  correctionBand->Draw ("E3") ;
+  h_correctionBand->Draw ("E3") ;
   gaussianBand->Draw ("E3same") ;
   gStyle->SetPalette (1) ;
   ratio_total->Draw ("same") ;
@@ -308,37 +314,60 @@ int macro_004_10 (int mass)
       double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;
       double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ;
       poolPlotGaus.Fill ((num - mean) / sigma) ;
-      mean = correctionBand->GetBinContent (iBin) ;
-      sigma = correctionBand->GetBinError (iBin) ;
+      mean = h_correctionBand->GetBinContent (iBin) ;
+      sigma = h_correctionBand->GetBinError (iBin) ;
       poolPlot.Fill ((num - mean) / sigma) ;
     }
   poolPlotGaus.Fit ("gaus","L") ;
   c1->Print ("poolPlotGaus.pdf", "pdf") ;
+
+  //PG scale the error on the correction band by the sigma of the poolplot, if bigger than 1
+  double poolScaleGaus = poolPlotGaus.GetFunction ("gaus")->GetParameter (2) ;
+  if (poolScaleGaus > 1) 
+    {
+      for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin)
+        {
+          double newError = poolScaleGaus * gaussianBand->GetBinError (iBin) ;
+          gaussianBand->SetBinError (iBin, newError) ;
+        }
+    }
+ 
   poolPlot.Fit ("gaus","L") ;
   c1->Print ("poolPlot.pdf", "pdf") ;
+
+  //PG scale the error on the correction band by the sigma of the poolplot, if bigger than 1
+  double poolScale = poolPlot.GetFunction ("gaus")->GetParameter (2) ;
+  if (poolScale > 1) 
+    {
+      for (int iBin = 1 ; iBin <= correctionBand->GetNbinsX () ; ++iBin)
+        {
+          double newError = poolScale * h_correctionBand->GetBinError (iBin) ;
+          h_correctionBand->SetBinError (iBin, newError) ;
+        }
+    }
  
   //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
   TH1F * extrapolated_bkg = sidebaRegion->Clone ("extrapolated_bkg") ;
 
-  extrapolated_bkg->Multiply (correctionBand) ; //PG profile correction
+  extrapolated_bkg->Multiply (h_correctionBand) ; //PG profile correction
 //  extrapolated_bkg->Multiply (gaussianBand) ; //PG gaus fit correction
 
   //PG first plot of the result
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TLegend leg_compare (0.2, 0.2, 0.6, 0.4, NULL, "brNDC") ;
-  leg_compare.SetBorderSize (0) ;
-  leg_compare.SetTextFont (42) ;
-  leg_compare.SetTextSize (0.04) ;
-  leg_compare.SetLineColor (1) ;
-  leg_compare.SetLineStyle (1) ;
-  leg_compare.SetLineWidth (1) ;
-  leg_compare.SetFillColor (0) ;
-  leg_compare.SetFillStyle (0) ;
-  leg_compare.AddEntry (signalRegionMC, "simulation in signal region", "lfp") ;
-  leg_compare.AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
+  TLegend * leg_compare = new TLegend (0.2, 0.2, 0.6, 0.4, NULL, "brNDC") ;
+  leg_compare->SetBorderSize (0) ;
+  leg_compare->SetTextFont (42) ;
+  leg_compare->SetTextSize (0.04) ;
+  leg_compare->SetLineColor (1) ;
+  leg_compare->SetLineStyle (1) ;
+  leg_compare->SetLineWidth (1) ;
+  leg_compare->SetFillColor (0) ;
+  leg_compare->SetFillStyle (0) ;
+  leg_compare->AddEntry (signalRegionMC, "simulation in signal region", "lfp") ;
+  leg_compare->AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
 
   c1->SetLogy () ;
 //  c1->DrawFrame (100, 0.1, 800, 5000) ;
@@ -346,13 +375,13 @@ int macro_004_10 (int mass)
   extrapolated_bkg->SetTitle ("") ;
   extrapolated_bkg->SetLineColor (kRed) ;
   extrapolated_bkg->SetFillColor (kOrange) ;
-  extrapolated_bkg->Draw ("E3same") ;
+  extrapolated_bkg->Draw ("E3") ;
 
   signalRegionMC->SetStats (0) ;
   signalRegionMC->SetMarkerStyle (24) ;
   signalRegionMC->SetMarkerColor (kBlack) ;
   signalRegionMC->Draw ("Psame") ;
-  leg_compare.Draw () ;
+  leg_compare->Draw () ;
   c1->Print ("extrapAndMc.pdf", "pdf") ;
   c1->SetLogy (0) ;
   c1->Update () ;
