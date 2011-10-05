@@ -25,10 +25,15 @@
 double MyGetMinimum(const TH1F* histo, const double& minval, int binMin=-1, int binMax=-1);
 double MyGetMaximum(const TH1F* histo, const double& maxval, int binMin=-1, int binMax=-1);
 
+void MyDraw(THStack* hs, const std::string& option = "");
+
 void DrawTStackError(THStack* hs, bool poisson = false, double syst = 0.);
 
 TH1F* DrawTStackDataMCRatio(THStack* hs, TH1F* dataGlobalHisto,
                             TGraph* ratioGraph1s, TGraph* ratioGraph2s);
+
+
+
 
 
 
@@ -92,6 +97,24 @@ class drawTStack
   void SetYLegend(const double& yLow, const double& yHigh);
 
   void SetUnit(const std::string& unit);  
+  
+  
+  
+  TH1F* GetGlobalHisto()     { return m_globalHisto;     };
+  TH1F* GetBkgGlobalHisto()  { return m_bkgGlobalHisto;  };
+  TH1F* GetSigGlobalHisto()  { return m_sigGlobalHisto;  };
+  TH1F* GetDataGlobalHisto() { return m_dataGlobalHisto; };
+  
+  THStack* GetStack()    { return m_stack;    };
+  THStack* GetBkgStack() { return m_bkgStack; };
+  THStack* GetSigStack() { return m_sigStack; };
+  
+  std::map<std::string, TH1F*> GetHistoSummed()     { return m_histo_summed; };
+  std::map<std::string, TH1F*> GetBkgHistoSummed()  { return m_bkgHisto_summed; };
+  std::map<std::string, TH1F*> GetSigHistoSummed()  { return m_sigHisto_summed; };
+  std::map<std::string, TH1F*> GetDataHistoSummed() { return m_dataHisto_summed; };
+  
+  TLegend* GetLegend() { return m_legend; }; 
   
   
   

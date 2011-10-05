@@ -814,9 +814,9 @@ int main(int argc, char** argv)
     
 
     if( vars.WJ1.pt() > 0. )
-      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForJets,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
     if( vars.WJ2.pt() > 0. )
-      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForJets,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
     if( vars.WJ2.pt() > vars.WJ1.pt() )
     {
       float QGLikelihoodDummy = vars.WJ2_QGLikelihood;

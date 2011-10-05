@@ -63,11 +63,12 @@
 ##QCD_Pt-80to170_BCtoE_TuneZ2_7TeV-pythia_Summer11-PU_S4_START42_V11-v1              1_QCD                   51 1 1001   0   -1.      9360.000   1.0   PFlow 
 ##QCD_Pt-20_MuEnrichedPt-15_TuneZ2_7TeV-pythia6_Summer11-PU_S4_START42_V11-v1        1_QCD                   51 1 1001   0   -1.     84700.000   1.0   PFlow 
 ##WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1               5_W+jets_madgraph       92 1 1001   0   -1.     31314.000   1.0   PFlow
+WToLNu_1jEnh2_2jEnh35_3jEnh40_4jEnh50_7TeV-sherpa_Summer11-PU_S4_START42_V11-v1      5_W+jets_sherpa         92 1 1001   0   -1.     31314.000   1.0   PFlow
 ##SingleElectron_Run2011A-May10ReReco-v1                                             0_data_SingleElectron    1 1 1001   1   -1.         1.000   1.0   PFlow
 ##SingleMu_Run2011A-May10ReReco-v1                                                   0_data_SingleMu          1 1 1001   1   -1.         1.000   1.0   PFlow
 ##ElectronHad_Run2011A-PromptReco-v4                                                 0_data_SingleElectron    1 1 1001   1   -1.         1.000   1.0   PFlow
 ##SingleMu_Run2011A-PromptReco-v4                                                    0_data_SingleMu          1 1 1001   1   -1.         1.000   1.0   PFlow
-ElectronHad_Run2011A-05Aug2011-v1                                                  0_data_SingleElectron    1 1 1001   1   -1.         1.000   1.0   PFlow
-SingleMu_Run2011A-05Aug2011-v1                                                     0_data_SingleMu          1 1 1001   1   -1.         1.000   1.0   PFlow
-ElectronHad_Run2011A-PromptReco-v6                                                 0_data_SingleElectron    1 1 1001   1   -1.         1.000   1.0   PFlow
-SingleMu_Run2011A-PromptReco-v6                                                    0_data_SingleMu          1 1 1001   1   -1.         1.000   1.0   PFlow
+##ElectronHad_Run2011A-05Aug2011-v1                                                  0_data_SingleElectron    1 1 1001   1   -1.         1.000   1.0   PFlow
+##SingleMu_Run2011A-05Aug2011-v1                                                     0_data_SingleMu          1 1 1001   1   -1.         1.000   1.0   PFlow
+##ElectronHad_Run2011A-PromptReco-v6                                                 0_data_SingleElectron    1 1 1001   1   -1.         1.000   1.0   PFlow
+##SingleMu_Run2011A-PromptReco-v6                                                    0_data_SingleMu          1 1 1001   1   -1.         1.000   1.0   PFlow

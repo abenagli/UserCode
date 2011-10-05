@@ -438,6 +438,8 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
         histo_summed -> SetLineWidth(1);
         if(m_mH_summed[mapIt->first] > 0.)
         {
+          histo_summed -> SetFillColor(0);
+          histo_summed -> SetFillStyle(0);
           histo_summed -> SetLineColor(m_color_summed[mapIt->first]);
           histo_summed -> SetLineWidth(2);
         }
@@ -756,7 +758,7 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
     if( stackSig == false )
     {
       m_bkgStack -> Draw("HISTO");
-      m_sigStack -> Draw("HISTO,same");
+      MyDraw(m_sigStack,"HISTO,same");
     }
     else
     {
@@ -804,6 +806,8 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   // sameAreaNoStack or integralNoStack modes  
   if( (mode == "sameAreaNoStack") || (mode == "integralNoStack") )
   {
+    p1 -> cd();
+    
     if( stackSig == false )
     {
       m_bkgStack -> Draw("nostack,HISTO");
@@ -1116,6 +1120,8 @@ void drawTStack::DrawEvents(const std::string& mode,
         histo_summed -> SetLineWidth(1);
         if(m_mH_summed[mapIt->first] > 0.)
         {
+          histo_summed -> SetFillColor(0);
+          histo_summed -> SetFillStyle(0);
           histo_summed -> SetLineColor(m_color_summed[mapIt->first]);
           histo_summed -> SetLineWidth(2);
         }
@@ -1280,7 +1286,7 @@ void drawTStack::DrawEvents(const std::string& mode,
     if( stackSig == false )
     {
       m_bkgStack -> Draw("HISTO");
-      m_sigStack -> Draw("HISTO,same");
+      MyDraw(m_sigStack,"HISTO,same");
     }
     else
     {
@@ -1639,6 +1645,20 @@ double MyGetMaximum(const TH1F* histo, const double& maxval, int binMin, int bin
   }
   
   return maximum;
+}
+
+
+//-------------------------------------------------------------------
+
+
+void MyDraw(THStack* hs, const std::string& option)
+{
+  TObjArray* histos = hs -> GetStack();
+  for(int histIt = histos->GetEntries()-1; histIt >=0 ; --histIt) 
+  {
+    TH1F* histo = (TH1F*)( histos -> At(histIt) );
+    histo -> Draw(option.c_str());
+  }
 }
 
 
