@@ -1,6 +1,18 @@
 #include <./test/plotUtils.C>
 #include "./interface/Functions.h"
 
+void scaleErrors (TH1F * histo, double scaleFactor)
+{
+  for (int iBin = 0 ; iBin < histo->GetNBinsX () ; ++iBin)
+    {
+      histo->SetBinError (iBin, scaleFactor * histo->GetBinError (iBin)) ;
+    }
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 int macro_004_10 (int mass)
 {
   TString inputFile = "testBkg_004_S" ;
@@ -73,11 +85,13 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = m4_upper_DATA ;  
 */
 
+/*
   cout << "upper sideband analysis" << endl ;
   TH1F * sidebaRegionMC = m4_upper_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_upper_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
+*/
 
 /*
   cout << "upper sideband analysis closure test" << endl ;
@@ -87,13 +101,11 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
-/*
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_sideband_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
-*/
 
 /*
   cout << "final analysis closure test" << endl ;
@@ -160,7 +172,18 @@ int macro_004_10 (int mass)
   numFitFunc->SetLineWidth (1) ;
   numFitFunc->SetLineColor (kBlue+2) ;
   numFitFunc->SetNpx (10000) ;
-  signalRegionMC->Fit (numFitFunc, "L", "", 160., 800.) ;
+
+  signalRegionMC->Fit (numFitFunc, "LQ", "", 160., 800.) ;
+  int fitStatus = 1 ;
+  int loops = 0 ; 
+  while (fitStatus != 0 && loops < 30)
+    {
+      TFitResultPtr fitResultPtr = signalRegionMC->Fit (numFitFunc, "LQ", "", 160., 800.) ;
+      fitStatus = (int)(fitResultPtr) ;
+      ++loops ;
+    }
+  cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
+
   TH1F * num_fit_error = new TH1F ("num_fit_error", "", 64, 160., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (num_fit_error, 0.68) ;
 
@@ -186,7 +209,18 @@ int macro_004_10 (int mass)
   denFitFunc->SetLineWidth (1) ;
   denFitFunc->SetLineColor (kBlue+2) ;
   denFitFunc->SetNpx (10000) ;
-  sidebaRegionMC->Fit (denFitFunc, "L", "", 160., 800.) ;
+
+  sidebaRegionMC->Fit (denFitFunc, "Q", "", 160., 800.) ;
+  fitStatus = 1 ;
+  loops = 0 ; 
+  while (fitStatus != 0 && loops < 30)
+    {
+      TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "LQ", "", 160., 800.) ;
+      fitStatus = (int)(fitResultPtr) ;
+      ++loops ;
+    }
+  cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
+
   TH1F * den_fit_error = new TH1F ("den_fit_error", "", 64, 160., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (den_fit_error, 0.68) ;
 
@@ -201,7 +235,7 @@ int macro_004_10 (int mass)
 
   TRandom3 r ;
   int nToys = 10000 ;
-  TH2F * correctionPlane = new TH2F ("correctionPlane", "", 70, 100, 800, 200, 0, 3) ;
+  TH2F * correctionPlane = new TH2F ("correctionPlane", "", 70, 100, 800, 600, 0, 9) ;
 
   TH1F * dummyNum = (TH1F *) signalRegionMC->Clone ("dummyNum") ;
   TH1F * dummyDen = (TH1F *) sidebaRegionMC->Clone ("dummyDen") ;
@@ -307,7 +341,7 @@ int macro_004_10 (int mass)
   leg_compare.AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
 
   c1->SetLogy () ;
-  c1->DrawFrame (100, 0.1, 800, 5000) ;
+//  c1->DrawFrame (100, 0.1, 800, 5000) ;
   extrapolated_bkg->SetStats (0) ;
   extrapolated_bkg->SetTitle ("") ;
   extrapolated_bkg->SetLineColor (kRed) ;
@@ -315,12 +349,24 @@ int macro_004_10 (int mass)
   extrapolated_bkg->Draw ("E3same") ;
 
   signalRegionMC->SetStats (0) ;
-  signalRegionMC->SetMarkerStyle (5) ;
+  signalRegionMC->SetMarkerStyle (24) ;
   signalRegionMC->SetMarkerColor (kBlack) ;
-  signalRegionMC->Draw ("same") ;
+  signalRegionMC->Draw ("Psame") ;
   leg_compare.Draw () ;
-  c1->Print ("compare_signal_region_new.pdf", "pdf") ;
+  c1->Print ("extrapAndMc.pdf", "pdf") ;
+  c1->SetLogy (0) ;
+  c1->Update () ;
+  c1->Print ("extrapAndMc_lin.pdf", "pdf") ;
 
+  c1->SetLogy () ;
+  extrapolated_bkg->Draw ("E3") ;
+  signalRegion->SetMarkerStyle (20) ;
+  signalRegion->Draw ("same") ;
+  c1->Print ("extrapAndData.pdf", "pdf") ;
+  c1->SetLogy (0) ;
+  c1->Update () ;
+  c1->Print ("extrapAndData_lin.pdf", "pdf") ;
+  
   //PG fit the extrapolated bkg
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -429,6 +475,7 @@ int macro_004_10 (int mass)
   g_background_count.Draw ("AE3") ;
   g_total.Draw ("EPsame") ;
   c1->Print ("results.pdf", "pdf") ;
+  c1->SetLogy (0) ;
 
   TGraph g_expectedCountings ;
   int k = 0 ;
@@ -441,7 +488,6 @@ int macro_004_10 (int mass)
   g_expectedCountings.SetPoint (k, masses.at (k++), 17.11) ;
   g_expectedCountings.SetPoint (k, masses.at (k++), 10.35) ;
 
-  c1->SetLogy (0) ;
   c1->DrawFrame (200, 0, 700, 200) ;
   g_error.SetLineWidth (2) ;
   g_error.Draw ("L") ;
@@ -459,6 +505,7 @@ int macro_004_10 (int mass)
 //  extrapolated_bkg_fitBand->Write () ;
   correctionPlane->Write () ;
   correctionBand->Write () ;
+  m4_signal_total_SIG->Write ("sig") ;
   g_total.Write ("g_total") ;
   g_background_count.Write ("g_background_count") ;
   g_error.Write ("g_error") ;
