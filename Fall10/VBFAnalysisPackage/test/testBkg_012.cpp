@@ -148,9 +148,9 @@ int main (int argc, char** argv)
   TProfile * correctionBand = new TProfile ("correctionBand", "", 70, 100, 800, 0, 10) ; //PG memory leak
   
   double minMin = 30 ;
-  double minMax = 100 ;
+  double minMax = 120 ;
   double maxMax = 400 ;
-  double step = 30. ;
+  double step = 10. ;
   TH2F summary ("summary", "", 
                 (step+minMax-minMin)/step, minMin - 0.5 * step, minMax + 0.5 * step,
                 (step+maxMax-minMin)/step, minMin - 0.5 * step, maxMax + 0.5 * step) ;
