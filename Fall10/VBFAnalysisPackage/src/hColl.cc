@@ -1,6 +1,8 @@
 #include "hColl.h"
 #include "THStack.h"
 
+#include <iostream>
+
 using namespace std ;
 
 hColl::hColl (string pN, int b, double m, double M) :
@@ -58,6 +60,11 @@ void
 hColl::save (TFile * f) 
 {
   f->cd () ;
+  if (collection.size () == 0) 
+    {
+      cout << "nothing to be saved for " << plotName << endl ;
+      return ;
+    }
   THStack stack (("stack_" + plotName).c_str (), "") ;
   for (unsigned int i = 0 ; i < collection.size () ; ++i) 
     {
