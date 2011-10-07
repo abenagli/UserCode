@@ -4,10 +4,6 @@
 #include <iostream>
 
 
-
-
-
-
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 // SIMPLE FUNCTIONS
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -47,6 +43,7 @@ double exponential(double* x, double* par)
   
   //std::cout << "N: " << N << "   lambda: " << lambda << std::endl;
   return exp(N) * exp(-1.*lambda*xx);
+//  return N * exp(-1.*lambda*xx);
 }
 
 
@@ -259,6 +256,15 @@ double attenuatedDoubleExponentialCumLeadingEdge(double* x, double* par)
 double attenuatedCB(double* x, double* par)
 {
   return crystalBallHigh (x, par) * antiFermi (x, &par[5]) ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+double antiFermiWithScale (double* x, double* par)
+{
+  return antiFermi (x, par) * par[2] ;
 }
 
 
