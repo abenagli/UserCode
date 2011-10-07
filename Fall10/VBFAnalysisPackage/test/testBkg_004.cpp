@@ -121,28 +121,36 @@ int main (int argc, char** argv)
 //      |   +--------------------+
 //      +-------------------------------  m4
 
-  hColl m4_EvenHigher ("m4_EvenHigher", 70, 100., 800.) ;
-  hColl m4_upper      ("m4_upper",      70, 100., 800.) ;
-  hColl m4_signal     ("m4_signal",     70, 100., 800.) ;
-  hColl m4_lower      ("m4_lower",      70, 100., 800.) ;
-  hColl m4_sideband   ("m4_sideband",   70, 100., 800.) ;
-
-  TH1F * m4_EvenHigher_DATA = new TH1F ("m4_EvenHigher_DATA", "m4_EvenHigher_DATA", 70, 100., 800.) ;
-  TH1F * m4_upper_DATA      = new TH1F ("m4_upper_DATA",      "m4_upper_DATA",      70, 100., 800.) ;
-  TH1F * m4_signal_DATA     = new TH1F ("m4_signal_DATA",     "m4_signal_DATA",     70, 100., 800.) ;
-  TH1F * m4_lower_DATA      = new TH1F ("m4_lower_DATA",      "m4_lower_DATA",      70, 100., 800.) ;
-  TH1F * m4_sideband_DATA   = new TH1F ("m4_sideband_DATA",   "m4_sideband_DATA",   70, 100., 800.) ;
-
-  hColl m4_EvenHigher_SIG ("m4_EvenHigher_SIG", 70, 100., 800.) ;
-  hColl m4_upper_SIG      ("m4_upper_SIG",      70, 100., 800.) ;
-  hColl m4_signal_SIG     ("m4_signal_SIG",     70, 100., 800.) ;
-  hColl m4_lower_SIG      ("m4_lower_SIG",      70, 100., 800.) ;
-  hColl m4_sideband_SIG   ("m4_sideband_SIG",   70, 100., 800.) ;
-
+  int nBins = 140 ;
+  double m4_min = 100. ;
+  double m4_max = 800. ;
   //PG the cuts
   TCut generalCut = "" ;
   generalCut = generalCut && "1 == 1" ;
-  
+//  generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
+  generalCut = generalCut && "lep_flavour == 13" ; //PG only electrons
+  std::string outputRootFullFileName = "testBkg_004_5GeV_S" + mass + ".root" ;
+//  std::string outputRootFullFileName = "testBkg_004_noKF.root" ;
+
+
+  hColl m4_EvenHigher ("m4_EvenHigher", nBins, m4_min, m4_max) ;
+  hColl m4_upper      ("m4_upper",      nBins, m4_min, m4_max) ;
+  hColl m4_signal     ("m4_signal",     nBins, m4_min, m4_max) ;
+  hColl m4_lower      ("m4_lower",      nBins, m4_min, m4_max) ;
+  hColl m4_sideband   ("m4_sideband",   nBins, m4_min, m4_max) ;
+
+  TH1F * m4_EvenHigher_DATA = new TH1F ("m4_EvenHigher_DATA", "m4_EvenHigher_DATA", nBins, m4_min, m4_max) ;
+  TH1F * m4_upper_DATA      = new TH1F ("m4_upper_DATA",      "m4_upper_DATA",      nBins, m4_min, m4_max) ;
+  TH1F * m4_signal_DATA     = new TH1F ("m4_signal_DATA",     "m4_signal_DATA",     nBins, m4_min, m4_max) ;
+  TH1F * m4_lower_DATA      = new TH1F ("m4_lower_DATA",      "m4_lower_DATA",      nBins, m4_min, m4_max) ;
+  TH1F * m4_sideband_DATA   = new TH1F ("m4_sideband_DATA",   "m4_sideband_DATA",   nBins, m4_min, m4_max) ;
+
+  hColl m4_EvenHigher_SIG ("m4_EvenHigher_SIG", nBins, m4_min, m4_max) ;
+  hColl m4_upper_SIG      ("m4_upper_SIG",      nBins, m4_min, m4_max) ;
+  hColl m4_signal_SIG     ("m4_signal_SIG",     nBins, m4_min, m4_max) ;
+  hColl m4_lower_SIG      ("m4_lower_SIG",      nBins, m4_min, m4_max) ;
+  hColl m4_sideband_SIG   ("m4_sideband_SIG",   nBins, m4_min, m4_max) ;
+
   TCut lower      = "WJJ_m > 50  && WJJ_m < 65" ;
   TCut signal     = "WJJ_m > 65  && WJJ_m < 95" ;
   TCut upper      = "WJJ_m > 95  && WJJ_m < 130" ;
@@ -228,9 +236,6 @@ int main (int argc, char** argv)
       ++index ;   
     } //PG loop over samples
 
-  // define out file names
-  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
-//  std::string outputRootFullFileName = "testBkg_004_noKF.root" ;
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
   outputRootFile->cd () ;
 
