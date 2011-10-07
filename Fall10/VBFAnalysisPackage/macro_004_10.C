@@ -1,6 +1,9 @@
 #include <./test/plotUtils.C>
 #include "./interface/Functions.h"
 
+/**
+  dump a tprofile in a TH1F, so that the errors are easily modifiable afterwards
+*/
 TH1F * dumpProfile (TString outputName, TProfile * input)
 {
   TH1F * output = new TH1F (outputName, outputName, input->GetNbinsX (), input->GetXaxis ()->GetXmin (), input->GetXaxis ()->GetXmax ()) ;
@@ -16,15 +19,34 @@ TH1F * dumpProfile (TString outputName, TProfile * input)
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+/**
+ add to the output the relative error in the input
+*/ 
+// void addError (TH1F * modified, TH1F * source)
+// {
+//   for (int iBin = 1 ; iBin <= modified->GetNbinsX () ; ++iBin) 
+//     {
+//       ;
+//     }
+// 
+// }
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
 int macro_004_10 (int mass)
 {
-  TString inputFile = "testBkg_004_S" ;
+//  TString inputFile = "testBkg_004_S" ;
+//  TString inputFile = "testBkg_004_mu_S" ; //PG only muons
+//  TString inputFile = "testBkg_004_el_S" ; //PG only muons
+  TString inputFile = "testBkg_004_5GeV_S" ; //PG only muons
   inputFile += mass ;
   inputFile += ".root" ;
   cout << inputFile << endl ;
   TFile input (inputFile) ;
+
+  int nToys = 10 ;
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -141,6 +163,13 @@ int macro_004_10 (int mass)
   stack_m4_sideband->Draw ("hist") ;
   c1->Print ("denominator.pdf", "pdf") ;
 
+  int nBins =  m4_signal_DATA->GetNbinsX () ;
+  double m4_min = m4_signal_DATA->GetXaxis ()->GetXmin () ;
+  double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
+ 
+  double binSize = (m4_max - m4_min) / nBins ;
+  
+  cout << nBins << " " << m4_min << " " << m4_max << " " << binSize << endl ;
 
 //------------------------------
  // attenuated double exponential
@@ -189,7 +218,7 @@ int macro_004_10 (int mass)
     }
   cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
 
-  TH1F * num_fit_error = new TH1F ("num_fit_error", "", 64, 160., 800.) ;
+  TH1F * num_fit_error = new TH1F ("num_fit_error", "", (800-160)/binSize, 160., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (num_fit_error, 0.68) ;
 
   num_fit_error->SetFillColor (kGray+2) ;
@@ -215,7 +244,7 @@ int macro_004_10 (int mass)
   denFitFunc->SetLineColor (kBlue+2) ;
   denFitFunc->SetNpx (10000) ;
 
-  sidebaRegionMC->Fit (denFitFunc, "Q", "", 160., 800.) ;
+  sidebaRegionMC->Fit (denFitFunc, "LQ", "", 160., 800.) ;
   fitStatus = 1 ;
   loops = 0 ; 
   while (fitStatus != 0 && loops < 30)
@@ -226,7 +255,7 @@ int macro_004_10 (int mass)
     }
   cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
 
-  TH1F * den_fit_error = new TH1F ("den_fit_error", "", 64, 160., 800.) ;
+  TH1F * den_fit_error = new TH1F ("den_fit_error", "", (800-160)/binSize, 160., 800.) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (den_fit_error, 0.68) ;
 
   den_fit_error->SetFillColor (kGray+2) ;
@@ -239,13 +268,12 @@ int macro_004_10 (int mass)
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TRandom3 r ;
-  int nToys = 10 ;
-  TH2F * correctionPlane = new TH2F ("correctionPlane", "", 70, 100, 800, 600, 0, 9) ;
+  TH2F * correctionPlane = new TH2F ("correctionPlane", "", nBins, m4_min, m4_max, 600, 0, 9) ;
 
   TH1F * dummyNum = (TH1F *) signalRegionMC->Clone ("dummyNum") ;
   TH1F * dummyDen = (TH1F *) sidebaRegionMC->Clone ("dummyDen") ;
-  double intSignal = signalRegionMC->Integral () ;
-  double intSideband = sidebaRegionMC->Integral () ;
+  double intSignal = signalRegionMC->Integral () * 2.6 / 2.1 ;   //PG put in the W+jets MC statistics for the uncertainty
+  double intSideband = sidebaRegionMC->Integral () * 2.6 / 2.1 ; //PG put in the W+jets MC statistics for the uncertainty
  
   for (int iToy = 0 ; iToy < nToys ; ++iToy)
     {
@@ -306,23 +334,23 @@ int macro_004_10 (int mass)
   //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TH1F poolPlot ("poolPlot", "", 50, -5, 5) ;
-  TH1F poolPlotGaus ("poolPlotGaus", "", 50, -5, 5) ;
+  TH1F pullPlot ("pullPlot", "", 50, -5, 5) ;
+  TH1F pullPlotGaus ("pullPlotGaus", "", 50, -5, 5) ;
   for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin) 
     {
       double num = ratio_total->GetBinContent (iBin) ;
       double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;
       double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ;
-      poolPlotGaus.Fill ((num - mean) / sigma) ;
+      pullPlotGaus.Fill ((num - mean) / sigma) ;
       mean = h_correctionBand->GetBinContent (iBin) ;
       sigma = h_correctionBand->GetBinError (iBin) ;
-      poolPlot.Fill ((num - mean) / sigma) ;
+      pullPlot.Fill ((num - mean) / sigma) ;
     }
-  poolPlotGaus.Fit ("gaus","L") ;
-  c1->Print ("poolPlotGaus.pdf", "pdf") ;
+  pullPlotGaus.Fit ("gaus","L") ;
+  c1->Print ("pullPlotGaus.pdf", "pdf") ;
 
-  //PG scale the error on the correction band by the sigma of the poolplot, if bigger than 1
-  double poolScaleGaus = poolPlotGaus.GetFunction ("gaus")->GetParameter (2) ;
+  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
+  double poolScaleGaus = pullPlotGaus.GetFunction ("gaus")->GetParameter (2) ;
   if (poolScaleGaus > 1) 
     {
       for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin)
@@ -332,11 +360,11 @@ int macro_004_10 (int mass)
         }
     }
  
-  poolPlot.Fit ("gaus","L") ;
-  c1->Print ("poolPlot.pdf", "pdf") ;
+  pullPlot.Fit ("gaus","L") ;
+  c1->Print ("pullPlot.pdf", "pdf") ;
 
-  //PG scale the error on the correction band by the sigma of the poolplot, if bigger than 1
-  double poolScale = poolPlot.GetFunction ("gaus")->GetParameter (2) ;
+  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
+  double poolScale = pullPlot.GetFunction ("gaus")->GetParameter (2) ;
   if (poolScale > 1) 
     {
       for (int iBin = 1 ; iBin <= correctionBand->GetNbinsX () ; ++iBin)
@@ -506,30 +534,19 @@ int macro_004_10 (int mass)
   c1->Print ("results.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
-  TGraph g_expectedCountings ;
-  int k = 0 ;
-  g_expectedCountings.SetPoint (k, masses.at (k++), 74.14) ;
-  g_expectedCountings.SetPoint (k, masses.at (k++), 75.13) ;
-  g_expectedCountings.SetPoint (k, masses.at (k++), 76.54) ;
-  g_expectedCountings.SetPoint (k, masses.at (k++), 65.89) ;
-  g_expectedCountings.SetPoint (k, masses.at (k++), 43.78) ;
-  g_expectedCountings.SetPoint (k, masses.at (k++), 28.21) ;
-  g_expectedCountings.SetPoint (k, masses.at (k++), 17.11) ;
-  g_expectedCountings.SetPoint (k, masses.at (k++), 10.35) ;
-
   c1->DrawFrame (200, 0, 700, 200) ;
   g_error.SetLineWidth (2) ;
   g_error.Draw ("L") ;
-  g_expectedCountings.SetMarkerStyle (8) ;
-  g_expectedCountings.Draw ("LP") ;
-  c1->Print ("trivial_sensitivity.pdf", "pdf") ;
+//  g_expectedCountings.SetMarkerStyle (8) ;
+//  g_expectedCountings.Draw ("LP") ;
+  c1->Print ("systematic_and_statistics.pdf", "pdf") ;
 
   TFile output ("output_004_10.root", "recreate") ;
   output.cd () ;
   ratio_total->Write () ;
   gaussianBand->Write () ;
-  poolPlot.Write () ;
-  poolPlotGaus.Write () ;
+  pullPlot.Write () ;
+  pullPlotGaus.Write () ;
   extrapolated_bkg->Write () ;
 //  extrapolated_bkg_fitBand->Write () ;
   correctionPlane->Write () ;
@@ -538,7 +555,7 @@ int macro_004_10 (int mass)
   g_total.Write ("g_total") ;
   g_background_count.Write ("g_background_count") ;
   g_error.Write ("g_error") ;
-  g_expectedCountings.Write ("g_expectedCountings") ;
+//  g_expectedCountings.Write ("g_expectedCountings") ;
   output.Close () ;
 
   gApplication->Terminate (0) ;
@@ -580,7 +597,4 @@ int macro_004_10 (int mass)
   KEY: TH1F	m4_lower_ZZ;1	ZZ
   KEY: TH1F	m4_lower_top;1	top
   KEY: THStack	stack_m4_lower;1	
-
-
-
 */
