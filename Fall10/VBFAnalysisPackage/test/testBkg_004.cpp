@@ -121,7 +121,7 @@ int main (int argc, char** argv)
 //      |   +--------------------+
 //      +-------------------------------  m4
 
-  int nBins = 140 ;
+  int nBins = 70 ;
   double m4_min = 100. ;
   double m4_max = 800. ;
   //PG the cuts
@@ -129,8 +129,11 @@ int main (int argc, char** argv)
   generalCut = generalCut && "1 == 1" ;
 //  generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
   generalCut = generalCut && "lep_flavour == 13" ; //PG only electrons
-  std::string outputRootFullFileName = "testBkg_004_5GeV_S" + mass + ".root" ;
+  std::string outputRootFullFileName = "testBkg_004_noKF_S" + mass + ".root" ;
+//  std::string outputRootFullFileName = "testBkg_004_5GeV_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF.root" ;
+  TString m4_VAR = "lepNuW_m" ;
+//  TString m4_VAR = "lepNuW_m_KF" ;
 
 
   hColl m4_EvenHigher ("m4_EvenHigher", nBins, m4_min, m4_max) ;
@@ -197,22 +200,22 @@ int main (int argc, char** argv)
           VBFAnalysisVariables vars ;
           SetVBFPreselectionTreeBranches (vars, chain) ;
     
-          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_lower_SIG->GetName (), cutLowerExtended) ;
-          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_signal_SIG->GetName (), cutSignalExtended) ;
-          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_upper_SIG->GetName (), cutUpperExtended) ;
-          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_EvenHigher_SIG->GetName (), cutEvenHigherExtended) ;
-          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_sideband_SIG->GetName (), cutSidebandExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_SIG->GetName (), cutLowerExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_signal_SIG->GetName (), cutSignalExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_SIG->GetName (), cutUpperExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_EvenHigher_SIG->GetName (), cutEvenHigherExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_sideband_SIG->GetName (), cutSidebandExtended) ;
           
           continue ;
         }
 
       if (iColl->first == "DATA")
         {
-          iColl->second->Draw ("lepNuW_m_KF >> m4_lower_DATA", cutLower) ;
-          iColl->second->Draw ("lepNuW_m_KF >> m4_signal_DATA", cutSignal) ;
-          iColl->second->Draw ("lepNuW_m_KF >> m4_upper_DATA", cutUpper) ;
-          iColl->second->Draw ("lepNuW_m_KF >> m4_EvenHigher_DATA", cutEvenHigher) ;
-          iColl->second->Draw ("lepNuW_m_KF >> m4_sideband_DATA", cutSideband) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_lower_DATA"), cutLower) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_signal_DATA"), cutSignal) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_upper_DATA"), cutUpper) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_EvenHigher_DATA"), cutEvenHigher) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_sideband_DATA"), cutSideband) ;
         
           continue ;
         }  
@@ -227,11 +230,11 @@ int main (int argc, char** argv)
       VBFAnalysisVariables vars ;
       SetVBFPreselectionTreeBranches (vars, chain) ;
 
-      iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_lower->GetName (), cutLowerExtended) ;
-      iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_signal->GetName (), cutSignalExtended) ;
-      iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_upper->GetName (), cutUpperExtended) ;
-      iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_EvenHigher->GetName (), cutEvenHigherExtended) ;
-      iColl->second->Draw (TString ("lepNuW_m_KF >> ") + h_m4_sideband->GetName (), cutSidebandExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower->GetName (), cutLowerExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_signal->GetName (), cutSignalExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper->GetName (), cutUpperExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_EvenHigher->GetName (), cutEvenHigherExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_sideband->GetName (), cutSidebandExtended) ;
       
       ++index ;   
     } //PG loop over samples
