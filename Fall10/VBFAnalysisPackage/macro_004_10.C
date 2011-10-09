@@ -40,13 +40,14 @@ int macro_004_10 (int mass)
 //  TString inputFile = "testBkg_004_S" ;
 //  TString inputFile = "testBkg_004_mu_S" ; //PG only muons
 //  TString inputFile = "testBkg_004_el_S" ; //PG only muons
-  TString inputFile = "testBkg_004_5GeV_S" ; //PG only muons
+//  TString inputFile = "testBkg_004_5GeV_S" ;
+  TString inputFile = "testBkg_004_noKF_S" ; //PG no kinematic fit
   inputFile += mass ;
   inputFile += ".root" ;
   cout << inputFile << endl ;
   TFile input (inputFile) ;
 
-  int nToys = 10 ;
+  int nToys = 10000 ;
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -163,6 +164,13 @@ int macro_004_10 (int mass)
   stack_m4_sideband->Draw ("hist") ;
   c1->Print ("denominator.pdf", "pdf") ;
 
+  //PG correction factor from the ratio of histograms 
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  TH1F * ratio_total = (TH1F *) signalRegionMC->Clone ("ratio") ;
+  ratio_total->Divide (sidebaRegionMC) ;
+  ratio_total->SetMarkerColor (kOrange) ;
+
   int nBins =  m4_signal_DATA->GetNbinsX () ;
   double m4_min = m4_signal_DATA->GetXaxis ()->GetXmin () ;
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
@@ -226,6 +234,12 @@ int macro_004_10 (int mass)
   num_fit_error->Draw ("E3same") ;
   signalRegionMC->Draw ("sames") ;
   c1->Print ("numerator_fit.pdf", "pdf") ;
+  c1->SetLogy () ;
+  signalRegionMC->Draw () ;
+  num_fit_error->Draw ("E3same") ;
+  signalRegionMC->Draw ("sames") ;
+  c1->Print ("numerator_fit_log.pdf", "pdf") ;
+  c1->SetLogy (0) ;
 
   TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedCB, 0., 1000., 7) ;
   //PG                        N                              , gaus m, gaus s, joint, exp, fermi E, kT
@@ -247,7 +261,7 @@ int macro_004_10 (int mass)
   sidebaRegionMC->Fit (denFitFunc, "LQ", "", 160., 800.) ;
   fitStatus = 1 ;
   loops = 0 ; 
-  while (fitStatus != 0 && loops < 30)
+  while (fitStatus != 0 && loops < 50)
     {
       TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "LQ", "", 160., 800.) ;
       fitStatus = (int)(fitResultPtr) ;
@@ -263,6 +277,19 @@ int macro_004_10 (int mass)
   den_fit_error->Draw ("E3same") ;
   sidebaRegionMC->Draw ("sames") ;
   c1->Print ("denominator_fit.pdf", "pdf") ;
+  c1->SetLogy () ;
+  sidebaRegionMC->Draw () ;
+  den_fit_error->Draw ("E3same") ;
+  sidebaRegionMC->Draw ("sames") ;
+  c1->Print ("denominator_fit_log.pdf", "pdf") ;
+  c1->SetLogy (0) ;
+
+  sidebaRegion->Draw () ;
+  c1->Print ("sideband.pdf", "pdf") ;
+  c1->SetLogy () ;
+  sidebaRegion->Draw () ;
+  c1->Print ("sideband_log.pdf", "pdf") ;
+  c1->SetLogy (0) ;
 
   //PG toy experiments to determine the size of the error band on the extrapolation factor
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -294,20 +321,25 @@ int macro_004_10 (int mass)
         }
     }
 
-  //PG correction factor from the ratio of histograms 
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-  TH1F * ratio_total = (TH1F *) signalRegionMC->Clone ("ratio") ;
-  ratio_total->Divide (sidebaRegionMC) ;
-  ratio_total->SetMarkerColor (kOrange) ;
-  
   //PG correction factor from the profile of the many toys
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TProfile * correctionBand = correctionPlane->ProfileX ("correctionBand", 1, -1, "s") ;
   TH1F * h_correctionBand = dumpProfile ("h_correctionBand", correctionBand) ;
+
+  //PG use the ratio of functions as central value
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+  
+  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
+    {
+      double center = h_correctionBand->GetBinCenter (iBin) ;
+      double corr = numFitFunc->Eval (center) / denFitFunc->Eval (center) ; 
+      h_correctionBand->SetBinContent (iBin, corr) ;
+    }
+
   h_correctionBand->SetStats (0) ;
   h_correctionBand->SetFillColor (kOrange) ;
+  h_correctionBand->SetMarkerStyle (29) ;
  
   //PG correction factor from the gaussian fit to slices of the many toys
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -326,7 +358,8 @@ int macro_004_10 (int mass)
   correctionPlane->SetStats (0) ;
 //  correctionPlane->Draw ("COLZ") ;
   h_correctionBand->Draw ("E3") ;
-  gaussianBand->Draw ("E3same") ;
+  h_correctionBand->Draw ("Psame") ;
+//  gaussianBand->Draw ("E3same") ;
   gStyle->SetPalette (1) ;
   ratio_total->Draw ("same") ;
   c1->Print ("correctionPlane.pdf", "pdf") ;
