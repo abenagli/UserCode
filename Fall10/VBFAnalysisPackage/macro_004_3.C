@@ -1,9 +1,11 @@
 #include <vector>
 #include <sstream>
 
+
 int macro_004_3 ()
 {
   TFile input ("testBkg_004.root") ;
+//  TFile input ("testBkg_004_noKF_S350.root") ;
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ----
@@ -20,18 +22,21 @@ int macro_004_3 ()
   TH1F * m4_signal_total = (TH1F *) stack_m4_signal->GetStack ()->Last () ;
   TH1F * m4_signal_Wjet = (TH1F *) input.Get ("m4_signal_Wjet") ;
 
-  TCanvas c1 ;
-  
   vector<double> v_chi2 ;
+  vector<double> v_Rchi2 ;
   vector<double> v_alpha ;
   int index = 0 ;
   std::vector<TH1F *> comparisons ;
   std::vector<TH1F *> shapes ;
  
   //PG comincio a farlo per Wjets
+  double bestAlpha = 0. ;
+  double bestRChi2 = 10000. ;
+  double bestChi2 = 10000. ;
+  double step = 0.01 ;
 
   //PG loop on alpha   
-  for (double alpha = 0. ; alpha < 1.01 ; alpha += 0.05)
+  for (double alpha = 0. ; alpha < 1.01 ; alpha += step)
     {
       //PG signal = beta (alpha * lower + (1-alpha) * upper)
       //PG alpha = 0 --> upper shape
@@ -54,20 +59,33 @@ int macro_004_3 ()
 
       scaled_extrap->SetFillColor (0) ;
       scaled_extrap->SetLineColor (kGray + 1) ;
+      scaled_extrap->SetTitle ("") ;
       shapes.push_back (scaled_extrap) ;
 
       TH1F * scaled_signal = (TH1F *) m4_signal_Wjet->Clone ("scaled_signal") ;
       scaled_signal->Scale (1. / scaled_signal->Integral ()) ;
 
-      double chi2 = -1. ; 
       int igood = 0 ;
       vector<double> residuals (scaled_extrap.GetNbinsX (), 0.) ;
-      chi2 = scaled_signal->Chi2Test (scaled_extrap, "WWCHI2/NDF", &residuals[0]) ;
+      double Rchi2 = -1. ; 
+      Rchi2 = scaled_signal->Chi2Test (scaled_extrap, "WWCHI2/NDF", &residuals[0]) ;
+      double chi2 = -1. ; 
+      chi2 = scaled_signal->Chi2Test (scaled_extrap, "WWCHI2", &residuals[0]) ;
 //      double Ndof = scaled_extrap->GetNbinsX () ;
 //      m4_signal_Wjet->Chi2TestX (scaled, chi2, Ndof, igood, "WW", &residuals[0]) ;
       v_chi2.push_back (chi2) ;
+      v_Rchi2.push_back (Rchi2) ;
       v_alpha.push_back (alpha) ;
 
+      if (Rchi2 < bestRChi2)
+        {
+          bestRChi2 = Rchi2 ;
+          bestChi2 = chi2 ;
+          bestAlpha = alpha ;
+        }
+
+      cout << alpha << " " << chi2 << " " << Rchi2 << " " << chi2/Rchi2 << endl ;
+      
       stringstream name ;
       name << "sig_o_side_" << alpha ;
       
@@ -81,11 +99,19 @@ int macro_004_3 ()
     
     } //PG loop on alpha
 
-  TCanvas c1 ;
+  TCanvas * c1 = new TCanvas () ;
 
-  TGraph g_chi2 (v_alpha.size (), &v_alpha[0], &v_chi2[0]) ;
-  g_chi2.Draw ("AL*") ;
-  c1.Print ("chi2Trend.pdf", "pdf") ;
+  c1->SetLogy () ;
+  TGraph * g_chi2 = new TGraph (v_alpha.size (), &v_alpha[0], &v_chi2[0]) ;
+  g_chi2->Draw ("AL*") ;
+  c1->Print ("chi2Trend.pdf", "pdf") ;
+  c1->SetLogy (0) ;
+
+  c1->SetLogy () ;
+  TGraph * g_Rchi2 = new TGraph (v_alpha.size (), &v_alpha[0], &v_Rchi2[0]) ;
+  g_Rchi2->Draw ("AL*") ;
+  c1->Print ("Rchi2Trend.pdf", "pdf") ;
+  c1->SetLogy (0) ;
 
   TLegend * leg_ratios = new TLegend (0.5, 0.5, 0.9, 0.95, NULL, "brNDC") ;
   leg_ratios->SetBorderSize (0) ;
@@ -97,7 +123,15 @@ int macro_004_3 ()
   leg_ratios->SetFillColor (0) ;
   leg_ratios->SetFillStyle (0) ;
 
-  c1.DrawFrame (100., 0., 800., 5) ;
+//  c1->DrawFrame (100., 0., 800., 5) ;
+
+  comparisons.at (0)->SetLineColor (kGreen) ;
+  comparisons.back ()->SetLineColor (kOrange) ;
+  comparisons.at (0)->SetLineWidth (2) ;
+  comparisons.back ()->SetLineWidth (2) ;
+  comparisons.at (0)->Draw ("") ;
+  comparisons.back ()->Draw ("histsame") ;
+
   for (unsigned int i = 0 ; i < comparisons.size () ; ++i) 
     {
 //      comparisons.at (i)->SetLineColor (50 + 2 * i) ;
@@ -106,14 +140,10 @@ int macro_004_3 ()
     }
 //  leg_ratios->Draw () ;  
 
-  comparisons.at (0)->SetLineColor (kGreen) ;
-  comparisons.back ()->SetLineColor (kOrange) ;
-  comparisons.at (0)->SetLineWidth (2) ;
-  comparisons.back ()->SetLineWidth (2) ;
   comparisons.at (0)->Draw ("histsame") ;
   comparisons.back ()->Draw ("histsame") ;
 
-  c1.Print ("sig_o_side_vs_alpha.pdf", "pdf") ;
+  c1->Print ("sig_o_side_vs_alpha.pdf", "pdf") ;
 
   shapes.at (0)->Draw ("hist") ;
   for (unsigned int i = 1 ; i < comparisons.size () ; ++i) 
@@ -129,11 +159,62 @@ int macro_004_3 ()
   shapes.back ()->Draw ("histsame") ;
 
   m4_signal_Wjet->SetLineColor (kBlack) ;
-  m4_signal_Wjet->SetMarkerStyle (20) ;
+  m4_signal_Wjet->SetMarkerStyle (24) ;
   m4_signal_Wjet->SetMarkerColor (kBlack) ;
   m4_signal_Wjet->DrawNormalized ("PEsame") ;
 
-  c1.Print ("shapes.pdf", "pdf") ;
+  c1->Print ("shapes.pdf", "pdf") ;
+
+  //PG differenze fra la shape scelta e quella di segnale
+  //PG differenze in chi2 fra il prima ed il dopo
+
+  cout << bestAlpha << endl ;
+  cout << "chi2  :" << v_chi2 .at (bestAlpha / step - 1) << " | " << v_chi2 .at (bestAlpha / step) << " | " << v_chi2 .at (bestAlpha / step + 1) << endl ;
+  cout << "Rchi2 :" << v_Rchi2.at (bestAlpha / step - 1) << " | " << v_Rchi2.at (bestAlpha / step) << " | " << v_Rchi2.at (bestAlpha / step + 1) << endl ;
+  cout << "alpha :" << v_alpha.at (bestAlpha / step - 1) << " | " << v_alpha.at (bestAlpha / step) << " | " << v_alpha.at (bestAlpha / step + 1) << endl ;
+
+  double minAlpha = bestAlpha ;
+  int minAlphaIndex = bestAlpha / step ;
+  for (int ind = bestAlpha / step ; ind > 0 ; --ind)
+    {
+      cout << ind << " > " ;
+      if (v_chi2 .at (ind) - bestChi2 > 1.) 
+        {
+          cout << "stop " << v_alpha.at (ind) << endl ;
+          minAlpha = v_alpha.at (ind) ;
+          minAlphaIndex = ind ;
+          break ;
+        }
+    }
+
+  double maxAlpha = bestAlpha / step ;
+  int maxAlphaIndex = bestAlpha / step ;
+  for (int ind = bestAlpha / step ; ind < 1./step ; ++ind)
+    {
+      cout << ind << " > " ;
+      if (v_chi2.at (ind) - bestChi2 > 1.) 
+        {
+          cout << "stop " << v_alpha.at (ind) << endl ;
+          maxAlpha = v_alpha.at (ind) ;
+          maxAlphaIndex = ind ;
+          break ;
+        }
+    }
+
+  cout << minAlpha << " " << maxAlpha << endl ;
+
+  c1->DrawFrame (100., 0., 800., 2.) ;
+  comparisons.at (bestAlpha)->Draw ("same") ;
+  c1->Print ("bestDistance.pdf", "pdf") ;
+
+  shapes.at (bestAlpha/step)->SetLineColor (kBlack) ;
+  shapes.at (bestAlpha/step)->Draw ("") ;
+  shapes.at (minAlphaIndex)->SetLineColor (kRed) ;
+  shapes.at (maxAlphaIndex)->SetLineColor (kRed) ;
+  shapes.at (minAlphaIndex)->Draw ("histsame") ;
+  shapes.at (maxAlphaIndex)->Draw ("histsame") ;
+  m4_signal_Wjet->DrawNormalized ("same") ;
+  c1->Print ("result.pdf", "pdf") ;
 
 }
 
@@ -171,7 +252,4 @@ int macro_004_3 ()
   KEY: TH1F	m4_lower_ZZ;1	ZZ
   KEY: TH1F	m4_lower_top;1	top
   KEY: THStack	stack_m4_lower;1	
-
-
-
 */
