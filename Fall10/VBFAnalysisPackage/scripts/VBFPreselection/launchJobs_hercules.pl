@@ -34,7 +34,6 @@ $OUTPUTSAVEPath   = $User_Preferences{"OUTPUTSAVEPath"} ;
 $OUTPUTFILEName   = $User_Preferences{"OUTPUTFILEName"} ;
 $JOBModulo        = $User_Preferences{"JOBModulo"} ;
 
-$LISTOFSamples  = $BASEDir."/".$LISTOFSamples;
 $JOBCfgTemplate = $BASEDir."/".$JOBCfgTemplate;
 
 

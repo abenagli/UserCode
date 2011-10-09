@@ -812,18 +812,6 @@ int main(int argc, char** argv)
       vars.eventWeight *= f_metTurnOn -> Eval(vars.met_et) * f_jetTurnOn -> Eval(vars.WJ1.pt(),vars.WJ2.pt());
     */
     
-
-    if( vars.WJ1.pt() > 0. )
-      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
-    if( vars.WJ2.pt() > 0. )
-      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
-    if( vars.WJ2.pt() > vars.WJ1.pt() )
-    {
-      float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
-      vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
-      vars.WJ1_QGLikelihood = QGLikelihoodDummy;
-    }
-   
     
     // Fill distributions
     stepEvents[step] += 1;
@@ -889,8 +877,8 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "WJJ Deta/Dphi cuts", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) > 2.50) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) > 2.50) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) > 1.50) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) > 3.15) ) continue;
     
     
     // fill distributions
@@ -1022,6 +1010,18 @@ int main(int argc, char** argv)
     
     
     DoKinematicFit(vars);
+    
+    
+    if( vars.WJ1.pt() > 0. )
+      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    if( vars.WJ2.pt() > 0. )
+      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    if( vars.WJ2.pt() > vars.WJ1.pt() )
+    {
+      float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
+      vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
+      vars.WJ1_QGLikelihood = QGLikelihoodDummy;
+    }
     
     
     // fill distributions

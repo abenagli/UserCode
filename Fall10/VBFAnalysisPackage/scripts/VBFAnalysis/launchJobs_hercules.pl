@@ -36,8 +36,7 @@ $INPUTFILEName         = $User_Preferences{"INPUTFILEName"};
 $OUTPUTSaveDir         = $User_Preferences{"OUTPUTSaveDir"};
 
 $SELECTIONSCfgTemplate = $BASEDir."/".$SELECTIONSCfgTemplate;
-$SAMPLESListFile       = $BASEDir."/".$OUTPUTSaveDir."/".$SAMPLESListFile;
-$OUTPUTSaveDir         = $BASEDir."/".$OUTPUTSaveDir;
+$SAMPLESListFile       = $OUTPUTSaveDir."/".$SAMPLESListFile;
 
 print "BASEDir = "          .$BASEDir."\n" ;
 print "SELECTIONSCfgTemplate = ".$SELECTIONSCfgTemplate."\n";

@@ -100,6 +100,8 @@ class drawTStack
   
   
   
+  int GetColorSummed(const std::string& name) { return m_color_summed[name]; };
+  
   TH1F* GetGlobalHisto()     { return m_globalHisto;     };
   TH1F* GetBkgGlobalHisto()  { return m_bkgGlobalHisto;  };
   TH1F* GetSigGlobalHisto()  { return m_sigGlobalHisto;  };

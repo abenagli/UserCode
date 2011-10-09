@@ -353,7 +353,8 @@ void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType);
 void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT);
-void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD);
+void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD,
+                     const float& JESScale = 1.);
 void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT);
 void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader);

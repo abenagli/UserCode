@@ -790,9 +790,12 @@ void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 
 
 
-void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD)
+void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD,
+                     const float& JESScale)
 {
   ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);  
+  if( JESScale != 1. )
+    jet *= JESScale;
   
   vars.jets.push_back( reader.Get4V("jets")->at(jetIt) );
   

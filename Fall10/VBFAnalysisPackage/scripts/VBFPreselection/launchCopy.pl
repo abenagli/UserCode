@@ -31,8 +31,6 @@ $INPUTSAVEPath    = $User_Preferences{"INPUTSAVEPath"} ;
 $OUTPUTSAVEPath   = $User_Preferences{"OUTPUTSAVEPath"} ;
 $OUTPUTFILEName   = $User_Preferences{"OUTPUTFILEName"} ;
 
-$LISTOFSamples  = $BASEDir."/".$LISTOFSamples;
-
 print "LISTOFSamples = "    .$LISTOFSamples."\n" ;
 print "JETAlgorithm = "     .$JETAlgorithm."\n" ;
 print "INPUTSAVEPath = "    .$INPUTSAVEPath."\n" ;

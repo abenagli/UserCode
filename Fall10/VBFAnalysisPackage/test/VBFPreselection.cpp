@@ -6,6 +6,7 @@
 #include <iomanip>
 
 #include "TH1F.h"
+#include "TH2F.h"
 
 
 
@@ -30,23 +31,25 @@ int main(int argc, char** argv)
   // Parse the config file
   parseConfigFile(argv[1]);
   
-  std::string inputFileList = gConfigParser -> readStringOption("Input::inputFileList");
-  std::string jetAlgorithm  = gConfigParser -> readStringOption("Input::jetAlgorithm");
-  std::string jetType       = gConfigParser -> readStringOption("Input::jetType");
-  std::string higgsMass     = gConfigParser -> readStringOption("Input::higgsMass");
+  std::string inputFileList      = gConfigParser -> readStringOption("Input::inputFileList");
+  std::string jetAlgorithm       = gConfigParser -> readStringOption("Input::jetAlgorithm");
+  std::string jetType            = gConfigParser -> readStringOption("Input::jetType");
+  std::string higgsMass          = gConfigParser -> readStringOption("Input::higgsMass");
+  std::string JECUncertaintyFile = gConfigParser -> readStringOption("Input::JECUncertaintyFile");
     
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
   std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + jetAlgorithm + ".root";
   
-  int entryFIRST       = gConfigParser -> readIntOption("Options::entryFIRST");
-  int entryMAX         = gConfigParser -> readIntOption("Options::entryMAX");
-  int entryMODULO      = gConfigParser -> readIntOption("Options::entryMODULO");
-  int verbosity        = gConfigParser -> readIntOption("Options::verbosity");
-  int dataFlag         = gConfigParser -> readIntOption("Options::dataFlag");
-  float crossSection   = gConfigParser -> readFloatOption("Options::crossSection");
-  int TMVA4JetTraining = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
-
+  int entryFIRST          = gConfigParser -> readIntOption("Options::entryFIRST");
+  int entryMAX            = gConfigParser -> readIntOption("Options::entryMAX");
+  int entryMODULO         = gConfigParser -> readIntOption("Options::entryMODULO");
+  int verbosity           = gConfigParser -> readIntOption("Options::verbosity");
+  int dataFlag            = gConfigParser -> readIntOption("Options::dataFlag");
+  float crossSection      = gConfigParser -> readFloatOption("Options::crossSection");
+  int TMVA4JetTraining    = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
+  float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
+  
   
   int nJetCntMIN = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
   float jetPtMIN  = gConfigParser -> readFloatOption("Cuts::jetPtMIN");
@@ -84,6 +87,19 @@ int main(int argc, char** argv)
   
   stepName = "JetFilter"+jetAlgorithm+"Events/passedEvents";
   std::map<int,int> jetFilterEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
+  
+  
+  
+  
+  
+  
+  // Get the JEC uncertainty file, if needed
+  TH2F* JECUncertainty = NULL; 
+  if( JESScaleVariation != 0. )
+  {
+    TFile* temp = TFile::Open(JECUncertaintyFile.c_str(),"READ");
+    JECUncertainty = (TH2F*)( temp -> Get("histo") );
+  }
   
   
   
@@ -664,7 +680,23 @@ int main(int argc, char** argv)
         if( (fabs(jet.eta()) >= 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) + reader.GetInt("jets_neutralMultiplicity")->at(jetIt) <= 1) ) continue;
       }
       
-      SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD);
+      
+      float JESScale = 1.;
+      if( JESScaleVariation != 0. )
+      {
+        float eta = jet.eta();
+        if( eta < -5. ) eta = -5.;
+        if( eta > -5. ) eta = +5.;
+        
+        float pt = jet.pt();
+        if( pt < 0. ) pt = 0.;
+        if( pt > 1000. ) pt = 1000.;
+        int bin = JECUncertainty -> FindFixBin(eta,pt);
+        
+        JESScale += JESScaleVariation * JECUncertainty->GetBinContent(bin);
+      }
+      
+      SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD, JESScale);
       
     } // loop on jets
     if( verbosity == 1)
