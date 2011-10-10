@@ -995,10 +995,6 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
-  vars.lepMetW_pt = (vars.lep + vars.met + vars.WJJ).pt();
-  vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
-  vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
-  
   vars.lepNu_nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
   vars.p_nu = &(vars.nu);
   vars.lepNu_m = (vars.lep+vars.nu).mass();
@@ -1006,6 +1002,10 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lepW_pt = vars.lepW.pt();
   vars.lepNuW = vars.lepW + vars.nu;
   vars.lepNuW_m = vars.lepNuW.mass();
+  
+  vars.lepMetW_pt = (vars.lep + vars.met + vars.WJJ).pt();
+  vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
+  vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
   
   //std::cout << "Higgs mt = " << vars.lepMetW_mt << "   Higgs m = " << vars.lepNuW_m << std::endl;
 }
