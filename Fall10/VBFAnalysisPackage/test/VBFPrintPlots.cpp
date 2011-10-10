@@ -224,7 +224,7 @@ int main(int argc, char** argv)
   
   
   //---------------------------------------------  
-  // PV
+  // PV & rho
   //---------------------------------------------
   
   variableNames.at(0) = "PV_n";  
@@ -268,6 +268,22 @@ int main(int argc, char** argv)
   //stack -> SetXaxisTitle("#chi^{2}/ndof(PV)");
   //stack -> SetUnit("");
   //stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
+  
+  
+  
+  variableNames.at(0) = "rhoForJets";
+  histoName    = "PU_rhoForJets";
+  stack -> SetXaxisRange(0., 30.);
+  stack -> SetXaxisTitle("#rho_{0.-5.0}");
+  stack -> SetUnit("GeV/#Delta#Eta#Delta#phi");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
+  
+  variableNames.at(0) = "rhoForIsolation";
+  histoName    = "PU_rhoForIsolation";
+  stack -> SetXaxisRange(0., 30.);
+  stack -> SetXaxisTitle("#rho_{0.-2.5}");
+  stack -> SetUnit("GeV/#Delta#Eta#Delta#phi");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
   
   
   
