@@ -111,7 +111,7 @@ int main(int argc, char** argv)
   
   stack -> SetXLegend(0.76, 0.99);
   stack -> SetYLegend(0.60, 0.85);
-  /*
+  
   stack -> DrawEvents("events", lumi, step, true, PURescale, stackSig);
   stack -> DrawEvents("eventsScaled", lumi, step, true, PURescale, stackSig);
   stack -> DrawEvents("eventsScaledStack", lumi, step, true, PURescale, stackSig);
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
   stack -> DrawEvents("efficiencies", lumi, step, true, PURescale, stackSig);
   stack -> SetYaxisRange(0.01, 1.1);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true, PURescale, stackSig);
-  */
+  
   
   
   
