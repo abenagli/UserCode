@@ -751,7 +751,7 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
     myScaledMet += JESScale * myUnclusterizedMet;
     
     //std::cout << "met: " << vars.met.Et() << "   myMet: " << sqrt(myMet.perp2()) << std::endl;
-    vars.met.SetPxPyPzE(myMet.X(),myMet.Y(),0.,sqrt(myMet.perp2()));
+    vars.met.SetPxPyPzE(myScaledMet.X(),myScaledMet.Y(),0.,sqrt(myScaledMet.perp2()));
   }
   
   
@@ -835,7 +835,6 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
   ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);  
   
   
-  float JESScale = 1.;
   if( JESScaleVariation != 0. )
   {
     float eta = jet.eta();
@@ -847,9 +846,9 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     if( pt > 1000. ) pt = 1000.;
     int bin = JECUncertainty -> FindFixBin(eta,pt);
     
-    JESScale += JESScaleVariation * JECUncertainty->GetBinContent(bin);
+    float JESScale = 1. + JESScaleVariation * JECUncertainty->GetBinContent(bin);
     //std::cout << "eta: " << eta << "   pt: " << pt << "   JESScale: " << JESScale << std::endl;                                                                              
-    jet.SetPxPyPzE(JESScale*jet.Px(),JESScale*jet.Py(),JESScale*jet.Pz(),fabs(JESScale)*jet.E()) *= JESScale;
+    jet.SetPxPyPzE(JESScale*jet.Px(),JESScale*jet.Py(),JESScale*jet.Pz(),fabs(JESScale)*jet.E());
   }
   
   
