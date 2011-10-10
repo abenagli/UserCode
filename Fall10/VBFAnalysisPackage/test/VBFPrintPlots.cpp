@@ -1151,21 +1151,21 @@ int main(int argc, char** argv)
   histoName = "lepNuW_m";
   stack -> SetXaxisRange(100., 800);
   stack -> SetXaxisTitle("m(lepton+neutrino+WJets)");
-  stack -> SetUnit("GeV/c2");
+  stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 70, PURescale, weightEvent, stackSig);
   
   variableNames.at(0) = "lepNuW_m_KF";
   histoName = "lepNuW_m_KF";
   stack -> SetXaxisRange(100., 800);
   stack -> SetXaxisTitle("m(lepton+neutrino+WJets) after KF");
-  stack -> SetUnit("GeV/c2");
+  stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 70, PURescale, weightEvent, stackSig);
   
   //variableNames.at(0) = "abs(lepNuW_zepp)";
   //histoName = "lepNuW_zepp";
   //stack -> SetXaxisRange(0., 1.);
   //stack -> SetXaxisTitle("zepp(lepton+neutrino+WJets)");
-  ///stack -> SetUnit("GeV/c2");
+  ///stack -> SetUnit("GeV/c^{2}");
   //stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, stackSig);
   
   variableNames.at(0) = "lepMetW_pt/lepNuW_m";
@@ -1181,21 +1181,21 @@ int main(int argc, char** argv)
   histoName = "lepW_pt";
   stack -> SetXaxisRange(0., 200);
   stack -> SetXaxisTitle("pt(lepton+WJets)");
-  stack -> SetUnit("");
+  stack -> SetUnit("GeV/c");
   stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
   
   variableNames.at(0) = "lepMetW_pt";
   histoName = "lepMetW_pt";
   stack -> SetXaxisRange(0., 200);
   stack -> SetXaxisTitle("pt(lepton+met+WJets)");
-  stack -> SetUnit("");
+  stack -> SetUnit("GeV/c");
   stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
   
   variableNames.at(0) = "lepMetW_mt";
   histoName = "lepMetW_mt";
   stack -> SetXaxisRange(100., 800.);
   stack -> SetXaxisTitle("mt(lepton+met+WJets)");
-  stack -> SetUnit("");
+  stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 35, PURescale, weightEvent, stackSig);
   
   variableNames.at(0) = "lepMetW_Dphi";

@@ -214,12 +214,12 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
       
       std::string cutExtended = "(1==1)";
       if(PURescale)
-        cutExtended += " * (PURescaleFactor((PUit_n+PUoot_n)/3.))";
+        cutExtended += " * (PURescaleFactor(PUit_n))";
       if(weightEvent)
         cutExtended += " * (eventWeight)";
       if(cut)
         cutExtended += " * ("+cut->at(jj)+")";
-
+      
       c1 = new TCanvas();
       c1 -> cd();      
       tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), cutExtended.c_str());      

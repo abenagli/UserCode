@@ -222,12 +222,12 @@ int main (int argc, char** argv)
 //      if (iColl->first == "ggH") continue ;
 
 //      TCut cutLower = generalCut && lower ;
-//      TCut cutLowerExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutLower.GetTitle (), LUMI) ;    
+//      TCut cutLowerExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutLower.GetTitle (), LUMI) ;    
 
-     TCut generalCutExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", generalCut.GetTitle (), LUMI) ;    
+     TCut generalCutExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", generalCut.GetTitle (), LUMI) ;    
 
      TCut cut = chi2 && generalCut ;
-     TCut cutExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cut.GetTitle (), LUMI) ;    
+     TCut cutExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cut.GetTitle (), LUMI) ;    
       
      if (iColl->first == "DATA")
         {
