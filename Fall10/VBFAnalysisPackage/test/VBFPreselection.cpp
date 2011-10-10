@@ -627,7 +627,7 @@ int main(int argc, char** argv)
     
     //*****************
     // met and neutrino
-    SetMetVariables(vars, reader, jetType);
+    SetMetVariables(vars, reader, jetType, JESScaleVariation, JECUncertainty);
     
     //****************
     SetBTagVariables(vars, reader, jetType, jetEtaCNT);
@@ -680,23 +680,7 @@ int main(int argc, char** argv)
         if( (fabs(jet.eta()) >= 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) + reader.GetInt("jets_neutralMultiplicity")->at(jetIt) <= 1) ) continue;
       }
       
-      
-      float JESScale = 1.;
-      if( JESScaleVariation != 0. )
-      {
-        float eta = jet.eta();
-        if( eta < -5. ) eta = -5.;
-        if( eta > -5. ) eta = +5.;
-        
-        float pt = jet.pt();
-        if( pt < 0. ) pt = 0.;
-        if( pt > 1000. ) pt = 1000.;
-        int bin = JECUncertainty -> FindFixBin(eta,pt);
-        
-        JESScale += JESScaleVariation * JECUncertainty->GetBinContent(bin);
-      }
-      
-      SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD, JESScale);
+      SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD, JESScaleVariation, JECUncertainty);
       
     } // loop on jets
     if( verbosity == 1)

@@ -5,6 +5,7 @@
 #include "ntpleUtils.h"
 
 #include "TTree.h"
+#include "TH2F.h"
 
 
 
@@ -351,10 +352,11 @@ void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
 void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
 void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType);
+void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType,
+		     const float& JESScaleVariation, TH2F* JECUncertainty);
 void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT);
 void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD,
-                     const float& JESScale = 1.);
+                     const float& JESScaleVariation, TH2F* JECUncertainty);
 void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT);
 void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
