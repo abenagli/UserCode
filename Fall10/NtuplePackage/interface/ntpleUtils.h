@@ -229,26 +229,6 @@ void Print4JetCombination(const std::vector<int>& combination);
 /** print 4-vector */
 void Print4V(const ROOT::Math::XYZTVector& p);
 
-/** get the neutrino from W mass constraint  */
-int GetNeutrino(ROOT::Math::XYZTVector& nu,
-                const ROOT::Math::XYZTVector& lep,
-                const ROOT::Math::XYZTVector& met,
-                const ROOT::Math::XYZTVector& WJ1,
-                const ROOT::Math::XYZTVector& WJ2,
-                const float& mH);
-
-/** get lnujj angles  */
-void GetLNuJJAngles(float& cphi_lvjj,
-                    float& cphi_lvz,
-                    float& ctheta_l,
-                    float& ctheta_j1,
-                    float& ctheta_lv,
-                    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& l,
-                    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& v,
-                    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& j1,
-                    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& j2);
-
-
 
 
 /** get electorn flag/severity level */
