@@ -4,6 +4,10 @@
 #include <iostream>
 
 
+
+
+
+
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 // SIMPLE FUNCTIONS
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -43,7 +47,6 @@ double exponential(double* x, double* par)
   
   //std::cout << "N: " << N << "   lambda: " << lambda << std::endl;
   return exp(N) * exp(-1.*lambda*xx);
-//  return N * exp(-1.*lambda*xx);
 }
 
 
@@ -193,6 +196,184 @@ double crystalBallHigh(double* x, double* par)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
+/*** crystall ball with low tail ***/
+double crystalBallLow(double* x, double* par)
+{
+  //[0] = N
+  //[1] = mean
+  //[2] = sigma
+  //[3] = alpha
+  //[4] = n
+  
+  double xx = x[0];
+  double mean = par[1];
+  double sigma = par[2];
+  double alpha = par[3];
+  double n = par[4];
+  
+  if( (xx-mean)/sigma <= -1.*fabs(alpha) )  
+  {
+    double A = pow(n/fabs(alpha), n) * exp(-0.5 * alpha*alpha);
+    double B = n/fabs(alpha) - fabs(alpha);
+    
+    return par[0] * A * pow(B - (xx-mean)/sigma, -1.*n);
+  }
+  
+  else
+  {
+    return par[0] * exp(-1. * (xx-mean)*(xx-mean) / (2*sigma*sigma) );
+  } 
+  
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** breit-wigner ***/
+double gaussian(double* x, double* par)
+{
+  //[0] = N
+  //[1] = mu
+  //[2] = sigma
+  
+  double xx = x[0];
+  double N = par[0];
+  double mu = par[1];
+  double sigma = par[2];
+  
+  return N / (sigma * sqrt(2.*3.14159) ) * exp(-1.*(xx-mu)*(xx-mu)/(2*sigma*sigma));
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** breit-wigner ***/
+double breitWigner(double* x, double* par)
+{
+  //[0] = N
+  //[1] = mass
+  //[2] = width
+  
+  double xx = x[0];
+  double M = par[1];
+  double G = par[2];
+  
+  //double gamma = sqrt(M*M*(M*M+G*G));
+  //double norm = 2*sqrt(2)*M*G*gamma/(3.14159*sqrt(M*M+gamma));
+  double norm = M*M*G*G;
+  
+  return par[0] * norm / ( pow((xx*xx-M*M),2) + M*M*G*G );
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** breit-wigner convoluted with crystalBall ***/
+double breitWigner_crystalBallLow(double* x, double* par)
+{
+  //[0] = N
+  //[1] = b.w. - mass
+  //[2] = b.w. - width
+  //[3] = c.b. - mean
+  //[4] = c.b. - sigma
+  //[5] = c.b. - alpha
+  //[6] = c.b. - n
+  
+  
+  // convolute
+  double xx = x[0];
+  double xMin = -100.;
+  double xMax = 1100.;
+  int nSteps = 240;
+  double stepWidth = (xMax-xMin)/nSteps;
+  
+  double* y = new double[1];
+  double* z = new double[1];
+  
+  double* par_bw = new double[3];
+  par_bw[0] = 1.;
+  par_bw[1] = par[1];
+  par_bw[2] = par[2];
+
+  double* par_cb = new double[5];
+  par_cb[0] = par[0];
+  par_cb[1] = par[3];
+  par_cb[2] = par[4];
+  par_cb[3] = par[5];
+  par_cb[4] = par[6];
+      
+  double val = 0.;
+  for(int i = 0; i < nSteps; ++i)
+  {
+    double yy = xMin+i*stepWidth;
+    y[0] = yy;
+    z[0] = xx-yy;
+    val += breitWigner(y,par_bw) * crystalBallLow(z,par_cb);
+  }
+  
+  delete y;
+  delete z;
+  delete par_bw;
+  delete par_cb;
+  
+  return val;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** breit-wigner convoluted with a gaussian ***/
+double breitWigner_gaussian(double* x, double* par)
+{
+  //[0] = N
+  //[1] = b.w. - mass
+  //[2] = b.w. - width
+  //[3] = gauss - mean
+  //[4] = gauss - sigma
+  
+  
+  // convolute
+  double xx = x[0];
+  double xMin = -100.;
+  double xMax = 1100.;
+  int nSteps = 1200;
+  double stepWidth = (xMax-xMin)/nSteps;
+  
+  double* y = new double[1];
+  double* z = new double[1];
+  
+  double* par_bw = new double[3];
+  par_bw[0] = 1.;
+  par_bw[1] = par[1];
+  par_bw[2] = par[2];
+
+  double* par_gaussian = new double[3];
+  par_gaussian[0] = 1.;
+  par_gaussian[1] = par[3];
+  par_gaussian[2] = par[4];
+      
+  double val = 0.;
+  for(int i = 0; i < nSteps; ++i)
+  {
+    double yy = xMin+i*stepWidth;
+    y[0] = yy;
+    z[0] = xx-yy;
+    val += breitWigner(y,par_bw) * gaussian(z,par_gaussian);
+  }
+  
+  delete y;
+  delete z;
+  delete par_bw;
+  delete par_gaussian;
+  
+  return par[0] * val;
+}
+
+
 
 
 
@@ -256,15 +437,6 @@ double attenuatedDoubleExponentialCumLeadingEdge(double* x, double* par)
 double attenuatedCB(double* x, double* par)
 {
   return crystalBallHigh (x, par) * antiFermi (x, &par[5]) ;
-}
-
-
-// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-
-double antiFermiWithScale (double* x, double* par)
-{
-  return antiFermi (x, par) * par[2] ;
 }
 
 
