@@ -149,6 +149,10 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector* p_met;
   ROOT::Math::XYZTVector nu;
   ROOT::Math::XYZTVector* p_nu;
+  ROOT::Math::XYZTVector nu1;
+  ROOT::Math::XYZTVector* p_nu1;
+  ROOT::Math::XYZTVector nu2;
+  ROOT::Math::XYZTVector* p_nu2;
   
   float met_et;  
   

@@ -98,6 +98,8 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   // met variables
   vars.m_reducedTree -> Branch("met",   "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_met);
   vars.m_reducedTree -> Branch("nu",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu);
+  vars.m_reducedTree -> Branch("nu1",   "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu1);
+  vars.m_reducedTree -> Branch("nu2",   "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu2);
   vars.m_reducedTree -> Branch("met_et",       &vars.met_et,             "met_et/F");
   vars.m_reducedTree -> Branch("lepMet_pt",    &vars.lepMet_pt,       "lepMet_pt/F");
   vars.m_reducedTree -> Branch("lepMet_mt",    &vars.lepMet_mt,       "lepMet_mt/F");
@@ -344,6 +346,10 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.p_met = NULL;
   vars.nu = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_nu = NULL;
+  vars.nu1 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_nu1 = NULL;
+  vars.nu2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_nu2 = NULL;
   vars.met_et = -1.;
   
   vars.lepMet = ROOT::Math::XYZTVector(0., 0., 0., 0.);
@@ -995,14 +1001,14 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
-  ROOT::Math::XYZTVector nu1;
-  ROOT::Math::XYZTVector nu2;
-  vars.lepNu_nSolutions = GetNeutrino(nu1,nu2,vars.lep,vars.met,vars.WJ1,vars.WJ2);
+  vars.lepNu_nSolutions = GetNeutrino(vars.nu1,vars.nu2,vars.lep,vars.met,vars.WJ1,vars.WJ2);
+  vars.p_nu1 = &(vars.nu1);
+  vars.p_nu2 = &(vars.nu2);
   
-  if( fabs(nu1.Pz()) < fabs(nu2.Pz()) )
-    vars.nu = nu1;
+  if( fabs(vars.nu1.Pz()) < fabs(vars.nu2.Pz()) )
+    vars.nu = vars.nu1;
   else
-    vars.nu = nu2;
+    vars.nu = vars.nu2;
   
   vars.p_nu = &(vars.nu);
   vars.lepNu_m = (vars.lep+vars.nu).mass();
