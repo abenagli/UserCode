@@ -995,7 +995,15 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
-  vars.lepNu_nSolutions = GetNeutrino(vars.nu,vars.lep,vars.met,vars.WJ1,vars.WJ2,vars.mH);
+  ROOT::Math::XYZTVector nu1;
+  ROOT::Math::XYZTVector nu2;
+  vars.lepNu_nSolutions = GetNeutrino(nu1,nu2,vars.lep,vars.met,vars.WJ1,vars.WJ2);
+  
+  if( fabs(nu1.Pz()) < fabs(nu2.Pz()) )
+    vars.nu = nu1;
+  else
+    vars.nu = nu2;
+  
   vars.p_nu = &(vars.nu);
   vars.lepNu_m = (vars.lep+vars.nu).mass();
   vars.lepW = vars.lep + vars.WJJ;

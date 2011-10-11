@@ -1,6 +1,7 @@
 #include "VBFAnalysisVariables.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
+#include "analysisUtils.h"
 #include "readJSONFile.h"
 
 #include <iomanip>

@@ -725,7 +725,11 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   Draw(c2,histoName,mode,stackSig,true,lumi);
   
   CloseRootFiles();
-  
+
+  m_xAxisRange = false;
+  m_xAxisTitle = false;
+  m_yAxisRange = false;
+  m_yAxisTitle = false;
 }
 
 
@@ -907,12 +911,6 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
     c->Print((m_outputDir+"lin_"+histoName+"."+m_imgFormat).c_str(), m_imgFormat.c_str());
   else
     c->Print((m_outputDir+"log_"+histoName+"."+m_imgFormat).c_str(), m_imgFormat.c_str());
-  
-  
-  m_xAxisRange = false;
-  m_xAxisTitle = false;
-  m_yAxisRange = false;
-  m_yAxisTitle = false;
   
   delete c;
 }
@@ -1458,7 +1456,7 @@ void drawTStack::DrawEvents(const std::string& mode,
       significance -> GetYaxis() -> SetLabelSize(0.03);
       significance -> GetYaxis() -> SetTitle("S / #sqrt{S+B}");
       significance -> GetYaxis() -> SetTitleOffset(1.50);
-      significance -> GetYaxis() -> SetRangeUser(0.,1.1*significance->GetMaximum());
+      significance -> GetYaxis() -> SetRangeUser(0.,2.);
 
       significance -> SetLineColor(kRed);
       significance -> SetFillStyle(0);

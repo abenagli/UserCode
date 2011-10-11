@@ -3,6 +3,7 @@
 
 #include "treeReader.h"
 #include "ntpleUtils.h"
+#include "analysisUtils.h"
 
 #include "TTree.h"
 #include "TH2F.h"
