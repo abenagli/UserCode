@@ -2,7 +2,7 @@
 
 
 
-void DoKinematicFit(VBFAnalysisVariables& vars)
+void DoKinematicFit(VBFAnalysisVariables& vars, const std::string& method)
 {
   // lepton
   TLorentzVector vl(vars.lep.px(),vars.lep.py(),vars.lep.pz(),vars.lep.energy());
@@ -90,9 +90,12 @@ void DoKinematicFit(VBFAnalysisVariables& vars)
   fitter->addMeasParticle( j2 );
   fitter->addConstraint( mCons1 );
   fitter->addConstraint( mCons2 );
-  //fitter->addConstraint( pxCons );
-  //fitter->addConstraint( pyCons );
-    
+  if( method == "FNAL" )
+  {
+    fitter->addConstraint( pxCons );
+    fitter->addConstraint( pyCons );
+  }
+  
   //Set convergence criteria
   fitter->setMaxNbIter( 500 );
   fitter->setMaxDeltaS( 1e-2 );
