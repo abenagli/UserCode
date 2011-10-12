@@ -16,9 +16,17 @@ int GetNeutrino(ROOT::Math::XYZTVector& nu1,
 
   float pz1 = ( lep.pz()*(alpha + 0.5*80.399*80.399) + lep.energy()*sqrt(delta) ) / lep.pt() / lep.pt();
   float pz2 = ( lep.pz()*(alpha + 0.5*80.399*80.399) - lep.energy()*sqrt(delta) ) / lep.pt() / lep.pt();
-
-  nu1.SetPxPyPzE(met.px(), met.py(), pz1, sqrt(met.px()*met.px() + met.py()*met.py() + pz1*pz1));
-  nu2.SetPxPyPzE(met.px(), met.py(), pz2, sqrt(met.px()*met.px() + met.py()*met.py() + pz2*pz2));
+  
+  if( fabs(pz1) < fabs(pz2) )
+  {
+    nu1.SetPxPyPzE(met.px(), met.py(), pz1, sqrt(met.px()*met.px() + met.py()*met.py() + pz1*pz1));
+    nu2.SetPxPyPzE(met.px(), met.py(), pz2, sqrt(met.px()*met.px() + met.py()*met.py() + pz2*pz2));
+  }
+  else
+  {
+    nu1.SetPxPyPzE(met.px(), met.py(), pz2, sqrt(met.px()*met.px() + met.py()*met.py() + pz2*pz2));
+    nu2.SetPxPyPzE(met.px(), met.py(), pz1, sqrt(met.px()*met.px() + met.py()*met.py() + pz1*pz1));  
+  }
   
   if( delta > 0. ) return 2;
   else return 1;

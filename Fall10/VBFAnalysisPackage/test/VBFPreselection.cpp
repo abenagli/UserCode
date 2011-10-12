@@ -51,10 +51,12 @@ int main(int argc, char** argv)
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
   
   
-  int nJetCntMIN = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
-  float jetPtMIN  = gConfigParser -> readFloatOption("Cuts::jetPtMIN");
-  float jetEtaCNT = gConfigParser -> readFloatOption("Cuts::jetEtaCNT");
-  float jetEtaFWD = gConfigParser -> readFloatOption("Cuts::jetEtaFWD");
+  int nJetCntMIN    = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
+  float lepJetDRMIN = gConfigParser -> readFloatOption("Cuts::lepJetDRMIN");
+  float jetPtMIN    = gConfigParser -> readFloatOption("Cuts::jetPtMIN");
+  float jetEtaCNT   = gConfigParser -> readFloatOption("Cuts::jetEtaCNT");
+  float jetEtaFWD   = gConfigParser -> readFloatOption("Cuts::jetEtaFWD");
+  
   
   std::string WSelectionMETHOD   = gConfigParser -> readStringOption("Cuts::WSelectionMETHOD");
   std::string tagSelectionMETHOD = gConfigParser -> readStringOption("Cuts::tagSelectionMETHOD");
@@ -649,12 +651,12 @@ int main(int argc, char** argv)
       // clean jets from selected lepton
       float DR = deltaR(jet.eta(), jet.phi(), vars.lep.eta(), vars.lep.phi());
       
-      if( (leptonFLAVOUR == "e")  && (DR < 0.5) ) continue;
-      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 11) && (DR < 0.5) ) continue;
+      if( (leptonFLAVOUR == "e")  && (DR < lepJetDRMIN) ) continue;
+      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 11) && (DR < lepJetDRMIN) ) continue;
       
-      if( (leptonFLAVOUR == "mu") && (DR < 0.5) ) continue;
-      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 13) && (DR < 0.5) ) continue;
-            
+      if( (leptonFLAVOUR == "mu") && (DR < lepJetDRMIN) ) continue;
+      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 13) && (DR < lepJetDRMIN) ) continue;
+      
       
       // jetID
       if(jetType == "Calo")
@@ -754,7 +756,7 @@ int main(int argc, char** argv)
 		<< std::endl;
       
     } // loop on jets
-      */
+    */
 
 
 
@@ -908,20 +910,6 @@ int main(int argc, char** argv)
       // fIll event counters
       stepEvents[step] += 1;
     }
-    
-    
-    
-    
-    
-    
-    //***************
-    // Get the angles
-    //double ctheta_l, ctheta_j1, ctheta_j2;
-    //GetLNuJJAngles(ctheta_l,ctheta_j1,ctheta_j2,
-    //               *vars.p_lep,
-    //               *vars.p_nu,
-    //               *vars.p_WJ1,
-    //               *vars.p_WJ2);
     
     
     

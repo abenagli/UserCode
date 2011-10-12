@@ -64,6 +64,10 @@ struct VBFAnalysisVariables
   ROOT::Math::XYZTVector lep;
   ROOT::Math::XYZTVector* p_lep_KF;
   ROOT::Math::XYZTVector lep_KF;
+  ROOT::Math::XYZTVector* p_lep_KF1;
+  ROOT::Math::XYZTVector lep_KF1;
+  ROOT::Math::XYZTVector* p_lep_KF2;
+  ROOT::Math::XYZTVector lep_KF2;
   
   ROOT::Math::XYZTVector* p_lepNu;
   ROOT::Math::XYZTVector lepNu;
@@ -107,8 +111,16 @@ struct VBFAnalysisVariables
   ROOT::Math::XYZTVector met;
   ROOT::Math::XYZTVector* p_nu;
   ROOT::Math::XYZTVector nu;
+  ROOT::Math::XYZTVector* p_nu1;
+  ROOT::Math::XYZTVector nu1;
+  ROOT::Math::XYZTVector* p_nu2;
+  ROOT::Math::XYZTVector nu2;
   ROOT::Math::XYZTVector* p_nu_KF;
   ROOT::Math::XYZTVector nu_KF;
+  ROOT::Math::XYZTVector* p_nu_KF1;
+  ROOT::Math::XYZTVector nu_KF1;
+  ROOT::Math::XYZTVector* p_nu_KF2;
+  ROOT::Math::XYZTVector nu_KF2;
   float met_et;
   
   float lepMet_pt;
@@ -179,8 +191,16 @@ struct VBFAnalysisVariables
 
   ROOT::Math::XYZTVector* p_WJ1_KF;
   ROOT::Math::XYZTVector WJ1_KF;
+  ROOT::Math::XYZTVector* p_WJ1_KF1;
+  ROOT::Math::XYZTVector WJ1_KF1;
+  ROOT::Math::XYZTVector* p_WJ1_KF2;
+  ROOT::Math::XYZTVector WJ1_KF2;
   ROOT::Math::XYZTVector* p_WJ2_KF;
   ROOT::Math::XYZTVector WJ2_KF;
+  ROOT::Math::XYZTVector* p_WJ2_KF1;
+  ROOT::Math::XYZTVector WJ2_KF1;
+  ROOT::Math::XYZTVector* p_WJ2_KF2;
+  ROOT::Math::XYZTVector WJ2_KF2;
   
   ROOT::Math::XYZTVector* p_WJJ;
   ROOT::Math::XYZTVector WJJ;
@@ -224,12 +244,22 @@ struct VBFAnalysisVariables
   float lepNu_m;
   int lepNu_nSolutions;
   float lepNuW_m;
+  float lepNuW_m1;
+  float lepNuW_m2;
   float lepNuW_zepp;
   
   float lepNuW_m_KF;
+  float lepNuW_m_KF1;
+  float lepNuW_m_KF2;
   float chi2_KF;
+  float chi2_KF1;
+  float chi2_KF2;
   int ndf_KF;
+  int ndf_KF1;
+  int ndf_KF2;
   int status_KF;
+  int status_KF1;
+  int status_KF2;
   
   float lepNuW_cphi;
   float lepNuZ_cphi;

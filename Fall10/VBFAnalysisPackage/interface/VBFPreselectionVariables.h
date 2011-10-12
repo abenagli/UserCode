@@ -289,6 +289,8 @@ struct VBFPreselectionVariables
   // Higgs variables
   ROOT::Math::XYZTVector lepW;
   ROOT::Math::XYZTVector lepNuW;
+  ROOT::Math::XYZTVector lepNuW1;
+  ROOT::Math::XYZTVector lepNuW2;
   
   float lepMetW_pt;
   float lepMetW_mt;
@@ -297,6 +299,8 @@ struct VBFPreselectionVariables
   int lepNu_nSolutions;
   float lepW_pt;
   float lepNuW_m;
+  float lepNuW_m1;
+  float lepNuW_m2;
   float lepNuW_zepp;
   
   

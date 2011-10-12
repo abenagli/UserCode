@@ -380,6 +380,8 @@ int main(int argc, char** argv)
     vars.lep = *(vars.p_lep);
     vars.met = *(vars.p_met);
     vars.nu = *(vars.p_nu);
+    vars.nu1 = *(vars.p_nu1);
+    vars.nu2 = *(vars.p_nu2);
     vars.lepNu = *(vars.p_lep) + *(vars.p_nu);
     vars.leadingJ = *(vars.p_leadingJ);
     vars.WJ1 = *(vars.p_WJ1);
@@ -1010,8 +1012,7 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
     
     
-    DoKinematicFit(vars);
-    
+    DoKinematicFit(vars,0,"MIB");
     
     if( vars.WJ1.pt() > 0. )
       vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );

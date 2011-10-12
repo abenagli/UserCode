@@ -14,6 +14,6 @@
 
 
 
-void DoKinematicFit(VBFAnalysisVariables& vars, const std::string& method = "MIB");
+void DoKinematicFit(VBFAnalysisVariables& vars, const int& flag = 0, const std::string& method = "MIB");
 
 #endif

@@ -194,6 +194,8 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lepNu_nSolutions", &vars.lepNu_nSolutions, "lepNu_nSolutions/I");
   vars.m_reducedTree -> Branch("lepW_pt",          &vars.lepW_pt,                   "lepW_pt/F");
   vars.m_reducedTree -> Branch("lepNuW_m",         &vars.lepNuW_m,                 "lepNuW_m/F");
+  vars.m_reducedTree -> Branch("lepNuW_m1",        &vars.lepNuW_m1,               "lepNuW_m1/F");
+  vars.m_reducedTree -> Branch("lepNuW_m2",        &vars.lepNuW_m2,               "lepNuW_m2/F");
   vars.m_reducedTree -> Branch("lepNuW_zepp",      &vars.lepNuW_zepp,           "lepNuW_zepp/F");
   
   
@@ -481,6 +483,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   // Higgs variables
   vars.lepW = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.lepNuW = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.lepNuW1 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.lepNuW2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   
   vars.lepMetW_pt = -1.;
   vars.lepMetW_mt = -1.;
@@ -489,6 +493,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lepNu_nSolutions = -1;
   vars.lepW_pt = -1.;
   vars.lepNuW_m = -1.;
+  vars.lepNuW_m1 = -1.;
+  vars.lepNuW_m2 = -1.;
   vars.lepNuW_zepp = -99.;
   
   
@@ -1015,7 +1021,11 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lepW = vars.lep + vars.WJJ;
   vars.lepW_pt = vars.lepW.pt();
   vars.lepNuW = vars.lepW + vars.nu;
+  vars.lepNuW1 = vars.lepW + vars.nu1;
+  vars.lepNuW2 = vars.lepW + vars.nu2;
   vars.lepNuW_m = vars.lepNuW.mass();
+  vars.lepNuW_m1 = vars.lepNuW1.mass();
+  vars.lepNuW_m2 = vars.lepNuW2.mass();
   
   vars.lepMetW_pt = (vars.lep + vars.met + vars.WJJ).pt();
   vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );

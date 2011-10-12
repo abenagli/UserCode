@@ -99,8 +99,12 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   // met variables
   vars.p_met = new ROOT::Math::XYZTVector;
   vars.p_nu = new ROOT::Math::XYZTVector;
+  vars.p_nu1 = new ROOT::Math::XYZTVector;
+  vars.p_nu2 = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("met",   &vars.p_met);
   reducedTree -> SetBranchAddress("nu",    &vars.p_nu);
+  reducedTree -> SetBranchAddress("nu1",   &vars.p_nu1);
+  reducedTree -> SetBranchAddress("nu2",   &vars.p_nu2);
   reducedTree -> SetBranchAddress("met_et",      &vars.met_et);
   reducedTree -> SetBranchAddress("lepMet_pt",   &vars.lepMet_pt);
   reducedTree -> SetBranchAddress("lepMet_mt",   &vars.lepMet_mt);
@@ -180,6 +184,8 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lepNu_nSolutions", &vars.lepNu_nSolutions);
   reducedTree -> SetBranchAddress("lepW_pt",          &vars.lepW_pt);
   reducedTree -> SetBranchAddress("lepNuW_m",         &vars.lepNuW_m);
+  reducedTree -> SetBranchAddress("lepNuW_m1",        &vars.lepNuW_m1);
+  reducedTree -> SetBranchAddress("lepNuW_m2",        &vars.lepNuW_m2);
   reducedTree -> SetBranchAddress("lepNuW_zepp",      &vars.lepNuW_zepp);
   
   
@@ -229,17 +235,47 @@ void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
   
   vars.p_lep_KF = new ROOT::Math::XYZTVector;
   reducedTree -> Branch("lep_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_lep_KF);
+  vars.p_lep_KF1 = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("lep_KF1", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_lep_KF1);
+  vars.p_lep_KF2 = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("lep_KF2", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_lep_KF2);
+  
   vars.p_nu_KF = new ROOT::Math::XYZTVector;
   reducedTree -> Branch("nu_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu_KF);
+  vars.p_nu_KF1 = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("nu_KF1", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu_KF1);
+  vars.p_nu_KF2 = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("nu_KF2", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu_KF2);
+  
   vars.p_WJ1_KF = new ROOT::Math::XYZTVector;
   reducedTree -> Branch("WJ1_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1_KF);
+  vars.p_WJ1_KF1 = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("WJ1_KF1", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1_KF1);
+  vars.p_WJ1_KF2 = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("WJ1_KF2", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1_KF2);
+  
   vars.p_WJ2_KF = new ROOT::Math::XYZTVector;
   reducedTree -> Branch("WJ2_KF", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2_KF);
+  vars.p_WJ2_KF1 = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("WJ2_KF1", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2_KF1);
+  vars.p_WJ2_KF2 = new ROOT::Math::XYZTVector;
+  reducedTree -> Branch("WJ2_KF2", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2_KF2);
   
-  reducedTree -> Branch("lepNuW_m_KF", &vars.lepNuW_m_KF, "lepNuW_m_KF/F");
-  reducedTree -> Branch("chi2_KF",     &vars.chi2_KF,         "chi2_KF/F");
-  reducedTree -> Branch("ndf_KF",      &vars.ndf_KF,           "ndf_KF/I");
-  reducedTree -> Branch("status_KF",   &vars.status_KF,     "status_KF/I");
+  reducedTree -> Branch("lepNuW_m_KF",  &vars.lepNuW_m_KF,   "lepNuW_m_KF/F");
+  reducedTree -> Branch("lepNuW_m_KF1", &vars.lepNuW_m_KF1, "lepNuW_m_KF1/F");
+  reducedTree -> Branch("lepNuW_m_KF2", &vars.lepNuW_m_KF2, "lepNuW_m_KF2/F");
+  
+  reducedTree -> Branch("chi2_KF", &vars.chi2_KF,  "chi2_KF/F");
+  reducedTree -> Branch("chi2_KF1",&vars.chi2_KF1,"chi2_KF1/F");
+  reducedTree -> Branch("chi2_KF2",&vars.chi2_KF2,"chi2_KF2/F");
+  
+  reducedTree -> Branch("ndf_KF", &vars.ndf_KF,  "ndf_KF/I");
+  reducedTree -> Branch("ndf_KF1",&vars.ndf_KF1,"ndf_KF1/I");
+  reducedTree -> Branch("ndf_KF2",&vars.ndf_KF2,"ndf_KF2/I");
+  
+  reducedTree -> Branch("status_KF", &vars.status_KF,  "status_KF/I");
+  reducedTree -> Branch("status_KF1",&vars.status_KF1,"status_KF1/I");
+  reducedTree -> Branch("status_KF2",&vars.status_KF2,"status_KF2/I");
 }
 
 

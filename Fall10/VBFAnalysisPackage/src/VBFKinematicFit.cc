@@ -2,12 +2,15 @@
 
 
 
-void DoKinematicFit(VBFAnalysisVariables& vars, const std::string& method)
+void DoKinematicFit(VBFAnalysisVariables& vars, const int& flag, const std::string& method)
 {
   // lepton
   TLorentzVector vl(vars.lep.px(),vars.lep.py(),vars.lep.pz(),vars.lep.energy());
   // neutrino
-  TLorentzVector vv(vars.nu.px(),vars.nu.py(),vars.nu.pz(),vars.nu.energy());
+  TLorentzVector vv;
+  if( flag == 1 )      vv.SetXYZT(vars.nu1.px(),vars.nu1.py(),vars.nu1.pz(),vars.nu1.energy());
+  else if( flag == 2 ) vv.SetXYZT(vars.nu2.px(),vars.nu2.py(),vars.nu2.pz(),vars.nu2.energy());
+  else                 vv.SetXYZT( vars.nu.px(), vars.nu.py(), vars.nu.pz(), vars.nu.energy());
   // W-jet 1
   TLorentzVector v1(vars.WJ1.px(),vars.WJ1.py(),vars.WJ1.pz(),vars.WJ1.energy());
   // W-jet 2
@@ -40,7 +43,7 @@ void DoKinematicFit(VBFAnalysisVariables& vars, const std::string& method)
   // neutrino
   PFMETResolution(vars.met.Et(),EtRes,etaRes,phiRes);
   mv(0,0) = EtRes*EtRes;
-  mv(1,1) = 25.;
+  mv(1,1) = 0.01;
   mv(2,2) = phiRes*phiRes;
   
   // jets
@@ -65,6 +68,7 @@ void DoKinematicFit(VBFAnalysisVariables& vars, const std::string& method)
   TFitParticleEtEtaPhi* j1 = new TFitParticleEtEtaPhi("WJet1","WJet1",&tmp1,&m1);
   TFitParticleEtEtaPhi* j2 = new TFitParticleEtEtaPhi("WJet2","WJet2",&tmp2,&m2);
   
+  //std::cout << "flag: " << flag << "   ";
   //std::cout << "l: " << tmpl.Pz() << "   mass: " << tmpl.M() << std::endl;
   //std::cout << "v: " << tmpv.Pz() << "   mass: " << tmpv.M() << std::endl;
   //std::cout << "nSolutions: " << nSolutions << std::endl;
@@ -103,25 +107,68 @@ void DoKinematicFit(VBFAnalysisVariables& vars, const std::string& method)
   fitter->setVerbosity(0);
   
   //Perform the fit
-  vars.status_KF = fitter->fit();
+  if( flag == 1 )      vars.status_KF1 = fitter->fit();
+  else if( flag == 2 ) vars.status_KF2 = fitter->fit();
+  else                 vars.status_KF  = fitter->fit();
   
   
   // update the higgs mass after kinematic fit
-  vars.lep_KF.SetPxPyPzE(l->getCurr4Vec()->Px(),l->getCurr4Vec()->Py(),l->getCurr4Vec()->Pz(),l->getCurr4Vec()->E()  );
-  vars.p_lep_KF = &vars.lep_KF;
+  if( flag == 1 )
+  {
+    vars.lep_KF1.SetPxPyPzE(l->getCurr4Vec()->Px(),l->getCurr4Vec()->Py(),l->getCurr4Vec()->Pz(),l->getCurr4Vec()->E()  );
+    vars.p_lep_KF1 = &vars.lep_KF1;
+    
+    vars.nu_KF1.SetPxPyPzE(v->getCurr4Vec()->Px(),v->getCurr4Vec()->Py(),v->getCurr4Vec()->Pz(),v->getCurr4Vec()->E()  );
+    vars.p_nu_KF1 = &vars.nu_KF1;
+    
+    vars.WJ1_KF1.SetPxPyPzE(j1->getCurr4Vec()->Px(),j1->getCurr4Vec()->Py(),j1->getCurr4Vec()->Pz(),j1->getCurr4Vec()->E()  );
+    vars.p_WJ1_KF1 = &vars.WJ1_KF1;
+    
+    vars.WJ2_KF1.SetPxPyPzE(j2->getCurr4Vec()->Px(),j2->getCurr4Vec()->Py(),j2->getCurr4Vec()->Pz(),j2->getCurr4Vec()->E()  );
+    vars.p_WJ2_KF1 = &vars.WJ2_KF1;
+    
+    vars.lepNuW_m_KF1 = ( (*(l->getCurr4Vec())) + (*(v->getCurr4Vec())) + (*(j1->getCurr4Vec())) + (*(j2->getCurr4Vec())) ).M();
+    vars.chi2_KF1 = fitter->getS();
+    vars.ndf_KF1 = fitter->getNDF();
+  }
   
-  vars.nu_KF.SetPxPyPzE(v->getCurr4Vec()->Px(),v->getCurr4Vec()->Py(),v->getCurr4Vec()->Pz(),v->getCurr4Vec()->E()  );
-  vars.p_nu_KF = &vars.nu_KF;
+  else if( flag == 2 )
+  {
+    vars.lep_KF2.SetPxPyPzE(l->getCurr4Vec()->Px(),l->getCurr4Vec()->Py(),l->getCurr4Vec()->Pz(),l->getCurr4Vec()->E()  );
+    vars.p_lep_KF2 = &vars.lep_KF2;
+    
+    vars.nu_KF2.SetPxPyPzE(v->getCurr4Vec()->Px(),v->getCurr4Vec()->Py(),v->getCurr4Vec()->Pz(),v->getCurr4Vec()->E()  );
+    vars.p_nu_KF2 = &vars.nu_KF2;
+    
+    vars.WJ1_KF2.SetPxPyPzE(j1->getCurr4Vec()->Px(),j1->getCurr4Vec()->Py(),j1->getCurr4Vec()->Pz(),j1->getCurr4Vec()->E()  );
+    vars.p_WJ1_KF2 = &vars.WJ1_KF2;
+    
+    vars.WJ2_KF2.SetPxPyPzE(j2->getCurr4Vec()->Px(),j2->getCurr4Vec()->Py(),j2->getCurr4Vec()->Pz(),j2->getCurr4Vec()->E()  );
+    vars.p_WJ2_KF2 = &vars.WJ2_KF2;
+    
+    vars.lepNuW_m_KF2 = ( (*(l->getCurr4Vec())) + (*(v->getCurr4Vec())) + (*(j1->getCurr4Vec())) + (*(j2->getCurr4Vec())) ).M();
+    vars.chi2_KF2 = fitter->getS();
+    vars.ndf_KF2 = fitter->getNDF();
+  }
   
-  vars.WJ1_KF.SetPxPyPzE(j1->getCurr4Vec()->Px(),j1->getCurr4Vec()->Py(),j1->getCurr4Vec()->Pz(),j1->getCurr4Vec()->E()  );
-  vars.p_WJ1_KF = &vars.WJ1_KF;
-  
-  vars.WJ2_KF.SetPxPyPzE(j2->getCurr4Vec()->Px(),j2->getCurr4Vec()->Py(),j2->getCurr4Vec()->Pz(),j2->getCurr4Vec()->E()  );
-  vars.p_WJ2_KF = &vars.WJ2_KF;
-  
-  vars.lepNuW_m_KF = ( (*(l->getCurr4Vec())) + (*(v->getCurr4Vec())) + (*(j1->getCurr4Vec())) + (*(j2->getCurr4Vec())) ).M();
-  vars.chi2_KF = fitter->getS();
-  vars.ndf_KF = fitter->getNDF();
+  else
+  {
+    vars.lep_KF.SetPxPyPzE(l->getCurr4Vec()->Px(),l->getCurr4Vec()->Py(),l->getCurr4Vec()->Pz(),l->getCurr4Vec()->E()  );
+    vars.p_lep_KF = &vars.lep_KF;
+    
+    vars.nu_KF.SetPxPyPzE(v->getCurr4Vec()->Px(),v->getCurr4Vec()->Py(),v->getCurr4Vec()->Pz(),v->getCurr4Vec()->E()  );
+    vars.p_nu_KF = &vars.nu_KF;
+    
+    vars.WJ1_KF.SetPxPyPzE(j1->getCurr4Vec()->Px(),j1->getCurr4Vec()->Py(),j1->getCurr4Vec()->Pz(),j1->getCurr4Vec()->E()  );
+    vars.p_WJ1_KF = &vars.WJ1_KF;
+    
+    vars.WJ2_KF.SetPxPyPzE(j2->getCurr4Vec()->Px(),j2->getCurr4Vec()->Py(),j2->getCurr4Vec()->Pz(),j2->getCurr4Vec()->E()  );
+    vars.p_WJ2_KF = &vars.WJ2_KF;
+    
+    vars.lepNuW_m_KF = ( (*(l->getCurr4Vec())) + (*(v->getCurr4Vec())) + (*(j1->getCurr4Vec())) + (*(j2->getCurr4Vec())) ).M();
+    vars.chi2_KF = fitter->getS();
+    vars.ndf_KF = fitter->getNDF();
+  }
   
   //std::cout << "lv: mass after KF: " << (vars.lep_KF+vars.nu_KF).M() << std::endl;
   //std::cout << "jj: mass after KF: " << (vars.WJ1_KF+vars.WJ2_KF).M() << std::endl;  
