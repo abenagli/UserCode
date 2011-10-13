@@ -126,37 +126,56 @@ int main (int argc, char** argv)
   double m4_max = 800. ;
   //PG the cuts
   TCut generalCut = "" ;
-  generalCut = generalCut && "1 == 1" ;
+//  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
+//  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
 //  generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
-  generalCut = generalCut && "lep_flavour == 13" ; //PG only electrons
-  std::string outputRootFullFileName = "testBkg_004_noKF_S" + mass + ".root" ;
+//  generalCut = generalCut && "lep_flavour == 13" ; //PG only electrons
+  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
+//  std::string outputRootFullFileName = "testBkg_004_cuts_S" + mass + ".root" ;
+//  std::string outputRootFullFileName = "testBkg_004_noKF_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_5GeV_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF.root" ;
-  TString m4_VAR = "lepNuW_m" ;
-//  TString m4_VAR = "lepNuW_m_KF" ;
+//  TString m4_VAR = "lepNuW_m" ;
+  TString m4_VAR = "lepNuW_m_KF" ;
 
 
   hColl m4_EvenHigher ("m4_EvenHigher", nBins, m4_min, m4_max) ;
   hColl m4_upper      ("m4_upper",      nBins, m4_min, m4_max) ;
+  hColl m4_upper_c    ("m4_upper_c",    nBins, m4_min, m4_max) ; // close
+  hColl m4_upper_a    ("m4_upper_a",    nBins, m4_min, m4_max) ; // away
   hColl m4_signal     ("m4_signal",     nBins, m4_min, m4_max) ;
   hColl m4_lower      ("m4_lower",      nBins, m4_min, m4_max) ;
+  hColl m4_lower_c    ("m4_lower_c",    nBins, m4_min, m4_max) ; // close
+  hColl m4_lower_a    ("m4_lower_a",    nBins, m4_min, m4_max) ; // away
   hColl m4_sideband   ("m4_sideband",   nBins, m4_min, m4_max) ;
 
   TH1F * m4_EvenHigher_DATA = new TH1F ("m4_EvenHigher_DATA", "m4_EvenHigher_DATA", nBins, m4_min, m4_max) ;
   TH1F * m4_upper_DATA      = new TH1F ("m4_upper_DATA",      "m4_upper_DATA",      nBins, m4_min, m4_max) ;
+  TH1F * m4_upper_c_DATA    = new TH1F ("m4_upper_c_DATA",    "m4_upper_c_DATA",    nBins, m4_min, m4_max) ;
+  TH1F * m4_upper_a_DATA    = new TH1F ("m4_upper_a_DATA",    "m4_upper_a_DATA",    nBins, m4_min, m4_max) ;
   TH1F * m4_signal_DATA     = new TH1F ("m4_signal_DATA",     "m4_signal_DATA",     nBins, m4_min, m4_max) ;
   TH1F * m4_lower_DATA      = new TH1F ("m4_lower_DATA",      "m4_lower_DATA",      nBins, m4_min, m4_max) ;
+  TH1F * m4_lower_c_DATA    = new TH1F ("m4_lower_c_DATA",    "m4_lower_c_DATA",    nBins, m4_min, m4_max) ;
+  TH1F * m4_lower_a_DATA    = new TH1F ("m4_lower_a_DATA",    "m4_lower_a_DATA",    nBins, m4_min, m4_max) ;
   TH1F * m4_sideband_DATA   = new TH1F ("m4_sideband_DATA",   "m4_sideband_DATA",   nBins, m4_min, m4_max) ;
 
   hColl m4_EvenHigher_SIG ("m4_EvenHigher_SIG", nBins, m4_min, m4_max) ;
   hColl m4_upper_SIG      ("m4_upper_SIG",      nBins, m4_min, m4_max) ;
+  hColl m4_upper_c_SIG    ("m4_upper_c_SIG",    nBins, m4_min, m4_max) ;
+  hColl m4_upper_a_SIG    ("m4_upper_a_SIG",    nBins, m4_min, m4_max) ;
   hColl m4_signal_SIG     ("m4_signal_SIG",     nBins, m4_min, m4_max) ;
   hColl m4_lower_SIG      ("m4_lower_SIG",      nBins, m4_min, m4_max) ;
+  hColl m4_lower_c_SIG    ("m4_lower_c_SIG",    nBins, m4_min, m4_max) ;
+  hColl m4_lower_a_SIG    ("m4_lower_a_SIG",    nBins, m4_min, m4_max) ;
   hColl m4_sideband_SIG   ("m4_sideband_SIG",   nBins, m4_min, m4_max) ;
 
   TCut lower      = "WJJ_m > 50  && WJJ_m < 65" ;
+  TCut lower_c    = "WJJ_m > 57  && WJJ_m < 65" ;
+  TCut lower_a    = "WJJ_m > 50  && WJJ_m < 57" ;
   TCut signal     = "WJJ_m > 65  && WJJ_m < 95" ;
   TCut upper      = "WJJ_m > 95  && WJJ_m < 130" ;
+  TCut upper_c    = "WJJ_m > 95  && WJJ_m < 107" ;
+  TCut upper_a    = "WJJ_m > 107 && WJJ_m < 130" ;
   TCut EvenHigher = "WJJ_m > 130 && WJJ_m < 400" ;
 
   //PG loop over samples
@@ -169,11 +188,23 @@ int main (int argc, char** argv)
       TCut cutLower = generalCut && lower ;
       TCut cutLowerExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutLower.GetTitle (), LUMI) ;    
 
+      TCut cutLower_c = generalCut && lower_c ;
+      TCut cutLower_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutLower_c.GetTitle (), LUMI) ;    
+
+      TCut cutLower_a = generalCut && lower_a ;
+      TCut cutLower_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutLower_a.GetTitle (), LUMI) ;    
+
       TCut cutSignal = generalCut && signal ;
       TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSignal.GetTitle (), LUMI) ;    
 
       TCut cutUpper = generalCut && upper ;
       TCut cutUpperExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutUpper.GetTitle (), LUMI) ;    
+
+      TCut cutUpper_c = generalCut && upper_c ;
+      TCut cutUpper_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutUpper_c.GetTitle (), LUMI) ;    
+
+      TCut cutUpper_a = generalCut && upper_a ;
+      TCut cutUpper_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutUpper_a.GetTitle (), LUMI) ;    
 
       TCut cutEvenHigher = generalCut && EvenHigher ;
       TCut cutEvenHigherExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutEvenHigher.GetTitle (), LUMI) ;    
@@ -191,8 +222,12 @@ int main (int argc, char** argv)
             } 
                 
           TH1F * h_m4_lower_SIG = m4_lower_SIG.addSample (iColl->first.c_str ()) ;
+          TH1F * h_m4_lower_c_SIG = m4_lower_c_SIG.addSample (iColl->first.c_str ()) ;
+          TH1F * h_m4_lower_a_SIG = m4_lower_a_SIG.addSample (iColl->first.c_str ()) ;
           TH1F * h_m4_signal_SIG = m4_signal_SIG.addSample (iColl->first.c_str ()) ;
           TH1F * h_m4_upper_SIG = m4_upper_SIG.addSample (iColl->first.c_str ()) ;
+          TH1F * h_m4_upper_c_SIG = m4_upper_c_SIG.addSample (iColl->first.c_str ()) ;
+          TH1F * h_m4_upper_a_SIG = m4_upper_a_SIG.addSample (iColl->first.c_str ()) ;
           TH1F * h_m4_EvenHigher_SIG = m4_EvenHigher_SIG.addSample (iColl->first.c_str ()) ;
           TH1F * h_m4_sideband_SIG = m4_sideband_SIG.addSample (iColl->first.c_str ()) ;
     
@@ -201,8 +236,12 @@ int main (int argc, char** argv)
           SetVBFPreselectionTreeBranches (vars, chain) ;
     
           iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_SIG->GetName (), cutLowerExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_c_SIG->GetName (), cutLower_cExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_a_SIG->GetName (), cutLower_aExtended) ;
           iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_signal_SIG->GetName (), cutSignalExtended) ;
           iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_SIG->GetName (), cutUpperExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_c_SIG->GetName (), cutUpper_cExtended) ;
+          iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_a_SIG->GetName (), cutUpper_aExtended) ;
           iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_EvenHigher_SIG->GetName (), cutEvenHigherExtended) ;
           iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_sideband_SIG->GetName (), cutSidebandExtended) ;
           
@@ -212,8 +251,12 @@ int main (int argc, char** argv)
       if (iColl->first == "DATA")
         {
           iColl->second->Draw (m4_VAR + TString (" >> m4_lower_DATA"), cutLower) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_lower_a_DATA"), cutLower_a) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_lower_c_DATA"), cutLower_c) ;
           iColl->second->Draw (m4_VAR + TString (" >> m4_signal_DATA"), cutSignal) ;
           iColl->second->Draw (m4_VAR + TString (" >> m4_upper_DATA"), cutUpper) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_upper_a_DATA"), cutUpper_a) ;
+          iColl->second->Draw (m4_VAR + TString (" >> m4_upper_c_DATA"), cutUpper_c) ;
           iColl->second->Draw (m4_VAR + TString (" >> m4_EvenHigher_DATA"), cutEvenHigher) ;
           iColl->second->Draw (m4_VAR + TString (" >> m4_sideband_DATA"), cutSideband) ;
         
@@ -221,8 +264,12 @@ int main (int argc, char** argv)
         }  
       
       TH1F * h_m4_lower = m4_lower.addSample (iColl->first.c_str ()) ;
+      TH1F * h_m4_lower_c = m4_lower_c.addSample (iColl->first.c_str ()) ;
+      TH1F * h_m4_lower_a = m4_lower_a.addSample (iColl->first.c_str ()) ;
       TH1F * h_m4_signal = m4_signal.addSample (iColl->first.c_str ()) ;
       TH1F * h_m4_upper = m4_upper.addSample (iColl->first.c_str ()) ;
+      TH1F * h_m4_upper_c = m4_upper_c.addSample (iColl->first.c_str ()) ;
+      TH1F * h_m4_upper_a = m4_upper_a.addSample (iColl->first.c_str ()) ;
       TH1F * h_m4_EvenHigher = m4_EvenHigher.addSample (iColl->first.c_str ()) ;
       TH1F * h_m4_sideband = m4_sideband.addSample (iColl->first.c_str ()) ;
 
@@ -231,8 +278,12 @@ int main (int argc, char** argv)
       SetVBFPreselectionTreeBranches (vars, chain) ;
 
       iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower->GetName (), cutLowerExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_c->GetName (), cutLower_cExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_a->GetName (), cutLower_aExtended) ;
       iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_signal->GetName (), cutSignalExtended) ;
       iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper->GetName (), cutUpperExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_c->GetName (), cutUpper_cExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_a->GetName (), cutUpper_aExtended) ;
       iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_EvenHigher->GetName (), cutEvenHigherExtended) ;
       iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_sideband->GetName (), cutSidebandExtended) ;
       
@@ -243,21 +294,33 @@ int main (int argc, char** argv)
   outputRootFile->cd () ;
 
   m4_upper.save (outputRootFile) ;
+  m4_upper_c.save (outputRootFile) ;
+  m4_upper_a.save (outputRootFile) ;
   m4_EvenHigher.save (outputRootFile) ;
   m4_signal.save (outputRootFile) ;
   m4_lower.save (outputRootFile) ;
+  m4_lower_c.save (outputRootFile) ;
+  m4_lower_a.save (outputRootFile) ;
   m4_sideband.save (outputRootFile) ;
 
   m4_upper_DATA->Write () ;   
+  m4_upper_c_DATA->Write () ;   
+  m4_upper_a_DATA->Write () ;   
   m4_EvenHigher_DATA->Write () ;   
   m4_signal_DATA->Write () ;  
   m4_lower_DATA->Write () ;   
+  m4_lower_c_DATA->Write () ;   
+  m4_lower_a_DATA->Write () ;   
   m4_sideband_DATA->Write () ;
 
   m4_upper_SIG.save (outputRootFile) ;   
+  m4_upper_c_SIG.save (outputRootFile) ;   
+  m4_upper_a_SIG.save (outputRootFile) ;   
   m4_EvenHigher_SIG.save (outputRootFile) ;   
   m4_signal_SIG.save (outputRootFile) ;  
   m4_lower_SIG.save (outputRootFile) ;   
+  m4_lower_c_SIG.save (outputRootFile) ;   
+  m4_lower_a_SIG.save (outputRootFile) ;   
   m4_sideband_SIG.save (outputRootFile) ;
 
   outputRootFile->Close () ;
