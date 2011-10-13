@@ -408,10 +408,9 @@ bool muonResolution(const double et, const double eta, double& etRes, double& et
 
 
 
-bool PFMETResolution(const double et, double& etRes, double& etaRes, double& phiRes)
+bool PFMETResolution(const double et, double& etRes,double& phiRes)
 {
   etRes  = et * (sqrt(square(0.05469) + square(10.549/et)));
-  etaRes = 0.0;
   phiRes = sqrt(square(0.164/sqrt(et)) + square(11.068/et));
   return true;
 }
