@@ -47,8 +47,11 @@ int macro_004_10 (int mass)
   cout << inputFile << endl ;
   TFile input (inputFile) ;
 
+  bool makeToys = true ; //PG make toys to eval the error
+       makeToys = false ; //PG error as the ratio of the errors of the function
   int nToys = 10000 ;
-
+  bool scaleBand = false ; //PG scale the band according to the pool wrt the MC histo
+ 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -176,7 +179,10 @@ int macro_004_10 (int mass)
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
  
   double binSize = (m4_max - m4_min) / nBins ;
-  
+  double startFit = 160 ; //GeV, bin from where to start the num & den fit for corr factor
+  double endFit = 800 ;   //GeV, bin from where to end the num & den fit for corr factor
+  int fitBins = (endFit-startFit) / binSize ;
+
   cout << nBins << " " << m4_min << " " << m4_max << " " << binSize << endl ;
 
 //------------------------------
@@ -215,18 +221,18 @@ int macro_004_10 (int mass)
   numFitFunc->SetLineColor (kBlue+2) ;
   numFitFunc->SetNpx (10000) ;
 
-  signalRegionMC->Fit (numFitFunc, "LQ", "", 160., 800.) ;
+  signalRegionMC->Fit (numFitFunc, "LQ", "", startFit, endFit) ;
   int fitStatus = 1 ;
   int loops = 0 ; 
   while (fitStatus != 0 && loops < 30)
     {
-      TFitResultPtr fitResultPtr = signalRegionMC->Fit (numFitFunc, "LQ", "", 160., 800.) ;
+      TFitResultPtr fitResultPtr = signalRegionMC->Fit (numFitFunc, "LQ", "", startFit, endFit) ;
       fitStatus = (int)(fitResultPtr) ;
       ++loops ;
     }
   cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
 
-  TH1F * num_fit_error = new TH1F ("num_fit_error", "", (800-160)/binSize, 160., 800.) ;
+  TH1F * num_fit_error = new TH1F ("num_fit_error", "", fitBins, startFit, endFit) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (num_fit_error, 0.68) ;
 
   num_fit_error->SetFillColor (kGray+2) ;
@@ -258,18 +264,18 @@ int macro_004_10 (int mass)
   denFitFunc->SetLineColor (kBlue+2) ;
   denFitFunc->SetNpx (10000) ;
 
-  sidebaRegionMC->Fit (denFitFunc, "LQ", "", 160., 800.) ;
+  sidebaRegionMC->Fit (denFitFunc, "LQ", "", startFit, endFit) ;
   fitStatus = 1 ;
   loops = 0 ; 
   while (fitStatus != 0 && loops < 50)
     {
-      TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "LQ", "", 160., 800.) ;
+      TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "LQ", "", startFit, endFit) ;
       fitStatus = (int)(fitResultPtr) ;
       ++loops ;
     }
   cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
 
-  TH1F * den_fit_error = new TH1F ("den_fit_error", "", (800-160)/binSize, 160., 800.) ;
+  TH1F * den_fit_error = new TH1F ("den_fit_error", "", fitBins, startFit, endFit) ;
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (den_fit_error, 0.68) ;
 
   den_fit_error->SetFillColor (kGray+2) ;
@@ -291,71 +297,110 @@ int macro_004_10 (int mass)
   c1->Print ("sideband_log.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
+
   //PG toy experiments to determine the size of the error band on the extrapolation factor
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TRandom3 r ;
-  TH2F * correctionPlane = new TH2F ("correctionPlane", "", nBins, m4_min, m4_max, 600, 0, 9) ;
+  TH1F * h_correctionBand ;
 
-  TH1F * dummyNum = (TH1F *) signalRegionMC->Clone ("dummyNum") ;
-  TH1F * dummyDen = (TH1F *) sidebaRegionMC->Clone ("dummyDen") ;
-  double intSignal = signalRegionMC->Integral () * 2.6 / 2.1 ;   //PG put in the W+jets MC statistics for the uncertainty
-  double intSideband = sidebaRegionMC->Integral () * 2.6 / 2.1 ; //PG put in the W+jets MC statistics for the uncertainty
- 
-  for (int iToy = 0 ; iToy < nToys ; ++iToy)
+  if (makeToys)
     {
-      if (iToy %(nToys/10) == 0) cout << "toy number " << iToy << endl ;
-
-      int nNum = r.Poisson (intSignal) ;
-      dummyNum->Reset () ;
-      dummyNum->FillRandom ("numFitFunc", nNum) ;
-
-      int nDen = r.Poisson (intSideband) ;
-      dummyDen->Reset () ;
-      dummyDen->FillRandom ("denFitFunc", nDen) ;
-
-      dummyNum->Divide (dummyDen) ;
-      for (int iBin = 1 ; iBin <= dummyNum->GetNbinsX () ; ++iBin)
+      TRandom3 r ;
+      TH2F * correctionPlane = new TH2F ("correctionPlane", "", nBins, m4_min, m4_max, 600, 0, 9) ;
+    
+      TH1F * dummyNum = (TH1F *) signalRegionMC->Clone ("dummyNum") ;
+      TH1F * dummyDen = (TH1F *) sidebaRegionMC->Clone ("dummyDen") ;
+      double intSignal = signalRegionMC->Integral () * 2.6 / 2.1 ;   //PG put in the W+jets MC statistics for the uncertainty
+      double intSideband = sidebaRegionMC->Integral () * 2.6 / 2.1 ; //PG put in the W+jets MC statistics for the uncertainty
+     
+      for (int iToy = 0 ; iToy < nToys ; ++iToy)
         {
-          correctionPlane->Fill (dummyNum->GetBinCenter (iBin), dummyNum->GetBinContent (iBin)) ;
+          if (iToy %(nToys/10) == 0) cout << "toy number " << iToy << endl ;
+    
+          int nNum = r.Poisson (intSignal) ;
+          dummyNum->Reset () ;
+          dummyNum->FillRandom ("numFitFunc", nNum) ;
+    
+          int nDen = r.Poisson (intSideband) ;
+          dummyDen->Reset () ;
+          dummyDen->FillRandom ("denFitFunc", nDen) ;
+    
+          dummyNum->Divide (dummyDen) ;
+          for (int iBin = 1 ; iBin <= dummyNum->GetNbinsX () ; ++iBin)
+            {
+              correctionPlane->Fill (dummyNum->GetBinCenter (iBin), dummyNum->GetBinContent (iBin)) ;
+            }
         }
+
+      //PG correction factor from the profile of the many toys
+      //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+      TProfile * correctionBand = correctionPlane->ProfileX ("correctionBand", 1, -1, "s") ;
+      TH1F * h_correctionBand = dumpProfile ("h_correctionBand", correctionBand) ;
+
+      //PG use the ratio of functions as central value
+      //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+      
+      for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
+        {
+          double center = h_correctionBand->GetBinCenter (iBin) ;
+          double corr = numFitFunc->Eval (center) / denFitFunc->Eval (center) ; 
+          h_correctionBand->SetBinContent (iBin, corr) ;
+        }
+
+      //PG correction factor from the gaussian fit to slices of the many toys
+      //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+      //PG FIXME this needs to be extracted from the loop
+    
+      TObjArray aSlices;
+      correctionPlane->FitSlicesY (0, 0, -1, 0, "QNRL", &aSlices) ;
+      TH1F * gaussianBand = aSlices.At (1)->Clone ("gaussianBand") ;
+      for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin) 
+        {
+          double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ;
+          gaussianBand->SetBinError (iBin, sigma) ;
+        }
+      gaussianBand->SetFillStyle (3002) ;
+      gaussianBand->SetFillColor (kGreen + 2) ;
+
     }
-
-  //PG correction factor from the profile of the many toys
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-  TProfile * correctionBand = correctionPlane->ProfileX ("correctionBand", 1, -1, "s") ;
-  TH1F * h_correctionBand = dumpProfile ("h_correctionBand", correctionBand) ;
-
-  //PG use the ratio of functions as central value
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-  
-  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
+  else 
     {
-      double center = h_correctionBand->GetBinCenter (iBin) ;
-      double corr = numFitFunc->Eval (center) / denFitFunc->Eval (center) ; 
-      h_correctionBand->SetBinContent (iBin, corr) ;
+      // prepare the histo
+      h_correctionBand = (TH1F *) signalRegionMC->Clone ("h_correctionBand") ;
+      h_correctionBand->Reset () ;
+      for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
+        {
+          // fill the histo central values
+          double center = h_correctionBand->GetBinCenter (iBin) ;
+          double corr = numFitFunc->Eval (center) / denFitFunc->Eval (center) ; 
+          h_correctionBand->SetBinContent (iBin, corr) ;
+          // fill the histo errors
+          int binForError = num_fit_error->GetXaxis ()->FindBin (center) ;
+          double error = 0. ;
+          //PG under the hipothesis of having the error only for the bins of the fit, need to check this first
+          if (binForError > 0 && binForError <= num_fit_error->GetNbinsX ())
+            {
+              double numErr = num_fit_error->GetBinError (binForError) / num_fit_error->GetBinContent (binForError) ;
+              double denErr = den_fit_error->GetBinError (binForError)  / den_fit_error->GetBinContent (binForError) ;
+              error = sqrt (numErr * numErr + denErr * denErr) ;
+              error *= h_correctionBand->GetBinContent (iBin) ;
+            }
+//          cout << " CB " << iBin 
+//               << " | m : " << center
+//               << " | corr : " << corr 
+//               << " | errBin : " << binForError
+//               << " | err : " << error << endl ;
+
+          h_correctionBand->SetBinError (iBin, error) ;
+        }
     }
 
   h_correctionBand->SetStats (0) ;
   h_correctionBand->SetFillColor (kOrange) ;
   h_correctionBand->SetMarkerStyle (29) ;
- 
-  //PG correction factor from the gaussian fit to slices of the many toys
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-  TObjArray aSlices;
-  correctionPlane->FitSlicesY (0, 0, -1, 0, "QNRL", &aSlices) ;
-  TH1F * gaussianBand = aSlices.At (1)->Clone ("gaussianBand") ;
-  for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin) 
-    {
-      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ;
-      gaussianBand->SetBinError (iBin, sigma) ;
-    }
-  gaussianBand->SetFillStyle (3002) ;
-  gaussianBand->SetFillColor (kGreen + 2) ;
-  
-  correctionPlane->SetStats (0) ;
+   
+//  correctionPlane->SetStats (0) ;
 //  correctionPlane->Draw ("COLZ") ;
   h_correctionBand->Draw ("E3") ;
   h_correctionBand->Draw ("Psame") ;
@@ -368,45 +413,48 @@ int macro_004_10 (int mass)
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TH1F pullPlot ("pullPlot", "", 50, -5, 5) ;
-  TH1F pullPlotGaus ("pullPlotGaus", "", 50, -5, 5) ;
-  for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin) 
+//  TH1F pullPlotGaus ("pullPlotGaus", "", 50, -5, 5) ; FIXME this is there only in the case of toys, commented by now, therefore
+  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin) 
     {
       double num = ratio_total->GetBinContent (iBin) ;
-      double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;
-      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ;
-      pullPlotGaus.Fill ((num - mean) / sigma) ;
+//      double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;  FIXME this is there only in the case of toys, commented by now, therefore
+//      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ; FIXME this is there only in the case of toys, commented by now, therefore
+//      pullPlotGaus.Fill ((num - mean) / sigma) ; FIXME this is there only in the case of toys, commented by now, therefore
       mean = h_correctionBand->GetBinContent (iBin) ;
       sigma = h_correctionBand->GetBinError (iBin) ;
       pullPlot.Fill ((num - mean) / sigma) ;
     }
-  pullPlotGaus.Fit ("gaus","L") ;
-  c1->Print ("pullPlotGaus.pdf", "pdf") ;
-
-  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
-  double poolScaleGaus = pullPlotGaus.GetFunction ("gaus")->GetParameter (2) ;
-  if (poolScaleGaus > 1) 
-    {
-      for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin)
-        {
-          double newError = poolScaleGaus * gaussianBand->GetBinError (iBin) ;
-          gaussianBand->SetBinError (iBin, newError) ;
-        }
-    }
- 
   pullPlot.Fit ("gaus","L") ;
   c1->Print ("pullPlot.pdf", "pdf") ;
+//  pullPlotGaus.Fit ("gaus","L") ;         FIXME this is there only in the case of toys, commented by now, therefore
+//  c1->Print ("pullPlotGaus.pdf", "pdf") ; FIXME this is there only in the case of toys, commented by now, therefore
+
+//PG FIXME this is there only in the case of toys, commented by now, therefore
+//  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
+//  double poolScaleGaus = pullPlotGaus.GetFunction ("gaus")->GetParameter (2) ;
+//  if (poolScaleGaus > 1) 
+//    {
+//      for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin)
+//        {
+//          double newError = poolScaleGaus * gaussianBand->GetBinError (iBin) ;
+//          gaussianBand->SetBinError (iBin, newError) ;
+//        }
+//    }
+// 
 
   //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
-  double poolScale = pullPlot.GetFunction ("gaus")->GetParameter (2) ;
-  if (poolScale > 1) 
+  if (scaleBand)
     {
-      for (int iBin = 1 ; iBin <= correctionBand->GetNbinsX () ; ++iBin)
+      double poolScale = pullPlot.GetFunction ("gaus")->GetParameter (2) ;
+      if (poolScale > 1) 
         {
-          double newError = poolScale * h_correctionBand->GetBinError (iBin) ;
-          h_correctionBand->SetBinError (iBin, newError) ;
+          for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
+            {
+              double newError = poolScale * h_correctionBand->GetBinError (iBin) ;
+              h_correctionBand->SetBinError (iBin, newError) ;
+            }
         }
-    }
- 
+    } 
   //PG calculate the extrapolated background
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
@@ -577,13 +625,13 @@ int macro_004_10 (int mass)
   TFile output ("output_004_10.root", "recreate") ;
   output.cd () ;
   ratio_total->Write () ;
-  gaussianBand->Write () ;
+//  gaussianBand->Write () ; //PG FIXME find another way to have this in the root file
   pullPlot.Write () ;
-  pullPlotGaus.Write () ;
+//  pullPlotGaus.Write () ; 
   extrapolated_bkg->Write () ;
-//  extrapolated_bkg_fitBand->Write () ;
-  correctionPlane->Write () ;
-  correctionBand->Write () ;
+//  extrapolated_bkg_fitBand->Write () ;      //PG FIXME find another way to have this in the root file
+//  if (makeToys) correctionPlane->Write () ; //PG FIXME find another way to have this in the root file
+//  if (makeToys) correctionBand->Write () ;  //PG FIXME find another way to have this in the root file
   m4_signal_total_SIG->Write ("sig") ;
   g_total.Write ("g_total") ;
   g_background_count.Write ("g_background_count") ;
