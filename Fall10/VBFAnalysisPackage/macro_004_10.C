@@ -1,6 +1,23 @@
 #include <./test/plotUtils.C>
 #include "./interface/Functions.h"
 
+void legendMaquillage (TLegend * leg)
+{
+  leg->SetBorderSize (0) ;
+  leg->SetTextFont (42) ;
+  leg->SetTextSize (0.04) ;
+  leg->SetLineColor (1) ;
+  leg->SetLineStyle (1) ;
+  leg->SetLineWidth (1) ;
+  leg->SetFillColor (0) ;
+  leg->SetFillStyle (0) ;
+  return ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 /**
   dump a tprofile in a TH1F, so that the errors are easily modifiable afterwards
 */
@@ -19,6 +36,8 @@ TH1F * dumpProfile (TString outputName, TProfile * input)
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 /**
  add to the output the relative error in the input
 */ 
@@ -58,44 +77,59 @@ int macro_004_10 (int mass)
   //PG get the bkg samples
 
   THStack * stack_m4_EvenHigher = (THStack *) input.Get ("stack_m4_EvenHigher") ;
-  TH1F * m4_EvenHigher_total = (TH1F*) stack_m4_EvenHigher->GetStack ()->Last () ;    
+  TH1F * m4_EvenHigher_total = (TH1F*) stack_m4_EvenHigher->GetStack ()->Last () ;  
+  m4_EvenHigher_total->SetTitle ("") ;  
 
   THStack * stack_m4_upper = (THStack *) input.Get ("stack_m4_upper") ;
   TH1F * m4_upper_total = (TH1F*) stack_m4_upper->GetStack ()->Last () ;
+  m4_upper_total->SetTitle ("") ;
     
   THStack * stack_m4_lower = (THStack *) input.Get ("stack_m4_lower") ;
   TH1F * m4_lower_total = (TH1F *) stack_m4_lower->GetStack ()->Last () ;
+  m4_lower_total->SetTitle ("") ;
     
   THStack * stack_m4_signal = (THStack *) input.Get ("stack_m4_signal") ;
   TH1F * m4_signal_total = (TH1F *) stack_m4_signal->GetStack ()->Last () ;
-
+  m4_signal_total->SetTitle ("") ;
+  
   THStack * stack_m4_sideband = (THStack *) input.Get ("stack_m4_sideband") ;
   TH1F * m4_sideband_total = (TH1F *) stack_m4_sideband->GetStack ()->Last () ;
-
+  m4_sideband_total->SetTitle ("") ;
+  
   //PG get the signal samples
 
   THStack * stack_m4_EvenHigher_SIG = (THStack *) input.Get ("stack_m4_EvenHigher_SIG") ;
   TH1F * m4_EvenHigher_total_SIG = (TH1F*) stack_m4_EvenHigher_SIG->GetStack ()->Last () ;    
-
+  m4_EvenHigher_total_SIG->SetTitle ("") ;
+  
   THStack * stack_m4_upper_SIG = (THStack *) input.Get ("stack_m4_upper_SIG") ;
   TH1F * m4_upper_total_SIG = (TH1F*) stack_m4_upper_SIG->GetStack ()->Last () ;
-    
+  m4_upper_total_SIG->SetTitle ("") ;
+      
   THStack * stack_m4_lower_SIG = (THStack *) input.Get ("stack_m4_lower_SIG") ;
   TH1F * m4_lower_total_SIG = (TH1F *) stack_m4_lower_SIG->GetStack ()->Last () ;
-    
+  m4_lower_total_SIG->SetTitle ("") ;
+  
   THStack * stack_m4_signal_SIG = (THStack *) input.Get ("stack_m4_signal_SIG") ;
   TH1F * m4_signal_total_SIG = (TH1F *) stack_m4_signal_SIG->GetStack ()->Last () ;
-
+  m4_signal_total_SIG->SetTitle ("") ;
+  
   THStack * stack_m4_sideband_SIG = (THStack *) input.Get ("stack_m4_sideband_SIG") ;
   TH1F * m4_sideband_total_SIG = (TH1F *) stack_m4_sideband_SIG->GetStack ()->Last () ;
-
+  m4_sideband_total_SIG->SetTitle ("") ;
+  
   //PG get the data
   
   TH1F * m4_EvenHigher_DATA = (TH1F *) input.Get ("m4_EvenHigher_DATA") ;      
+  m4_EvenHigher_DATA->SetTitle ("") ;
   TH1F * m4_upper_DATA = (TH1F *) input.Get ("m4_upper_DATA") ;      
+  m4_upper_DATA->SetTitle ("") ;
   TH1F * m4_signal_DATA = (TH1F *) input.Get ("m4_signal_DATA") ;    
+  m4_signal_DATA->SetTitle ("") ;
   TH1F * m4_lower_DATA = (TH1F *) input.Get ("m4_lower_DATA") ;      
+  m4_lower_DATA->SetTitle ("") ;
   TH1F * m4_sideband_DATA = (TH1F *) input.Get ("m4_sideband_DATA") ;
+  m4_sideband_DATA->SetTitle ("") ;
 
   //PG which histograms I use
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -156,16 +190,17 @@ int macro_004_10 (int mass)
   signalRegion->Add (m4_signal_total_SIG) ; 
 */
 
-  //PG fit separately numerator and denominator of MC 
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
   TCanvas * c1 = new TCanvas () ;
 
+  TLegend * leg_signal = makeLegendTitle (*stack_m4_signal) ;
   stack_m4_signal->Draw ("hist") ;
-  c1->Print ("numerator.pdf", "pdf") ;
+  leg_signal->Draw () ;
+  c1->Print ("signal_stack.pdf", "pdf") ;
 
+  TLegend * leg_sideband = makeLegendTitle (*stack_m4_sideband) ;
   stack_m4_sideband->Draw ("hist") ;
-  c1->Print ("denominator.pdf", "pdf") ;
+  leg_sideband->Draw () ;
+  c1->Print ("sideband_stack_MC.pdf", "pdf") ;
 
   //PG correction factor from the ratio of histograms 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -205,6 +240,8 @@ int macro_004_10 (int mass)
  //(*func) -> SetParName(8,"N2");
  //(*func) -> SetParName(9,"#lambda2");
 
+  //PG fit separately numerator and denominator of MC 
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedCB, 0., 1000., 7) ;
   //PG                        N                             , gaus m, gaus s, joint, exp, fermi E, kT
@@ -245,6 +282,13 @@ int macro_004_10 (int mass)
   num_fit_error->Draw ("E3same") ;
   signalRegionMC->Draw ("sames") ;
   c1->Print ("numerator_fit_log.pdf", "pdf") ;
+  c1->SetLogy (0) ;
+
+  signalRegion->Draw () ;
+  c1->Print ("signal.pdf", "pdf") ;
+  c1->SetLogy () ;
+  signalRegion->Draw () ;
+  c1->Print ("signal_log.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
   TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedCB, 0., 1000., 7) ;
@@ -407,7 +451,7 @@ int macro_004_10 (int mass)
 //  gaussianBand->Draw ("E3same") ;
   gStyle->SetPalette (1) ;
   ratio_total->Draw ("same") ;
-  c1->Print ("correctionPlane.pdf", "pdf") ;
+  c1->Print ("correctionFactor.pdf", "pdf") ;
 
   //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -425,7 +469,7 @@ int macro_004_10 (int mass)
       pullPlot.Fill ((num - mean) / sigma) ;
     }
   pullPlot.Fit ("gaus","L") ;
-  c1->Print ("pullPlot.pdf", "pdf") ;
+//  c1->Print ("pullPlot.pdf", "pdf") ;
 //  pullPlotGaus.Fit ("gaus","L") ;         FIXME this is there only in the case of toys, commented by now, therefore
 //  c1->Print ("pullPlotGaus.pdf", "pdf") ; FIXME this is there only in the case of toys, commented by now, therefore
 
@@ -463,48 +507,7 @@ int macro_004_10 (int mass)
   extrapolated_bkg->Multiply (h_correctionBand) ; //PG profile correction
 //  extrapolated_bkg->Multiply (gaussianBand) ; //PG gaus fit correction
 
-  //PG first plot of the result
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TLegend * leg_compare = new TLegend (0.2, 0.2, 0.6, 0.4, NULL, "brNDC") ;
-  leg_compare->SetBorderSize (0) ;
-  leg_compare->SetTextFont (42) ;
-  leg_compare->SetTextSize (0.04) ;
-  leg_compare->SetLineColor (1) ;
-  leg_compare->SetLineStyle (1) ;
-  leg_compare->SetLineWidth (1) ;
-  leg_compare->SetFillColor (0) ;
-  leg_compare->SetFillStyle (0) ;
-  leg_compare->AddEntry (signalRegionMC, "simulation in signal region", "lfp") ;
-  leg_compare->AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "lp") ;
-
-  c1->SetLogy () ;
-//  c1->DrawFrame (100, 0.1, 800, 5000) ;
-  extrapolated_bkg->SetStats (0) ;
-  extrapolated_bkg->SetTitle ("") ;
-  extrapolated_bkg->SetLineColor (kRed) ;
-  extrapolated_bkg->SetFillColor (kOrange) ;
-  extrapolated_bkg->Draw ("E3") ;
-
-  signalRegionMC->SetStats (0) ;
-  signalRegionMC->SetMarkerStyle (24) ;
-  signalRegionMC->SetMarkerColor (kBlack) ;
-  signalRegionMC->Draw ("Psame") ;
-  leg_compare->Draw () ;
-  c1->Print ("extrapAndMc.pdf", "pdf") ;
-  c1->SetLogy (0) ;
-  c1->Update () ;
-  c1->Print ("extrapAndMc_lin.pdf", "pdf") ;
-
-  c1->SetLogy () ;
-  extrapolated_bkg->Draw ("E3") ;
-  signalRegion->SetMarkerStyle (20) ;
-  signalRegion->Draw ("same") ;
-  c1->Print ("extrapAndData.pdf", "pdf") ;
-  c1->SetLogy (0) ;
-  c1->Update () ;
-  c1->Print ("extrapAndData_lin.pdf", "pdf") ;
-  
   //PG fit the extrapolated bkg
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -534,10 +537,73 @@ int macro_004_10 (int mass)
 //  extrapolated_bkg->Draw ("E3same") ;
 //  extrapolated_bkg_fitBand->Draw ("E3same") ;
 //  extrapolated_bkg_fitBand->Draw () ;
+
+  extrapolated_bkg->SetStats (0) ;
+  extrapolated_bkg->SetTitle ("") ;
+  extrapolated_bkg->SetLineColor (kBlack) ;
+  extrapolated_bkg->SetFillColor (kOrange) ;
+
   extrapolated_bkg->Draw ("E3P") ;
 //  extrapolated_bkg_fitBand->Draw ("E3same") ;
   c1->Print ("extrapolatedBkg.pdf", "pdf") ;
+  c1->SetLogy () ;
+  c1->Update () ;
+  c1->Print ("extrapolatedBkg_log.pdf", "pdf") ;
+  c1->SetLogy (0) ;
 
+  //PG first plot of the result
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  signalRegionMC->SetStats (0) ;
+  signalRegionMC->SetMarkerStyle (24) ;
+  signalRegionMC->SetMarkerColor (kBlack) ;
+
+  TLegend * leg_extrapAndMc = new TLegend (0.5, 0.8, 0.95, 0.95, NULL, "brNDC") ;
+  legendMaquillage (leg_extrapAndMc) ;
+  leg_extrapAndMc->AddEntry (signalRegionMC, "simulation in SR", "p") ;
+  leg_extrapAndMc->AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "fp") ;
+
+  c1->SetLogy () ;
+//  c1->DrawFrame (100, 0.1, 800, 5000) ;
+  extrapolated_bkg->Draw ("E3") ;
+  signalRegionMC->Draw ("Psame") ;
+  leg_extrapAndMc->Draw () ;
+  c1->Print ("extrapAndMc.pdf", "pdf") ;
+  c1->SetLogy (0) ;
+  c1->Update () ;
+  c1->Print ("extrapAndMc_lin.pdf", "pdf") ;
+
+  //PG the pull trend
+  pair<TGraphErrors*, TGraphErrors*> extrapAndMc_pulls =
+    getPullTrend (signalRegionMC, extrapolated_bkg) ;
+  extrapAndMc_pulls.second->Draw ("AE3") ;
+  extrapAndMc_pulls.first->SetMarkerStyle (24) ;
+  extrapAndMc_pulls.first->Draw ("samePE") ;
+  c1->Print ("extrapAndMc_pull.pdf", "pdf") ;
+
+  TLegend * leg_extrapAndData = new TLegend (0.5, 0.8, 0.95, 0.95, NULL, "brNDC") ;
+  legendMaquillage (leg_extrapAndData) ;
+  leg_extrapAndData->AddEntry (signalRegion, "data in SR", "p") ;
+  leg_extrapAndData->AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "fp") ;
+
+  c1->SetLogy () ;
+  signalRegion->SetStats (0) ;
+  extrapolated_bkg->Draw ("E3") ;
+  signalRegion->SetMarkerStyle (20) ;
+  signalRegion->Draw ("same") ;
+  leg_extrapAndData->Draw () ;
+  c1->Print ("extrapAndData.pdf", "pdf") ;
+  c1->SetLogy (0) ;
+  c1->Update () ;
+  c1->Print ("extrapAndData_lin.pdf", "pdf") ;
+  
+  pair<TGraphErrors*, TGraphErrors*> extrapAndData_pulls =
+    getPullTrend (signalRegion, extrapolated_bkg) ;
+  extrapAndData_pulls.second->Draw ("AE3") ;
+  extrapAndData_pulls.first->Draw ("samePE") ;
+  c1->Print ("extrapAndData_pull.pdf", "pdf") ;
+
+  
   //PG prepare the windows for the fast cut-n-count thing
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -606,12 +672,19 @@ int macro_004_10 (int mass)
       g_error.SetPoint (i, masses.at (i), sqrt (bkg_count_error * bkg_count_error + total)) ;
     } //PG loop on the mass points
 
-  c1->SetLogy () ;
   g_total.SetMarkerStyle (6) ;
   g_background_count.SetLineColor (kOrange) ;
   g_background_count.SetFillColor (kOrange) ;
+
+  TLegend * leg_results = new TLegend (0.5, 0.8, 0.95, 0.95, NULL, "brNDC") ;
+  legendMaquillage (leg_results) ;
+  leg_results->AddEntry (&g_total, "measured events in signal window", "p") ;
+  leg_results->AddEntry (&g_background_count, "expected bkg in signal window", "f") ;
+
+  c1->SetLogy () ;
   g_background_count.Draw ("AE3") ;
   g_total.Draw ("EPsame") ;
+  leg_results->Draw () ;
   c1->Print ("results.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
