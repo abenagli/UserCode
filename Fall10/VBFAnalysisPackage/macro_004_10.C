@@ -60,7 +60,8 @@ int macro_004_10 (int mass)
 //  TString inputFile = "testBkg_004_mu_S" ; //PG only muons
 //  TString inputFile = "testBkg_004_el_S" ; //PG only muons
 //  TString inputFile = "testBkg_004_5GeV_S" ;
-  TString inputFile = "testBkg_004_noKF_S" ; //PG no kinematic fit
+//  TString inputFile = "testBkg_004_noKF_S" ; //PG no kinematic fit
+  TString inputFile = "testBkg_004_S" ; //PG kinematic fit
   inputFile += mass ;
   inputFile += ".root" ;
   cout << inputFile << endl ;
@@ -84,9 +85,25 @@ int macro_004_10 (int mass)
   TH1F * m4_upper_total = (TH1F*) stack_m4_upper->GetStack ()->Last () ;
   m4_upper_total->SetTitle ("") ;
     
+  THStack * stack_m4_upper_a = (THStack *) input.Get ("stack_m4_upper_a") ;
+  TH1F * m4_upper_a_total = (TH1F*) stack_m4_upper_a->GetStack ()->Last () ;
+  m4_upper_a_total->SetTitle ("") ;
+    
+  THStack * stack_m4_upper_c = (THStack *) input.Get ("stack_m4_upper_c") ;
+  TH1F * m4_upper_c_total = (TH1F*) stack_m4_upper_c->GetStack ()->Last () ;
+  m4_upper_c_total->SetTitle ("") ;
+    
   THStack * stack_m4_lower = (THStack *) input.Get ("stack_m4_lower") ;
   TH1F * m4_lower_total = (TH1F *) stack_m4_lower->GetStack ()->Last () ;
   m4_lower_total->SetTitle ("") ;
+    
+  THStack * stack_m4_lower_a = (THStack *) input.Get ("stack_m4_lower_a") ;
+  TH1F * m4_lower_a_total = (TH1F *) stack_m4_lower_a->GetStack ()->Last () ;
+  m4_lower_a_total->SetTitle ("") ;
+    
+  THStack * stack_m4_lower_c = (THStack *) input.Get ("stack_m4_lower_c") ;
+  TH1F * m4_lower_c_total = (TH1F *) stack_m4_lower_c->GetStack ()->Last () ;
+  m4_lower_c_total->SetTitle ("") ;
     
   THStack * stack_m4_signal = (THStack *) input.Get ("stack_m4_signal") ;
   TH1F * m4_signal_total = (TH1F *) stack_m4_signal->GetStack ()->Last () ;
@@ -106,9 +123,25 @@ int macro_004_10 (int mass)
   TH1F * m4_upper_total_SIG = (TH1F*) stack_m4_upper_SIG->GetStack ()->Last () ;
   m4_upper_total_SIG->SetTitle ("") ;
       
+  THStack * stack_m4_upper_a_SIG = (THStack *) input.Get ("stack_m4_upper_a_SIG") ;
+  TH1F * m4_upper_a_total_SIG = (TH1F*) stack_m4_upper_a_SIG->GetStack ()->Last () ;
+  m4_upper_a_total_SIG->SetTitle ("") ;
+      
+  THStack * stack_m4_upper_c_SIG = (THStack *) input.Get ("stack_m4_upper_c_SIG") ;
+  TH1F * m4_upper_c_total_SIG = (TH1F*) stack_m4_upper_c_SIG->GetStack ()->Last () ;
+  m4_upper_c_total_SIG->SetTitle ("") ;
+      
   THStack * stack_m4_lower_SIG = (THStack *) input.Get ("stack_m4_lower_SIG") ;
   TH1F * m4_lower_total_SIG = (TH1F *) stack_m4_lower_SIG->GetStack ()->Last () ;
   m4_lower_total_SIG->SetTitle ("") ;
+  
+  THStack * stack_m4_lower_a_SIG = (THStack *) input.Get ("stack_m4_lower_a_SIG") ;
+  TH1F * m4_lower_a_total_SIG = (TH1F *) stack_m4_lower_a_SIG->GetStack ()->Last () ;
+  m4_lower_a_total_SIG->SetTitle ("") ;
+  
+  THStack * stack_m4_lower_c_SIG = (THStack *) input.Get ("stack_m4_lower_c_SIG") ;
+  TH1F * m4_lower_c_total_SIG = (TH1F *) stack_m4_lower_c_SIG->GetStack ()->Last () ;
+  m4_lower_c_total_SIG->SetTitle ("") ;
   
   THStack * stack_m4_signal_SIG = (THStack *) input.Get ("stack_m4_signal_SIG") ;
   TH1F * m4_signal_total_SIG = (TH1F *) stack_m4_signal_SIG->GetStack ()->Last () ;
@@ -124,10 +157,18 @@ int macro_004_10 (int mass)
   m4_EvenHigher_DATA->SetTitle ("") ;
   TH1F * m4_upper_DATA = (TH1F *) input.Get ("m4_upper_DATA") ;      
   m4_upper_DATA->SetTitle ("") ;
+  TH1F * m4_upper_a_DATA = (TH1F *) input.Get ("m4_upper_a_DATA") ;      
+  m4_upper_a_DATA->SetTitle ("") ;
+  TH1F * m4_upper_c_DATA = (TH1F *) input.Get ("m4_upper_c_DATA") ;      
+  m4_upper_c_DATA->SetTitle ("") ;
   TH1F * m4_signal_DATA = (TH1F *) input.Get ("m4_signal_DATA") ;    
   m4_signal_DATA->SetTitle ("") ;
   TH1F * m4_lower_DATA = (TH1F *) input.Get ("m4_lower_DATA") ;      
   m4_lower_DATA->SetTitle ("") ;
+  TH1F * m4_lower_a_DATA = (TH1F *) input.Get ("m4_lower_a_DATA") ;      
+  m4_lower_a_DATA->SetTitle ("") ;
+  TH1F * m4_lower_c_DATA = (TH1F *) input.Get ("m4_lower_c_DATA") ;      
+  m4_lower_c_DATA->SetTitle ("") ;
   TH1F * m4_sideband_DATA = (TH1F *) input.Get ("m4_sideband_DATA") ;
   m4_sideband_DATA->SetTitle ("") ;
 
@@ -166,11 +207,13 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
+/*
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_sideband_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
+*/
 
 /*
   cout << "final analysis closure test" << endl ;
@@ -181,7 +224,7 @@ int macro_004_10 (int mass)
 */
 
 /*
-  cout << "final analysis closure test with additional signal" << endl ;
+  cout << "final analysis closure test with signal injection" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ;
@@ -189,6 +232,17 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
   signalRegion->Add (m4_signal_total_SIG) ; 
 */
+
+  cout << "Martijn's test" << endl ;
+  TH1F * sidebaRegionMC = m4_upper_a_total ; 
+  sidebaRegionMC->Add (m4_lower_a_total) ;
+  TH1F * signalRegionMC = m4_upper_c_total ; 
+  signalRegionMC->Add (m4_lower_c_total) ;
+  TH1F * sidebaRegion = m4_upper_a_DATA ; 
+  sidebaRegion->Add (m4_lower_a_DATA) ;
+  TH1F * signalRegion = m4_upper_c_DATA ; 
+  signalRegion->Add (m4_lower_c_DATA) ;
+
 
   TCanvas * c1 = new TCanvas () ;
 
@@ -444,6 +498,12 @@ int macro_004_10 (int mass)
   h_correctionBand->SetFillColor (kOrange) ;
   h_correctionBand->SetMarkerStyle (29) ;
    
+  TLegend * leg_correctionFactor = new TLegend (0.5, 0.8, 0.95, 0.95, NULL, "brNDC") ;
+  legendMaquillage (leg_correctionFactor) ;
+  leg_correctionFactor->AddEntry (h_correctionBand, "correction band", "pf") ;
+  leg_correctionFactor->AddEntry (ratio_total, "MC ratio", "pl") ;
+
+  c1->DrawFrame (100, 0.01, 800, 2.) ;
 //  correctionPlane->SetStats (0) ;
 //  correctionPlane->Draw ("COLZ") ;
   h_correctionBand->Draw ("E3") ;
@@ -451,6 +511,7 @@ int macro_004_10 (int mass)
 //  gaussianBand->Draw ("E3same") ;
   gStyle->SetPalette (1) ;
   ratio_total->Draw ("same") ;
+  leg_correctionFactor->Draw () ;
   c1->Print ("correctionFactor.pdf", "pdf") ;
 
   //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
