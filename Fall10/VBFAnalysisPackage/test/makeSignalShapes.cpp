@@ -156,7 +156,7 @@ int main (int argc, char** argv)
       RooDataHist bdata (nameRdh.str ().c_str (), nameRdh.str ().c_str (), RooArgList (m), total) ;
       stringstream namePdf ;
       namePdf << "PDF_" << iMap->first ;
-      RooHistPdf pdf (namePdf.str ().c_str (), namePdf.str ().c_str (), RooArgList (m), bdata, 1) ;
+      RooHistPdf pdf (namePdf.str ().c_str (), namePdf.str ().c_str (), RooArgList (m), bdata, 8) ;
       pdf.Write () ;
       stringstream name ; 
       name << "sig_" << iMap->first ;
