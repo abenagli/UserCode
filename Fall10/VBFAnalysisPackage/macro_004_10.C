@@ -1,6 +1,97 @@
 #include <./test/plotUtils.C>
 #include "./interface/Functions.h"
 
+
+void setDoubleExpPars (TF1 * func)
+{
+  //PG numbers from Andrea
+  func->SetParameter (2, 180.) ;
+  func->SetParameter (3, 11.) ;
+  func->SetParameter (4, 10.) ;
+  func->SetParameter (5, 0.012) ;
+  func->SetParameter (6, 5.) ;
+  func->SetParameter (7, 0.005) ;
+  
+  func->SetParLimits (2, 150., 250.) ;
+  func->SetParLimits (3, 0., 100.) ;
+  
+  func->SetParName (2, "#mu") ;
+  func->SetParName (3, "kT") ;
+  func->SetParName (4, "N1") ;
+  func->SetParName (5, "#lambda1") ;
+  func->SetParName (6, "N2") ;
+  func->SetParName (7, "#lambda2") ;
+  func->SetLineWidth (1) ;
+  func->SetLineColor (kBlue+2) ;
+  func->SetNpx (10000) ;
+  return ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+
+//PG FIXME questo e' corretto?
+void setAttDoubleExpPars (TF1 * func)
+{
+  //PG numbers from Andrea
+  func->SetParameter (4, 180.) ;
+  func->SetParameter (5, 11.) ;
+  func->SetParameter (6, 10.) ;
+  func->SetParameter (7, 0.012) ;
+  func->SetParameter (8, 5.) ;
+  func->SetParameter (9, 0.005) ;
+  
+  func->SetParLimits (4, 150., 250.) ;
+  func->SetParLimits (5, 0., 100.) ;
+  
+  func->SetParName (4, "#mu") ;
+  func->SetParName (5, "kT") ;
+  func->SetParName (6, "N1") ;
+  func->SetParName (7, "#lambda1") ;
+  func->SetParName (8, "N2") ;
+  func->SetParName (9, "#lambda2") ;
+  func->SetLineWidth (1) ;
+  func->SetLineColor (kBlue+2) ;
+  func->SetNpx (10000) ;
+  return ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+void setCBPars (TF1 * func, int scale)
+{
+  //PG N, gaus m, gaus s, joint, exp, fermi E, kT
+  func->SetParameter (0, scale) ;
+  func->SetParameter (1, 200.) ;
+  func->SetParameter (2, 20.) ;
+  func->SetParameter (3, 0.1) ;
+  func->SetParameter (4, 10.) ;
+  func->SetParameter (5, 200) ;
+  func->SetParameter (6, 10) ;
+
+  func->SetLineWidth (1) ;
+  func->SetLineColor (kBlue+2) ;
+  func->SetNpx (10000) ;
+  return ;
+  
+  //PG alternative parameters
+//  func->SetParameter (0, scale) ;
+//  func->SetParameter (1, 180.) ;
+//  func->SetParameter (2, 23.) ;
+//  func->SetParameter (3, 0.3) ;
+//  func->SetParameter (4, 20.) ;
+//  func->SetParameter (5, 180) ;
+//  func->SetParameter (6, 15) ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 void legendMaquillage (TLegend * leg)
 {
   leg->SetBorderSize (0) ;
@@ -62,6 +153,7 @@ int macro_004_10 (int mass)
 //  TString inputFile = "testBkg_004_5GeV_S" ;
 //  TString inputFile = "testBkg_004_noKF_S" ; //PG no kinematic fit
   TString inputFile = "testBkg_004_S" ; //PG kinematic fit
+//  TString inputFile = "testBkg_004_20GeV_S" ; //PG kinematic fit, coarse binning
   inputFile += mass ;
   inputFile += ".root" ;
   cout << inputFile << endl ;
@@ -172,7 +264,7 @@ int macro_004_10 (int mass)
   TH1F * m4_sideband_DATA = (TH1F *) input.Get ("m4_sideband_DATA") ;
   m4_sideband_DATA->SetTitle ("") ;
 
-  //PG which histograms I use
+  //PG which histograms I use = possible analysis configurations
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 /*
@@ -215,13 +307,11 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = m4_signal_DATA ;  
 */
 
-/*
   cout << "final analysis closure test" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ; 
   TH1F * signalRegion   = signalRegionMC ; 
-*/
 
 /*
   cout << "final analysis closure test with signal injection" << endl ;
@@ -233,6 +323,7 @@ int macro_004_10 (int mass)
   signalRegion->Add (m4_signal_total_SIG) ; 
 */
 
+/*
   cout << "Martijn's test" << endl ;
   TH1F * sidebaRegionMC = m4_upper_a_total ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;
@@ -242,7 +333,10 @@ int macro_004_10 (int mass)
   sidebaRegion->Add (m4_lower_a_DATA) ;
   TH1F * signalRegion = m4_upper_c_DATA ; 
   signalRegion->Add (m4_lower_c_DATA) ;
+*/
 
+  //PG plot MC singal and background region 
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TCanvas * c1 = new TCanvas () ;
 
@@ -268,49 +362,20 @@ int macro_004_10 (int mass)
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
  
   double binSize = (m4_max - m4_min) / nBins ;
-  double startFit = 160 ; //GeV, bin from where to start the num & den fit for corr factor
+  double startFit = 240 ; //GeV, bin from where to start the num & den fit for corr factor
   double endFit = 800 ;   //GeV, bin from where to end the num & den fit for corr factor
   int fitBins = (endFit-startFit) / binSize ;
 
   cout << nBins << " " << m4_min << " " << m4_max << " " << binSize << endl ;
 
-//------------------------------
- // attenuated double exponential
- //
- //(*func) -> SetParameter(4,180.);
- //(*func) -> SetParameter(5,11.);
- //(*func) -> SetParameter(6,10.);
- //(*func) -> SetParameter(7,0.012);
- //(*func) -> SetParameter(8,5.);
- //(*func) -> SetParameter(9,0.005);
- //
- //(*func) -> SetParLimits(4,150.,250.);
- //(*func) -> SetParLimits(5,0.,100.);
- //
- //(*func) -> SetParName(4,"#mu");
- //(*func) -> SetParName(5,"kT");
- //(*func) -> SetParName(6,"N1");
- //(*func) -> SetParName(7,"#lambda1");
- //(*func) -> SetParName(8,"N2");
- //(*func) -> SetParName(9,"#lambda2");
-
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedCB, 0., 1000., 7) ;
-  //PG                        N                             , gaus m, gaus s, joint, exp, fermi E, kT
-//  numFitFunc->SetParameters (signalRegionMC->Integral () / 5, 200.  , 20.   , 0.1  , 10 , 200    , 10) ;
-  numFitFunc->SetParameter (0, signalRegionMC->Integral () / 5.) ;
-  numFitFunc->SetParameter (1, 200.) ;
-  numFitFunc->SetParameter (2, 20.) ;
-  numFitFunc->SetParameter (3, 0.1) ;
-  numFitFunc->SetParameter (4, 10.) ;
-  numFitFunc->SetParameter (5, 200) ;
-  numFitFunc->SetParameter (6, 10) ;
+  TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedDoubleExponential, 0., 1000., 7) ;
+  setAttDoubleExpPars (numFitFunc) ;
 
-  numFitFunc->SetLineWidth (1) ;
-  numFitFunc->SetLineColor (kBlue+2) ;
-  numFitFunc->SetNpx (10000) ;
+//  TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedCB, 0., 1000., 7) ;
+//  setCBPars (numFitFunc, signalRegionMC->Integral () / 5.) ;
 
   signalRegionMC->Fit (numFitFunc, "LQ", "", startFit, endFit) ;
   int fitStatus = 1 ;
@@ -345,22 +410,11 @@ int macro_004_10 (int mass)
   c1->Print ("signal_log.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
-  TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedCB, 0., 1000., 7) ;
-  //PG                        N                              , gaus m, gaus s, joint, exp, fermi E, kT
-  //PG denFitFunc->SetParameters (sidebaRegionMC->Integral () / 5., 180.  , 23.   , 0.3  , 20., 180    , 15) ;
-  denFitFunc->SetParameter (0, sidebaRegionMC->Integral () / 5.) ;
-  denFitFunc->SetParameter (1, 180.) ;
-  denFitFunc->SetParameter (2, 23.) ;
-  denFitFunc->SetParameter (3, 0.3) ;
-  denFitFunc->SetParameter (4, 20.) ;
-  denFitFunc->SetParameter (5, 180) ;
-  denFitFunc->SetParameter (6, 15) ;
-//  denFitFunc->SetParLimits (0, sidebaRegionMC->Integral ()/10, sidebaRegionMC->Integral () * 10) ;
-//  cout << sidebaRegionMC->Integral () << endl ; 
+  TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedDoubleExponential, 0., 1000., 7) ;
+  setAttDoubleExpPars (denFitFunc) ;
 
-  denFitFunc->SetLineWidth (1) ;
-  denFitFunc->SetLineColor (kBlue+2) ;
-  denFitFunc->SetNpx (10000) ;
+//  TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedCB, 0., 1000., 7) ;
+//  setCBPars (denFitFunc, sidebaRegionMC->Integral () / 5.) ;
 
   sidebaRegionMC->Fit (denFitFunc, "LQ", "", startFit, endFit) ;
   fitStatus = 1 ;
@@ -506,7 +560,7 @@ int macro_004_10 (int mass)
   c1->DrawFrame (100, 0.01, 800, 2.) ;
 //  correctionPlane->SetStats (0) ;
 //  correctionPlane->Draw ("COLZ") ;
-  h_correctionBand->Draw ("E3") ;
+  h_correctionBand->Draw ("E3same") ;
   h_correctionBand->Draw ("Psame") ;
 //  gaussianBand->Draw ("E3same") ;
   gStyle->SetPalette (1) ;
@@ -771,6 +825,7 @@ int macro_004_10 (int mass)
   g_background_count.Write ("g_background_count") ;
   g_error.Write ("g_error") ;
 //  g_expectedCountings.Write ("g_expectedCountings") ;
+  h_correctionBand->Write () ;
   output.Close () ;
 
   gApplication->Terminate (0) ;
