@@ -1,7 +1,6 @@
 /*
-testBkg_004.exe cfg/2011-07-09-listaFile.txt
+testBkg_004.exe cfg/2011-10-11-listaFile.txt  
 
-NB Kinematic Fit applied (_KF in the vars name)
 
 */
 
@@ -80,7 +79,7 @@ int main (int argc, char** argv)
   //Check if all nedeed arguments to parse are there
   if (argc != 3)
     {
-      std::cerr << ">>>>> VBFAnalysis::usage: " << argv[0] << " configFileName" << std::endl ;
+      std::cerr << ">>>>> VBFAnalysis::usage: " << argv[0] << " configFileName higgsmass" << std::endl ;
       return 1 ;
     }
 
@@ -107,21 +106,21 @@ int main (int argc, char** argv)
 //      |   |     EvenHigher     |     
 //      |   |                    |
 //      |   +--------------------+
-//      |   |                    |
-//      |   |     upper          |     
-//      |   |                    |
+//      |   |                 a  |
+//      |   |     upper      --- |     
+//      |   |                 c  |
 //      |   +--------------------+
 //      |   |                    |
 //      |   |    signal          |     
 //      |   |                    |
 //      |   +--------------------+
-//      |   |                    |
-//      |   |    lower           |     
-//      |   |                    |
+//      |   |                 c  |
+//      |   |    lower       --- |     
+//      |   |                 a  |
 //      |   +--------------------+
 //      +-------------------------------  m4
 
-  int nBins = 70 ;
+  int nBins = 35 ;
   double m4_min = 100. ;
   double m4_max = 800. ;
   //PG the cuts
@@ -130,14 +129,14 @@ int main (int argc, char** argv)
 //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
 //  generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
 //  generalCut = generalCut && "lep_flavour == 13" ; //PG only electrons
-  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
+//  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_cuts_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_5GeV_S" + mass + ".root" ;
+  std::string outputRootFullFileName = "testBkg_004_20GeV_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF.root" ;
 //  TString m4_VAR = "lepNuW_m" ;
   TString m4_VAR = "lepNuW_m_KF" ;
-
 
   hColl m4_EvenHigher ("m4_EvenHigher", nBins, m4_min, m4_max) ;
   hColl m4_upper      ("m4_upper",      nBins, m4_min, m4_max) ;
