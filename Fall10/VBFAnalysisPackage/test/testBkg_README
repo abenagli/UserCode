@@ -34,6 +34,8 @@ testBkg_004.cpp
                    apply the correction factor to mc (closure test)
                    apply the correction factor to data
                    inject signal in the MC - choose the mass to be used
+                   added capability for Martijn's test, so far cannot fit
+                   can change the fitting function
                    
 testBkg_005.cpp
 - counting events
@@ -52,9 +54,6 @@ testBkg007.cpp
 
 testBkg_008.cpp
 - compare side-band and signal regions
-
-testBkg_009.cpp
-- roofit tests
 
 testBkg_009.cpp
 - create two statistically independent sub-samples in data and MCs
