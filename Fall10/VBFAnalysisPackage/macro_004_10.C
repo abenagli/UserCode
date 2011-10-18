@@ -5,22 +5,15 @@
 void setDoubleExpPars (TF1 * func)
 {
   //PG numbers from Andrea
-  func->SetParameter (2, 180.) ;
-  func->SetParameter (3, 11.) ;
-  func->SetParameter (4, 10.) ;
-  func->SetParameter (5, 0.012) ;
-  func->SetParameter (6, 5.) ;
-  func->SetParameter (7, 0.005) ;
+  func->SetParameter (0, 10.) ;
+  func->SetParameter (1, 0.012) ;
+  func->SetParameter (2, 5.) ;
+  func->SetParameter (3, 0.005) ;
   
-  func->SetParLimits (2, 150., 250.) ;
-  func->SetParLimits (3, 0., 100.) ;
-  
-  func->SetParName (2, "#mu") ;
-  func->SetParName (3, "kT") ;
-  func->SetParName (4, "N1") ;
-  func->SetParName (5, "#lambda1") ;
-  func->SetParName (6, "N2") ;
-  func->SetParName (7, "#lambda2") ;
+  func->SetParName (0, "N1") ;
+  func->SetParName (1, "#lambda1") ;
+  func->SetParName (2, "N2") ;
+  func->SetParName (3, "#lambda2") ;
   func->SetLineWidth (1) ;
   func->SetLineColor (kBlue+2) ;
   func->SetNpx (10000) ;
@@ -36,22 +29,22 @@ void setDoubleExpPars (TF1 * func)
 void setAttDoubleExpPars (TF1 * func)
 {
   //PG numbers from Andrea
-  func->SetParameter (4, 180.) ;
-  func->SetParameter (5, 11.) ;
-  func->SetParameter (6, 10.) ;
-  func->SetParameter (7, 0.012) ;
-  func->SetParameter (8, 5.) ;
-  func->SetParameter (9, 0.005) ;
+  func->SetParameter (0, 180.) ;
+  func->SetParameter (1, 11.) ;
+  func->SetParameter (2, 10.) ;
+  func->SetParameter (3, 0.012) ;
+  func->SetParameter (4, 5.) ;
+  func->SetParameter (5, 0.005) ;
   
-  func->SetParLimits (4, 150., 250.) ;
-  func->SetParLimits (5, 0., 100.) ;
+  func->SetParLimits (0, 150., 250.) ;
+  func->SetParLimits (1, 0., 100.) ;
   
-  func->SetParName (4, "#mu") ;
-  func->SetParName (5, "kT") ;
-  func->SetParName (6, "N1") ;
-  func->SetParName (7, "#lambda1") ;
-  func->SetParName (8, "N2") ;
-  func->SetParName (9, "#lambda2") ;
+  func->SetParName (0, "#mu") ;
+  func->SetParName (1, "kT") ;
+  func->SetParName (2, "N1") ;
+  func->SetParName (3, "#lambda1") ;
+  func->SetParName (4, "N2") ;
+  func->SetParName (5, "#lambda2") ;
   func->SetLineWidth (1) ;
   func->SetLineColor (kBlue+2) ;
   func->SetNpx (10000) ;
