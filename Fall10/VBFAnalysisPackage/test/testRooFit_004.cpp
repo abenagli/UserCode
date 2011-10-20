@@ -1,8 +1,5 @@
 /*
-testBkg_004.exe cfg/2011-07-09-listaFile.txt
-
-NB Kinematic Fit applied (_KF in the vars name)
-
+testRooFit_004.exe cfg/2011-10-18-listaFile.txt
 */
 
 
@@ -33,8 +30,6 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "RooRealVar.h"
 #include "RooFormulaVar.h"
 #include "RooArgSet.h"
-#include "RooHistPdf.h"
-#include "RooKeysPdf.h"
 
 #include "hColl.h"
 
@@ -113,28 +108,13 @@ int main (int argc, char** argv)
   TH1::SetDefaultSumw2 (kTRUE) ;
   int colors[11] = {kBlue+2, kRed, 10, kCyan+2, kOrange+7, kGray, kMagenta+1, kGreen+2, kOrange, kViolet+2, kRed+3} ;
 
-  vector<RooDataSet*> simulation_DS ;
   RooDataSet * data_DS ;
 
-  RooRealVar m ("m", "4-body inv mass", 0., 1000.) ;
+  RooRealVar x ("x", "4-body inv mass", 0., 1000.) ;
   RooRealVar weight ("weight", "event weight", 0., 1000000000000.) ;
 
-//  RooRealVar totEvents ("totEvents", "total number of events", 0., 1000000000.) ;
-//  RooRealVar crossSection ("crossSection", "process cross-section", 0., 1000000000.) ;
-//  RooRealVar PUit_n ("PUit_n", "in time pileup", 0., 100.) ;
-//  RooRealVar PUoot_n ("PUoot_n", "out of time pileup", 0., 100.) ;
-//  TString expression = "1./totEvents * crossSection * " ;
-//  expression += LUMI ;
-//  expression += " * PURescaleFactor((PUit_n+PUoot_n)/3.)" ; 
-//  RooFormulaVar weight ("weight", expression, RooArgList (totEvents, crossSection, PUit_n, PUoot_n)) ;
-
-
-//  TH1F * m4_upper_DATA = new TH1F ("m4_upper_DATA", "m4_upper_DATA", 70, 100., 800.) ;
-//  TH1F * m4_signal_DATA = new TH1F ("m4_signal_DATA", "m4_signal_DATA", 70, 100., 800.) ;
-//  TH1F * m4_lower_DATA = new TH1F ("m4_lower_DATA", "m4_lower_DATA", 70, 100., 800.) ;
-//  TH1F * m4_sideband_DATA = new TH1F ("m4_sideband_DATA", "m4_sideband_DATA", 70, 100., 800.) ;
-
-  map<string, RooDataSet *> signalDataSets ;
+  double minMjj = 65 ;
+  double maxMjj = 95 ;
 
   //PG loop over samples
   int index = 0 ;
@@ -142,43 +122,27 @@ int main (int argc, char** argv)
        iColl != collections.end () ; 
        ++iColl)
     {
+      if (iColl->first.find ("DATA") == string::npos) continue ;
+      cout << " reading " << iColl->first << endl ;
 
-      if (iColl->first.find ("ggH") == string::npos) continue ;
-      cout << "reading " << iColl->first << endl ;   
-      stringstream DSname ; 
-      DSname << "DS_" << iColl->first ;
-      RooDataSet * rds = new RooDataSet (DSname.str ().c_str (), DSname.str ().c_str (), iColl->second, RooArgSet (m)) ;
-
+      RooDataSet * rds = new RooDataSet ("data_obs", "data_obs", iColl->second, RooArgSet (x)) ; 
       VBFAnalysisVariables vars ;
       SetVBFPreselectionTreeBranches (vars, iColl->second) ;
       for (int i = 0 ; i < iColl->second->GetEntries () ; ++i)
         {
           iColl->second->GetEntry (i) ;
-          m = vars.lepNuW_m_KF ;
-          double weight = 1./vars.totEvents * vars.crossSection *  LUMI * PURescaleFactor ((vars.PUit_n + vars.PUoot_n)/3.) ; 
-          rds->add (RooArgSet (m), weight) ;            
+          x = vars.lepNuW_m_KF ;
+          rds->add (RooArgSet (x)) ;            
         }
+      data_DS = rds ;
 
-      signalDataSets[iColl->first] = rds ;
     } //PG loop over samples
 
-
   // define out file names
-  std::string outputRootFullFileName = "testRooFit_003.root" ;
+  std::string outputRootFullFileName = "testRooFit_004.root" ;
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
   outputRootFile->cd () ;
-
-  for (map<string, RooDataSet *>::iterator iMap = signalDataSets.begin () ;
-       iMap != signalDataSets.end () ;
-       ++iMap)
-    {
-      stringstream nameKeyPdf ;
-      nameKeyPdf << "KPDF_" << iMap->first ;
-      cout << "saving " << nameKeyPdf.str () << endl ;
-      RooKeysPdf * sigPdf = new RooKeysPdf (nameKeyPdf.str ().c_str (), nameKeyPdf.str ().c_str (), m, *(iMap->second)) ;
-      sigPdf->Write () ;
-    }
-
+  data_DS->Write () ;
   outputRootFile->Close () ;
   delete outputRootFile ;
   

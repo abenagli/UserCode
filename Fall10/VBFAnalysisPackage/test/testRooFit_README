@@ -2,8 +2,13 @@ testRooFit_001.cpp
 - test of the double fit function present in interface/RooFitFunctions.h
 
 testRooFit_002.cpp
-- lake RooDataSets of the various samples, but the signal
+- make RooDataSets of the various samples, but the signal, with m2 and m4
 
 testRooFit_003.cpp
 - make RooDataHist for signal samples (ok)
 - make RooKeysPdf for signal samples (not ok)
+
+testRooFit_004.cpp
+- make RooDataSets of the DATA, with m4
+- apply signal region cut on m2 before filling the RooDataSet
+

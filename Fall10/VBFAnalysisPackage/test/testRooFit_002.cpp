@@ -180,7 +180,7 @@ int main (int argc, char** argv)
     } //PG loop over samples
 
   // define out file names
-  std::string outputRootFullFileName = "testBkg_009.root" ;
+  std::string outputRootFullFileName = "testRooFit_002.root" ;
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
   outputRootFile->cd () ;
   for (int i = 0 ; i < simulation_DS.size () ; ++i) simulation_DS.at (i)->Write () ;
