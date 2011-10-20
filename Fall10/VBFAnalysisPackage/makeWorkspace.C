@@ -36,7 +36,7 @@ int makeWorkspace ()
   cout << " --- --- --- --- --- --- ---" << endl ;
   w.Print () ;
   
-  TFile * output = new TFile ("combineWS_350.root", "recreate") ;
+  TFile * output = new TFile ("combineWS_400.root", "recreate") ;
   output->cd () ;
   w.Write () ;
   output->Close () ;
