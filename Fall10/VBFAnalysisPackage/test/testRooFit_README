@@ -1,0 +1,9 @@
+testRooFit_001.cpp
+- test of the double fit function present in interface/RooFitFunctions.h
+
+testRooFit_002.cpp
+- lake RooDataSets of the various samples, but the signal
+
+testRooFit_003.cpp
+- make RooDataHist for signal samples (ok)
+- make RooKeysPdf for signal samples (not ok)
