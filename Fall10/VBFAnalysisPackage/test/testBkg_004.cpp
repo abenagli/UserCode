@@ -91,7 +91,7 @@ int main (int argc, char** argv)
   cout << "samples " << inputFileList << endl ;
 
   map<string, TChain *> collections ;
-  string treeName = "ntu_18" ;
+  string treeName = "ntu_14" ;
   ReadFile (collections, inputFileList, treeName) ;
   
   TH1::SetDefaultSumw2 (kTRUE) ;
@@ -120,7 +120,7 @@ int main (int argc, char** argv)
 //      |   +--------------------+
 //      +-------------------------------  m4
 
-  int nBins = 35 ;
+  int nBins = 70 ;
   double m4_min = 100. ;
   double m4_max = 800. ;
   //PG the cuts
@@ -129,11 +129,11 @@ int main (int argc, char** argv)
 //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
 //  generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
 //  generalCut = generalCut && "lep_flavour == 13" ; //PG only electrons
-//  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
+  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_cuts_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_5GeV_S" + mass + ".root" ;
-  std::string outputRootFullFileName = "testBkg_004_20GeV_S" + mass + ".root" ;
+//  std::string outputRootFullFileName = "testBkg_004_20GeV_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF.root" ;
 //  TString m4_VAR = "lepNuW_m" ;
   TString m4_VAR = "lepNuW_m_KF" ;
