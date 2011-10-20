@@ -50,7 +50,7 @@ int main (int argc, char** argv)
   
   
   // plot the distributions
-  RooPlot *xplot = m.frame () ;
+  RooPlot *xplot = x.frame () ;
   RFdoubleExp.plotOn (xplot) ;
   TCanvas c1 ;
   xplot->Draw () ;

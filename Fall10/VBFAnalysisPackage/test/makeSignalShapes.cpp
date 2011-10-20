@@ -152,12 +152,14 @@ int main (int argc, char** argv)
 
       stringstream nameRdh ;
       nameRdh << "RDH_" << iMap->first ;
-      RooRealVar m ("m", "higgs mass", 0., 1000.) ;
-      RooDataHist bdata (nameRdh.str ().c_str (), nameRdh.str ().c_str (), RooArgList (m), total) ;
+      RooRealVar x ("x", "higgs mass", 0., 1000.) ;
+      RooDataHist bdata (nameRdh.str ().c_str (), nameRdh.str ().c_str (), RooArgList (x), total) ;
+
       stringstream namePdf ;
       namePdf << "PDF_" << iMap->first ;
-      RooHistPdf pdf (namePdf.str ().c_str (), namePdf.str ().c_str (), RooArgList (m), bdata, 8) ;
+      RooHistPdf pdf (namePdf.str ().c_str (), namePdf.str ().c_str (), RooArgList (x), bdata, 8) ;
       pdf.Write () ;
+
       stringstream name ; 
       name << "sig_" << iMap->first ;
       total->Write (name.str ().c_str ()) ;
