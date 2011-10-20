@@ -21,7 +21,7 @@
 
 
 void SetStepNames(std::map<int, std::string>&, const std::string&, const int&, bool);
-bool AcceptHLTPath(const std::vector<std::string>&, const std::vector<float>&, const std::string&);
+bool AcceptHLTPath(const std::vector<std::string>&, const std::vector<float>&, const std::string&, bool& pathFound);
 
 
 
@@ -181,7 +181,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 20;
+  int nStep = 16;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_PURescaled = new TH1F("events_PURescaled", "events_PURescaled", nStep, 0., 1.*nStep);
@@ -228,7 +228,6 @@ int main(int argc, char** argv)
     cloneTrees[step] = chain -> CloneTree(0);
     cloneTrees[step] -> SetName(treeName); 
     AddVBFAnalysisTreeBranches(vars,cloneTrees[step]);
-    InitializeVBFAnalysisTree(vars);
   }
   
   
@@ -237,6 +236,9 @@ int main(int argc, char** argv)
   std::cout << ">>> VBFPreselection::Get run/LS map from JSON file" << std::endl;
   std::map<int, std::vector<std::pair<int, int> > > jsonMap;
   jsonMap = readJSONFile(jsonFileName);
+  
+  
+  
   
   
   
@@ -253,13 +255,19 @@ int main(int argc, char** argv)
   std::vector<std::string> HLTPathNames_mu_MC;
   
   // data
+  
+  // 5.0E32 epoch 160404-163869
   HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
   HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
   HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
-  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  HLTPathNames_e_DATA.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+  // 1.0E33 epoch 165088-166967
+  HLTPathNames_e_DATA.push_back("HLT_Ele17_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT15_v2");
+  HLTPathNames_e_DATA.push_back("HLT_Ele17_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT15_v4");
+  // 1.4E33 epoch 167039-167913
   HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+  // 2.0E33 epoch 170249-173198
+  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v1");
+  // 3.0E33 epoch 173236-173692
   HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
   
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v1");
@@ -270,11 +278,45 @@ int main(int argc, char** argv)
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v7");
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v8");
   HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v9");
+  /*
+  // 5.0E32 epoch 160404-163869
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v5");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v6");
+  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v1");
+  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v2");
+  // 1.0E33 epoch 165088-166967
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v8");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v9");
+  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v3");
+  // 1.4E33 epoch 167039-167913
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v11");
+  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v5");
+  // 2.0E33 epoch 170249-173198
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v13");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu20_v8");
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v8");
+  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v7");
+  HLTPathNames_mu_DATA.push_back("HLT_Mu40_v5");
+  // 3.0E33 epoch 173236-173692
+  HLTPathNames_mu_DATA.push_back("HLT_IsoMu20_v9");
+  HLTPathNames_mu_DATA.push_back("HLT_Mu40_v6");
+  */
   
   // mc
+  
+  // electron
   HLTPathNames_e_MC.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
   
+  // muon
   HLTPathNames_mu_MC.push_back("HLT_IsoMu24_v1");
+  //HLTPathNames_mu_MC.push_back("HLT_Mu24_v1");
+  /*
+  HLTPathNames_mu_MC.push_back("HLT_IsoMu17_v5");
+  HLTPathNames_mu_MC.push_back("HLT_Mu30_v1");
+  */
+  
+  
+  
   
   
   
@@ -314,7 +356,7 @@ int main(int argc, char** argv)
   
   
   
-  //********************                                                                                                                                                        
+  //********************
   // STEP 1 - All events
   int step = 1;
   stepEvents[step] = totalEvents[1];
@@ -328,26 +370,22 @@ int main(int argc, char** argv)
     stepEvents_plus[njetBin] = tempMap;
     stepEvents_minus[njetBin] = tempMap;
   }
-  stepNames[1]  = "1) All events";
-  stepNames[2]  = "2) Preselection";
+  stepNames[1]  = "1) all events";
+  stepNames[2]  = "2) preselection";
   stepNames[3]  = "3) HLT";
-  stepNames[4]  = "4) Lepton ID+iso";
-  stepNames[5]  = "5) Lepton 3D I.P.";
-  stepNames[6]  = "6) Lepton pt/eta";
-  stepNames[7]  = "7) Lepton mt";
-  stepNames[8]  = "8) Met";
-  stepNames[9]  = "9) jet veto";
-  stepNames[10] = "10) W-jet pt cut";
-  stepNames[11] = "11) b-tag veto";
-  stepNames[12] = "12) WJJ Deta/Dphi cuts";
-  stepNames[13] = "13) lep-met angle cuts";
-  stepNames[14] = "14) WJ1-WJ2 angle cuts";
-  stepNames[15] = "15) pt max/met cuts";
-  stepNames[16] = "16) W pt cut";
-  stepNames[17] = "17) Kinematic Fit";
-  stepNames[18] = "18) Helicity angles cuts";
-  stepNames[19] = "19) W mass cut";
-  stepNames[20] = "20) Higgs mass cut";
+  stepNames[4]  = "4) lepton ID+iso";
+  stepNames[5]  = "5) lepton pt/eta";
+  stepNames[6]  = "6) lepton mt";
+  stepNames[7]  = "7) met";
+  stepNames[8]  = "8) W-jets pt";
+  stepNames[9]  = "9) b-tag veto";
+  stepNames[10] = "10) jet veto";
+  stepNames[11] = "11) lep-met angles";
+  stepNames[12] = "12) WJ1-WJ2 angles";
+  stepNames[13] = "13) W pt";
+  stepNames[14] = "14) kinematic fit";
+  stepNames[15] = "15) W mass";
+  stepNames[16] = "16) Higgs mass";
   
   
   
@@ -373,8 +411,7 @@ int main(int argc, char** argv)
     
     //*******************
     // SET SOME VARIABLES
-    for(int step = firstSTEP; step <= nStep; ++step)
-      InitializeVBFAnalysisTree(vars);
+    InitializeVBFAnalysisTree(vars);
     
     vars.totEvents = stepEvents[1];
     vars.lep = *(vars.p_lep);
@@ -426,7 +463,7 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "preselection", step, verbosity);
     
     
-    if( (leptonFLAVOUR == "e") &&  (vars.lep_flavour != 11) ) continue;
+    if( (leptonFLAVOUR == "e")  && (vars.lep_flavour != 11) ) continue;
     if( (leptonFLAVOUR == "mu") && (vars.lep_flavour != 13) ) continue;
     
     
@@ -451,6 +488,7 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "HLT", step, verbosity);
     
     
+    bool pathFound = false;
     skipEvent = true;
 
     if( verbosity == 1)
@@ -472,53 +510,57 @@ int main(int argc, char** argv)
     
     for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
     {
-      if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt)) == true )
+      if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound) == true )
         skipEvent = false;
     }
-        
+    
+    if( pathFound == false )
+      std::cout << ">>>>>>>>> AcceptHLTPath::Warning: no paths found in the HLT menu" << std::endl;  
+    
     if( (HLTCUT == 1) && (skipEvent == true) ) continue;
     
     
-    // electron trigger emulation
+    
+    //// electron trigger emulation
     if( HLTCUT == 1 )
     {
       if( (vars.lep_flavour == 11) && (vars.lep.pt() < 30.) ) continue;
       if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > 2.5) ) continue;
-      if( (vars.lep_flavour == 11) && (vars.lep_isEB == 1) )
-      {
-        if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.125) ) continue;
-        if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.125) ) continue;
-        if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.125) ) continue;
-        
-        if( vars.lep_sigmaIetaIeta > 0.011 ) continue;
-        if( fabs(vars.lep_DphiIn)  > 0.070 ) continue;
-        if( fabs(vars.lep_DetaIn)  > 0.008 ) continue;
-        if( vars.lep_HOverE        > 0.050 ) continue;
-      }
-      if( (vars.lep_flavour == 11) && (vars.lep_isEB == 0) )
-      {
-        if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.075) ) continue;
-        if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.075) ) continue;
-        if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.075) ) continue;
-        
-        if( vars.lep_sigmaIetaIeta  > 0.031 ) continue;
-        if( fabs(vars.lep_DphiIn)   > 0.020 ) continue;
-        if( fabs(vars.lep_DetaIn)   > 0.005 ) continue;
-        if( vars.lep_HOverE         > 0.025 ) continue;
-      }
+      //if( (vars.lep_flavour == 11) && (vars.lep_isEB == 1) )
+      //{
+      //  if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.125) ) continue;
+      //  if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.125) ) continue;
+      //  if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.125) ) continue;
+      //  
+      //  if( vars.lep_sigmaIetaIeta > 0.011 ) continue;
+      //  if( fabs(vars.lep_DphiIn)  > 0.070 ) continue;
+      //  if( fabs(vars.lep_DetaIn)  > 0.008 ) continue;
+      //  if( vars.lep_HOverE        > 0.050 ) continue;
+      //}
+      //if( (vars.lep_flavour == 11) && (vars.lep_isEB == 0) )
+      //{
+      //  if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.075) ) continue;
+      //  if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.075) ) continue;
+      //  if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.075) ) continue;
+      //  
+      //  if( vars.lep_sigmaIetaIeta  > 0.031 ) continue;
+      //  if( fabs(vars.lep_DphiIn)   > 0.020 ) continue;
+      //  if( fabs(vars.lep_DetaIn)   > 0.005 ) continue;
+      //  if( vars.lep_HOverE         > 0.025 ) continue;
+      //}
       if( (vars.lep_flavour == 11) && (metCUT == 1) && (vars.met.Et() < 30.) ) continue;
-      if( (vars.lep_flavour == 11) && (std::max(vars.WJ1.pt(),vars.WJ2.pt()) < 35.) ) continue;
-      if( (vars.lep_flavour == 11) && (std::min(vars.WJ1.pt(),vars.WJ2.pt()) < 30.) ) continue;
+      //if( (vars.lep_flavour == 11) && (std::max(vars.WJ1.pt(),vars.WJ2.pt()) < 35.) ) continue;
+      //if( (vars.lep_flavour == 11) && (std::min(vars.WJ1.pt(),vars.WJ2.pt()) < 30.) ) continue;
     }
     
-    // muon trigger emulation
+    //// muon trigger emulation
     if( HLTCUT == 1 )
     {
       if( (vars.lep_flavour == 13) && (vars.lep.pt() < 25.) ) continue;
       if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > 2.1) ) continue;
-      if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_tkIso  > 1.000) ) continue;
-      if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_emIso  > 1.000) ) continue;
-      if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_hadIso > 1.000) ) continue;
+      //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_tkIso  > 1.000) ) continue;
+      //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_emIso  > 1.000) ) continue;
+      //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_hadIso > 1.000) ) continue;
     }
     
     
@@ -629,40 +671,17 @@ int main(int argc, char** argv)
     if( (antiIsoCUT == 1) && (isAntiIsolated == false) ) continue; 
     
     
-    // fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
-    //***************************************
-    // STEP 5 - Initial cuts - lepton 3D I.P.
-    step += 1;
-    //SetStepNames(stepNames, "lepton 3D I.P.", step, verbosity);
-    
-    
+    // vertex compatibility
     bool is3DIP = true;
     
     if( vars.lep_flavour == 11 )
-    {
       if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > ele3DipMAX ) is3DIP = false;
-    }
     
     if( vars.lep_flavour == 13 )
-    {
       if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > mu3DipMAX ) is3DIP = false;
-    }    
     
-    if( is3DIP == false ) continue;
+    //if( is3DIP == false ) continue;
     
     
     // fill distributions
@@ -679,9 +698,9 @@ int main(int argc, char** argv)
     
     
     
-
+    
     //***********************
-    // STEP 6 - lepton pt/eta
+    // STEP 5 - lepton pt/eta
     step += 1;
     //SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
      
@@ -714,12 +733,12 @@ int main(int argc, char** argv)
     
     
     //*******************
-    // STEP 7 - lepton mt
+    // STEP 6 - lepton mt
     step += 1;
     //SetStepNames(stepNames, "lepton mt", step, verbosity);
     
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (lepMetMtCUT == 1) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (lepMetMtCUT == 1) && (vars.lepNu_m > 110.) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (lepMetMtCUT == 1) && (vars.lepNu_m > 110.) ) continue;
     
     
     // fill distributions
@@ -738,7 +757,7 @@ int main(int argc, char** argv)
     
     
     //****************************
-    // STEP 8 - Initial cuts - met
+    // STEP 7 - Initial cuts - met
     step += 1;
     //SetStepNames(stepNames, "met", step, verbosity);
     
@@ -764,34 +783,10 @@ int main(int argc, char** argv)
     
     
     
-    //*********************************
-    // STEP 9 - Initial cuts - jet veto
+    //**********************************
+    // STEP 8 - Initial cuts - W-jets pt
     step += 1;
-    //SetStepNames(stepNames, "jet veto", step, verbosity);
-    
-    
-    if( vars.nJets_pt30 > 3 ) continue;
-    
-    
-    // Fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-        
-    
-    
-    
-    
-    //*************************************
-    // STEP 10 - Initial cuts - W-jet pt cut
-    step += 1;
-    //SetStepNames(stepNames, "W-jet pt cut", step, verbosity);
+    //SetStepNames(stepNames, "W-jet pt", step, verbosity);
     
     
     if( (vars.WJ1.pt() <= 30.) || (vars.WJ2.pt() <= 30.) ) continue;
@@ -832,19 +827,15 @@ int main(int argc, char** argv)
     
     
     //************************************
-    // STEP 11 - Initial cuts - b-tag veto
+    // STEP 9 - Initial cuts - b-tag veto
     step += 1;
     //SetStepNames(stepNames, "b-tag veto", step, verbosity);
     
     
     bool isBTagged = false;
     bool isAntiBTagged = true;
-    //for(unsigned int jetIt = 0; jetIt < vars.nJets; ++jetIt)
-    //{
-    //  if( vars.jets_bTag.at(jetIt) > 2.5 ) isBTagged = true;
-    //}
     
-    if( vars.nBTag_TCHEM_pt20 > 0 ) isBTagged = true;
+    if( vars.nBTag_TCHEM_pt30 > 0 ) isBTagged = true;
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
     
     //if( (vars.nJets >=1) && (vars.jets_bTag1 > 4.00) ) isBTagged = true;
@@ -874,17 +865,17 @@ int main(int argc, char** argv)
     
     
     
-    //********************************************
-    // STEP 12 - Initial cuts - WJJ Deta/Dphi cuts
+    
+    //*********************************
+    // STEP 10 - Initial cuts - jet veto
     step += 1;
-    //SetStepNames(stepNames, "WJJ Deta/Dphi cuts", step, verbosity);
+    //SetStepNames(stepNames, "jet veto", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) > 1.50) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) > 3.15) ) continue;
+    if( vars.nJets_cnt_pt30 > 3 ) continue;
     
     
-    // fill distributions
+    // Fill distributions
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
@@ -899,10 +890,10 @@ int main(int argc, char** argv)
     
     
     
-    //********************************************
-    // STEP 13 - Initial cuts - lep-met angle cuts
+    //****************************************
+    // STEP 11 - Initial cuts - lep-met angles
     step += 1;
-    //SetStepNames(stepNames, "lep-met angle cuts", step, verbosity);
+    //SetStepNames(stepNames, "lep-met angles", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
@@ -924,8 +915,8 @@ int main(int argc, char** argv)
     
     
     
-    //********************************************
-    // STEP 14 - Initial cuts - WJ1-WJ2 angle cuts
+    //****************************************
+    // STEP 12 - Initial cuts - WJ1-WJ2 angles
     step += 1;
     //SetStepNames(stepNames, "WJ1-WJ2 angle cuts", step, verbosity);
     
@@ -953,38 +944,38 @@ int main(int argc, char** argv)
     
     
     
-    //******************************************
-    // STEP 15 - Initial cuts - pt max/met  cuts
+    ////******************************************
+    //// STEP XX - Initial cuts - pt max/met  cuts
+    //step += 1;
+    ////SetStepNames(stepNames, "pt max cuts", step, verbosity);
+    //
+    //
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt2) < lepWJJPt2MIN) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt3) < lepWJJPt3MIN) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) && (metCUT == 1) ) && (vars.met.Et() < metEtMIN) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) && (metCUT == 1) ) && (vars.met.Et() > metEtMAX) ) continue;
+    //
+    //
+    //// fill distributions
+    //stepEvents[step] += 1;
+    //stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    //if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    //if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    //if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    //if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    //
+    //if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //*******************************
+    // STEP 13 - Initial cuts - W pt
     step += 1;
-    //SetStepNames(stepNames, "pt max cuts", step, verbosity);
-    
-    
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt2) < lepWJJPt2MIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt3) < lepWJJPt3MIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) && (metCUT == 1) ) && (vars.met.Et() < metEtMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) && (metCUT == 1) ) && (vars.met.Et() > metEtMAX) ) continue;
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
-    //**********************************
-    // STEP 16 - Initial cuts - W pt cut
-    step += 1;
-    //SetStepNames(stepNames, "W pt cuts", step, verbosity);
+    //SetStepNames(stepNames, "W pt", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.WJ1+vars.WJ2).Pt() < WPtMIN) ) continue;
@@ -1007,13 +998,14 @@ int main(int argc, char** argv)
     
     
     //***************************************
-    // STEP 17 - Initial cuts - Kinematic Fit
+    // STEP 14 - Initial cuts - Kinematic Fit
     step += 1;
     //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
     
     
-    DoKinematicFit(vars,0,"MIB");
+    DoKinematicFit(vars,0.1,"MIB");
     
+    /*
     if( vars.WJ1.pt() > 0. )
       vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
     if( vars.WJ2.pt() > 0. )
@@ -1024,38 +1016,7 @@ int main(int argc, char** argv)
       vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
       vars.WJ1_QGLikelihood = QGLikelihoodDummy;
     }
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
-    //*****************************************
-    // STEP 18 - Initial cuts - Helicity angles
-    step += 1;
-    //SetStepNames(stepNames, "Helicity angles", step, verbosity);
-    
-    
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lep_ctheta < lepCthetaMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lep_ctheta > lepCthetaMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.WJ1_ctheta < WJ1CthetaMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.WJ1_ctheta > WJ1CthetaMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lepNu_ctheta < lepNuCthetaMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lepNu_ctheta > lepNuCthetaMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (std::min(vars.WJ1_lep_Dphi,vars.WJ2_lep_Dphi) < lepWJ1DphiMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (std::min(vars.WJ1_lep_Dphi,vars.WJ2_lep_Dphi) > lepWJ1DphiMAX) ) continue;
-    
+    */
     
     // fill distributions
     stepEvents[step] += 1;
@@ -1072,10 +1033,41 @@ int main(int argc, char** argv)
     
     
     
-    //************************************
-    // STEP 19 - Initial cuts - W mass cut
+    ////*****************************************
+    //// STEP XX - Initial cuts - Helicity angles
+    //step += 1;
+    ////SetStepNames(stepNames, "Helicity angles", step, verbosity);
+    //
+    //
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lep_ctheta < lepCthetaMIN) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lep_ctheta > lepCthetaMAX) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.WJ1_ctheta < WJ1CthetaMIN) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.WJ1_ctheta > WJ1CthetaMAX) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lepNu_ctheta < lepNuCthetaMIN) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lepNu_ctheta > lepNuCthetaMAX) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (std::min(vars.WJ1_lep_Dphi,vars.WJ2_lep_Dphi) < lepWJ1DphiMIN) ) continue;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (std::min(vars.WJ1_lep_Dphi,vars.WJ2_lep_Dphi) > lepWJ1DphiMAX) ) continue;
+    //
+    //
+    //// fill distributions
+    //stepEvents[step] += 1;
+    //stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    //if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    //if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    //if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    //if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    //
+    //if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //********************************
+    // STEP 15 - Initial cuts - W mass
     step += 1;
-    //SetStepNames(stepNames, "W mass cut", step, verbosity);
+    //SetStepNames(stepNames, "W mass", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
@@ -1097,14 +1089,14 @@ int main(int argc, char** argv)
     
     
     
-    //****************************************
-    // STEP 20 - Initial cuts - Higgs mass cut
+    //************************************
+    // STEP 16 - Initial cuts - Higgs mass
     step += 1;
     //SetStepNames(stepNames, "Higgs mass cut", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m) < lepNuWMMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m) > lepNuWMMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m_KF) < lepNuWMMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m_KF) > lepNuWMMAX) ) continue;
     
     
     // fill distributions
@@ -1205,14 +1197,20 @@ void SetStepNames(std::map<int, std::string>& stepNames, const std::string& step
 
 bool AcceptHLTPath(const std::vector<std::string>& HLT_Names,
                    const std::vector<float>& HLT_Accept,
-                   const std::string& HLTPathName)
+                   const std::string& HLTPathName,
+                   bool& pathFound)
 {
   bool acceptEvent = false;
   
   for(unsigned int HLTIt = 0; HLTIt < HLT_Names.size(); ++HLTIt)
-    if( (HLT_Names.at(HLTIt) == HLTPathName) &&
-        (HLT_Accept.at(HLTIt) == 1) )
-      acceptEvent = true;
+  {
+    if( HLT_Names.at(HLTIt) == HLTPathName )
+    {
+      pathFound = true;
+      if( HLT_Accept.at(HLTIt) == 1 )
+        acceptEvent = true;
+    }
+  }
   
   return acceptEvent;
 }

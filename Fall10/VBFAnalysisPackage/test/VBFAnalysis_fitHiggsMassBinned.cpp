@@ -17,7 +17,6 @@ std::vector<double>* mydata;
 std::vector<double>* myweights;
 
 double fitFunc(double* x, double* par);
-double superGausCumCauda(double* x, double* par);
 
 int fitHiggsMassBinned(TH1F* h_lepNuW_m,
                        float xFitMIN1, float xFitMAX1, float xFitMIN2, float xFitMAX2, float xWidth,
@@ -93,12 +92,20 @@ int main(int argc, char** argv)
   
   int binMin = -1;
   int binMax = -1;
+  int binFitMin1 = -1;
+  int binFitMax1 = -1;
+  int binFitMin2 = -1;
+  int binFitMax2 = -1;
   for(int bin = 1; bin <= nBins; ++bin)
   {
     float binCenter = xMin + 0.5*xWidth + xWidth*(bin-1);
     
     if( (binCenter >= lepNuWMMIN) && (binMin == -1) ) binMin = bin;
     if( (binCenter >= lepNuWMMIN) && (binCenter < lepNuWMMAX) ) binMax = bin;
+    if( (binCenter >= xFitMIN1) && (binFitMin1 == -1) ) binFitMin1 = bin;
+    if( (binCenter >= xFitMIN1) && (binCenter < xFitMAX1) ) binFitMax1 = bin;
+    if( (binCenter >= xFitMIN2) && (binFitMin2 == -1) ) binFitMin2 = bin;
+    if( (binCenter >= xFitMIN2) && (binCenter < xFitMAX2) ) binFitMax2 = bin;
   }
   //std::cout << "binMin: " << binMin << "   binMax: " << binMax << std::endl;
   
@@ -145,9 +152,9 @@ int main(int argc, char** argv)
   
   TH1F* h_chi2     = new TH1F("h_chi2","",     100,    0.,   3.);
   TH1F* h_diff_obs = new TH1F("h_diff_obs","",2000,-1000.,1000.);
-  TH1F* h_res_obs  = new TH1F("h_res_obs", "", 200,   -1.,   1.);
+  TH1F* h_res_obs  = new TH1F("h_res_obs", "", 500,   -1.,   1.);
   TH1F* h_diff_est = new TH1F("h_diff_est","",2000,-1000.,1000.);
-  TH1F* h_res_est  = new TH1F("h_res_est", "", 200,   -1.,   1.);
+  TH1F* h_res_est  = new TH1F("h_res_est", "", 500,   -1.,   1.);
   TH1F* h_err_est  = new TH1F("h_err_est", "",2000,    0.,2000.);
   
   
@@ -268,7 +275,7 @@ int main(int argc, char** argv)
       
       
       // set tree branches
-      tree -> SetBranchAddress("lepNuW_m", &lepNuW_m);
+      tree -> SetBranchAddress("lepNuW_m_KF", &lepNuW_m);
       
        
       // loop on the events
@@ -316,7 +323,7 @@ int main(int argc, char** argv)
       tree -> SetBranchAddress("crossSection", &crossSection);
       tree -> SetBranchAddress("PUit_n",       &PUit_n);
       tree -> SetBranchAddress("PUoot_n",      &PUoot_n);
-      tree -> SetBranchAddress("lepNuW_m",     &lepNuW_m);
+      tree -> SetBranchAddress("lepNuW_m_KF",  &lepNuW_m);
       
       
       // loop on the events
@@ -357,7 +364,7 @@ int main(int argc, char** argv)
       tree -> SetBranchAddress("crossSection", &crossSection);
       tree -> SetBranchAddress("PUit_n",       &PUit_n);
       tree -> SetBranchAddress("PUoot_n",      &PUoot_n);
-      tree -> SetBranchAddress("lepNuW_m",     &lepNuW_m);
+      tree -> SetBranchAddress("lepNuW_m_KF",  &lepNuW_m);
       
       
       // loop on the events
@@ -444,40 +451,30 @@ int main(int argc, char** argv)
   // ON MC - FIT MASS DISTRIBUTION
   //------------------------------
   
-  TF1* f_toSample = new TF1("f_toSample",attenuatedDoubleExponentialCumLeadingEdge,0.,1000,8);
+  TF1* f_toSample = new TF1("f_toSample",doubleExponential,xFitMIN1,xFitMAX2,4);
   f_toSample -> SetNpx(10000);
   f_toSample -> SetLineColor(kBlue);
   f_toSample -> SetLineWidth(2);
   
-  f_toSample -> SetParameter(0,180.);
-  f_toSample -> SetParameter(1,20.);
-  f_toSample -> SetParameter(2,3.);
-  f_toSample -> SetParameter(3,0.005);
-  f_toSample -> SetParameter(4,10.);
-  f_toSample -> SetParameter(5,0.012);
-  f_toSample -> FixParameter(6,175.);
-  f_toSample -> SetParameter(7,150.);
+  f_toSample -> SetParameter(0,3.);
+  f_toSample -> SetParameter(1,0.005);
+  f_toSample -> SetParameter(2,10.);
+  f_toSample -> SetParameter(3,0.012);
   
-  f_toSample -> SetParLimits(0,150.,250.);
-  f_toSample -> SetParLimits(1,0.,100.);
+  f_toSample -> SetParName(0,"N1");
+  f_toSample -> SetParName(1,"#lambda1");
+  f_toSample -> SetParName(2,"N2");
+  f_toSample -> SetParName(3,"#lambda2");
   
-  f_toSample -> SetParName(0,"#mu");
-  f_toSample -> SetParName(1,"kT");
-  f_toSample -> SetParName(2,"N1");
-  f_toSample -> SetParName(3,"#lambda1");
-  f_toSample -> SetParName(4,"N2");
-  f_toSample -> SetParName(5,"#lambda2");
-  f_toSample -> SetParName(6,"x_{0}");
-  f_toSample -> SetParName(7,"#lambda");
-  
-  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",0.,1000.);
-  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",0.,1000.);
-  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",0.,1000.);
+  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",xFitMIN1,xFitMAX2);
+  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",xFitMIN1,xFitMAX2);
+  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",xFitMIN1,xFitMAX2);
   
   
   TH1F* temp = new TH1F("temp","",nBins,xMin,xMax);
   temp -> Sumw2();
-  temp -> FillRandom("f_toSample",10000000);
+  for(int j = 0; j < 10000000; ++j)
+    temp -> Fill( f_toSample->GetRandom() );
   temp -> Scale(h_mcSum_lepNuW_m->Integral()/temp->GetEntries());
   h_mcSumToSample_lepNuW_m = (TH1F*)(temp->Clone("h_mcSumToSample_lepNuW_m"));
   
@@ -488,8 +485,8 @@ int main(int argc, char** argv)
   if( onMC == 1 )
   {
     // count events
-    float N = h_mcSumToSample_lepNuW_m -> Integral();
-    float N_sig = h_sigToSample_lepNuW_m -> Integral();
+    float N = h_mcSumToSample_lepNuW_m -> Integral(binFitMin1,binFitMax2);
+    float N_sig = h_sigToSample_lepNuW_m -> Integral(binFitMin1,binFitMax2);
     
     N_expected = h_mcSumToSample_lepNuW_m -> Integral(binMin,binMax);
     N_expected_err = 0;

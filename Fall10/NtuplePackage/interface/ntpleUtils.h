@@ -48,7 +48,7 @@ int parseConfigFile (const TString& config) ;
 
 
 /** compute the PU rescale factor */
-double PURescaleFactor (const double& nPU_MC);
+double PURescaleFactor(const double& nPU_MC, const int& PUScale = 0);
 
 
 

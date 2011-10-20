@@ -943,7 +943,7 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
     
     
-    DoKinematicFit(vars);
+    DoKinematicFit(vars,5.,"MIB");
     
     
     // fill distributions

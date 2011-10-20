@@ -2,7 +2,8 @@
 
 
 
-void DoKinematicFit(VBFAnalysisVariables& vars, const int& flag, const std::string& method)
+void DoKinematicFit(VBFAnalysisVariables& vars, const double& metEtaRes, const std::string& method,
+                    const int& flag)
 {
   // lepton
   TLorentzVector vl(vars.lep.px(),vars.lep.py(),vars.lep.pz(),vars.lep.energy());
@@ -31,20 +32,21 @@ void DoKinematicFit(VBFAnalysisVariables& vars, const int& flag, const std::stri
   m1.Zero();
   m2.Zero();
   
-  double EtRes,etaRes,phiRes;
   
   // lepton
-  if(vars.lep_flavour == 11) electronResolution(vars.lep.Et(),vars.lep.eta(),EtRes,etaRes,phiRes);
-  if(vars.lep_flavour == 13)     muonResolution(vars.lep.Et(),vars.lep.eta(),EtRes,etaRes,phiRes);
-  ml(0,0) = EtRes*EtRes;
-  ml(1,1) = etaRes*etaRes;
-  ml(2,2) = phiRes*phiRes;
+  double lepEtRes,lepEtaRes,lepPhiRes;
+  if(vars.lep_flavour == 11) electronResolution(vars.lep.Et(),vars.lep.eta(),lepEtRes,lepEtaRes,lepPhiRes);
+  if(vars.lep_flavour == 13)     muonResolution(vars.lep.Et(),vars.lep.eta(),lepEtRes,lepEtaRes,lepPhiRes);
+  ml(0,0) = lepEtRes*lepEtRes;
+  ml(1,1) = lepEtaRes*lepEtaRes;
+  ml(2,2) = lepPhiRes*lepPhiRes;
   
   // neutrino
-  PFMETResolution(vars.met.Et(),EtRes,etaRes,phiRes);
-  mv(0,0) = EtRes*EtRes;
-  mv(1,1) = 0.01;
-  mv(2,2) = phiRes*phiRes;
+  double metEtRes,metPhiRes;
+  PFMETResolution(vars.met.Et(),metEtRes,metPhiRes);
+  mv(0,0) = metEtRes*metEtRes;
+  mv(1,1) = metEtaRes*metEtaRes;
+  mv(2,2) = metPhiRes*metPhiRes;
   
   // jets
   m1(0,0) = ErrEt (vars.WJ1.Et(),vars.WJ1.eta());

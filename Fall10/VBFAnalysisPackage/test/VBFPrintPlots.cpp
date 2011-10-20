@@ -548,82 +548,44 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("EE d_{z}(electron)");
   stack -> SetUnit("cm");
   stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  
-  
-  
-  variableNames.at(0) = "lep_tkIso/lep.pt()";
-  histoName = "ele_tkRelIso_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.2);
-  stack -> SetXaxisTitle("EB #Sigma pt_{tracks} / pt_{electron}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_tkIso/lep.pt()";
-  histoName = "ele_tkRelIso_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.2);
-  stack -> SetXaxisTitle("EE #Sigma pt_{tracks} / pt_{electron}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  variableNames.at(0) = "lep_emIso/lep.pt()";
-  histoName = "ele_emRelIso_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.2);
-  stack -> SetXaxisTitle("EB #Sigma et_{ECAL} / pt_{electron}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_emIso/lep.pt()";
-  histoName = "ele_emRelIso_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.2);
-  stack -> SetXaxisTitle("EE #Sigma et_{ECAL} / pt_{electron}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  variableNames.at(0) = "lep_hadIso/lep.pt()";
-  histoName = "ele_hadRelIso_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.2);
-  stack -> SetXaxisTitle("EB #Sigma et_{HCAL} / pt_{electron}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_hadIso/lep.pt()";
-  histoName = "ele_hadRelIso_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.2);
-  stack -> SetXaxisTitle("EE #Sigma et_{HCAL} / pt_{electron}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  variableNames.at(0) = "(lep_tkIso+lep_emIso+lep_hadIso)/lep.pt()";
-  histoName = "ele_combRelIso_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.4);
-  stack -> SetXaxisTitle("EB #Sigma (pt_{trakcs}+et_{ECAL}+et_{HCAL}) / pt_{electron}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 80, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "(lep_tkIso+lep_emIso+lep_hadIso)/lep.pt()";
-  histoName = "ele_combRelIso_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.4);
-  stack -> SetXaxisTitle("EE #Sigma (pt_{trakcs}+et_{ECAL}+et_{HCAL}) / pt_{electron}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 80, PURescale, weightEvent, stackSig, cuts);
   */
+  
+  
+  
+  
+  
+  variableNames.at(0) = "lep_tkIso/lep.pt()";
+  histoName = "ele_tkRelIso";
+  cuts -> at(0) = "( lep_flavour == 11 )";
+  stack -> SetXaxisRange(0., 0.2);
+  stack -> SetXaxisTitle("#Sigma pt_{tracks} / pt_{electron}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  
+  variableNames.at(0) = "lep_emIso/lep.pt()";
+  histoName = "ele_emRelIso";
+  cuts -> at(0) = "( lep_flavour == 11 )";
+  stack -> SetXaxisRange(0., 0.2);
+  stack -> SetXaxisTitle("#Sigma et_{ECAL} / pt_{electron}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  
+  variableNames.at(0) = "lep_hadIso/lep.pt()";
+  histoName = "ele_hadRelIso";
+  cuts -> at(0) = "( lep_flavour == 11 )";
+  stack -> SetXaxisRange(0., 0.2);
+  stack -> SetXaxisTitle("#Sigma et_{HCAL} / pt_{electron}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  
+  variableNames.at(0) = "(lep_tkIso+lep_emIso+lep_hadIso)/lep.pt()";
+  histoName = "ele_combRelIso";
+  cuts -> at(0) = "( lep_flavour == 11 )";
+  stack -> SetXaxisRange(0., 0.4);
+  stack -> SetXaxisTitle("#Sigma (pt_{tracks}+et_{ECAL}+et_{HCAL}) / pt_{muon}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 80, PURescale, weightEvent, stackSig, cuts);  
+  
   
   
   
@@ -719,16 +681,42 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("nHits(muon)");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  */
   
   
   
+  
+  
+  variableNames.at(0) = "lep_tkIso";
+  histoName = "mu_tkIso";
+  cuts -> at(0) = "( lep_flavour == 13 )";
+  stack -> SetXaxisRange(0., 4.);
+  stack -> SetXaxisTitle("#Sigma pt_{tracks}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+   
+  variableNames.at(0) = "lep_emIso";
+  histoName = "mu_emIso";
+  cuts -> at(0) = "( lep_flavour == 13 )";
+  stack -> SetXaxisRange(0., 4.);
+  stack -> SetXaxisTitle("#Sigma et_{ECAL}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  
+  variableNames.at(0) = "lep_hadIso";
+  histoName = "mu_hadIso";
+  cuts -> at(0) = "( lep_flavour == 13 )";
+  stack -> SetXaxisRange(0., 4.);
+  stack -> SetXaxisTitle("#Sigma et_{HCAL}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
   
   
   
   variableNames.at(0) = "lep_tkIso/lep.pt()";
   histoName = "mu_tkRelIso";
   cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 2.);
+  stack -> SetXaxisRange(0., 0.2);
   stack -> SetXaxisTitle("#Sigma pt_{tracks} / pt_{muon}");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
@@ -756,7 +744,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("#Sigma (pt_{tracks}+et_{ECAL}+et_{HCAL}) / pt_{muon}");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 80, PURescale, weightEvent, stackSig, cuts);
-  */
+    
   
   
   
