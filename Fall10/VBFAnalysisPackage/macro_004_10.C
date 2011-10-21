@@ -6,7 +6,7 @@ void setDoubleExpPars (TF1 * func)
 {
   //PG numbers from Andrea
   func->SetParameter (0, 10.) ;
-  func->SetParameter (1, 0.012) ;
+  func->SetParameter (1, 0.013) ;
   func->SetParameter (2, 5.) ;
   func->SetParameter (3, 0.005) ;
   
@@ -292,19 +292,19 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
-/*
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_sideband_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
-*/
 
+/*
   cout << "final analysis closure test" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ; 
   TH1F * signalRegion   = signalRegionMC ; 
+*/
 
 /*
   cout << "final analysis closure test with signal injection" << endl ;
@@ -364,18 +364,21 @@ int macro_004_10 (int mass)
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedDoubleExponential, 0., 1000., 7) ;
-  setAttDoubleExpPars (numFitFunc) ;
+  TF1 * numFitFunc = new TF1 ("numFitFunc", doubleExponential, 0., 1000., 4) ;
+  setDoubleExpPars (numFitFunc) ;
+
+//  TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedDoubleExponential, 0., 1000., 6) ;
+//  setAttDoubleExpPars (numFitFunc) ;
 
 //  TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedCB, 0., 1000., 7) ;
 //  setCBPars (numFitFunc, signalRegionMC->Integral () / 5.) ;
 
-  signalRegionMC->Fit (numFitFunc, "LQ", "", startFit, endFit) ;
-  int fitStatus = 1 ;
+  TFitResultPtr fitResultPtr = signalRegionMC->Fit (numFitFunc, "L", "", startFit, endFit) ;
+  int fitStatus = (int)(fitResultPtr) ;
   int loops = 0 ; 
   while (fitStatus != 0 && loops < 30)
     {
-      TFitResultPtr fitResultPtr = signalRegionMC->Fit (numFitFunc, "LQ", "", startFit, endFit) ;
+      fitResultPtr = signalRegionMC->Fit (numFitFunc, "L", "", startFit, endFit) ;
       fitStatus = (int)(fitResultPtr) ;
       ++loops ;
     }
@@ -403,18 +406,21 @@ int macro_004_10 (int mass)
   c1->Print ("signal_log.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
-  TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedDoubleExponential, 0., 1000., 7) ;
-  setAttDoubleExpPars (denFitFunc) ;
+  TF1 * denFitFunc = new TF1 ("denFitFunc", doubleExponential, 0., 1000., 4) ;
+  setDoubleExpPars (denFitFunc) ;
+
+//  TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedDoubleExponential, 0., 1000., 6) ;
+//  setAttDoubleExpPars (denFitFunc) ;
 
 //  TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedCB, 0., 1000., 7) ;
 //  setCBPars (denFitFunc, sidebaRegionMC->Integral () / 5.) ;
 
-  sidebaRegionMC->Fit (denFitFunc, "LQ", "", startFit, endFit) ;
-  fitStatus = 1 ;
+  fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
+  fitStatus = (int)(fitResultPtr) ;
   loops = 0 ; 
   while (fitStatus != 0 && loops < 50)
     {
-      TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "LQ", "", startFit, endFit) ;
+      TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
       fitStatus = (int)(fitResultPtr) ;
       ++loops ;
     }
