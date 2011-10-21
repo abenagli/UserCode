@@ -355,8 +355,8 @@ int macro_004_10 (int mass)
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
  
   double binSize = (m4_max - m4_min) / nBins ;
-  double startFit = 240 ; //GeV, bin from where to start the num & den fit for corr factor
-  double endFit = 800 ;   //GeV, bin from where to end the num & den fit for corr factor
+  double startFit = 200 ; //GeV, bin from where to start the num & den fit for corr factor
+  double endFit = 1000 ;   //GeV, bin from where to end the num & den fit for corr factor
   int fitBins = (endFit-startFit) / binSize ;
 
   cout << nBins << " " << m4_min << " " << m4_max << " " << binSize << endl ;
@@ -726,13 +726,13 @@ int macro_004_10 (int mass)
   vector<double> mMax ;
   masses.push_back (250.) ;  mMin.push_back (225) ; mMax.push_back (275) ; //PG Hwindow.push_back (24.) ;
   masses.push_back (300.) ;  mMin.push_back (270) ; mMax.push_back (330) ; //PG Hwindow.push_back (27.) ;
-  masses.push_back (350.) ;  mMin.push_back (320) ; mMax.push_back (380) ; //PG Hwindow.push_back (32.) ;
-  masses.push_back (400.) ;  mMin.push_back (360) ; mMax.push_back (440) ; //PG Hwindow.push_back (40.) ;
-  masses.push_back (450.) ;  mMin.push_back (405) ; mMax.push_back (495) ; //PG Hwindow.push_back (46.) ;
-  masses.push_back (500.) ;  mMin.push_back (445) ; mMax.push_back (565) ; //PG Hwindow.push_back (54.) ;
-  masses.push_back (550.) ;  mMin.push_back (490) ; mMax.push_back (630) ; //PG Hwindow.push_back (61.) ;
-  masses.push_back (600.) ;  mMin.push_back (530) ; mMax.push_back (700) ; //PG Hwindow.push_back (68.) ;
-
+  masses.push_back (350.) ;  mMin.push_back (310) ; mMax.push_back (390) ; //PG Hwindow.push_back (32.) ;
+  masses.push_back (400.) ;  mMin.push_back (355) ; mMax.push_back (445) ; //PG Hwindow.push_back (40.) ;
+  masses.push_back (450.) ;  mMin.push_back (390) ; mMax.push_back (510) ; //PG Hwindow.push_back (46.) ;
+  masses.push_back (500.) ;  mMin.push_back (415) ; mMax.push_back (575) ; //PG Hwindow.push_back (54.) ;
+  masses.push_back (550.) ;  mMin.push_back (470) ; mMax.push_back (610) ; //PG Hwindow.push_back (61.) ;
+  masses.push_back (600.) ;  mMin.push_back (485) ; mMax.push_back (665) ; //PG Hwindow.push_back (68.) ;
+  
   //PG the fast cut-n-count thing
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   
@@ -756,8 +756,21 @@ int macro_004_10 (int mass)
   //PG loop on the mass points
   for (int i = 0 ; i < masses.size () ; ++i)
     {
-      int minBin = signalRegion->FindBin (mMin.at (i)) ;       //PG analysis
-      int maxBin = signalRegion->FindBin (mMax.at (i)) ;       //PG analysis
+      int minBin = -1;
+      int maxBin = -1;
+      int nBins = signalRegion -> GetNbinsX();
+      float binWidth = signalRegion -> GetBinWidth(1);
+      float minX = signalRegion -> GetBinLowEdge(1);
+      float maxX = signalRegion -> GetBinLowEdge(nBins)+binWidth;
+      
+      for(int bin = 1; bin <= nBins; ++bin)
+      {
+        float binCenter = minX + 0.5*binWidth + binWidth*(bin-1);
+        
+        if( (binCenter >= mMin.at(i)) && (minBin == -1) ) minBin = bin;
+        if( (binCenter >= mMin.at(i)) && (binCenter < mMax.at(i)) ) maxBin = bin;
+      }
+      
       double total = signalRegion->Integral (minBin, maxBin) ; //PG analysis
       double min = signalRegion->GetBinLowEdge (minBin) ;
       double max = signalRegion->GetBinLowEdge (maxBin + 1) ;
@@ -777,7 +790,7 @@ int macro_004_10 (int mass)
            << bkg_count << " : "
            << bkg_count_error / bkg_count << " : "
            << total << " : "
-           << "\n" ;
+           << endl;
            
       g_total.SetPoint (i, masses.at (i), total) ;
       g_total.SetPointError (i, 50., sqrt (total)) ;
