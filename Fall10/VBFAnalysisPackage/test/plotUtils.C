@@ -103,6 +103,37 @@ getPullTrend  (TH1F * hDATA, TH1F * hMC)
 }
 
 
+
+
+// --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + 
+
+
+TH1F *
+getPullPlot  (TH1F * hDATA, TH1F * hMC)
+{
+  int nbin = 0.272 * hDATA->GetNbinsX () + 3 ;
+  std::string name1 = hDATA->GetName () ;
+  std::string name2 = hMC->GetName () ; 
+  std::string nameNew = "p_" + name1 + "_o_" + name2 ; 
+  
+  TH1F * pull = new TH1F (nameNew.c_str (), "", nbin, -3, 3) ;
+
+  for  (int iBin = 0 ; iBin < hDATA->GetNbinsX () ; iBin++)
+    {
+      double X = hDATA->GetBinCenter (iBin+1) ;
+      double DATA = hDATA->GetBinContent (iBin+1) ;
+      double MC = hMC->GetBinContent (iBin+1) ;
+      double errMC = hMC->GetBinError (iBin+1) ;
+      pull->Fill ((DATA - MC) / sqrt (errMC * errMC + DATA)) ;
+      
+    }
+//  pull->Fit ("gaus") ;
+  pull->SetFillColor (kGreen + 2) ;
+  pull->SetFillStyle (3001) ;
+  return pull ;
+}
+
+
 // --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + 
 
 

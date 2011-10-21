@@ -292,19 +292,19 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
+/*
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_sideband_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
+*/
 
-/*
   cout << "final analysis closure test" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ; 
   TH1F * signalRegion   = signalRegionMC ; 
-*/
 
 /*
   cout << "final analysis closure test with signal injection" << endl ;
@@ -695,6 +695,10 @@ int macro_004_10 (int mass)
   extrapAndMc_pulls.first->Draw ("samePE") ;
   c1->Print ("extrapAndMc_pull.pdf", "pdf") ;
 
+  TH1F * extrapAndMc_pull = getPullPlot (signalRegionMC, extrapolated_bkg) ;
+  extrapAndMc_pull->Draw () ;
+  c1->Print ("extrapAndMc_pull2.pdf", "pdf") ;
+  
   TLegend * leg_extrapAndData = new TLegend (0.5, 0.8, 0.95, 0.95, NULL, "brNDC") ;
   legendMaquillage (leg_extrapAndData) ;
   leg_extrapAndData->AddEntry (signalRegion, "data in SR", "p") ;
@@ -717,6 +721,10 @@ int macro_004_10 (int mass)
   extrapAndData_pulls.first->Draw ("samePE") ;
   c1->Print ("extrapAndData_pull.pdf", "pdf") ;
 
+  TH1F * extrapAndData_pull = getPullPlot (signalRegion, extrapolated_bkg) ;
+  extrapAndData_pull->Draw () ;
+  c1->Print ("extrapAndData_pull2.pdf", "pdf") ;
+  
   
   //PG prepare the windows for the fast cut-n-count thing
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
