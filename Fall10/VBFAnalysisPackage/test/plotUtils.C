@@ -109,9 +109,9 @@ getPullTrend  (TH1F * hDATA, TH1F * hMC)
 
 
 TH1F *
-getPullPlot  (TH1F * hDATA, TH1F * hMC)
+getPullPlot  (TH1F * hDATA, TH1F * hMC, double min, double max)
 {
-  int nbin = 0.272 * hDATA->GetNbinsX () + 3 ;
+  int nbin = 0.3 * hDATA->GetNbinsX () + 3 ;
   std::string name1 = hDATA->GetName () ;
   std::string name2 = hMC->GetName () ; 
   std::string nameNew = "p_" + name1 + "_o_" + name2 ; 
@@ -119,8 +119,9 @@ getPullPlot  (TH1F * hDATA, TH1F * hMC)
   TH1F * pull = new TH1F (nameNew.c_str (), "", nbin, -3, 3) ;
 
   for  (int iBin = 0 ; iBin < hDATA->GetNbinsX () ; iBin++)
-    {
+    {    	
       double X = hDATA->GetBinCenter (iBin+1) ;
+      if (X < min || X > max) continue ;
       double DATA = hDATA->GetBinContent (iBin+1) ;
       double MC = hMC->GetBinContent (iBin+1) ;
       double errMC = hMC->GetBinError (iBin+1) ;

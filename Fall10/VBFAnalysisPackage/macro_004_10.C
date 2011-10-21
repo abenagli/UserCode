@@ -292,19 +292,19 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
-/*
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_sideband_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
-*/
 
+/*
   cout << "final analysis closure test" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ; 
   TH1F * signalRegion   = signalRegionMC ; 
+*/
 
 /*
   cout << "final analysis closure test with signal injection" << endl ;
@@ -355,7 +355,7 @@ int macro_004_10 (int mass)
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
  
   double binSize = (m4_max - m4_min) / nBins ;
-  double startFit = 200 ; //GeV, bin from where to start the num & den fit for corr factor
+  double startFit = 240 ; //GeV, bin from where to start the num & den fit for corr factor
   double endFit = 1000 ;   //GeV, bin from where to end the num & den fit for corr factor
   int fitBins = (endFit-startFit) / binSize ;
 
@@ -695,7 +695,7 @@ int macro_004_10 (int mass)
   extrapAndMc_pulls.first->Draw ("samePE") ;
   c1->Print ("extrapAndMc_pull.pdf", "pdf") ;
 
-  TH1F * extrapAndMc_pull = getPullPlot (signalRegionMC, extrapolated_bkg) ;
+  TH1F * extrapAndMc_pull = getPullPlot (signalRegionMC, extrapolated_bkg, startFit, endFit) ;
   extrapAndMc_pull->Draw () ;
   c1->Print ("extrapAndMc_pull2.pdf", "pdf") ;
   
@@ -721,7 +721,7 @@ int macro_004_10 (int mass)
   extrapAndData_pulls.first->Draw ("samePE") ;
   c1->Print ("extrapAndData_pull.pdf", "pdf") ;
 
-  TH1F * extrapAndData_pull = getPullPlot (signalRegion, extrapolated_bkg) ;
+  TH1F * extrapAndData_pull = getPullPlot (signalRegion, extrapolated_bkg, startFit, endFit) ;
   extrapAndData_pull->Draw () ;
   c1->Print ("extrapAndData_pull2.pdf", "pdf") ;
   
