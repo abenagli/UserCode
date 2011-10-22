@@ -156,6 +156,8 @@ int macro_004_10 (int mass)
        makeToys = false ; //PG error as the ratio of the errors of the function
   int nToys = 10000 ;
   bool scaleBand = false ; //PG scale the band according to the pool wrt the MC histo
+  bool makeBkgFit = false ; //PG smooth the extrap bkg shape with a double exp fit
+                            //PG leave it false by now, it generates a big bias
  
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -292,11 +294,13 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
+/*
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion   = m4_sideband_DATA ;
   TH1F * signalRegion   = m4_signal_DATA ;  
+*/
 
 /*
   cout << "final analysis closure test" << endl ;
@@ -316,7 +320,6 @@ int macro_004_10 (int mass)
   signalRegion->Add (m4_signal_total_SIG) ; 
 */
 
-/*
   cout << "Martijn's test" << endl ;
   TH1F * sidebaRegionMC = m4_upper_a_total ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;
@@ -326,7 +329,6 @@ int macro_004_10 (int mass)
   sidebaRegion->Add (m4_lower_a_DATA) ;
   TH1F * signalRegion = m4_upper_c_DATA ; 
   signalRegion->Add (m4_lower_c_DATA) ;
-*/
 
   //PG plot MC singal and background region 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -355,7 +357,7 @@ int macro_004_10 (int mass)
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
  
   double binSize = (m4_max - m4_min) / nBins ;
-  double startFit = 240 ; //GeV, bin from where to start the num & den fit for corr factor
+  double startFit = 200 ; //GeV, bin from where to start the num & den fit for corr factor
   double endFit = 1000 ;   //GeV, bin from where to end the num & den fit for corr factor
   int fitBins = (endFit-startFit) / binSize ;
 
@@ -448,11 +450,10 @@ int macro_004_10 (int mass)
   c1->Print ("sideband_log.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
+  TH1F * h_correctionBand ;
 
   //PG toy experiments to determine the size of the error band on the extrapolation factor
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-  TH1F * h_correctionBand ;
 
   if (makeToys)
     {
@@ -578,8 +579,8 @@ int macro_004_10 (int mass)
 //      double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;  FIXME this is there only in the case of toys, commented by now, therefore
 //      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ; FIXME this is there only in the case of toys, commented by now, therefore
 //      pullPlotGaus.Fill ((num - mean) / sigma) ; FIXME this is there only in the case of toys, commented by now, therefore
-      mean = h_correctionBand->GetBinContent (iBin) ;
-      sigma = h_correctionBand->GetBinError (iBin) ;
+      double mean = h_correctionBand->GetBinContent (iBin) ;
+      double sigma = h_correctionBand->GetBinError (iBin) ;
       pullPlot.Fill ((num - mean) / sigma) ;
     }
   pullPlot.Fit ("gaus","L") ;
@@ -621,26 +622,6 @@ int macro_004_10 (int mass)
   extrapolated_bkg->Multiply (h_correctionBand) ; //PG profile correction
 //  extrapolated_bkg->Multiply (gaussianBand) ; //PG gaus fit correction
 
-
-  //PG fit the extrapolated bkg
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-//  TF1 * fitFuncBkg = new TF1 ("fitFuncBkg", attenuatedCB, 0., 1000., 7) ;
-//  fitFuncBkg->SetLineWidth (1) ;
-//  fitFuncBkg->SetLineColor (kBlue+2) ;
-//  fitFuncBkg->SetNpx (10000) ;
-//  fitFuncBkg->SetParameter (0, signalRegionMC->Integral ()) ;
-//  fitFuncBkg->SetParameter (1, 200.) ;
-//  fitFuncBkg->SetParameter (2, 20.) ;
-//  fitFuncBkg->SetParameter (3, 0.1) ;
-//  fitFuncBkg->SetParameter (4, 10) ;
-//  fitFuncBkg->SetParameter (5, 200) ;
-//  fitFuncBkg->SetParameter (6, 10) ;
-//  
-//  extrapolated_bkg->Fit (fitFuncBkg, "L+", "", 100., 800.) ;
-//  TH1F * extrapolated_bkg_fitBand = new TH1F ("extrapolated_bkg_fitBand", "", 70, 100., 800.) ;
-//  (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (extrapolated_bkg_fitBand, 0.68) ;
-
   //PG  plot of the result
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -665,6 +646,60 @@ int macro_004_10 (int mass)
   c1->Print ("extrapolatedBkg_log.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
+
+  //PG fit the extrapolated bkg
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+  if (makeBkgFit)
+    {
+      TF1 * bkgFitFunc = new TF1 ("bkgFitFunc", doubleExponential, 0., 1000., 4) ;
+      setDoubleExpPars (bkgFitFunc) ;
+    
+      TFitResultPtr fitResultPtr2 = extrapolated_bkg->Fit (bkgFitFunc, "L", "", startFit, endFit) ;
+      fitStatus = (int)(fitResultPtr2) ;
+      loops = 0 ; 
+      while (fitStatus != 0 && loops < 30)
+        {
+          fitResultPtr2 = extrapolated_bkg->Fit (bkgFitFunc, "L", "", startFit, endFit) ;
+          fitStatus = (int)(fitResultPtr2) ;
+          ++loops ;
+        }
+      cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
+    
+      TH1F * extrapolated_bkg_fitBand = new TH1F ("extrapolated_bkg_fitBand", "", fitBins, startFit, endFit) ;
+      (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (extrapolated_bkg_fitBand, 0.68) ;
+      
+      //PG set the error to this estimate of the background
+      for (iBin = 1 ; iBin <= extrapolated_bkg.GetNbinsX () ; ++iBin)
+        {
+          double center = extrapolated_bkg->GetBinCenter (iBin) ;
+          int iBinBand = extrapolated_bkg_fitBand->GetXaxis ()->FindBin (center) ;
+
+          double errBkg = 0. ;
+          if (extrapolated_bkg->GetBinContent (iBin))
+            errBkg = extrapolated_bkg->GetBinError (iBin) /
+                     extrapolated_bkg->GetBinContent (iBin) ;
+          double errFit = 0. ;
+          if (extrapolated_bkg_fitBand->GetBinContent (iBinBand))
+            errFit = extrapolated_bkg_fitBand->GetBinError (iBinBand) /
+                     extrapolated_bkg_fitBand->GetBinContent (iBinBand) ;
+          double errTot = sqrt (errFit * errFit + errBkg * errBkg) * extrapolated_bkg_fitBand->GetBinContent (iBinBand) ; 
+          extrapolated_bkg_fitBand->SetBinError (iBinBand, errTot) ;                    
+        }
+
+      c1->SetLogy () ;
+      extrapolated_bkg->Draw ("E3") ;
+      extrapolated_bkg_fitBand->SetFillStyle (3001) ;
+      extrapolated_bkg_fitBand->SetFillColor (kBlue) ;
+      extrapolated_bkg_fitBand->Draw ("E3same") ;
+      c1->Print ("fittedBackground.pdf", "pdf") ;
+      c1->SetLogy (0) ;
+      c1->Update () ;
+      c1->Print ("fittedBackground_lin.pdf", "pdf") ;
+      
+      //PG NB here I change the background I use,
+      //PG therefore I loose the old bkg!
+      extrapolated_bkg = extrapolated_bkg_fitBand ;
+    }
   //PG first plot of the result
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -740,6 +775,12 @@ int macro_004_10 (int mass)
   masses.push_back (500.) ;  mMin.push_back (415) ; mMax.push_back (575) ; //PG Hwindow.push_back (54.) ;
   masses.push_back (550.) ;  mMin.push_back (470) ; mMax.push_back (610) ; //PG Hwindow.push_back (61.) ;
   masses.push_back (600.) ;  mMin.push_back (485) ; mMax.push_back (665) ; //PG Hwindow.push_back (68.) ;
+
+  for (int iMass = 0 ; iMass < masses.size () ; ++iMass)
+    {
+      if (mMin.at (iMass) < startFit) cout << "WARNING: mass " << masses.at (iMass) << " not trustable\n";  
+      if (mMax.at (iMass) > endFit) cout << "WARNING: mass " << masses.at (iMass) << " not trustable\n";  
+    }
   
   //PG the fast cut-n-count thing
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -772,12 +813,12 @@ int macro_004_10 (int mass)
       float maxX = signalRegion -> GetBinLowEdge(nBins)+binWidth;
       
       for(int bin = 1; bin <= nBins; ++bin)
-      {
-        float binCenter = minX + 0.5*binWidth + binWidth*(bin-1);
-        
-        if( (binCenter >= mMin.at(i)) && (minBin == -1) ) minBin = bin;
-        if( (binCenter >= mMin.at(i)) && (binCenter < mMax.at(i)) ) maxBin = bin;
-      }
+        {
+          float binCenter = minX + 0.5*binWidth + binWidth*(bin-1);
+          
+          if( (binCenter >= mMin.at(i)) && (minBin == -1) ) minBin = bin;
+          if( (binCenter >= mMin.at(i)) && (binCenter < mMax.at(i)) ) maxBin = bin;
+        }
       
       double total = signalRegion->Integral (minBin, maxBin) ; //PG analysis
       double min = signalRegion->GetBinLowEdge (minBin) ;
