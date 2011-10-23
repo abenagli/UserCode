@@ -73,8 +73,9 @@ getPullTrend  (TH1F * hDATA, TH1F * hMC)
     {
       double X = hDATA->GetBinCenter (iBin+1) ;
       double DATA = hDATA->GetBinContent (iBin+1) ;
-      double MC = hMC->GetBinContent (iBin+1) ;
-      double errMC = hMC->GetBinError (iBin+1) ;
+      int binMC = hMC->GetXaxis ()->FindBin (X) ;
+      double MC = hMC->GetBinContent (binMC) ;
+      double errMC = hMC->GetBinError (binMC) ;
       
       grPull->SetPoint       (point, X,  (MC ? DATA/MC : 0)) ;
       grPull->SetPointError  (point, 0,  (MC ? sqrt (DATA)/MC : 0)) ;
@@ -123,12 +124,12 @@ getPullPlot  (TH1F * hDATA, TH1F * hMC, double min, double max)
       double X = hDATA->GetBinCenter (iBin+1) ;
       if (X < min || X > max) continue ;
       double DATA = hDATA->GetBinContent (iBin+1) ;
-      double MC = hMC->GetBinContent (iBin+1) ;
-      double errMC = hMC->GetBinError (iBin+1) ;
+      int binMC = hMC->GetXaxis ()->FindBin (X) ;
+      double MC = hMC->GetBinContent (binMC) ;
+      double errMC = hMC->GetBinError (binMC) ;
       pull->Fill ((DATA - MC) / sqrt (errMC * errMC + DATA)) ;
-      
     }
-//  pull->Fit ("gaus") ;
+  pull->Fit ("gaus", "QL") ;
   pull->SetFillColor (kGreen + 2) ;
   pull->SetFillStyle (3001) ;
   return pull ;
