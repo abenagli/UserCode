@@ -156,7 +156,7 @@ int macro_004_10 (int mass)
        makeToys = false ; //PG error as the ratio of the errors of the function
   int nToys = 10000 ;
   bool scaleBand = false ; //PG scale the band according to the pool wrt the MC histo
-  bool makeBkgFit = false ; //PG smooth the extrap bkg shape with a double exp fit
+  bool makeBkgFit = true ; //PG smooth the extrap bkg shape with a double exp fit
                             //PG leave it false by now, it generates a big bias
  
   //PG get the histograms
@@ -819,15 +819,34 @@ int macro_004_10 (int mass)
           if( (binCenter >= mMin.at(i)) && (minBin == -1) ) minBin = bin;
           if( (binCenter >= mMin.at(i)) && (binCenter < mMax.at(i)) ) maxBin = bin;
         }
-      
+
       double total = signalRegion->Integral (minBin, maxBin) ; //PG analysis
       double min = signalRegion->GetBinLowEdge (minBin) ;
       double max = signalRegion->GetBinLowEdge (maxBin + 1) ;
 
+//      int minBinBkg = extrapolated_bkg->GetXaxis ()->FindBin (mMin.at (i)) ;
+//      int maxBinBkg = extrapolated_bkg->GetXaxis ()->FindBin (mMax.at (i)) ;
+      int minBinBkg = -1 ;
+      int maxBinBkg = -1 ;
+      for(int binBkg = 1; binBkg <= extrapolated_bkg->GetNbinsX() ; ++binBkg)
+        {
+          float binCenter = extrapolated_bkg->GetBinLowEdge(1) 
+                            + 0.5 * extrapolated_bkg->GetBinWidth(1) 
+                            + extrapolated_bkg->GetBinWidth(1)*(binBkg-1);
+          
+          if( (binCenter >= mMin.at(i)) && (minBinBkg == -1) ) minBinBkg = binBkg;
+          if( (binCenter >= mMin.at(i)) && (binCenter < mMax.at(i)) ) maxBinBkg = binBkg;
+        }
+
+
+      double minBkg = extrapolated_bkg->GetBinLowEdge (minBinBkg) ;
+      double maxBkg = extrapolated_bkg->GetBinLowEdge (maxBinBkg + 1) ;
+
       double bkg_count_error = 0. ;
-      double bkg_count = extrapolated_bkg->IntegralAndError (minBin, maxBin, bkg_count_error) ;
+      double bkg_count = extrapolated_bkg->IntegralAndError (minBinBkg, maxBinBkg, bkg_count_error) ;
+
       double expSignal = m4_signal_total_SIG->Integral (minBin, maxBin) ;
-      
+
       cout << "MH | " << masses.at (i) 
            << " : (" << min
            << "," << max
