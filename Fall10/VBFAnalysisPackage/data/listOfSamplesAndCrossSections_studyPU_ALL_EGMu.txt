@@ -1,4 +1,0 @@
-2_VBF_HToWWToLNuQQ_M-170_7TeV-powheg-pythia6_Fall10-START38_V12-v1                                  1_qqH170_noPU               1 1 1001   0   170.   0.2300   1.0   AK5PF
-VBF_HToWWToLNuQQ_M-170_7TeV-powheg-pythia6_Winter10-E7TeV_ProbDist_2011Flat_BX156_START39_V8-v1     2_qqH170_2011PU             3 1 1001   0   170.   0.2300   1.0   AK5PF
-#3_VBF_HToWWToLNuQQ_M-170_7TeV-powheg-pythia6_Winter10-E7TeV_ProbDist_2011Flat_BX156_START39_V8-v1   3_qqH170_2011PU_L1Offset    3 1 1001   0   170.   0.2300   1.0   AK5PF
-4_VBF_HToWWToLNuQQ_M-170_7TeV-powheg-pythia6_Winter10-E7TeV_ProbDist_2011Flat_BX156_START39_V8-v1   4_qqH170_2011PU_L1FastJet   3 1 1001   0   170.   0.2300   1.0   AK5PF
