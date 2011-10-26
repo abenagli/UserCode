@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+
+use Env;
+
+# ----------------------------------------------------------------------------
+#      MAIN PROGRAM
+# ----------------------------------------------------------------------------
+
+#PG lettura dei parametri da cfg file
+#PG --------------------------------
+print "reading ".$ARGV[0]."\n" ;
+
+open (USERCONFIG,$ARGV[0]) ;
+
+while (<USERCONFIG>)
+  {
+    chomp; 
+    s/#.*//;                # no comments
+    s/^\s+//;               # no leading white
+    s/\s+$//;               # no trailing white
+#    next unless length;     # anything left?
+    my ($var, $value) = split(/\s*=\s*/, $_, 2);
+    $User_Preferences{$var} = $value;
+  }
+
+
+$BASEDir               = $VBFANALYSISPKG;
+$SELECTIONSCfgTemplate = $User_Preferences{"SELECTIONSCfgTemplate"};
+$EXEName               = $User_Preferences{"EXEName"};
+$SAMPLESListFile       = $User_Preferences{"SAMPLESListFile"};
+
+$SELECTIONSCfgTemplate = $BASEDir."/".$SELECTIONSCfgTemplate;
+
+print "BASEDir = "          .$BASEDir."\n" ;
+print "SELECTIONSCfgTemplate = ".$SELECTIONSCfgTemplate."\n";
+print "EXEName = ".$EXEName."\n";
+print "SAMPLESListFile = ".$SAMPLESListFile."\n";
+
+
+
+
+
+
+$sampleJobListFile = "./lancia.sh";
+open(SAMPLEJOBLISTFILE, ">", $sampleJobListFile); 
+
+
+
+#------------------
+# loop over samples
+
+print("\n");
+open(SAMPLESListFile, $SAMPLESListFile) ;
+
+$type = 0;
+while(<SAMPLESListFile>)
+{
+  chomp;
+  s/#.*//;                # no comments
+  s/^\s+//;               # no leading white
+  s/\s+$//;               # no trailing white
+  
+  ($mH,$lepNuWMMIN,$lepNuWMMAX,$xFitMIN1,$xFitMAX1,$xFitMIN2,$xFitMAX2) = split(" ");
+  
+  print("Higgs mass = ".$mH."   lepNuWMMIN = ".$lepNuWMMIN."   lepNuWMMAX = ".$lepNuWMMAX."\n");
+  $sampleDir = $OUTPUTSaveDir.$sample."/";
+  
+  
+  $selectionsCfgFile = "./selections_".$mH.".cfg";
+  system("cat ".$SELECTIONSCfgTemplate."   | sed -e s%HIGGSMASS%".$mH.
+                                       "%g | sed -e s%LEPNUWMMIN%".$lepNuWMMIN.
+                                       "%g | sed -e s%LEPNUWMMAX%".$lepNuWMMAX.
+                                       "%g | sed -e s%XFITMIN1%".$xFitMIN1.
+                                       "%g | sed -e s%XFITMAX1%".$xFitMAX1.
+                                       "%g | sed -e s%XFITMIN2%".$xFitMIN2.
+                                       "%g | sed -e s%XFITMAX2%".$xFitMAX2.
+                                       "%g > ".$selectionsCfgFile);
+  
+  
+  $sampleJobFile = "./job_".$mH.".sh";
+  open(SAMPLEJOBFILE, ">", $sampleJobFile);
+  
+  $command = "cd ".$BASEDir;
+  print SAMPLEJOBFILE $command."\n";
+  
+  $command = "source ./scripts/setup.sh";
+  print SAMPLEJOBFILE $command."\n";
+  
+  $command = "cd ".$BASEDir."/scripts/VBFAnalysis_fitHiggsMassBinned/";
+  print SAMPLEJOBFILE $command."\n";
+  
+  $command = "unbuffer ".$EXEName." ".$BASEDir."/scripts/VBFAnalysis_fitHiggsMassBinned/".$selectionsCfgFile." > out_".$mH.".txt";
+  print SAMPLEJOBFILE $command."\n";
+  
+  
+  
+  print SAMPLEJOBLISTFILE "echo \"qsub -V -q longcms -d ./ ".$sampleJobFile."\"\n";
+  print SAMPLEJOBLISTFILE "qsub -V -q longcms -d ./ ".$sampleJobFile."\n";
+  
+}
