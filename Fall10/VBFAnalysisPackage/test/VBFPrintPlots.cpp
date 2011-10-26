@@ -64,8 +64,8 @@ int main(int argc, char** argv)
   sprintf(stepDir, "step%d", step);
   char stepNumber[50];
   sprintf(stepNumber, "%d", step);
-  std::string fullOutputDir = inputDir + "/" + outputDir + "/" + method + "_" + stepDir + "/";
-  std::string fullHtmlName  = inputDir + "/" + outputDir + "/" + method + "_" + stepDir + ".html";
+  std::string fullOutputDir = inputDir + "/plots/" + outputDir + "/" + method + "_" + stepDir + "/";
+  std::string fullHtmlName  = inputDir + "/plots/" + outputDir + "/" + method + "_" + stepDir + ".html";
   
   
   
