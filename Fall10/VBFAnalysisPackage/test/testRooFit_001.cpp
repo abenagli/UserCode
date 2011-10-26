@@ -32,7 +32,7 @@ testRooFit_001.exe
 #include "TMVA/Reader.h"
 #include "hColl.h"
 
-#include "PURescaleFactor.C"
+// #include "PURescaleFactor.C"
 #pragma link C++ function PURescaleFactor (const int&);
 
 using namespace std ;
