@@ -1,6 +1,6 @@
 int macro_007 ()
 {
-  TFile * input = new TFile ("testBkg_007.root") ;
+  TFile * input = new TFile ("../testBkg_007.root") ;
   THStack * stack_m4 = (THStack *) input->Get ("stack_m4") ;
   THStack * stack_m4_sideband = (THStack *) input->Get ("stack_m4_sideband") ;
   THStack * stack_m4_signal = (THStack *) input->Get ("stack_m4_signal") ;

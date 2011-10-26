@@ -4,8 +4,8 @@
 
 int macro_004_3 ()
 {
-  TFile input ("testBkg_004.root") ;
-//  TFile input ("testBkg_004_noKF_S350.root") ;
+  TFile input ("../testBkg_004.root") ;
+//  TFile input ("../testBkg_004_noKF_S350.root") ;
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ----

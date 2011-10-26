@@ -3,7 +3,7 @@
 int macro_008 ()
 {
   std::vector<TH1F *> comparisons ;
-  TFile * input = new TFile ("testBkg_008.root") ;
+  TFile * input = new TFile ("../testBkg_008.root") ;
   for (double Mjj_width = 10. ; Mjj_width < 25. ; Mjj_width += 1.)
     {
       stringstream s_RatioName ;

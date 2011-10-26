@@ -13,7 +13,7 @@ I use two upper side-bands
 
 int macro_004_9 ()
 {
-  TFile input ("testBkg_004.root") ;
+  TFile input ("../testBkg_004.root") ;
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----

@@ -2,7 +2,7 @@
 
 int macro_009 ()
   {
-    TFile input ("testBkg_009.root") ;                  
+    TFile input ("../testBkg_009.root") ;                  
 
     RooDataSet * mc_DY   = (RooDataSet *) input.Get ("mc_DY") ;
     RooDataSet * mc_QCD  = (RooDataSet *) input.Get ("mc_QCD") ;

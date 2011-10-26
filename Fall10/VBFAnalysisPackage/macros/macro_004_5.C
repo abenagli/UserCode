@@ -9,7 +9,7 @@
 
 int macro_004_5 ()
 {
-  TFile input ("testBkg_004.root") ;
+  TFile input ("../testBkg_004.root") ;
 
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----

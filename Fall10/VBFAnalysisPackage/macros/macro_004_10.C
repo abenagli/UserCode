@@ -139,13 +139,13 @@ TH1F * dumpProfile (TString outputName, TProfile * input)
 
 int macro_004_10 (int mass)
 {
-//  TString inputFile = "testBkg_004_S" ;
-//  TString inputFile = "testBkg_004_mu_S" ; //PG only muons
-//  TString inputFile = "testBkg_004_el_S" ; //PG only muons
-//  TString inputFile = "testBkg_004_5GeV_S" ;
-//  TString inputFile = "testBkg_004_noKF_S" ; //PG no kinematic fit
-  TString inputFile = "testBkg_004_S" ; //PG kinematic fit
-//  TString inputFile = "testBkg_004_20GeV_S" ; //PG kinematic fit, coarse binning
+//  TString inputFile = "../testBkg_004_S" ;
+//  TString inputFile = "../testBkg_004_mu_S" ; //PG only muons
+//  TString inputFile = "../testBkg_004_el_S" ; //PG only muons
+//  TString inputFile = "../testBkg_004_5GeV_S" ;
+//  TString inputFile = "../testBkg_004_noKF_S" ; //PG no kinematic fit
+  TString inputFile = "../testBkg_004_S" ; //PG kinematic fit
+//  TString inputFile = "../testBkg_004_20GeV_S" ; //PG kinematic fit, coarse binning
   inputFile += mass ;
   inputFile += ".root" ;
   cout << inputFile << endl ;
