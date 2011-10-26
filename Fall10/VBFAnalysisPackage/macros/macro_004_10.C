@@ -1,5 +1,5 @@
 #include "./plotUtils.C"
-#include "./interface/Functions.h"
+#include "../interface/Functions.h"
 
 
 void setDoubleExpPars (TF1 * func)
