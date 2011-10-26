@@ -13,9 +13,6 @@
 
 
 
-std::vector<double>* mydata;
-std::vector<double>* myweights;
-
 double fitFunc(double* x, double* par);
 
 int fitHiggsMassBinned(TH1F* h_lepNuW_m,
@@ -23,7 +20,9 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
                        TF1** func, bool computeCL = false, TH1F* hint = NULL);
 
 std::string method = "";
-
+std::string varName = "lepNuW_m_KF"; 
+std::string WMassCut = "( (WJJ_m >= 65.) && (WJJ_m < 95.) )";
+//std::string WMassCut = "( ( (WJJ_m >= 55.) && (WJJ_m < 65.) ) || ( (WJJ_m >= 95.) && (WJJ_m < 120.) ) )";
 
 
 
@@ -113,19 +112,15 @@ int main(int argc, char** argv)
   
   
   
-  // Define tree variables
-  float mH;
-  int totEvents;
-  float crossSection;
-  int PUit_n;
-  int PUoot_n;
-  float lepNuW_m;
+  
+  // Define the output file
+  std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + method + "_" + jetAlgorithm + "_H" + std::string(higgsMassChar) + ".root";
+  TFile* outFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
+  TDirectory* MCDir = outFile -> mkdir("MC");
+  TDirectory* dataDir = outFile -> mkdir("data");
   
   
   
-  // Define the event container for unbinned fit
-  mydata = new std::vector<double>;
-  myweights = new std::vector<double>;
   
   
   
@@ -239,17 +234,9 @@ int main(int argc, char** argv)
   
   
   
-  // Define the output file
-  std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + method + "_" + jetAlgorithm + "_H" + std::string(higgsMassChar) + ".root";
-  TFile* outFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
-  TDirectory* MCDir = outFile -> mkdir("MC");
-  TDirectory* dataDir = outFile -> mkdir("data");
   
   
-  
-  
-  
-  
+    
   //---------------------------------
   // ON DATA - FILL MASS DISTRIBUTION
   //---------------------------------
@@ -274,18 +261,13 @@ int main(int argc, char** argv)
       if ( tree -> GetEntries() == 0 ) continue; 
       
       
-      // set tree branches
-      tree -> SetBranchAddress("lepNuW_m_KF", &lepNuW_m);
+      // fill histogram
+      outFile -> cd();
+      std::stringstream weight;
+      weight << "( 1. )";
+      std::string extendedCut = weight.str() + " * " + WMassCut;      
       
-       
-      // loop on the events
-      for(int entry = 0; entry < tree->GetEntries(); ++entry)
-      {
-        tree -> GetEntry(entry);
-        double weight = 1.;
-        
-        h_lepNuW_m -> Fill(lepNuW_m,weight);
-      }    
+      tree -> Draw((varName+" >>+ h_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
     }
   }
   
@@ -318,26 +300,13 @@ int main(int argc, char** argv)
       if ( tree -> GetEntries() == 0 ) continue; 
       
       
-      // set tree branches
-      tree -> SetBranchAddress("totEvents",    &totEvents);
-      tree -> SetBranchAddress("crossSection", &crossSection);
-      tree -> SetBranchAddress("PUit_n",       &PUit_n);
-      tree -> SetBranchAddress("PUoot_n",      &PUoot_n);
-      tree -> SetBranchAddress("lepNuW_m_KF",  &lepNuW_m);
+      // fill histogram
+      outFile -> cd();
+      std::stringstream weight;
+      weight << "( 1000 * " << lumi << " * 1. / totEvents * crossSection * PURescaleFactor(PUit_n) )";
+      std::string extendedCut = weight.str() + " * " + WMassCut;      
       
-      
-      // loop on the events
-      for(int entry = 0; entry < tree->GetEntries(); ++entry)
-      {
-        //std::cout << "reading entry " << entry << std::endl;
-        tree -> GetEntry(entry);
-        double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(PUit_n);
-        
-        mydata -> push_back(lepNuW_m);
-        myweights -> push_back(weight);
-        
-        h_mcSum_lepNuW_m -> Fill(lepNuW_m,weight);
-      }
+      tree -> Draw((varName+" >>+ h_mcSum_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
     }
     
     
@@ -359,26 +328,13 @@ int main(int argc, char** argv)
       if ( tree -> GetEntries() == 0 ) continue; 
       
       
-      // set tree branches
-      tree -> SetBranchAddress("totEvents",    &totEvents);
-      tree -> SetBranchAddress("crossSection", &crossSection);
-      tree -> SetBranchAddress("PUit_n",       &PUit_n);
-      tree -> SetBranchAddress("PUoot_n",      &PUoot_n);
-      tree -> SetBranchAddress("lepNuW_m_KF",  &lepNuW_m);
+      // fill histogram
+      outFile -> cd();
+      std::stringstream weight;
+      weight << "( 1000 * " << lumi << " * 1. / totEvents * crossSection * PURescaleFactor(PUit_n) )";
+      std::string extendedCut = weight.str() + " * " + WMassCut;      
       
-      
-      // loop on the events
-      for(int entry = 0; entry < tree->GetEntries(); ++entry)
-      {
-        //std::cout << "reading entry " << entry << std::endl;
-        tree -> GetEntry(entry);
-        double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(PUit_n);
-        
-        mydata -> push_back(lepNuW_m);
-        myweights -> push_back(weight);
-        
-        h_sig_lepNuW_m -> Fill(lepNuW_m,weight);
-      }
+      tree -> Draw((varName+" >>+ h_sig_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
     }
   }
   
@@ -475,7 +431,7 @@ int main(int argc, char** argv)
   temp -> Sumw2();
   for(int j = 0; j < 10000000; ++j)
     temp -> Fill( f_toSample->GetRandom() );
-  temp -> Scale(h_mcSum_lepNuW_m->Integral()/temp->GetEntries());
+  temp -> Scale(h_mcSum_lepNuW_m->Integral(binFitMin1,binFitMax2)/temp->Integral(binFitMin1,binFitMax2));
   h_mcSumToSample_lepNuW_m = (TH1F*)(temp->Clone("h_mcSumToSample_lepNuW_m"));
   
   h_sigToSample_lepNuW_m = (TH1F*)(h_sig_lepNuW_m->Clone("h_sigToSample_lepNuW_m"));
@@ -533,7 +489,7 @@ int main(int argc, char** argv)
       int N_poisson = r.Poisson(N);
       for(int entry = 0; entry < N_poisson; ++entry)
       {
-        lepNuW_m = h_mcSumToSample_lepNuW_m -> GetRandom();
+        double lepNuW_m = h_mcSumToSample_lepNuW_m -> GetRandom();
         double weight = 1.;
         
         h_lepNuW_m -> Fill(lepNuW_m,weight);
@@ -584,7 +540,7 @@ int main(int argc, char** argv)
       int N_poisson_sig = r.Poisson(N_sig);
       for(int entry = 0; entry < N_poisson_sig; ++entry)
       {
-        lepNuW_m = h_sigToSample_lepNuW_m -> GetRandom();
+        double lepNuW_m = h_sigToSample_lepNuW_m -> GetRandom();
         double weight = 1.;
         
         h_lepNuW_m_sig -> Fill(lepNuW_m,weight);
