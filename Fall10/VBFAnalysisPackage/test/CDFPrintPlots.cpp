@@ -60,11 +60,11 @@ int main(int argc, char** argv)
   std::string jetType = gConfigParser -> readStringOption("Options::jetType");
   
   char stepDir[50];
-  sprintf(stepDir, "plots_%d", step);
+  sprintf(stepDir, "step%d", step);
   char stepNumber[50];
   sprintf(stepNumber, "%d", step);
-  std::string fullOutputDir = inputDir + "/plots/" + stepDir + "_" + jetType + "_" + method + "/";
-  std::string fullHtmlName = inputDir + "/plots/" + stepDir + "_" + jetType + "_" + method + ".html";
+  std::string fullOutputDir = inputDir + "/plots/" + method + "_" + stepDir + "/";
+  std::string fullHtmlName  = inputDir + "/plots/" + method + "_" + stepDir + ".html";
   
   
   
