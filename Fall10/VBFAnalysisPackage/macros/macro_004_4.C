@@ -4,7 +4,7 @@
 */
 
 
-#include <./test/plotUtils.C>
+#include "./plotUtils.C"
 
 
 int macro_004_4 ()

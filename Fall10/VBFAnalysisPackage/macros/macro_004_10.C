@@ -1,5 +1,5 @@
-#include "../../NtuplePackage/interface/ntpleUtils.h"
-#include "../interface/Functions.h"
+#include "./plotUtils.C"
+#include "./interface/Functions.h"
 
 
 void setDoubleExpPars (TF1 * func)
@@ -22,7 +22,6 @@ void setDoubleExpPars (TF1 * func)
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
 
 
 //PG FIXME questo e' corretto?
@@ -156,7 +155,7 @@ int macro_004_10 (int mass)
        makeToys = false ; //PG error as the ratio of the errors of the function
   int nToys = 10000 ;
   bool scaleBand = false ; //PG scale the band according to the pool wrt the MC histo
-  bool makeBkgFit = true ; //PG smooth the extrap bkg shape with a double exp fit
+  bool makeBkgFit = false ; //PG smooth the extrap bkg shape with a double exp fit
                             //PG leave it false by now, it generates a big bias
  
   //PG get the histograms
@@ -310,7 +309,6 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
-/*
   cout << "final analysis closure test with signal injection" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
@@ -318,8 +316,8 @@ int macro_004_10 (int mass)
   sidebaRegion->Add (m4_sideband_total_SIG) ; 
   TH1F * signalRegion   = signalRegionMC ; 
   signalRegion->Add (m4_signal_total_SIG) ; 
-*/
 
+/*
   cout << "Martijn's test" << endl ;
   TH1F * sidebaRegionMC = m4_upper_a_total ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;
@@ -329,6 +327,7 @@ int macro_004_10 (int mass)
   sidebaRegion->Add (m4_lower_a_DATA) ;
   TH1F * signalRegion = m4_upper_c_DATA ; 
   signalRegion->Add (m4_lower_c_DATA) ;
+*/
 
   //PG plot MC singal and background region 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -828,6 +827,7 @@ int macro_004_10 (int mass)
 //      int maxBinBkg = extrapolated_bkg->GetXaxis ()->FindBin (mMax.at (i)) ;
       int minBinBkg = -1 ;
       int maxBinBkg = -1 ;
+      
       for(int binBkg = 1; binBkg <= extrapolated_bkg->GetNbinsX() ; ++binBkg)
         {
           float binCenter = extrapolated_bkg->GetBinLowEdge(1) 
@@ -837,7 +837,6 @@ int macro_004_10 (int mass)
           if( (binCenter >= mMin.at(i)) && (minBinBkg == -1) ) minBinBkg = binBkg;
           if( (binCenter >= mMin.at(i)) && (binCenter < mMax.at(i)) ) maxBinBkg = binBkg;
         }
-
 
       double minBkg = extrapolated_bkg->GetBinLowEdge (minBinBkg) ;
       double maxBkg = extrapolated_bkg->GetBinLowEdge (maxBinBkg + 1) ;
