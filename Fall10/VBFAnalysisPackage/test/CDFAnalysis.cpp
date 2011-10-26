@@ -57,7 +57,6 @@ int main(int argc, char** argv)
   int entryMAX = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
   int firstSTEP = gConfigParser -> readIntOption("Options::firstSTEP");
-  float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   int verbosity = gConfigParser -> readIntOption("Options::verbosity"); 
   int trainMVA = gConfigParser -> readIntOption("Options::trainMVA"); 
   int applyMVA = gConfigParser -> readIntOption("Options::applyMVA"); 
@@ -112,8 +111,6 @@ int main(int argc, char** argv)
   float WJJMassMAX = gConfigParser -> readFloatOption("Cuts::WJJMassMAX");
   float WJJMaxPtMIN = gConfigParser -> readFloatOption("Cuts::WJJMaxPtMIN");
   float WJJMinPtMIN = gConfigParser -> readFloatOption("Cuts::WJJMinPtMIN");
-  float WJJDRMIN = gConfigParser -> readFloatOption("Cuts::WJJDRMIN");
-  float WJJDRMAX = gConfigParser -> readFloatOption("Cuts::WJJDRMAX");
   float WJJDetaMIN = gConfigParser -> readFloatOption("Cuts::WJJDetaMIN");
   float WJJDetaMAX = gConfigParser -> readFloatOption("Cuts::WJJDetaMAX");
   float WJJDphiMIN = gConfigParser -> readFloatOption("Cuts::WJJDphiMIN");
@@ -352,7 +349,7 @@ int main(int argc, char** argv)
     
     //*******************
     // SET SOME VARIABLES
-    for(int step = firstSTEP; step <= nStep; ++step)
+    for(int iStep = firstSTEP; iStep <= nStep; ++iStep)
       InitializeVBFAnalysisTree(vars);
     
     vars.totEvents = stepEvents[1];
@@ -722,7 +719,8 @@ int main(int argc, char** argv)
     
     if( metCUT == 1 )
     {
-      if( vars.met.Et() < 30. ) continue;
+      if( vars.met.Et() < metEtMIN ) continue;
+      if( vars.met.Et() > metEtMAX ) continue;
     }
     
     
@@ -775,35 +773,18 @@ int main(int argc, char** argv)
     if( std::max(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMaxPtMIN ) continue;
     if( std::min(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMinPtMIN ) continue;
     
-    /*
-    TF1* f_metTurnOn = new TF1("f_metTurnOn"," ([0] + ([1]-[0])/2 * (1 +TMath::Erf((x-[2])/([3]*sqrt(2)))))",0.,1000.);
-    f_metTurnOn -> SetParameter(0,3.06396e-01);
-    f_metTurnOn -> SetParameter(1,9.93169e-01);
-    f_metTurnOn -> SetParameter(2,2.02097e+01);
-    f_metTurnOn -> SetParameter(3,1.20391e+01);
+    if( vars.WJ1.pt() > 0. )
+      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForJets,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    if( vars.WJ2.pt() > 0. )
+      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForJets,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
     
-    TF2* f_jetTurnOn = new TF2("j_jetTurnOn","(([0] + ([1]-[0])/2 * (1 +TMath::Erf((x-[2])/([3]*sqrt(2)))))) * ([0] + ([1]-[0])/2 * (1 +TMath::Erf((y-[2])/([3]*sqrt(2)))))");
-    f_jetTurnOn -> SetParameter(0,2.28966e-01);
-    f_jetTurnOn -> SetParameter(1,9.53513e-01);
-    f_jetTurnOn -> SetParameter(2,2.66816e+01);
-    f_jetTurnOn -> SetParameter(3,7.17539e+00);
-    
-    if(vars.dataFlag != 1)
-      vars.eventWeight *= f_metTurnOn -> Eval(vars.met_et) * f_jetTurnOn -> Eval(vars.WJ1.pt(),vars.WJ2.pt());
-    */
-    
-
-    //if( vars.WJ1.pt() > 0. )
-    //  vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForJets,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
-    //if( vars.WJ2.pt() > 0. )
-    //  vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForJets,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
     if( vars.WJ2.pt() > vars.WJ1.pt() )
     {
       float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
       vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
       vars.WJ1_QGLikelihood = QGLikelihoodDummy;
     }
-   
+    
     
     // Fill distributions
     stepEvents[step] += 1;
@@ -827,25 +808,9 @@ int main(int argc, char** argv)
     
     
     bool isBTagged = false;
-    bool isAntiBTagged = true;
-    //for(unsigned int jetIt = 0; jetIt < vars.nJets; ++jetIt)
-    //{
-    //  if( vars.jets_bTag.at(jetIt) > 2.5 ) isBTagged = true;
-    //}
     
     if( vars.nBTag_TCHEM_pt20 > 0 ) isBTagged = true;
     if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
-    
-    //if( (vars.nJets >=1) && (vars.jets_bTag1 > 4.00) ) isBTagged = true;
-    //if( (vars.nJets >=2) && (vars.jets_bTag2 > 2.50) ) isBTagged = true;
-    //if( vars.WJ1_bTag > 3.30 ) isBTagged = true;
-    //if( vars.WJ2_bTag > 3.30 ) isBTagged = true;
-    //if( (vars.thirdJ.Pt() > 0.) && (vars.thirdJ_bTag > 3.30) ) isBTagged = true;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
-    
-    //if( (vars.nJets >=1) && (vars.jets_bTag1 < 4.00) ) isAntiBTagged = false;
-    //if( (vars.nJets >=2) && (vars.jets_bTag2 < 2.50) ) isAntiBTagged = false;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isAntiBTagged == false) ) continue;
     
     
     // fill distributions
@@ -869,8 +834,10 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "WJJ Deta/Dphi cuts", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) > WJJDetaMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) > WJJDphiMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( deltaEta(vars.WJ1.eta(),vars.WJ2.eta()) < WJJDetaMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( deltaEta(vars.WJ1.eta(),vars.WJ2.eta()) > WJJDetaMAX) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( deltaPhi(vars.WJ1.phi(),vars.WJ2.phi()) < WJJDphiMIN) ) continue;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( deltaPhi(vars.WJ1.phi(),vars.WJ2.phi()) > WJJDphiMAX) ) continue;
     
     
     // fill distributions

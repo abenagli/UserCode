@@ -34,7 +34,7 @@ testRooFit_004.exe cfg/2011-10-18-listaFile.txt
 #include "hColl.h"
 
 // #include "PURescaleFactor.C"
-#pragma link C++ function PURescaleFactor (const int&);
+//#pragma link C++ function PURescaleFactor (const int&);
 
 using namespace std ;
 

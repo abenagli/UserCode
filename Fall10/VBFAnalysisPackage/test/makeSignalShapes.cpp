@@ -36,10 +36,8 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "TMVA/Reader.h"
 #include "hColl.h"
 
-#include "PURescaleFactor.C"
-#pragma link C++ function PURescaleFactor (const int&);
-
 using namespace std ;
+
 
 
 int ReadFile (map<string, TChain *> & output, string inputList, string treeName)

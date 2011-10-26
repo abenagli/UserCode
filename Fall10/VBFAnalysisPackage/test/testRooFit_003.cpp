@@ -39,7 +39,7 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "hColl.h"
 
 // #include "PURescaleFactor.C"
-#pragma link C++ function PURescaleFactor (const int&);
+//#pragma link C++ function PURescaleFactor (const int&);
 
 using namespace std ;
 

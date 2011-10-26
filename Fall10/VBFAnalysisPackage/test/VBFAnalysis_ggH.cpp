@@ -108,13 +108,6 @@ int main(int argc, char** argv)
   float metEtMIN = gConfigParser -> readFloatOption("Cuts::metEtMIN");
   float metEtMAX = gConfigParser -> readFloatOption("Cuts::metEtMAX");
   
-  float tagJJMassMIN = gConfigParser -> readFloatOption("Cuts::tagJJMassMIN");
-  float tagJJDetaMIN = gConfigParser -> readFloatOption("Cuts::tagJJDetaMIN");
-  float tagJJMaxPtMIN = gConfigParser -> readFloatOption("Cuts::tagJJMaxPtMIN");
-  float tagJJMinPtMIN = gConfigParser -> readFloatOption("Cuts::tagJJMinPtMIN");
-  float tagJJMaxEtaMIN = gConfigParser -> readFloatOption("Cuts::tagJJMaxEtaMIN");
-  float tagJJMinEtaMIN = gConfigParser -> readFloatOption("Cuts::tagJJMinEtaMIN");
-  
   float WJJMassMIN = gConfigParser -> readFloatOption("Cuts::WJJMassMIN");
   float WJJMassMAX = gConfigParser -> readFloatOption("Cuts::WJJMassMAX");
   float WJJMaxPtMIN = gConfigParser -> readFloatOption("Cuts::WJJMaxPtMIN");
@@ -127,9 +120,6 @@ int main(int argc, char** argv)
   float WJJDphiMAX = gConfigParser -> readFloatOption("Cuts::WJJDphiMAX");
   
   float WPtMIN = gConfigParser -> readFloatOption("Cuts::WPtMIN");
-  
-  float lepZeppMAX = gConfigParser -> readFloatOption("Cuts::lepZeppMAX");
-  float lepNuWZeppMAX = gConfigParser -> readFloatOption("Cuts::lepNuWZeppMAX");
   
   float lepMetWDphiMIN = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMIN");
   float lepMetWDphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMAX");
@@ -764,7 +754,8 @@ int main(int argc, char** argv)
     
     if( metCUT == 1 )
     {
-      if( vars.met.Et() < 30. ) continue;
+      if( vars.met.Et() < metEtMIN ) continue;
+      if( vars.met.Et() > metEtMAX ) continue;
     }
     
     
@@ -1005,7 +996,7 @@ int main(int argc, char** argv)
     
     DoKinematicFit(vars,0.1,"MIB");
     
-    /*
+    
     if( vars.WJ1.pt() > 0. )
       vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
     if( vars.WJ2.pt() > 0. )
@@ -1016,7 +1007,7 @@ int main(int argc, char** argv)
       vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
       vars.WJ1_QGLikelihood = QGLikelihoodDummy;
     }
-    */
+    
     
     // fill distributions
     stepEvents[step] += 1;

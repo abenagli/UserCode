@@ -63,16 +63,11 @@ int main(int argc, char** argv)
   int step        = gConfigParser -> readIntOption("Options::step");
   
   
-  //[Cuts]
-  float xFitMIN = gConfigParser -> readFloatOption("Cuts::xFitMIN");
-  float xFitMAX = gConfigParser -> readFloatOption("Cuts::xFitMAX");
   
   int nBins = 30;
   float xMin = 0.;
   float xMax = 300.;
   float xWidth = (xMax-xMin)/nBins;
-  
-  int nBinsFit = int((xFitMAX-xFitMIN)/xWidth);
   
   
   

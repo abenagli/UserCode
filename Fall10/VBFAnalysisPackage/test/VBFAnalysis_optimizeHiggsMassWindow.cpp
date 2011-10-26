@@ -52,10 +52,7 @@ int main(int argc, char** argv)
   
   
   //[Options]
-  int entryFIRST  = gConfigParser -> readIntOption("Options::entryFIRST");
-  int entryMAX    = gConfigParser -> readIntOption("Options::entryMAX");
-  int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
-  int step        = gConfigParser -> readIntOption("Options::step");
+  int step = gConfigParser -> readIntOption("Options::step");
   
   
   

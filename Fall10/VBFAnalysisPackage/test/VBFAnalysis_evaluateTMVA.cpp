@@ -56,16 +56,13 @@ int main(int argc, char** argv)
   
   
   //[Options]
-  int entryFIRST  = gConfigParser -> readIntOption("Options::entryFIRST");
-  int entryMAX    = gConfigParser -> readIntOption("Options::entryMAX");
-  int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
-  int step        = gConfigParser -> readIntOption("Options::step");
-  float lumiInt   = gConfigParser -> readIntOption("Options::lumiInt"); //in pb-1
+  int step    = gConfigParser -> readIntOption("Options::step");
+  float lumi  = gConfigParser -> readIntOption("Options::lumi"); //in pb-1
   
   
   // Define tree variables
   int totEvents;
-  float mH;
+  int mH;
   float crossSection;
   
   //Prepare variables to read the tree
@@ -166,7 +163,7 @@ int main(int argc, char** argv)
     if ( tree -> GetEntries() == 0 ) continue; 
     
     // compute event weight at nth step
-    double weight = 1. / totEvents * crossSection * lumiInt; 
+    double weight = 1. / totEvents * crossSection * lumi; 
     
     
     tree -> SetBranchAddress("jets_bTag1", &jets_bTag1);
