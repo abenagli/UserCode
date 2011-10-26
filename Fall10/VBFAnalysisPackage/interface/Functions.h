@@ -443,4 +443,13 @@ double attenuatedCB(double* x, double* par)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
+double antiFermiWithScale (double* x, double* par)
+{
+  return antiFermi (x, par) * par[2] ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 #endif
