@@ -62,9 +62,6 @@ int main(int argc, char** argv)
   
   
   //[Options]
-  int entryFIRST  = gConfigParser -> readIntOption("Options::entryFIRST");
-  int entryMAX    = gConfigParser -> readIntOption("Options::entryMAX");
-  int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
   int step        = gConfigParser -> readIntOption("Options::step");
   
   
@@ -147,7 +144,6 @@ int main(int argc, char** argv)
   std::cout << "******************************************************" << std::endl;
   std::cout << "BookMethod" << std::endl;
   std::cout << "******************************************************" << std::endl;
-  char methodName[50];
   //factory -> BookMethod(TMVA::Types::kCuts, "kCuts");
   factory -> BookMethod(TMVA::Types::kBDT,"kBDT");
   factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood");
