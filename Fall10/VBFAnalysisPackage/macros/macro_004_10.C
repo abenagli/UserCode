@@ -299,31 +299,31 @@ int macro_004_10 (int mass)
 
 /*
   cout << "final analysis" << endl ;
-  TH1F * sidebaRegionMC = m4_sideband_total ; 
-  TH1F * signalRegionMC = m4_signal_total ;
-  TH1F * sidebaRegion   = m4_sideband_DATA ;
-  TH1F * signalRegion   = m4_signal_DATA ;  
+  TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
+  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
+  TH1F * sidebaRegion   = m4_sideband_DATA->Clone ("sidebaRegion") ;
+  TH1F * signalRegion   = m4_signal_DATA->Clone ("signalRegion") ;  
 */
 
 /*
   cout << "final analysis closure test" << endl ;
-  TH1F * sidebaRegionMC = m4_sideband_total ; 
-  TH1F * signalRegionMC = m4_signal_total ;  
-  TH1F * sidebaRegion   = sidebaRegionMC ; 
-  TH1F * signalRegion   = signalRegionMC ; 
+  TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
+  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;  
+  TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ; 
+  TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
 */
 
 /*
   int injectScale = 1 ;
   cout << "final analysis closure test with signal injection with scale " << injectScale << endl ;
-  TH1F * sidebaRegionMC = m4_sideband_total ; 
-  TH1F * signalRegionMC = m4_signal_total ;  
-  TH1F * sidebaRegion   = sidebaRegionMC ;
+  TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
+  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
+  TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ;
   TH1F * injectSigSideband = m4_sideband_total_SIG->Clone ("injectSigSideband") ;
   injectSigSideband->Scale (injectScale) ;
   sidebaRegion->Add (injectSigSideband) ; 
   setSqrtErrors (sidebaRegion) ; //PG this is valid for many events
-  TH1F * signalRegion   = signalRegionMC ; 
+  TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
   TH1F * injectSigSignal = m4_signal_total_SIG->Clone ("injectSigSignal") ;
   injectSigSignal->Scale (injectScale) ;
   signalRegion->Add (injectSigSignal) ; 
@@ -332,41 +332,39 @@ int macro_004_10 (int mass)
 
 /*
   cout << "final analysis with outer sidebands" << endl ;
-  TH1F * sidebaRegionMC = m4_upper_a_total ; 
+  TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;  
-  TH1F * signalRegionMC = m4_signal_total ;
-  TH1F * sidebaRegion = m4_upper_a_DATA ; 
+  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
+  TH1F * sidebaRegion = m4_upper_a_DATA->Clone ("sidebaRegion") ;
   sidebaRegion->Add (m4_lower_a_DATA) ;
-  TH1F * signalRegion   = m4_signal_DATA ;  
+  TH1F * signalRegion = m4_signal_DATA->Clone ("signalRegion") ;
 */
 
 /*
   cout << "final analysis with outer sidebands closure test" << endl ;
-  TH1F * sidebaRegionMC = m4_upper_a_total ; 
+  TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;  
-  TH1F * signalRegionMC = m4_signal_total ;
-  TH1F * sidebaRegion   = sidebaRegionMC ; 
-  TH1F * signalRegion   = signalRegionMC ; 
+  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
+  TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ; 
+  TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
 */
 
-/*
   int injectScale = 1 ;
   cout << "final analysis with outer sidebands closure test with signal injection with scale " << injectScale << endl ;
-  TH1F * sidebaRegionMC = m4_upper_a_total ; 
+  TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;  
-  TH1F * signalRegionMC = m4_signal_total ;  
-  TH1F * sidebaRegion   = sidebaRegionMC ;
+  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
+  TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ; 
   TH1F * injectSigSideband = m4_lower_a_total_SIG->Clone ("injectSigSideband") ;
   injectSigSideband->Add (m4_upper_a_total_SIG) ;
   injectSigSideband->Scale (injectScale) ;
   sidebaRegion->Add (injectSigSideband) ; 
   setSqrtErrors (sidebaRegion) ; //PG this is valid for many events
-  TH1F * signalRegion   = signalRegionMC ; 
+  TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
   TH1F * injectSigSignal = m4_signal_total_SIG->Clone ("injectSigSignal") ;
   injectSigSignal->Scale (injectScale) ;
   signalRegion->Add (injectSigSignal) ; 
   setSqrtErrors (signalRegion) ; //PG this is valid for many events
-*/
 
 
   //PG plot MC singal and background region 
