@@ -104,6 +104,21 @@ getPullTrend  (TH1F * hDATA, TH1F * hMC)
 }
 
 
+// --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + 
+
+
+void legendMaquillage (TLegend * leg)
+{
+  leg->SetBorderSize (0) ;
+  leg->SetTextFont (42) ;
+  leg->SetTextSize (0.04) ;
+  leg->SetLineColor (1) ;
+  leg->SetLineStyle (1) ;
+  leg->SetLineWidth (1) ;
+  leg->SetFillColor (0) ;
+  leg->SetFillStyle (0) ;
+  return ;
+}
 
 
 // --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + 

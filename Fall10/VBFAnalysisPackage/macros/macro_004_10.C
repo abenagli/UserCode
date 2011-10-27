@@ -1,6 +1,17 @@
 #include "./plotUtils.C"
 #include "../interface/Functions.h"
 
+void setSqrtErrors (TH1F * input)
+{
+  for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
+    {
+      input->SetBinError (iBin, sqrt (input->GetBinContent (iBin))) ;
+    }
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
 
 void setDoubleExpPars (TF1 * func)
 {
@@ -79,25 +90,6 @@ void setCBPars (TF1 * func, int scale)
 //  func->SetParameter (5, 180) ;
 //  func->SetParameter (6, 15) ;
 }
-
-
-// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-
-void legendMaquillage (TLegend * leg)
-{
-  leg->SetBorderSize (0) ;
-  leg->SetTextFont (42) ;
-  leg->SetTextSize (0.04) ;
-  leg->SetLineColor (1) ;
-  leg->SetLineStyle (1) ;
-  leg->SetLineWidth (1) ;
-  leg->SetFillColor (0) ;
-  leg->SetFillStyle (0) ;
-  return ;
-}
-
-
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
@@ -309,13 +301,20 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
-  cout << "final analysis closure test with signal injection" << endl ;
+  int injectScale = 5 ;
+  cout << "final analysis closure test with signal injection with scale " << injectScale << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
   TH1F * sidebaRegion   = sidebaRegionMC ;
-  sidebaRegion->Add (m4_sideband_total_SIG) ; 
+  TH1F * injectSigSideband = m4_sideband_total_SIG->Clone ("injectSigSideband") ;
+  injectSigSideband->Scale (injectScale) ;
+  sidebaRegion->Add (injectSigSideband) ; 
+  setSqrtErrors (sidebaRegion) ; //PG this is valid for many events
   TH1F * signalRegion   = signalRegionMC ; 
-  signalRegion->Add (m4_signal_total_SIG) ; 
+  TH1F * injectSigSignal = m4_signal_total_SIG->Clone ("injectSigSignal") ;
+  injectSigSignal->Scale (injectScale) ;
+  signalRegion->Add (injectSigSignal) ; 
+  setSqrtErrors (signalRegion) ; //PG this is valid for many events
 
 /*
   cout << "Martijn's test" << endl ;
