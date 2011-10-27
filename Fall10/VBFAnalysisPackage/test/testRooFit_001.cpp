@@ -42,19 +42,19 @@ using namespace std ;
 int main (int argc, char** argv)
 {
 
-  N1.setVal (10.) ;
-  L1.setVal (0.012) ;
-  N2.setVal (5.) ;
-  L2.setVal (0.005) ;
-  
-  
-  
-  // plot the distributions
-  RooPlot *xplot = x.frame () ;
-  RFdoubleExp.plotOn (xplot) ;
-  TCanvas c1 ;
-  xplot->Draw () ;
-  c1.Print ("testDoubleExp.pdf","pdf") ;
+//  N1.setVal (10.) ;
+//  L1.setVal (0.012) ;
+//  N2.setVal (5.) ;
+//  L2.setVal (0.005) ;
+//  
+//  
+//  
+//  // plot the distributions
+//  RooPlot *xplot = x.frame () ;
+//  RFdoubleExp.plotOn (xplot) ;
+//  TCanvas c1 ;
+//  xplot->Draw () ;
+//  c1.Print ("testDoubleExp.pdf","pdf") ;
 
   return 0 ;
 }
