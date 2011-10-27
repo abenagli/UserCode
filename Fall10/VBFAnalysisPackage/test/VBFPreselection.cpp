@@ -210,7 +210,7 @@ int main(int argc, char** argv)
         
     vars.runId   = reader.GetInt("runId")->at(0);
     vars.lumiId  = reader.GetInt("lumiId")->at(0);
-    vars.eventId = reader.GetInt("eventId")->at(0);
+    vars.eventId = reader.GetLongLongInt("eventId")->at(0);
     vars.eventNaiveId += 1;
     
     vars.eventWeight = 1.;

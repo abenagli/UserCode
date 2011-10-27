@@ -27,7 +27,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("TMVA4Jet",     &vars.TMVA4Jet,         "TMVA4Jet/I");
   vars.m_reducedTree -> Branch("runId",        &vars.runId,               "runId/I");
   vars.m_reducedTree -> Branch("lumiId",       &vars.lumiId,             "lumiId/I");
-  vars.m_reducedTree -> Branch("eventId",      &vars.eventId,           "eventId/I");
+  vars.m_reducedTree -> Branch("eventId",      &vars.eventId,           "eventId/L");
   vars.m_reducedTree -> Branch("eventNaiveId", &vars.eventNaiveId, "eventNaiveId/I");
   
   vars.m_reducedTree -> Branch("eventWeight", &vars.eventWeight, "eventWeight/F");

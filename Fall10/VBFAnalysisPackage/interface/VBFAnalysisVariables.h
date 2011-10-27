@@ -29,7 +29,7 @@ struct VBFAnalysisVariables
   int dataFlag; 
   int runId;
   int lumiId;
-  int eventId;
+  long long int eventId;
   int eventNaiveId;
   
   float eventWeight;

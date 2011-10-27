@@ -26,7 +26,7 @@ struct VBFPreselectionVariables
   int TMVA4Jet;
   int runId; 
   int lumiId; 
-  int eventId; 
+  long long int eventId; 
   int eventNaiveId; 
   
   float eventWeight;

@@ -434,8 +434,8 @@ int main(int argc, char** argv)
     {
       if(AcceptEventByRunAndLumiSection(vars.runId, vars.lumiId, jsonMap) == false) skipEvent = true;      
       
-      std::pair<int,int> eventLSandID(vars.lumiId, vars.eventId);
-      std::pair<int,std::pair<int,int> > eventRUNandLSandID(vars.runId, eventLSandID);
+      std::pair<int,long long int> eventLSandID(vars.lumiId, vars.eventId);
+      std::pair<int,std::pair<int,long long int> > eventRUNandLSandID(vars.runId, eventLSandID);
       if( eventsMap[eventRUNandLSandID] == 1 ) skipEvent = true;
       else eventsMap[eventRUNandLSandID] = 1;
     }
