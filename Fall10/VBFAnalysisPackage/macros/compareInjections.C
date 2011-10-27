@@ -150,7 +150,7 @@ int compareInjections ()
   zero->Draw ("E3same") ;
 //  bkg_5S_diff->Draw ("same") ;
   bkg_1S_diff->Draw ("Phistsame") ;
-  bkg_1S_outer_diff->Draw ("Phistsame") ;
+//  bkg_1S_outer_diff->Draw ("Phistsame") ;
   m4_signal_total_SIG->Draw ("histsame") ;
 
   TLegend * leg_comparison = new TLegend (0.25, 0.7, 0.90, 0.90, NULL, "brNDC") ;
@@ -158,7 +158,7 @@ int compareInjections ()
   leg_comparison->AddEntry (m4_signal_total_SIG, "expected 350 GeV Higgs", "l") ;
   leg_comparison->AddEntry (zero, "bkg estimate uncertainty", "f") ;
   leg_comparison->AddEntry (bkg_1S_diff, "bkg bias due to signal injection", "pl") ;
-  leg_comparison->AddEntry (bkg_1S_outer_diff, "... with outer sidebands only", "pl") ;
+//  leg_comparison->AddEntry (bkg_1S_outer_diff, "... with outer sidebands only", "pl") ;
   leg_comparison->Draw () ;
   
   c4->Print ("injectionTest.pdf", "pdf") ;
