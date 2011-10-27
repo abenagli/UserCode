@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   std::string samplesListFile = gConfigParser -> readStringOption("Input::samplesListFile");
   std::string inputFileName = gConfigParser -> readStringOption("Input::inputFileName");
   
-  std::string outputDir = gConfigParser -> readStringOption("Input::outputDir");
+  std::string outputDir = gConfigParser -> readStringOption("Output::outputDir");
     
   std::string imgFormat = gConfigParser -> readStringOption("Options::imgFormat");
   int step = gConfigParser -> readIntOption("Options::step");  
