@@ -287,13 +287,13 @@ int macro_004_10 (int mass)
 
 /*
   cout << "Martijn's test" << endl ;
-  TH1F * sidebaRegionMC = m4_upper_a_total ; 
+  TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;
-  TH1F * signalRegionMC = m4_upper_c_total ; 
+  TH1F * signalRegionMC = m4_upper_c_total->Clone ("signalRegionMC") ; 
   signalRegionMC->Add (m4_lower_c_total) ;
-  TH1F * sidebaRegion = m4_upper_a_DATA ; 
+  TH1F * sidebaRegion = m4_upper_a_DATA->Clone ("sidebaRegion") ; 
   sidebaRegion->Add (m4_lower_a_DATA) ;
-  TH1F * signalRegion = m4_upper_c_DATA ; 
+  TH1F * signalRegion = m4_upper_c_DATA->Clone ("signalRegion") ; 
   signalRegion->Add (m4_lower_c_DATA) ;
 */
 
@@ -349,6 +349,7 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
 */
 
+/*
   int injectScale = 1 ;
   cout << "final analysis with outer sidebands closure test with signal injection with scale " << injectScale << endl ;
   TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
@@ -365,7 +366,7 @@ int macro_004_10 (int mass)
   injectSigSignal->Scale (injectScale) ;
   signalRegion->Add (injectSigSignal) ; 
   setSqrtErrors (signalRegion) ; //PG this is valid for many events
-
+*/
 
   //PG plot MC singal and background region 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
