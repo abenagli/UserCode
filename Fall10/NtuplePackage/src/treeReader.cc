@@ -170,7 +170,7 @@ std::vector<int>* treeReader::GetInt(const std::string &name)
 std::vector<int>* treeReader::GetLongLongInt(const std::string &name)
 {
   std::map<std::string,std::vector<long long int> * >::const_iterator it_LLI = m_LLIvectors.find(name);
-  if( it_LLI != m_Ivectors.end() ) return m_LLIvectors[name];
+  if( it_LLI != m_LLIvectors.end() ) return m_LLIvectors[name];
   else return new std::vector<long long int>;
 }
 
