@@ -110,7 +110,7 @@ int main (int argc, char** argv)
 
   RooDataSet * data_DS ;
 
-  RooRealVar x ("x", "4-body inv mass", 0., 1000.) ;
+  RooRealVar x ("x", "4-body inv mass", 200., 1000.) ; //PG FIXME import funciotn
   RooRealVar weight ("weight", "event weight", 0., 1000000000000.) ;
 
   double minMjj = 65 ;
@@ -125,13 +125,16 @@ int main (int argc, char** argv)
       if (iColl->first.find ("DATA") == string::npos) continue ;
       cout << " reading " << iColl->first << endl ;
 
-      RooDataSet * rds = new RooDataSet ("data_obs", "data_obs", iColl->second, RooArgSet (x)) ; 
+      RooDataSet * rds = new RooDataSet ("data_obs", "data_obs", RooArgSet (x)) ; 
       VBFAnalysisVariables vars ;
-      SetVBFPreselectionTreeBranches (vars, iColl->second) ;
+      float lepNuW_m_KF ;
+      iColl->second->SetBranchAddress ("lepNuW_m_KF", &lepNuW_m_KF) ;
+
       for (int i = 0 ; i < iColl->second->GetEntries () ; ++i)
         {
           iColl->second->GetEntry (i) ;
-          x = vars.lepNuW_m_KF ;
+          if (lepNuW_m_KF < 200) continue ;
+          x = lepNuW_m_KF ;
           rds->add (RooArgSet (x)) ;            
         }
       data_DS = rds ;
