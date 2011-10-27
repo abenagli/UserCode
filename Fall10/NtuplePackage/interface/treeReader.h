@@ -25,13 +25,14 @@ class treeReader
     int GetEntries () {return m_tree->GetEntries () ; } ;
     
 //     template <class T> std::vector<T>* Get(const std::string &name);
-    std::vector<ROOT::Math::XYZVector>*  Get3V    (const std::string &name);
-    std::vector<ROOT::Math::XYZPoint>*   Get3PV   (const std::string &name);
-    std::vector<ROOT::Math::XYZTVector>* Get4V    (const std::string &name);
-    std::vector<double>*                 GetDouble(const std::string &name);
-    std::vector<float>*                  GetFloat (const std::string &name);
-    std::vector<int>*                    GetInt   (const std::string &name);
-    std::vector<std::string>*            GetString(const std::string &name);
+    std::vector<ROOT::Math::XYZVector>*  Get3V         (const std::string &name);
+    std::vector<ROOT::Math::XYZPoint>*   Get3PV        (const std::string &name);
+    std::vector<ROOT::Math::XYZTVector>* Get4V         (const std::string &name);
+    std::vector<double>*                 GetDouble     (const std::string &name);
+    std::vector<float>*                  GetFloat      (const std::string &name);
+    std::vector<int>*                    GetInt        (const std::string &name);
+    std::vector<long long int>*          GetLongLongInt(const std::string &name);
+    std::vector<std::string>*            GetString     (const std::string &name);
     
     
   private:
@@ -42,6 +43,7 @@ class treeReader
     std::map <std::string, std::vector<double> * >                 m_Dvectors ;
     std::map <std::string, std::vector<float> * >                  m_Fvectors ;
     std::map <std::string, std::vector<int> * >                    m_Ivectors ;
+    std::map <std::string, std::vector<long long int> * >          m_LLIvectors ;
     std::map <std::string, std::vector<std::string> * >            m_Svectors ;
     
     TTree * m_tree ;
@@ -71,15 +73,6 @@ class treeReader
 //   if (it_4V  != m_4Vvectors.end()  ) return m_4Vvectors[name];
 //  }
 // }
-
-
-
-
-
-
-
-
-
 
 #endif
 
