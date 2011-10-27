@@ -286,6 +286,18 @@ int macro_004_10 (int mass)
 */
 
 /*
+  cout << "Martijn's test" << endl ;
+  TH1F * sidebaRegionMC = m4_upper_a_total ; 
+  sidebaRegionMC->Add (m4_lower_a_total) ;
+  TH1F * signalRegionMC = m4_upper_c_total ; 
+  signalRegionMC->Add (m4_lower_c_total) ;
+  TH1F * sidebaRegion = m4_upper_a_DATA ; 
+  sidebaRegion->Add (m4_lower_a_DATA) ;
+  TH1F * signalRegion = m4_upper_c_DATA ; 
+  signalRegion->Add (m4_lower_c_DATA) ;
+*/
+
+/*
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;
@@ -301,7 +313,8 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
-  int injectScale = 5 ;
+/*
+  int injectScale = 1 ;
   cout << "final analysis closure test with signal injection with scale " << injectScale << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total ; 
   TH1F * signalRegionMC = m4_signal_total ;  
@@ -315,18 +328,46 @@ int macro_004_10 (int mass)
   injectSigSignal->Scale (injectScale) ;
   signalRegion->Add (injectSigSignal) ; 
   setSqrtErrors (signalRegion) ; //PG this is valid for many events
+*/
 
 /*
-  cout << "Martijn's test" << endl ;
+  cout << "final analysis with outer sidebands" << endl ;
   TH1F * sidebaRegionMC = m4_upper_a_total ; 
-  sidebaRegionMC->Add (m4_lower_a_total) ;
-  TH1F * signalRegionMC = m4_upper_c_total ; 
-  signalRegionMC->Add (m4_lower_c_total) ;
+  sidebaRegionMC->Add (m4_lower_a_total) ;  
+  TH1F * signalRegionMC = m4_signal_total ;
   TH1F * sidebaRegion = m4_upper_a_DATA ; 
   sidebaRegion->Add (m4_lower_a_DATA) ;
-  TH1F * signalRegion = m4_upper_c_DATA ; 
-  signalRegion->Add (m4_lower_c_DATA) ;
+  TH1F * signalRegion   = m4_signal_DATA ;  
 */
+
+/*
+  cout << "final analysis with outer sidebands closure test" << endl ;
+  TH1F * sidebaRegionMC = m4_upper_a_total ; 
+  sidebaRegionMC->Add (m4_lower_a_total) ;  
+  TH1F * signalRegionMC = m4_signal_total ;
+  TH1F * sidebaRegion   = sidebaRegionMC ; 
+  TH1F * signalRegion   = signalRegionMC ; 
+*/
+
+/*
+  int injectScale = 1 ;
+  cout << "final analysis with outer sidebands closure test with signal injection with scale " << injectScale << endl ;
+  TH1F * sidebaRegionMC = m4_upper_a_total ; 
+  sidebaRegionMC->Add (m4_lower_a_total) ;  
+  TH1F * signalRegionMC = m4_signal_total ;  
+  TH1F * sidebaRegion   = sidebaRegionMC ;
+  TH1F * injectSigSideband = m4_lower_a_total_SIG->Clone ("injectSigSideband") ;
+  injectSigSideband->Add (m4_upper_a_total_SIG) ;
+  injectSigSideband->Scale (injectScale) ;
+  sidebaRegion->Add (injectSigSideband) ; 
+  setSqrtErrors (sidebaRegion) ; //PG this is valid for many events
+  TH1F * signalRegion   = signalRegionMC ; 
+  TH1F * injectSigSignal = m4_signal_total_SIG->Clone ("injectSigSignal") ;
+  injectSigSignal->Scale (injectScale) ;
+  signalRegion->Add (injectSigSignal) ; 
+  setSqrtErrors (signalRegion) ; //PG this is valid for many events
+*/
+
 
   //PG plot MC singal and background region 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
