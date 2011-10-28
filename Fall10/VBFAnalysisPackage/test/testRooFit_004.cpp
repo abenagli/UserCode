@@ -125,7 +125,7 @@ int main (int argc, char** argv)
       if (iColl->first.find ("DATA") == string::npos) continue ;
       cout << " reading " << iColl->first << endl ;
 
-      RooDataSet * rds = new RooDataSet ("data_obs", "data_obs", RooArgSet (x)) ; 
+      RooDataSet * rds = new RooDataSet ("data_unbinned", "data_unbinned", RooArgSet (x)) ; 
       VBFAnalysisVariables vars ;
       float lepNuW_m_KF ;
       iColl->second->SetBranchAddress ("lepNuW_m_KF", &lepNuW_m_KF) ;
