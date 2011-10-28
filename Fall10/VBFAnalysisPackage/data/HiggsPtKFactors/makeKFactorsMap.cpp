@@ -73,7 +73,7 @@ int main()
   outFile_cc << std::endl;  
   outFile_cc << std::endl;  
   outFile_cc << std::endl;  
-  outFile_cc << "double HiggsPtKFactors(const float& pt, const int& mH)" << std::endl;
+  outFile_cc << "double HiggsPtKFactors(const float& pt, const float& mH)" << std::endl;
   outFile_cc << "{" << std::endl;
   
   bool isFirstX = true;
@@ -96,11 +96,11 @@ int main()
     {
       if(isFirstMass == true)
       {
-        outFile_cc << "if(mH == " << masses[iFile] << ") return " << (kFactors[masses[iFile]])[bin] << "; ";
+        outFile_cc << "if(mH == " << masses[iFile] << ".) return " << (kFactors[masses[iFile]])[bin] << "; ";
         isFirstMass = false;
       }
       else
-        outFile_cc << "else if(mH == " << masses[iFile] << ") return " << (kFactors[masses[iFile]])[bin] << "; ";
+        outFile_cc << "else if(mH == " << masses[iFile] << ".) return " << (kFactors[masses[iFile]])[bin] << "; ";
     }
     outFile_cc << "else return 1.; "<< std::endl;
     outFile_cc << "  }" << std::endl;
@@ -119,7 +119,7 @@ int main()
   outFile_h << std::endl;  
   outFile_h << std::endl;  
   outFile_h << std::endl;  
-  outFile_h << "double HiggsPtKFactors(const float& pt, const int& mH);" << std::endl;
+  outFile_h << "double HiggsPtKFactors(const float& pt, const float& mH);" << std::endl;
   outFile_h << std::endl;
   outFile_h << "#endif" << std::endl;
 }
