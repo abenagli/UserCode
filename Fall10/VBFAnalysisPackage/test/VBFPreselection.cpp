@@ -1,7 +1,9 @@
 #include "VBFPreselectionVariables.h"
+#include "HiggsPtKFactors.h"
 #include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
+
 
 #include <iomanip>
 
@@ -210,7 +212,7 @@ int main(int argc, char** argv)
         
     vars.runId   = reader.GetInt("runId")->at(0);
     vars.lumiId  = reader.GetInt("lumiId")->at(0);
-    vars.eventId = reader.GetLongLongInt("eventId")->at(0);
+    vars.eventId = reader.GetInt("eventId")->at(0);
     vars.eventNaiveId += 1;
     
     vars.eventWeight = 1.;
@@ -905,6 +907,8 @@ int main(int argc, char** argv)
       SetTagJJVariables(vars, reader);
       SetThirdJetVariables(vars, reader);
       SetHVariables(vars, reader);
+      if(vars.mH > 0.) SetMCVariables(vars, reader);
+      if(vars.mH > 0.) vars.eventWeight = HiggsPtKFactors(vars.mc_H_pt,vars.mH);
       
       
       // fIll event counters
