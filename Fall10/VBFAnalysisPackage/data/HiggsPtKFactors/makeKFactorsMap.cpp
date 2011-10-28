@@ -107,7 +107,7 @@ int main()
     
   }
   
-  outFile_cc << "  else return 1." << std::endl;
+  outFile_cc << "  else return 1.;" << std::endl;
   outFile_cc << "}" << std::endl;
   
   
