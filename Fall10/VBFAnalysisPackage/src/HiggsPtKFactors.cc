@@ -516,9 +516,8 @@ double HiggsPtKFactors(const float& pt, const float& mH)
   {
     if(mH == 200.) return 0.483326; else if(mH == 250.) return 0.481904; else if(mH == 300.) return 0.494557; else if(mH == 350.) return 0.491368; else if(mH == 400.) return 0.497491; else if(mH == 450.) return 0.579273; else if(mH == 500.) return 0.57982; else if(mH == 550.) return 0.586099; else if(mH == 600.) return 0.597757; else return 1.; 
   }
-  else if(pt >= 490. && pt <  500.)
+  else
   {
-    if(mH == 200.) return 0.483326; else if(mH == 250.) return 0.481904; else if(mH == 300.) return 0.494557; else if(mH == 350.) return 0.490841; else if(mH == 400.) return 0.49624; else if(mH == 450.) return 0.579273; else if(mH == 500.) return 0.57982; else if(mH == 550.) return 0.586099; else if(mH == 600.) return 0.597757; else return 1.;
+    if(mH == 200.) return 0.483326; else if(mH == 250.) return 0.481904; else if(mH == 300.) return 0.494557; else if(mH == 350.) return 0.490841; else if(mH == 400.) return 0.49624; else if(mH == 450.) return 0.579273; else if(mH == 500.) return 0.57982; else if(mH == 550.) return 0.586099; else if(mH == 600.) return 0.597757; else return 1.; 
   }
-  else return 1.;
 }
