@@ -85,8 +85,12 @@ int main()
       isFirstX = false;
     }
     else
-      outFile_cc << "  else if(pt >= " << (xMins[masses[0]])[bin] << ". && pt <  " << (xMaxs[masses[0]])[bin] << ".)"<< std::endl;      
-    
+    {
+      if(bin < nBins-1)
+        outFile_cc << "  else if(pt >= " << (xMins[masses[0]])[bin] << ". && pt <  " << (xMaxs[masses[0]])[bin] << ".)"<< std::endl;      
+      else
+        outFile_cc << "  else"<< std::endl;      
+    }  
     
     outFile_cc << "  {" << std::endl;
     outFile_cc << "    ";
@@ -107,7 +111,6 @@ int main()
     
   }
   
-  outFile_cc << "  else return 1.;" << std::endl;
   outFile_cc << "}" << std::endl;
   
   
