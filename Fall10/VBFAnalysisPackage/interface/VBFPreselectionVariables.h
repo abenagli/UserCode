@@ -112,6 +112,7 @@ struct VBFPreselectionVariables
   int lep_flavour;
   float lep_pt;
   float lep_eta;
+  float lep_phi;
   float lep_zepp;
   float lep_z;
   float lep_dxy_BS;
@@ -142,6 +143,8 @@ struct VBFPreselectionVariables
   int lep_numberOfValidMuonHits;
   int lep_pixelLayersWithMeasurement;
   
+  int lep_mcMatched;
+  float lep_mcMatchDR;
   
   
   // met variables
@@ -154,7 +157,11 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector nu2;
   ROOT::Math::XYZTVector* p_nu2;
   
-  float met_et;  
+  float met_et;
+  float met_phi;
+  
+  int met_mcMatched;
+  float met_mcMatchDR;
   
   ROOT::Math::XYZTVector lepMet;
   
@@ -257,6 +264,12 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector WJJ;
   ROOT::Math::XYZTVector* p_WJJ;
   
+  float WJ1_pt;
+  float WJ2_pt;
+  float WJ1_eta;
+  float WJ2_eta;
+  float WJ1_phi;
+  float WJ2_phi;
   float WJ1_zepp;
   float WJ2_zepp;
   float WJ1_lep_Dphi;
@@ -271,6 +284,11 @@ struct VBFPreselectionVariables
   int WJ2_chargedMultiplicity;
   int WJ1_neutralMultiplicity;
   int WJ2_neutralMultiplicity;
+  
+  int WJ1_mcMatched;
+  int WJ2_mcMatched;
+  float WJ1_mcMatchDR;
+  float WJ2_mcMatchDR;
   
   float WJJ_Deta;
   float WJJ_Dphi;
@@ -344,6 +362,82 @@ struct VBFPreselectionVariables
   float thirdJ_tagJJDeta;
   float thirdJ_tagJJDphi;
   float thirdJ_tagJJDR;
+  
+  
+  
+  // MC variables
+  ROOT::Math::XYZTVector mc_lep;
+  ROOT::Math::XYZTVector* p_mc_lep;
+  
+  float mc_lep_charge;
+  int mc_lep_flavour;
+  float mc_lep_pt;
+  float mc_lep_eta;
+  float mc_lep_phi;
+  
+  
+  
+  ROOT::Math::XYZTVector mc_nu;
+  ROOT::Math::XYZTVector* p_mc_nu;
+  
+  float mc_nu_charge;
+  int mc_nu_flavour;
+  float mc_nu_pt;
+  float mc_nu_eta;
+  float mc_nu_phi;
+  
+  
+  
+  float mc_lepNu_pt;
+  float mc_lepNu_mt;
+  float mc_lepNu_Dphi;
+  
+  
+  
+  ROOT::Math::XYZTVector mc_WJ1;
+  ROOT::Math::XYZTVector* p_mc_WJ1;
+  ROOT::Math::XYZTVector mc_WJ2;
+  ROOT::Math::XYZTVector* p_mc_WJ2;
+  
+  float mc_WJ1_pt;
+  float mc_WJ2_pt;
+  float mc_WJ1_eta;
+  float mc_WJ2_eta;
+  float mc_WJ1_phi;
+  float mc_WJ2_phi;
+  
+  float mc_WJJ_Deta;
+  float mc_WJJ_Dphi;
+  float mc_WJJ_DR;
+  float mc_WJJ_pt;
+  float mc_WJJ_m;
+  
+  
+  
+  ROOT::Math::XYZTVector mc_W1;
+  ROOT::Math::XYZTVector* p_mc_W1;
+  ROOT::Math::XYZTVector mc_W2;
+  ROOT::Math::XYZTVector* p_mc_W2;
+  
+  float mc_W1_pt;
+  float mc_W2_pt;
+  float mc_W1_eta;
+  float mc_W2_eta;
+  float mc_W1_phi;
+  float mc_W2_phi;
+  float mc_W1_m;
+  float mc_W2_m;
+  
+  
+  
+  ROOT::Math::XYZTVector mc_H;
+  ROOT::Math::XYZTVector* p_mc_H;
+  
+  float mc_H_pt;
+  float mc_H_eta;
+  float mc_H_phi;
+  float mc_H_m;
+  
 };
 
 
@@ -371,5 +465,6 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader);
+void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader);
 
 #endif
