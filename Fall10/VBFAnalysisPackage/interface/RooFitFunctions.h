@@ -9,6 +9,7 @@
 
 RooRealVar x ("x", "higgs mass", 200., 1000.) ;
 
+
 RooRealVar N ("N", "rel amplitude second exp", 0., 1.) ;
 RooRealVar L1 ("L1", "rel attentuation first exp",  0., 1.) ;
 RooRealVar L2 ("L2", "rel attentuation first exp",  0., 1.) ;
