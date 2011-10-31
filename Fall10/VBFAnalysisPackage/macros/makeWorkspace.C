@@ -1,6 +1,6 @@
 #include "../interface/RooFitFunctions.h"
 
-int makeWorkspace () 
+int makeWorkspace (/*TString mass*/) 
 {
   RooWorkspace w ("w") ;
 
@@ -22,6 +22,8 @@ int makeWorkspace ()
   //PG --- --- --- --- --- --- --- --- --- ---
 
   TFile * sigIn = new TFile ("../signalShapes.root") ;
+
+//  RooHistPdf * signal = (RooHistPdf *) sigIn->Get (TString ("PDF_") + mass) ;  w.import (*signal) ;
   
   RooHistPdf * signal_250 = (RooHistPdf *) sigIn->Get ("PDF_250") ;  w.import (*signal_250) ;
   RooHistPdf * signal_300 = (RooHistPdf *) sigIn->Get ("PDF_300") ;  w.import (*signal_300) ;
@@ -45,7 +47,7 @@ int makeWorkspace ()
   cout << " --- --- --- --- --- --- ---" << endl ;
   w.Print () ;
   
-  TFile * output = new TFile ("combineWS.root", "recreate") ;
+  TFile * output = new TFile (TString ("combineWS.root"), "recreate") ;
   output->cd () ;
   w.Write () ;
   output->Close () ;

@@ -10,6 +10,7 @@ testRooFit_004.exe cfg/2011-10-18-listaFile.txt
 #include "hFactory.h"
 #include "h2Factory.h"
 #include "stdHisto.h"
+#include "RooFitFunctions.h"
 
 #include <iomanip>
 #include <string>
@@ -97,6 +98,7 @@ int main (int argc, char** argv)
     }
 
   float LUMI = 2145. ; //PG to have output in 1/fb
+  x.setBins (80) ;
 
   string inputFileList (argv[1]) ;
   cout << "samples " << inputFileList << endl ;
@@ -110,7 +112,7 @@ int main (int argc, char** argv)
 
   RooDataSet * data_DS ;
 
-  RooRealVar x ("x", "4-body inv mass", 200., 1000.) ; //PG FIXME import funciotn
+//  RooRealVar x ("x", "4-body inv mass", 200., 1000.) ; //PG FIXME import funciotn
   RooRealVar weight ("weight", "event weight", 0., 1000000000000.) ;
 
   double minMjj = 65 ;

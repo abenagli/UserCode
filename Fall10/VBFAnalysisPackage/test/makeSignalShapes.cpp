@@ -13,6 +13,7 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "hFactory.h"
 #include "h2Factory.h"
 #include "stdHisto.h"
+#include "RooFitFunctions.h"
 
 #include <cstdlib>
 #include <iomanip>
@@ -88,6 +89,7 @@ int main (int argc, char** argv)
     }
 
   float LUMI = 2145. ; //PG to have output in 1/fb
+  x.setBins (80) ;
 
   string inputFileList (argv[1]) ;
   cout << "samples " << inputFileList << endl ;
@@ -99,14 +101,14 @@ int main (int argc, char** argv)
   TH1::SetDefaultSumw2 (kTRUE) ;
 
   map<int, hColl *> signalz ;
-  hColl signal_250 ("signal_250", 100, 0., 1000.) ; signalz[250] = &signal_250 ;
-  hColl signal_300 ("signal_300", 100, 0., 1000.) ; signalz[300] = &signal_300 ;
-  hColl signal_350 ("signal_350", 100, 0., 1000.) ; signalz[350] = &signal_350 ;
-  hColl signal_400 ("signal_400", 100, 0., 1000.) ; signalz[400] = &signal_400 ;
-  hColl signal_450 ("signal_450", 100, 0., 1000.) ; signalz[450] = &signal_450 ;
-  hColl signal_500 ("signal_500", 100, 0., 1000.) ; signalz[500] = &signal_500 ;
-  hColl signal_550 ("signal_550", 100, 0., 1000.) ; signalz[550] = &signal_550 ;
-  hColl signal_600 ("signal_600", 100, 0., 1000.) ; signalz[600] = &signal_600 ;
+  hColl signal_250 ("signal_250", 80, 200., 1000.) ; signalz[250] = &signal_250 ;
+  hColl signal_300 ("signal_300", 80, 200., 1000.) ; signalz[300] = &signal_300 ;
+  hColl signal_350 ("signal_350", 80, 200., 1000.) ; signalz[350] = &signal_350 ;
+  hColl signal_400 ("signal_400", 80, 200., 1000.) ; signalz[400] = &signal_400 ;
+  hColl signal_450 ("signal_450", 80, 200., 1000.) ; signalz[450] = &signal_450 ;
+  hColl signal_500 ("signal_500", 80, 200., 1000.) ; signalz[500] = &signal_500 ;
+  hColl signal_550 ("signal_550", 80, 200., 1000.) ; signalz[550] = &signal_550 ;
+  hColl signal_600 ("signal_600", 80, 200., 1000.) ; signalz[600] = &signal_600 ;
 
   //PG loop over samples
   for (map<string, TChain *>::iterator iColl = collections.begin () ;
@@ -150,7 +152,7 @@ int main (int argc, char** argv)
 
       stringstream nameRdh ;
       nameRdh << "RDH_" << iMap->first ;
-      RooRealVar x ("x", "higgs mass", 0., 1000.) ;
+//      RooRealVar x ("x", "higgs mass", 200., 1000.) ;
       RooDataHist bdata (nameRdh.str ().c_str (), nameRdh.str ().c_str (), RooArgList (x), total) ;
 
       stringstream namePdf ;
