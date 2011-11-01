@@ -89,7 +89,7 @@ int main (int argc, char** argv)
     }
 
   float LUMI = 2145. ; //PG to have output in 1/fb
-  x.setBins (80) ;
+  x.setBins (xBinning) ;
 
   string inputFileList (argv[1]) ;
   cout << "samples " << inputFileList << endl ;
@@ -100,15 +100,15 @@ int main (int argc, char** argv)
   
   TH1::SetDefaultSumw2 (kTRUE) ;
 
-  map<int, hColl *> signalz ;
-  hColl signal_250 ("signal_250", 80, 200., 1000.) ; signalz[250] = &signal_250 ;
-  hColl signal_300 ("signal_300", 80, 200., 1000.) ; signalz[300] = &signal_300 ;
-  hColl signal_350 ("signal_350", 80, 200., 1000.) ; signalz[350] = &signal_350 ;
-  hColl signal_400 ("signal_400", 80, 200., 1000.) ; signalz[400] = &signal_400 ;
-  hColl signal_450 ("signal_450", 80, 200., 1000.) ; signalz[450] = &signal_450 ;
-  hColl signal_500 ("signal_500", 80, 200., 1000.) ; signalz[500] = &signal_500 ;
-  hColl signal_550 ("signal_550", 80, 200., 1000.) ; signalz[550] = &signal_550 ;
-  hColl signal_600 ("signal_600", 80, 200., 1000.) ; signalz[600] = &signal_600 ;
+  map<string, hColl *> signalz ;
+  hColl signal_250 ("signal_250", 80, 200., 1000.) ; signalz["250"] = &signal_250 ;
+  hColl signal_300 ("signal_300", 80, 200., 1000.) ; signalz["300"] = &signal_300 ;
+  hColl signal_350 ("signal_350", 80, 200., 1000.) ; signalz["350"] = &signal_350 ;
+  hColl signal_400 ("signal_400", 80, 200., 1000.) ; signalz["400"] = &signal_400 ;
+  hColl signal_450 ("signal_450", 80, 200., 1000.) ; signalz["450"] = &signal_450 ;
+  hColl signal_500 ("signal_500", 80, 200., 1000.) ; signalz["500"] = &signal_500 ;
+  hColl signal_550 ("signal_550", 80, 200., 1000.) ; signalz["550"] = &signal_550 ;
+  hColl signal_600 ("signal_600", 80, 200., 1000.) ; signalz["600"] = &signal_600 ;
 
   //PG loop over samples
   for (map<string, TChain *>::iterator iColl = collections.begin () ;
@@ -116,32 +116,27 @@ int main (int argc, char** argv)
        ++iColl)
     {
       TCut cutSignal = "WJJ_m > 65  && WJJ_m < 95" ;
-      TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSignal.GetTitle (), LUMI) ;    
+//      TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSignal.GetTitle (), LUMI) ;    
+      TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutSignal.GetTitle (), LUMI) ;    
 
       //PG search for signals
       if (iColl->first.find ("ggH") == string::npos && 
           iColl->first.find ("qqH") == string::npos) continue ;
 
       cout << " reading " << iColl->first << endl ;
-      for (map<int, hColl*>::const_iterator iMap = signalz.begin () ; 
-           iMap != signalz.end () ; 
-           ++iMap)
-        {  
-          stringstream mass ; 
-          mass << iMap->first ;
-          if (iColl->first.find (mass.str ()) != string::npos)
-            {
-              cout << "filling " << mass.str () << endl ;
-              TH1F * histo = iMap->second->addSample (iColl->first.c_str ()) ;
-              iColl->second->Draw (TString ("lepNuW_m_KF >> ") + histo->GetName (), cutSignalExtended) ;
-            }
-        }
+      string mass = iColl->first ;
+      mass.erase (0, 3) ;
+      cout << "MASS : " << mass << endl ;
+
+      TH1F * histo = signalz[mass]->addSample (iColl->first.c_str ()) ;
+      iColl->second->Draw (TString ("lepNuW_m_KF >> ") + histo->GetName (), cutSignalExtended) ;
+
     } //PG loop over samples
   cout << "filling done " << endl ;    
 
   TFile* outputRootFile = new TFile ("signalShapes.root", "RECREATE") ;
   outputRootFile->cd () ;
-  for (map<int, hColl*>::const_iterator iMap = signalz.begin () ; 
+  for (map<string, hColl*>::const_iterator iMap = signalz.begin () ; 
        iMap != signalz.end () ; 
        ++iMap) 
     {
@@ -149,6 +144,7 @@ int main (int argc, char** argv)
 //      iMap->second->save (outputRootFile) ;
       THStack stack = iMap->second->makeStack () ;
       TH1F * total = (TH1F *) stack.GetStack ()->Last () ;
+      cout << "   TH1F integral : " << total->Integral () << endl ;
 
       stringstream nameRdh ;
       nameRdh << "RDH_" << iMap->first ;
