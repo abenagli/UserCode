@@ -7,7 +7,7 @@ int makeWorkspace (/*TString mass*/)
   //PG the fit variable
   //PG --- --- --- --- --- --- --- --- --- ---
 
-  x.setBins (80) ;
+  x.setBins (xBinning) ;
   w.import (x) ;
   
   //PG the background parameters and shape

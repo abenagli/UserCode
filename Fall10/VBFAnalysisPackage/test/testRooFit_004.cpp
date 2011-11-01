@@ -98,7 +98,7 @@ int main (int argc, char** argv)
     }
 
   float LUMI = 2145. ; //PG to have output in 1/fb
-  x.setBins (80) ;
+  x.setBins (xBinning) ;
 
   string inputFileList (argv[1]) ;
   cout << "samples " << inputFileList << endl ;
