@@ -8,6 +8,8 @@
 
 
 RooRealVar x ("x", "higgs mass", 200., 1000.) ;
+int xBinning = 160 ; //PG 5 GeV binning
+// int xBinning = 80 ; //PG 10 GeV binning
 
 RooRealVar N ("N", "rel amplitude second exp", 0., 1.) ;
 RooRealVar L1 ("L1", "rel attentuation first exp",  0., 1.) ;
