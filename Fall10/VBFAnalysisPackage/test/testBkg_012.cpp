@@ -34,9 +34,6 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "TMVA/Reader.h"
 #include "hColl.h"
 
-// #include "PURescaleFactor.C"
-//#pragma link C++ function PURescaleFactor (const int&);
-
 using namespace std ;
 
 
@@ -102,7 +99,7 @@ int main (int argc, char** argv)
   
   hColl m4_Signal ("m4_Signal", 70, 100., 800.) ;
   TCut cutSignal = "WJJ_m > 65  && WJJ_m < 95" ;
-  TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSignal.GetTitle (), LUMI) ;    
+  TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutSignal.GetTitle (), LUMI) ;    
 
   //PG fill the signal histos
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -170,7 +167,7 @@ int main (int argc, char** argv)
                        << " && " << "WJJ_m < " << bandMax << ")" ;
           cout << sideband_cut.str () << endl ; 
           TCut cutSideband = sideband_cut.str ().c_str () ;
-          TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSideband.GetTitle (), LUMI) ;    
+          TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutSideband.GetTitle (), LUMI) ;    
 
           //PG the collection for the sideband
           hColl m4_Sideband ("m4_Sideband",   70, 100., 800.) ;

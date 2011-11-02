@@ -33,9 +33,6 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "TMVA/Reader.h"
 #include "hColl.h"
 
-// #include "PURescaleFactor.C"
-//#pragma link C++ function PURescaleFactor (const int&);
-
 using namespace std ;
 
 
@@ -137,13 +134,13 @@ int main (int argc, char** argv)
           SetVBFPreselectionTreeBranches (vars, chain) ;
     
           TCut cut = generalCut ;
-          TCut cutExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cut.GetTitle (), LUMI) ;
+          TCut cutExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cut.GetTitle (), LUMI) ;
     
           TCut cutSideband = generalCut && SidebandRegion ;
-          TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSideband.GetTitle (), LUMI) ;
+          TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutSideband.GetTitle (), LUMI) ;
     
           TCut cutSignal = generalCut && SignalRegion ;
-          TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSignal.GetTitle (), LUMI) ;
+          TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutSignal.GetTitle (), LUMI) ;
     
           if (iColl->first == "DATA") 
             {

@@ -30,9 +30,6 @@ testBkg_004.exe cfg/2011-10-11-listaFile.txt
 #include "TMVA/Reader.h"
 #include "hColl.h"
 
-// #include "PURescaleFactor.C"
-//#pragma link C++ function PURescaleFactor (const int&);
-
 using namespace std ;
 
 
@@ -185,31 +182,31 @@ int main (int argc, char** argv)
     {
 
       TCut cutLower = generalCut && lower ;
-      TCut cutLowerExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutLower.GetTitle (), LUMI) ;    
+      TCut cutLowerExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutLower.GetTitle (), LUMI) ;    
 
       TCut cutLower_c = generalCut && lower_c ;
-      TCut cutLower_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutLower_c.GetTitle (), LUMI) ;    
+      TCut cutLower_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutLower_c.GetTitle (), LUMI) ;    
 
       TCut cutLower_a = generalCut && lower_a ;
-      TCut cutLower_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutLower_a.GetTitle (), LUMI) ;    
+      TCut cutLower_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutLower_a.GetTitle (), LUMI) ;    
 
       TCut cutSignal = generalCut && signal ;
-      TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSignal.GetTitle (), LUMI) ;    
+      TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutSignal.GetTitle (), LUMI) ;    
 
       TCut cutUpper = generalCut && upper ;
-      TCut cutUpperExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutUpper.GetTitle (), LUMI) ;    
+      TCut cutUpperExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutUpper.GetTitle (), LUMI) ;    
 
       TCut cutUpper_c = generalCut && upper_c ;
-      TCut cutUpper_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutUpper_c.GetTitle (), LUMI) ;    
+      TCut cutUpper_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutUpper_c.GetTitle (), LUMI) ;    
 
       TCut cutUpper_a = generalCut && upper_a ;
-      TCut cutUpper_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutUpper_a.GetTitle (), LUMI) ;    
+      TCut cutUpper_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutUpper_a.GetTitle (), LUMI) ;    
 
       TCut cutEvenHigher = generalCut && EvenHigher ;
-      TCut cutEvenHigherExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutEvenHigher.GetTitle (), LUMI) ;    
+      TCut cutEvenHigherExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutEvenHigher.GetTitle (), LUMI) ;    
 
       TCut cutSideband = generalCut && (upper || lower) ;
-      TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)", cutSideband.GetTitle (), LUMI) ;    
+      TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutSideband.GetTitle (), LUMI) ;    
 
       cout << " reading " << iColl->first << endl ;
       if (iColl->first.find ("ggH") != string::npos || iColl->first.find ("qqH") != string::npos) 

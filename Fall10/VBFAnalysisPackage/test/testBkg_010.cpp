@@ -31,9 +31,6 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "TMVA/Reader.h"
 #include "hColl.h"
 
-// #include "PURescaleFactor.C"
-//#pragma link C++ function PURescaleFactor (const int&);
-
 using namespace std ;
 
 
@@ -154,7 +151,7 @@ int main (int argc, char** argv)
   TCut EvenHigher = "WJJ_m > 130 && WJJ_m < 400" ;
   TCut isEvenEvent = "eventNaiveId % 2 == 0" ;
 
-  string PUweight = "(%s) * 1./totEvents * crossSection * %f * PURescaleFactor((PUit_n+PUoot_n)/3.)" ;
+  string PUweight = "(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)" ;
 
   //PG loop over samples
   int index = 0 ;
