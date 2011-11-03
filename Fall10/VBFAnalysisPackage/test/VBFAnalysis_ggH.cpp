@@ -46,7 +46,6 @@ int main(int argc, char** argv)
   std::string inputFileList  = gConfigParser -> readStringOption("Input::inputFileList");
   std::string jetAlgorithm   = gConfigParser -> readStringOption("Input::jetAlgorithm");
   std::string jetType        = gConfigParser -> readStringOption("Input::jetType");
-  std::string higgsMass      = gConfigParser -> readStringOption("Input::higgsMass");
   std::string jsonFileName   = gConfigParser -> readStringOption("Input::jsonFileName");
   std::string MVAWeightsFile = gConfigParser -> readStringOption("Input::MVAWeightsFile");
   
