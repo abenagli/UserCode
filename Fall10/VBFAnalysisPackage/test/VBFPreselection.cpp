@@ -908,7 +908,7 @@ int main(int argc, char** argv)
       SetThirdJetVariables(vars, reader);
       SetHVariables(vars, reader);
       if(vars.mH > 0.) SetMCVariables(vars, reader);
-      if(vars.mH > 0.) vars.eventWeight = HiggsPtKFactors(vars.mc_H_pt,vars.mH);
+      if( (vars.mH > 0.) && (vars.mH < 1000.) ) vars.eventWeight = HiggsPtKFactors(vars.mc_H_pt,vars.mH);
       
       
       // fIll event counters
