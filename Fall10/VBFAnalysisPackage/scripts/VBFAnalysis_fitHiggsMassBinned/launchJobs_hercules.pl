@@ -32,10 +32,10 @@ $SAMPLESListFile       = $User_Preferences{"SAMPLESListFile"};
 
 $SELECTIONSCfgTemplate = $BASEDir."/".$SELECTIONSCfgTemplate;
 
-print "BASEDir = "          .$BASEDir."\n" ;
+print "BASEDir = "              .$BASEDir."\n" ;
 print "SELECTIONSCfgTemplate = ".$SELECTIONSCfgTemplate."\n";
-print "EXEName = ".$EXEName."\n";
-print "SAMPLESListFile = ".$SAMPLESListFile."\n";
+print "EXEName = "              .$EXEName."\n";
+print "SAMPLESListFile = "      .$SAMPLESListFile."\n";
 
 
 
@@ -61,20 +61,14 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white
   s/\s+$//;               # no trailing white
   
-  ($mH,$lepNuWMMIN,$lepNuWMMAX,$xFitMIN1,$xFitMAX1,$xFitMIN2,$xFitMAX2) = split(" ");
+  ($mH) = split(" ");
   
-  print("Higgs mass = ".$mH."   lepNuWMMIN = ".$lepNuWMMIN."   lepNuWMMAX = ".$lepNuWMMAX."\n");
+  print("Higgs mass = ".$mH."\n");
   $sampleDir = $OUTPUTSaveDir.$sample."/";
   
   
   $selectionsCfgFile = "./selections_".$mH.".cfg";
   system("cat ".$SELECTIONSCfgTemplate."   | sed -e s%HIGGSMASS%".$mH.
-                                       "%g | sed -e s%LEPNUWMMIN%".$lepNuWMMIN.
-                                       "%g | sed -e s%LEPNUWMMAX%".$lepNuWMMAX.
-                                       "%g | sed -e s%XFITMIN1%".$xFitMIN1.
-                                       "%g | sed -e s%XFITMAX1%".$xFitMAX1.
-                                       "%g | sed -e s%XFITMIN2%".$xFitMIN2.
-                                       "%g | sed -e s%XFITMAX2%".$xFitMAX2.
                                        "%g > ".$selectionsCfgFile);
   
   
