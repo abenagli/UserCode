@@ -332,7 +332,7 @@ int main(int argc, char** argv)
       // fill histogram
       outFile -> cd();
       std::stringstream weight;
-      weight << "( 1000 * " << lumi << " * 1. / totEvents * crossSection * PURescaleFactor(PUit_n) )";
+      weight << "( 1000 * " << lumi << " * 1. * eventWeight / totEvents * crossSection * PURescaleFactor(PUit_n) )";
       std::string extendedCut = weight.str() + " * " + WMassCut;      
       
       tree -> Draw((varName+" >>+ h_sig_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
