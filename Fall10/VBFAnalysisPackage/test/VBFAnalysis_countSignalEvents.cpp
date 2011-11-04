@@ -1,11 +1,20 @@
 #include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
+#include "HiggsMassWindows.h"
 
 #include <iostream>
+#include <iomanip>
 
 #include "TH1F.h"
 #include "TGraph.h"
+
+
+
+int nBins = 200;
+float xMin = 0.;
+float xMax = 1000.;
+float xWidth = (xMax-xMin)/nBins;
 
 
 
@@ -43,9 +52,17 @@ int main(int argc, char** argv)
   for(unsigned int i = 0; i < nSigTrees; ++ i) inputTotDirs.push_back(inputSigDirs.at(i));
   
   
-  //[Options]
-  int step        = gConfigParser -> readIntOption("Options::step");
+  //[Output]
+  std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
+  std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");
+
+  // Define the output file
+  std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + jetAlgorithm + ".root";
+  TFile* outFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
   
+  
+  //[Options]
+  int step    = gConfigParser -> readIntOption("Options::step");
   int PUScale = gConfigParser -> readIntOption("Options::PUScale");
   
   
@@ -53,10 +70,10 @@ int main(int argc, char** argv)
   // Define tree variables
   float mH;
   int totEvents;
+  float eventWeight;
   float crossSection;
   int PUit_n;
   int PUoot_n;
-  float lepNuW_m;
   float lepNuW_m_KF;
   
   
@@ -74,31 +91,27 @@ int main(int argc, char** argv)
   masses[6] = 550;
   masses[7] = 600;
   
-  int* lepNuWMMIN = new int[nMasses];
-  lepNuWMMIN[0] = 225;
-  lepNuWMMIN[1] = 270;
-  lepNuWMMIN[2] = 310;
-  lepNuWMMIN[3] = 355;
-  lepNuWMMIN[4] = 390;
-  lepNuWMMIN[5] = 415;
-  lepNuWMMIN[6] = 470;
-  lepNuWMMIN[7] = 485;
-  
-  int* lepNuWMMAX = new int[nMasses];
-  lepNuWMMAX[0] = 275;
-  lepNuWMMAX[1] = 330;
-  lepNuWMMAX[2] = 390;
-  lepNuWMMAX[3] = 445;
-  lepNuWMMAX[4] = 510;
-  lepNuWMMAX[5] = 575;
-  lepNuWMMAX[6] = 610;
-  lepNuWMMAX[7] = 665;
   
   
+  // Define counters and histograms
+  std::map<int,float> ggS;
+  std::map<int,float> qqS;
   
-  // Define counters
-  std::map<int,float> S;
-  std::map<int,float> S_KF;
+  std::map<int,TH1F*> h_ggS;
+  std::map<int,TH1F*> h_qqS;
+  
+  for(int iMass = 0; iMass < nMasses; ++iMass)
+  {
+    int mass = masses[iMass];
+    char histoName[50];
+    
+    sprintf(histoName,"ggH%d",mass);
+    h_ggS[mass] = new TH1F(histoName,"",nBins,xMin,xMax);
+    
+    sprintf(histoName,"qqH%d",mass);
+    h_qqS[mass] = new TH1F(histoName,"",nBins,xMin,xMax);
+  }
+  
   
   
   // count S events
@@ -108,17 +121,7 @@ int main(int argc, char** argv)
     std::string inputFullFileName;
     if(i < nSigTrees) inputFullFileName = baseDir + "/" + inputSigDirs.at(i)   + "/" + inputFileName + ".root";
     TFile* inputFile = TFile::Open(inputFullFileName.c_str());
-    std::string token1,token2,token3;
-    
-    
-    if( i < nSigTrees)
-    {
-      std::cout << ">>>>> VBFAnalysis_countSignalEvents::signal tree in " << inputSigDirs.at(i) << " opened" << std::endl;    
-      std::istringstream iss(inputSigDirs.at(i));
-      getline(iss,token1,'_');
-      getline(iss,token2,'_');
-      getline(iss,token3,'_');
-    }
+    std::cout << ">>>>> VBFAnalysis_countSignalEvents::signal tree in " << inputSigDirs.at(i) << " opened" << std::endl;    
     
     
     
@@ -132,60 +135,96 @@ int main(int argc, char** argv)
     
     // set tree branches
     tree -> SetBranchAddress("mH",           &mH);
+    tree -> SetBranchAddress("eventWeight",  &eventWeight);
     tree -> SetBranchAddress("totEvents",    &totEvents);
     tree -> SetBranchAddress("crossSection", &crossSection);
     tree -> SetBranchAddress("PUit_n",       &PUit_n);
     tree -> SetBranchAddress("PUoot_n",      &PUoot_n);
-    tree -> SetBranchAddress("lepNuW_m",     &lepNuW_m);
     tree -> SetBranchAddress("lepNuW_m_KF",  &lepNuW_m_KF);
     
     
+    // fill counters and histograms
     for(int entry = 0; entry < tree->GetEntries(); ++entry)
     {
       tree -> GetEntry(entry);
-      double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(PUit_n,PUScale);
+      double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(PUit_n,PUScale) * eventWeight;
       
-        
-      // loop on the masses
-      for(int iMass = 0; iMass < nMasses; ++iMass)
+      int mass = int(int(mH)%1000);
+      
+      if( (lepNuW_m_KF >= GetLepNuWMMIN(mass)) && (lepNuW_m_KF < GetLepNuWMMAX(mass)) )
       {
-        int mass = masses[iMass];
-        
-        if( (mH > 0) && (lepNuW_m >= lepNuWMMIN[iMass]) && (lepNuW_m < lepNuWMMAX[iMass]) )
+        if( mH < 1000 )
         {
-          if( ( (token2 == "M-250") || (token3 == "M-250") ) && (mass == 250) ) S[250] += weight;
-          if( ( (token2 == "M-300") || (token3 == "M-300") ) && (mass == 300) ) S[300] += weight;
-          if( ( (token2 == "M-350") || (token3 == "M-350") ) && (mass == 350) ) S[350] += weight;
-          if( ( (token2 == "M-400") || (token3 == "M-400") ) && (mass == 400) ) S[400] += weight;
-          if( ( (token2 == "M-450") || (token3 == "M-450") ) && (mass == 450) ) S[450] += weight;
-          if( ( (token2 == "M-500") || (token3 == "M-500") ) && (mass == 500) ) S[500] += weight;
-          if( ( (token2 == "M-550") || (token3 == "M-550") ) && (mass == 550) ) S[550] += weight;
-          if( ( (token2 == "M-600") || (token3 == "M-600") ) && (mass == 600) ) S[600] += weight;
+          char token[50];
+          sprintf(token,"M-%d",mass);
+          
+          ggS[mass] += weight;
+          h_ggS[mass] -> Fill(lepNuW_m_KF,weight);
 	}
         
-        if( (mH > 0) && (lepNuW_m_KF >= lepNuWMMIN[iMass]) && (lepNuW_m_KF < lepNuWMMAX[iMass]) )
+        else
         {
-          if( ( (token2 == "M-250") || (token3 == "M-250") ) && (mass == 250) ) S_KF[250] += weight;
-          if( ( (token2 == "M-300") || (token3 == "M-300") ) && (mass == 300) ) S_KF[300] += weight;
-          if( ( (token2 == "M-350") || (token3 == "M-350") ) && (mass == 350) ) S_KF[350] += weight;
-          if( ( (token2 == "M-400") || (token3 == "M-400") ) && (mass == 400) ) S_KF[400] += weight;
-          if( ( (token2 == "M-450") || (token3 == "M-450") ) && (mass == 450) ) S_KF[450] += weight;
-          if( ( (token2 == "M-500") || (token3 == "M-500") ) && (mass == 500) ) S_KF[500] += weight;
-          if( ( (token2 == "M-550") || (token3 == "M-550") ) && (mass == 550) ) S_KF[550] += weight;
-          if( ( (token2 == "M-600") || (token3 == "M-600") ) && (mass == 600) ) S_KF[600] += weight;
-        }
+          char token[50];
+          sprintf(token,"M-%d",mass);
+          
+          qqS[mass] += weight;
+          h_qqS[mass] -> Fill(lepNuW_m_KF,weight);
+	}
       }
-    }  
+    }
+    
   }
   
   
+  
+  // gluon-gluon fusion
+  std::cout << ">>>>>> RESULTS FOR ggH <<<<<<" << std::endl;
+  for(int iMass = 0; iMass < nMasses; ++iMass)
+  {
+    int mass = masses[iMass];
+    
+    std::cout << ">>> Higgs mass: " << mass
+              << "      ggS: "      << std::fixed << std::setprecision(3) << std::setw(7) << ggS[mass]
+              << std::endl;
+  }
+  
+  // vector boson fusion
+  std::cout << ">>>>>> RESULTS FOR qqH <<<<<<" << std::endl;
+  for(int iMass = 0; iMass < nMasses; ++iMass)
+  {
+    int mass = masses[iMass];
+    
+    std::cout << ">>> Higgs mass: " << mass
+              << "      qqS: "      << std::fixed << std::setprecision(3) << std::setw(7) << qqS[mass]
+              << std::endl;
+  }
+  
+  // gluon-gluon fusion + vector boson fusion
+  std::cout << ">>>>>> RESULTS FOR ggH+qqH <<<<<<" << std::endl;
+  for(int iMass = 0; iMass < nMasses; ++iMass)
+  {
+    int mass = masses[iMass];
+    
+    std::cout << ">>> Higgs mass: " << mass
+              << "        S: "      << std::fixed << std::setprecision(3) << std::setw(7) << ggS[mass]+qqS[mass]
+              << std::endl;
+  }
+  
+  
+  
+  // save histograms
+  outFile -> cd();
   
   for(int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
-    std::cout << ">>> Higgs mass: " << mass << "   S: " << S[mass] << "   S_KF: " << S_KF[mass] << std::endl;
+    h_ggS[mass] -> Write();
+    h_qqS[mass] -> Write();
   }
+  
+  outFile -> Close();
+  
   
   return 0;
 }

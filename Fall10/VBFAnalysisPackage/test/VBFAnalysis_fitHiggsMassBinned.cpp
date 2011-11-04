@@ -2,6 +2,7 @@
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
 #include "Functions.h"
+#include "HiggsMassWindows.h"
 
 #include <iostream>
 
@@ -47,7 +48,7 @@ int main(int argc, char** argv)
   std::string baseDir      = gConfigParser -> readStringOption("Input::baseDir");
   std::string jetAlgorithm = gConfigParser -> readStringOption("Input::jetAlgorithm");
   std::string jetType      = gConfigParser -> readStringOption("Input::jetType");
-  float lumi = gConfigParser -> readFloatOption("Input::lumi");
+  float lumi    = gConfigParser -> readFloatOption("Input::lumi");
   int higgsMass = gConfigParser -> readIntOption("Input::higgsMass");
   char higgsMassChar[50];
   sprintf(higgsMassChar,"%d",higgsMass);
@@ -75,12 +76,12 @@ int main(int argc, char** argv)
   method          = gConfigParser -> readStringOption("Options::method");
   
   //[Cuts]
-  float lepNuWMMIN = gConfigParser -> readFloatOption("Cuts::lepNuWMMIN");
-  float lepNuWMMAX = gConfigParser -> readFloatOption("Cuts::lepNuWMMAX");
-  float xFitMIN1 = gConfigParser -> readFloatOption("Cuts::xFitMIN1");
-  float xFitMAX1 = gConfigParser -> readFloatOption("Cuts::xFitMAX1");
-  float xFitMIN2 = gConfigParser -> readFloatOption("Cuts::xFitMIN2");
-  float xFitMAX2 = gConfigParser -> readFloatOption("Cuts::xFitMAX2");
+  float lepNuWMMIN = GetLepNuWMMIN(higgsMass);
+  float lepNuWMMAX = GetLepNuWMMAX(higgsMass);
+  float xFitMIN1 = GetXFitMIN1(higgsMass);
+  float xFitMAX1 = GetXFitMAX1(higgsMass);
+  float xFitMIN2 = GetXFitMIN2(higgsMass);
+  float xFitMAX2 = GetXFitMAX2(higgsMass);
   
   int nBins = 200;
   float xMin = 0.;
