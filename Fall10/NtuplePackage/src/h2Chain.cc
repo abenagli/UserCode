@@ -66,6 +66,18 @@ h2Chain::Fill (int i, double valx, double valy)
 
 
 void 
+h2Chain::Fill (int i, double valx, double valy, double weight) 
+  {
+    m_histos.at (i)->Fill (valx, valy, weight) ;
+    return ;
+  }
+
+
+
+//PG --------------------------------------------------------   
+
+
+void 
 h2Chain::Print (bool isLog, int rebinx, int rebiny) 
   {  
     TCanvas c1 ;
