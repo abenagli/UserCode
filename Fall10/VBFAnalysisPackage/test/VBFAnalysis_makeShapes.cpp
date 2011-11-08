@@ -72,7 +72,8 @@ int main(int argc, char** argv)
     TH1F* bkg;
     TH1F* bkg_fitErrUp;
     TH1F* bkg_fitErrDown;
-    
+
+    TH1F* histo;
     TH1F* histo_gg;
     TH1F* histo_qq;
     
@@ -91,23 +92,28 @@ int main(int argc, char** argv)
     
     inFile -> cd();
     data = (TH1F*)(inFile->Get("data/h_lepNuW_m"));
-    data_obs = (TH1F*)(data->Clone("data_obs"));
-    data_obs -> Reset();
+    
+    float xWidth = data -> GetBinWidth(1);
+    float xMin = GetLepNuWMMIN(mass);
+    float xMax = GetLepNuWMMAX(mass);
+    int nBins = int( (xMax - xMin)/xWidth );
+    
+    data_obs = new TH1F("data_obs","",nBins,xMin,xMax);
+    data_obs -> Sumw2();
+    
     
     hint = (TH1F*)(inFile->Get("data/hint"));
-    bkg            = (TH1F*)(hint->Clone("bkg"));
-    bkg_fitErrUp   = (TH1F*)(hint->Clone("bkg_fitErrUp"));
-    bkg_fitErrDown = (TH1F*)(hint->Clone("bkg_fitErrDown"));
-    bkg            -> Reset();
-    bkg_fitErrUp   -> Reset();
-    bkg_fitErrDown -> Reset();
+    bkg            = new TH1F("bkg",           "",nBins,xMin,xMax);
+    bkg_fitErrUp   = new TH1F("bkg_fitErrUp",  "",nBins,xMin,xMax);
+    bkg_fitErrDown = new TH1F("bkg_fitErrDown","",nBins,xMin,xMax);
     
     for(int bin = 1; bin <= data->GetNbinsX(); ++bin)
     {
       float binCenter  = data -> GetBinCenter(bin);
       float binContent = data -> GetBinContent(bin);
-      if( (binCenter >= GetLepNuWMMIN(mass)) && (binCenter < GetLepNuWMMAX(mass)) )
-        data_obs -> SetBinContent(bin,binContent);
+      if( (binCenter >= xMin) && (binCenter < xMax) )
+        for(int entry = 0; entry < binContent; ++entry)
+          data_obs -> Fill(binCenter);
     }
     
     for(int bin = 1; bin <= hint->GetNbinsX(); ++bin)
@@ -115,11 +121,11 @@ int main(int argc, char** argv)
       float binCenter  = hint -> GetBinCenter(bin);
       float binContent = hint -> GetBinContent(bin);
       float binError   = hint -> GetBinError(bin);
-      if( (binCenter >= GetLepNuWMMIN(mass)) && (binCenter < GetLepNuWMMAX(mass)) )
+      if( (binCenter >= xMin) && (binCenter < xMax) )
       {
-        bkg            -> SetBinContent(bin,binContent);
-        bkg_fitErrUp   -> SetBinContent(bin,binContent+binError);
-        bkg_fitErrDown -> SetBinContent(bin,binContent-binError);
+        bkg            -> Fill(binCenter,binContent);
+        bkg_fitErrUp   -> Fill(binCenter,binContent+binError);
+        bkg_fitErrDown -> Fill(binCenter,binContent-binError);
       }
     }
     
@@ -143,14 +149,34 @@ int main(int argc, char** argv)
     inFile -> cd();
     histo_gg = (TH1F*)(inFile->Get(histoName_gg.str().c_str()));
     outFile -> cd();
-    histo_gg -> SetName("ggH");
-    histo_gg -> Write();
+    histo = new TH1F("ggH","",nBins,xMin,xMax);
+    //histo -> Sumw2();
+    for(int bin = 1; bin <= histo_gg->GetNbinsX(); ++bin)
+    {
+      float binCenter  = histo_gg -> GetBinCenter(bin);
+      float binContent = histo_gg -> GetBinContent(bin);
+      if( (binCenter >= xMin) && (binCenter < xMax) )
+      {
+        histo -> Fill(binCenter,binContent);
+      }
+    }
+    histo -> Write();
     
     inFile -> cd();
     histo_qq = (TH1F*)(inFile->Get(histoName_qq.str().c_str()));
     outFile -> cd();
-    histo_qq -> SetName("qqH");
-    histo_qq -> Write();
+    histo = new TH1F("qqH","",nBins,xMin,xMax);
+    //histo -> Sumw2();
+    for(int bin = 1; bin <= histo_qq->GetNbinsX(); ++bin)
+    {
+      float binCenter  = histo_qq -> GetBinCenter(bin);
+      float binContent = histo_qq -> GetBinContent(bin);
+      if( (binCenter >= xMin) && (binCenter < xMax) )
+      {
+        histo -> Fill(binCenter,binContent);
+      }
+    }
+    histo -> Write();
     
     
     
@@ -173,14 +199,34 @@ int main(int argc, char** argv)
       inFile -> cd();
       histo_gg = (TH1F*)(inFile->Get(histoName_gg.str().c_str()));
       outFile -> cd();
-      histo_gg -> SetName(("ggH_"+label).c_str());
-      histo_gg -> Write();
+      histo = new TH1F(("ggH_"+label).c_str(),"",nBins,xMin,xMax);
+      //histo -> Sumw2();
+      for(int bin = 1; bin <= histo_gg->GetNbinsX(); ++bin)
+      {
+        float binCenter  = histo_gg -> GetBinCenter(bin);
+        float binContent = histo_gg -> GetBinContent(bin);
+        if( (binCenter >= xMin) && (binCenter < xMax) )
+        {
+          histo -> Fill(binCenter,binContent);
+        }
+      }
+      histo -> Write();
       
       inFile -> cd();
       histo_qq = (TH1F*)(inFile->Get(histoName_qq.str().c_str()));
       outFile -> cd();
-      histo_qq -> SetName(("qqH_"+label).c_str());
-      histo_qq -> Write();
+      histo = new TH1F(("qqH_"+label).c_str(),"",nBins,xMin,xMax);
+      //histo -> Sumw2();  
+      for(int bin = 1; bin <= histo_qq->GetNbinsX(); ++bin)
+      {
+        float binCenter  = histo_qq -> GetBinCenter(bin);
+        float binContent = histo_qq -> GetBinContent(bin);
+        if( (binCenter >= xMin) && (binCenter < xMax) )
+        {
+          histo -> Fill(binCenter,binContent);
+        }
+      }      
+      histo -> Write();
     }
     
     
