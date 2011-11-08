@@ -155,18 +155,12 @@ int main(int argc, char** argv)
       {
         if( mH < 1000 )
         {
-          char token[50];
-          sprintf(token,"M-%d",mass);
-          
           ggS[mass] += weight;
           h_ggS[mass] -> Fill(lepNuW_m_KF,weight);
 	}
         
         else
         {
-          char token[50];
-          sprintf(token,"M-%d",mass);
-          
           qqS[mass] += weight;
           h_qqS[mass] -> Fill(lepNuW_m_KF,weight);
 	}
