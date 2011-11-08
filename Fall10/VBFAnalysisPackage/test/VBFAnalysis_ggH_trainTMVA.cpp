@@ -63,14 +63,17 @@ int main(int argc, char** argv)
   
   
   //[Options]
-  int step        = gConfigParser -> readIntOption("Options::step");
+  int step   = gConfigParser -> readIntOption("Options::step");
+  float lumi = gConfigParser -> readIntOption("Options::lumi");
   
   
   
   // Define tree variables
   float mH;
   int totEvents;
+  float eventWeight;
   float crossSection;
+  int PUit_n;
   
   
   
@@ -105,12 +108,14 @@ int main(int argc, char** argv)
     // set tree branches
     tree -> SetBranchAddress("mH",           &mH);
     tree -> SetBranchAddress("totEvents",    &totEvents);
+    tree -> SetBranchAddress("eventWeight",  &eventWeight);
     tree -> SetBranchAddress("crossSection", &crossSection);
+    tree -> SetBranchAddress("PUit_n",       &PUit_n);
     tree -> GetEntry(0);
     
     
     // compute event weight at nth step
-    double weight = 1. * tree -> GetEntries() / totEvents * crossSection; 
+    double weight = lumi * 1000 * 1. * eventWeight / totEvents * crossSection * PURescaleFactor(PUit_n);
     
     
     // add tree to the factory
@@ -131,11 +136,12 @@ int main(int argc, char** argv)
   
   
   // Define variables
-  factory -> AddVariable("lep_eta",    'F');
-  factory -> AddVariable("lepMet_Dphi",'F');
-  factory -> AddVariable("lepMet_pt",  'F');
-  factory -> AddVariable("WJJ_pt",     'F');
-  factory -> AddVariable("WJJ_Dphi",   'F');
+  //factory -> AddVariable("lep_eta",    'F');
+  //factory -> AddVariable("lepMet_Dphi",'F');
+  //factory -> AddVariable("lepMet_pt",  'F');
+  //factory -> AddVariable("WJJ_pt",     'F');
+  //factory -> AddVariable("WJJ_Dphi",   'F');
+  factory -> AddVariable("lepNuW_m_KF",'F');
 
   
   factory -> PrepareTrainingAndTestTree("", "SplitMode=Random");
@@ -145,17 +151,17 @@ int main(int argc, char** argv)
   std::cout << "******************************************************" << std::endl;
   std::cout << "BookMethod" << std::endl;
   std::cout << "******************************************************" << std::endl;
-  //factory -> BookMethod(TMVA::Types::kCuts, "kCuts");
-  factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood_H"+higgsMass);
-  factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
+  factory -> BookMethod(TMVA::Types::kCuts, "kCuts");
+  //factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood_H"+higgsMass);
+  //factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
   //factory -> BookMethod(TMVA::Types::kKNN, "kKNN_H"+higgsMass);
-  factory -> BookMethod(TMVA::Types::kFisher, "kFisher");
-  factory -> BookMethod(TMVA::Types::kLD, "kLD");
-  factory -> BookMethod(TMVA::Types::kCFMlpANN, "kCFMlpANN_H"+higgsMass);
+  //factory -> BookMethod(TMVA::Types::kFisher, "kFisher");
+  //factory -> BookMethod(TMVA::Types::kLD, "kLD");
+  //factory -> BookMethod(TMVA::Types::kCFMlpANN, "kCFMlpANN_H"+higgsMass);
   //factory -> BookMethod(TMVA::Types::kTMlpANN, "kTMlpANN_H"+higgsMass);
   //factory -> BookMethod(TMVA::Types::kMLP, "kMLP");
   //factory -> BookMethod(TMVA::Types::kSVM, "kSVM");
-  factory -> BookMethod(TMVA::Types::kBDT,"kBDT_H"+higgsMass);
+  //factory -> BookMethod(TMVA::Types::kBDT,"kBDT_H"+higgsMass);
   
   std::cout << "******************************************************" << std::endl;
   std::cout << "TrainAllMethods" << std::endl;
