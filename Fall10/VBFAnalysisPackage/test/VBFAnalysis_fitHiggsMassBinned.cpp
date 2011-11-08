@@ -21,6 +21,7 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
                        TF1** func, bool computeCL = false, TH1F* hint = NULL);
 
 std::string method = "";
+std::string analysisMethod = "";
 std::string varName = "lepNuW_m_KF"; 
 std::string WMassCut = "( (WJJ_m >= 65.) && (WJJ_m < 95.) )";
 //std::string WMassCut = "( ( (WJJ_m >= 55.) && (WJJ_m < 65.) ) || ( (WJJ_m >= 95.) && (WJJ_m < 120.) ) )";
@@ -74,14 +75,15 @@ int main(int argc, char** argv)
   int onMC        = gConfigParser -> readIntOption("Options::onMC");
   int toyMAX      = gConfigParser -> readIntOption("Options::toyMAX");
   method          = gConfigParser -> readStringOption("Options::method");
+  analysisMethod  = gConfigParser -> readStringOption("Options::analysisMethod");
   
   //[Cuts]
   float lepNuWMMIN = GetLepNuWMMIN(higgsMass);
   float lepNuWMMAX = GetLepNuWMMAX(higgsMass);
-  float xFitMIN1 = GetXFitMIN1(higgsMass);
-  float xFitMAX1 = GetXFitMAX1(higgsMass);
-  float xFitMIN2 = GetXFitMIN2(higgsMass);
-  float xFitMAX2 = GetXFitMAX2(higgsMass);
+  float xFitMIN1 = GetXFitMIN1(higgsMass,analysisMethod);
+  float xFitMAX1 = GetXFitMAX1(higgsMass,analysisMethod);
+  float xFitMIN2 = GetXFitMIN2(higgsMass,analysisMethod);
+  float xFitMAX2 = GetXFitMAX2(higgsMass,analysisMethod);
   
   int nBins = 200;
   float xMin = 0.;
