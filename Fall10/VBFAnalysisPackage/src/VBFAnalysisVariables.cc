@@ -47,6 +47,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lep_flavour", &vars.lep_flavour);
   reducedTree -> SetBranchAddress("lep_pt",      &vars.lep_pt);
   reducedTree -> SetBranchAddress("lep_eta",     &vars.lep_eta);
+  reducedTree -> SetBranchAddress("lep_phi",     &vars.lep_phi);
   reducedTree -> SetBranchAddress("lep_zepp",    &vars.lep_zepp);
   reducedTree -> SetBranchAddress("lep_z",       &vars.lep_z);
   reducedTree -> SetBranchAddress("lep_dxy_BS",  &vars.lep_dxy_BS);
@@ -106,6 +107,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("nu1",   &vars.p_nu1);
   reducedTree -> SetBranchAddress("nu2",   &vars.p_nu2);
   reducedTree -> SetBranchAddress("met_et",      &vars.met_et);
+  reducedTree -> SetBranchAddress("met_phi",     &vars.met_phi);
   reducedTree -> SetBranchAddress("lepMet_pt",   &vars.lepMet_pt);
   reducedTree -> SetBranchAddress("lepMet_mt",   &vars.lepMet_mt);
   reducedTree -> SetBranchAddress("lepMet_Dphi", &vars.lepMet_Dphi);
@@ -148,7 +150,12 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   vars.p_WJJ    = new ROOT::Math::XYZTVector;
   reducedTree -> SetBranchAddress("WJ1",                     &vars.p_WJ1);
   reducedTree -> SetBranchAddress("WJ2",                     &vars.p_WJ2);
-  reducedTree -> SetBranchAddress("WJJ",                     &vars.p_WJJ);
+  reducedTree -> SetBranchAddress("WJ1_pt",                  &vars.WJ1_pt);
+  reducedTree -> SetBranchAddress("WJ2_pt",                  &vars.WJ2_pt);
+  reducedTree -> SetBranchAddress("WJ1_eta",                  &vars.WJ1_eta);
+  reducedTree -> SetBranchAddress("WJ2_eta",                  &vars.WJ2_eta);
+  reducedTree -> SetBranchAddress("WJ1_phi",                  &vars.WJ1_phi);
+  reducedTree -> SetBranchAddress("WJ2_phi",                  &vars.WJ2_phi);
   reducedTree -> SetBranchAddress("WJ1_lep_Dphi",            &vars.WJ1_lep_Dphi);
   reducedTree -> SetBranchAddress("WJ1_met_Dphi",            &vars.WJ1_met_Dphi);
   reducedTree -> SetBranchAddress("WJ2_lep_Dphi",            &vars.WJ2_lep_Dphi);
@@ -163,7 +170,8 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("WJ2_chargedMultiplicity", &vars.WJ2_chargedMultiplicity);
   reducedTree -> SetBranchAddress("WJ1_neutralMultiplicity", &vars.WJ1_neutralMultiplicity);
   reducedTree -> SetBranchAddress("WJ2_neutralMultiplicity", &vars.WJ2_neutralMultiplicity);
-  
+
+  reducedTree -> SetBranchAddress("WJJ",      &vars.p_WJJ);
   reducedTree -> SetBranchAddress("WJJ_Deta", &vars.WJJ_Deta);
   reducedTree -> SetBranchAddress("WJJ_Dphi", &vars.WJJ_Dphi);
   reducedTree -> SetBranchAddress("WJJ_DR",   &vars.WJJ_DR);
@@ -208,6 +216,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("tagJJ_DR",   &vars.tagJJ_DR);
   reducedTree -> SetBranchAddress("tagJJ_m",    &vars.tagJJ_m);
   
+  
   // third jet variables
   vars.p_thirdJ = new ROOT::Math::XYZTVector; 
   reducedTree -> SetBranchAddress("thirdJ", &vars.p_thirdJ);
@@ -218,6 +227,66 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("thirdJ_tagJJDeta", &vars.thirdJ_tagJJDeta);
   reducedTree -> SetBranchAddress("thirdJ_tagJJDphi", &vars.thirdJ_tagJJDphi);
   reducedTree -> SetBranchAddress("thirdJ_tagJJDR",   &vars.thirdJ_tagJJDR);
+  
+  
+  // MC variables
+  vars.p_mc_lep = new ROOT::Math::XYZTVector;
+  reducedTree -> SetBranchAddress("mc_lep", &vars.p_mc_lep);
+  reducedTree -> SetBranchAddress("mc_lep_charge",  &vars.mc_lep_charge);
+  reducedTree -> SetBranchAddress("mc_lep_flavour", &vars.mc_lep_flavour);
+  reducedTree -> SetBranchAddress("mc_lep_pt",      &vars.mc_lep_pt);
+  reducedTree -> SetBranchAddress("mc_lep_eta",     &vars.mc_lep_eta);
+  reducedTree -> SetBranchAddress("mc_lep_phi",     &vars.mc_lep_phi);
+  
+  vars.p_mc_nu = new ROOT::Math::XYZTVector;
+  reducedTree -> SetBranchAddress("mc_nu", vars.p_mc_nu);
+  reducedTree -> SetBranchAddress("mc_nu_charge",  &vars.mc_nu_charge);
+  reducedTree -> SetBranchAddress("mc_nu_flavour", &vars.mc_nu_flavour);
+  reducedTree -> SetBranchAddress("mc_nu_pt",      &vars.mc_nu_pt);
+  reducedTree -> SetBranchAddress("mc_nu_eta",     &vars.mc_nu_eta);
+  reducedTree -> SetBranchAddress("mc_nu_phi",     &vars.mc_nu_phi);
+  
+  reducedTree -> SetBranchAddress("mc_lepNu_pt",   &vars.mc_lepNu_pt);
+  reducedTree -> SetBranchAddress("mc_lepNu_mt",   &vars.mc_lepNu_mt);
+  reducedTree -> SetBranchAddress("mc_lepNu_Dphi", &vars.mc_lepNu_Dphi);
+  
+  vars.p_mc_WJ1 = new ROOT::Math::XYZTVector;
+  vars.p_mc_WJ2 = new ROOT::Math::XYZTVector;
+  reducedTree -> SetBranchAddress("mc_WJ1", &vars.p_mc_WJ1);  
+  reducedTree -> SetBranchAddress("mc_WJ2", &vars.p_mc_WJ2);  
+  reducedTree -> SetBranchAddress("mc_WJ1_pt",  &vars.mc_WJ1_pt);
+  reducedTree -> SetBranchAddress("mc_WJ2_pt",  &vars.mc_WJ2_pt);
+  reducedTree -> SetBranchAddress("mc_WJ1_eta", &vars.mc_WJ1_eta);
+  reducedTree -> SetBranchAddress("mc_WJ2_eta", &vars.mc_WJ2_eta);
+  reducedTree -> SetBranchAddress("mc_WJ1_phi", &vars.mc_WJ1_phi);
+  reducedTree -> SetBranchAddress("mc_WJ2_phi", &vars.mc_WJ2_phi);
+  
+  reducedTree -> SetBranchAddress("mc_WJJ_Deta", &vars.mc_WJJ_Deta);
+  reducedTree -> SetBranchAddress("mc_WJJ_Dphi", &vars.mc_WJJ_Dphi);
+  reducedTree -> SetBranchAddress("mc_WJJ_DR",   &vars.mc_WJJ_DR);
+  reducedTree -> SetBranchAddress("mc_WJJ_pt",   &vars.mc_WJJ_pt);
+  reducedTree -> SetBranchAddress("mc_WJJ_m",    &vars.mc_WJJ_m);
+  
+  vars.p_mc_W1 = new ROOT::Math::XYZTVector;
+  vars.p_mc_W2 = new ROOT::Math::XYZTVector;
+  reducedTree -> SetBranchAddress("mc_W1", &vars.p_mc_W1);  
+  reducedTree -> SetBranchAddress("mc_W2", &vars.p_mc_W2);  
+  reducedTree -> SetBranchAddress("mc_W1_pt",  &vars.mc_W1_pt);
+  reducedTree -> SetBranchAddress("mc_W2_pt",  &vars.mc_W2_pt);
+  reducedTree -> SetBranchAddress("mc_W1_eta", &vars.mc_W1_eta);
+  reducedTree -> SetBranchAddress("mc_W2_eta", &vars.mc_W2_eta);
+  reducedTree -> SetBranchAddress("mc_W1_phi", &vars.mc_W1_phi);
+  reducedTree -> SetBranchAddress("mc_W2_phi", &vars.mc_W2_phi);
+  reducedTree -> SetBranchAddress("mc_W1_m",   &vars.mc_W1_m);
+  reducedTree -> SetBranchAddress("mc_W2_m",   &vars.mc_W2_m);
+  
+  vars.p_mc_H = new ROOT::Math::XYZTVector;
+  reducedTree -> SetBranchAddress("mc_H", &vars.p_mc_H);  
+  reducedTree -> SetBranchAddress("mc_H_pt",  &vars.mc_H_pt);
+  reducedTree -> SetBranchAddress("mc_H_eta", &vars.mc_H_eta);
+  reducedTree -> SetBranchAddress("mc_H_phi", &vars.mc_H_phi);
+  reducedTree -> SetBranchAddress("mc_H_m",   &vars.mc_H_m);
+  
 }
 
 

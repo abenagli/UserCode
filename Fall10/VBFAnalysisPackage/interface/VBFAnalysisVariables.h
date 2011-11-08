@@ -76,6 +76,7 @@ struct VBFAnalysisVariables
   int lep_flavour;
   float lep_pt;
   float lep_eta;
+  float lep_phi;
   float lep_zepp;
   float lep_z;
   float lep_dxy_BS;
@@ -121,7 +122,9 @@ struct VBFAnalysisVariables
   ROOT::Math::XYZTVector nu_KF1;
   ROOT::Math::XYZTVector* p_nu_KF2;
   ROOT::Math::XYZTVector nu_KF2;
+  
   float met_et;
+  float met_phi;
   
   float lepMet_pt;
   float lepMet_mt;
@@ -205,12 +208,18 @@ struct VBFAnalysisVariables
   ROOT::Math::XYZTVector* p_WJJ;
   ROOT::Math::XYZTVector WJJ;
   
+  float WJ1_pt;
+  float WJ2_pt;
+  float WJ1_eta;
+  float WJ2_eta;
+  float WJ1_phi;
+  float WJ2_phi;
+  float WJ1_zepp;
+  float WJ2_zepp;
   float WJ1_lep_Dphi;
   float WJ1_met_Dphi;
   float WJ2_lep_Dphi;
   float WJ2_met_Dphi;
-  float WJ1_zepp;
-  float WJ2_zepp;
   float WJ1_bTag;
   float WJ2_bTag;
   float WJ1_ptD;
@@ -302,6 +311,82 @@ struct VBFAnalysisVariables
   float thirdJ_tagJJDeta;
   float thirdJ_tagJJDphi;
   float thirdJ_tagJJDR;
+  
+  
+  
+  // MC variables
+  ROOT::Math::XYZTVector mc_lep;
+  ROOT::Math::XYZTVector* p_mc_lep;
+  
+  float mc_lep_charge;
+  int mc_lep_flavour;
+  float mc_lep_pt;
+  float mc_lep_eta;
+  float mc_lep_phi;
+  
+  
+  
+  ROOT::Math::XYZTVector mc_nu;
+  ROOT::Math::XYZTVector* p_mc_nu;
+  
+  float mc_nu_charge;
+  int mc_nu_flavour;
+  float mc_nu_pt;
+  float mc_nu_eta;
+  float mc_nu_phi;
+  
+  
+  
+  float mc_lepNu_pt;
+  float mc_lepNu_mt;
+  float mc_lepNu_Dphi;
+  
+  
+  
+  ROOT::Math::XYZTVector mc_WJ1;
+  ROOT::Math::XYZTVector* p_mc_WJ1;
+  ROOT::Math::XYZTVector mc_WJ2;
+  ROOT::Math::XYZTVector* p_mc_WJ2;
+  
+  float mc_WJ1_pt;
+  float mc_WJ2_pt;
+  float mc_WJ1_eta;
+  float mc_WJ2_eta;
+  float mc_WJ1_phi;
+  float mc_WJ2_phi;
+  
+  float mc_WJJ_Deta;
+  float mc_WJJ_Dphi;
+  float mc_WJJ_DR;
+  float mc_WJJ_pt;
+  float mc_WJJ_m;
+  
+  
+  
+  ROOT::Math::XYZTVector mc_W1;
+  ROOT::Math::XYZTVector* p_mc_W1;
+  ROOT::Math::XYZTVector mc_W2;
+  ROOT::Math::XYZTVector* p_mc_W2;
+  
+  float mc_W1_pt;
+  float mc_W2_pt;
+  float mc_W1_eta;
+  float mc_W2_eta;
+  float mc_W1_phi;
+  float mc_W2_phi;
+  float mc_W1_m;
+  float mc_W2_m;
+  
+  
+  
+  ROOT::Math::XYZTVector mc_H;
+  ROOT::Math::XYZTVector* p_mc_H;
+  
+  float mc_H_pt;
+  float mc_H_eta;
+  float mc_H_phi;
+  float mc_H_m;
+  
 };
 
 
