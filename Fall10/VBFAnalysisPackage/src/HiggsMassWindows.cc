@@ -37,14 +37,14 @@ float GetXFitMIN1(const float& mH, const std::string& method)
 {
   if( method == "highMass" )
   {
-    if     ( mH == 250. ) return 300.;
-    else if( mH == 300. ) return 300.;
-    else if( mH == 350. ) return 300.;
-    else if( mH == 400. ) return 300.;
-    else if( mH == 450. ) return 300.;
-    else if( mH == 500. ) return 300.;
-    else if( mH == 550. ) return 300.;
-    else if( mH == 600. ) return 300.;
+    if     ( mH == 250. ) return 275.;
+    else if( mH == 300. ) return 275.;
+    else if( mH == 350. ) return 275.;
+    else if( mH == 400. ) return 275.;
+    else if( mH == 450. ) return 275.;
+    else if( mH == 500. ) return 275.;
+    else if( mH == 550. ) return 275.;
+    else if( mH == 600. ) return 275.;
     else return -1.;    
   }
   
