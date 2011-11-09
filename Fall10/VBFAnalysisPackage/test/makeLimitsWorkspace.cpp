@@ -223,6 +223,15 @@ int main (int argc, char** argv)
       name = "PDF_" + iMap->first ;
       RooHistPdf pdf (name.c_str (), name.c_str (), RooArgList (x), bdata, 8) ;
       w.import (pdf) ;
+
+      for (int iHist = 0 ; iHist < iMap->second->collection.size () ; ++iHist)
+        {
+          name = "RDH_" + string (iMap->second->collection.at (iHist)->GetName ()) ;
+          RooDataHist bdata_single (name.c_str (), name.c_str (), RooArgList (x), iMap->second->collection.at (iHist)) ;
+          name = "PDF_" + string (iMap->second->collection.at (iHist)->GetName ()) ;
+          RooHistPdf pdf_single (name.c_str (), name.c_str (), RooArgList (x), bdata_single, 8) ;
+          w.import (pdf_single) ;
+        }
     } //PG loop on signal histo collections
 
 
