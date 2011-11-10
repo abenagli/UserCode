@@ -13,13 +13,10 @@ BinSuf  =  .exe
 LibSuf  =  .so
 
 
-HDRS  =  $(wildcard $(HDR)*$(HdrSuf))
+HDRS  =  $(wildcard $(HDR)*$(HdrSuf)) $(wildcard $(HDR)/*/*$(HdrSuf))
 SRCS  =  $(wildcard *$(SrcSuf)) $(wildcard */*$(SrcSuf))
-SRCSNOTDIR  =  $(wildcard *$(SrcSuf)) $(notdir $(wildcard */*$(SrcSuf)))
 _OBJS  =  $(patsubst %$(SrcSuf), %$(ObjSuf), $(SRCS))
 OBJS   =  $(addprefix $(OBJ),$(_OBJS))
-_OBJSNOTDIR  =  $(patsubst %$(SrcSuf), %$(ObjSuf), $(SRCSNOTDIR))
-OBJSNOTDIR   =  $(addprefix $(OBJ),$(_OBJSNOTDIR))
 PRGS  =  $(wildcard $(PRG)*$(PrgSuf))
 _BINS    =  $(wildcard $(PRG)*$(PrgSuf))
 __BINS   =  $(_BINS:$(PrgSuf)=$(BinSuf))
@@ -116,11 +113,7 @@ test:
 	@echo ""
 	@echo "SRCS = $(SRCS)"
 	@echo ""
-	@echo "SRCSNOTDIR = $(SRCSNOTDIR)"
-	@echo ""
 	@echo "OBJS = $(OBJS)"
-	@echo ""
-	@echo "OBJSNOTDIR = $(OBJSNOTDIR)"
 	@echo ""
 	@echo "PRGS = $(PRGS)"
 	@echo ""
@@ -129,11 +122,11 @@ test:
 
 
 $(OBJ)%$(ObjSuf): %$(SrcSuf) $(HDRS)
-	$(CXX) -c $(CXXFLAGS) -o $(OBJ)$(notdir $@) $< 
+	$(CXX) -c $(CXXFLAGS) -o $(OBJ)$@ $< 
 
 
 $(OBJ)mydict.o: $(OBJ)mydict.cc $(OBJ)mydict.h
-	$(CXX) -c $(CXXFLAGS) -o $(OBJ)$(notdir $@) $<
+	$(CXX) -c $(CXXFLAGS) -o $(OBJ)$@ $<
 
 
 $(OBJ)mydict.cc: $(DICTHDRS)
@@ -142,7 +135,7 @@ $(OBJ)mydict.cc: $(DICTHDRS)
 
 $(LIB)$(SONAME): $(OBJS) $(OBJ)mydict.o
 	@echo "Linking $(SONAME):"
-	$(LD) $(LDFLAGS) $(OBJSNOTDIR) $(OBJ)mydict.o $(SOFLAGS) -o $(LIB)$(SONAME)
+	$(LD) $(LDFLAGS) $(OBJS) $(OBJ)mydict.o $(SOFLAGS) -o $(LIB)$(SONAME)
 
 $(BIN)%$(BinSuf): $(PRG)%$(PrgSuf) $(HDRS) $(LIB)$(SONAME)
 	$(CPP) $(CPPFLAGS) -L$(LIB) $(GLIBS) -lVBF  -o $@ $<
