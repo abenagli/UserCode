@@ -17,6 +17,7 @@ drawTStack::drawTStack(const std::string& inputDir,
  m_baseRootFileName(baseRootFileName),
  m_outputDir(outputDir),
  m_imgFormat(imgFormat),
+ m_generalCut("(1 == 1)"),
  m_xAxisRange(false),
  m_xRangeMin(0.),
  m_xRangeMax(1.),
@@ -212,7 +213,7 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     {
       //std::cout << "MakeHistogram::Dumping tree variable " << (variableNames.at(jj)+">>"+histoName).c_str() << std::endl;
       
-      std::string cutExtended = "(1==1)";
+      std::string cutExtended = m_generalCut;
       if(PURescale)
         cutExtended += " * (PURescaleFactor(PUit_n))";
       if(weightEvent)
@@ -1544,6 +1545,11 @@ void drawTStack::CloseRootFiles()
 
 
 
+
+void drawTStack::SetGeneralCut(const std::string& generalCut)
+{
+  m_generalCut = generalCut;
+}
 
 void drawTStack::SetXaxisRange(const double& xMin, const double& xMax)
 {

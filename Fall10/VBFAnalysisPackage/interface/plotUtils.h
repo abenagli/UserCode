@@ -86,6 +86,8 @@ class drawTStack
   
   void CloseRootFiles();
   
+  void SetGeneralCut(const std::string& generalCut);
+  
   void SetXaxisRange(const double& xMin, const double& xMax);
   void SetXaxisTitle(const std::string& xTitle);
 
@@ -170,6 +172,8 @@ class drawTStack
   
   double m_globalMinimum;
   double m_globalMaximum;
+  
+  std::string m_generalCut;
   
   bool m_xAxisRange;
   double m_xRangeMin;
