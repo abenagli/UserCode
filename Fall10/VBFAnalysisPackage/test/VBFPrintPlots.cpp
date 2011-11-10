@@ -1022,7 +1022,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("pt(WJets)");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames2, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts2);
   
   variableNames.at(0) = "max(WJ1.pt(), WJ2.pt())";
   histoName = "WJ1_pt";
@@ -1046,7 +1046,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-5., 5.);
   stack -> SetXaxisTitle("#eta(WJets)");
   stack -> SetUnit("");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames2, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts2);
   
   variableNames.at(0) = "max(abs(WJ1.eta()), abs(WJ2.eta()))";
   histoName = "WJ1_absEta";
