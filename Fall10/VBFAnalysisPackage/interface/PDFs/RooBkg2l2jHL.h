@@ -9,6 +9,9 @@
  * listed in LICENSE (http://roofit.sourceforge.net/license.txt)             *
  *****************************************************************************/
 
+#ifndef ROO_BKGD2L2JHL
+#define ROO_BKGD2L2JHL
+
 #include <vector>
 #include <string>
  
@@ -46,3 +49,4 @@ private:
 
 };
  
+#endif

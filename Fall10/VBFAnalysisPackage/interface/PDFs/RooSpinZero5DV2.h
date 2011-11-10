@@ -9,6 +9,8 @@
  * listed in LICENSE (http://roofit.sourceforge.net/license.txt)             *
  *****************************************************************************/
 
+#ifndef ROO_SPINZER5DV2
+#define ROO_SPINZER5DV2
 
 #include <vector>
 #include <string>
@@ -147,4 +149,4 @@ private:
   //ClassDef(RooSpinZero5DV2,0) // Your description goes here...
 };
  
-
+#endif
