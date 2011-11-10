@@ -276,6 +276,8 @@ struct VBFAnalysisVariables
   float WJ1_ctheta;
   float lepNu_ctheta;
   
+  float helicityLikelihood;
+  
   
   
   // tag-jet variables

@@ -299,6 +299,8 @@ void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
   reducedTree -> Branch("WJ1_ctheta",   &vars.WJ1_ctheta,     "WJ1_ctheta/F");
   reducedTree -> Branch("lepNu_ctheta", &vars.lepNu_ctheta, "lepNu_ctheta/F");
   
+  reducedTree -> Branch("helicityLikelihood",&vars.helicityLikelihood,"helicityLikelihood/F");
+  
   reducedTree -> Branch("WJ1_QGLikelihood", &vars.WJ1_QGLikelihood);
   reducedTree -> Branch("WJ2_QGLikelihood", &vars.WJ2_QGLikelihood);
   
@@ -356,6 +358,8 @@ void InitializeVBFAnalysisTree(VBFAnalysisVariables& vars)
   vars.lep_ctheta = -1.;
   vars.WJ1_ctheta = -1.;
   vars.lepNu_ctheta = -1.;
+  
+  vars.helicityLikelihood = -1.;
   
   vars.WJ1_QGLikelihood = -1.;
   vars.WJ2_QGLikelihood = -1.;
