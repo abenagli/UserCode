@@ -36,7 +36,7 @@ float* xFitMax = new float[nMasses];
 void FillHistograms(TTree* tree,
                     const std::string& label, std::map<std::string,TH1F*>& h_lepNuW_m, std::map<std::string,TH1F*>& h_lepNuW_m_KF);
 
-void DrawHistograms(std::map<std::string,TH1F*>& h_lepNuW_m, std::map<std::string,TH1F*>& h_lepNuW_m);
+void DrawHistograms(std::map<std::string,TH1F*>& h_lepNuW_m, std::map<std::string,TH1F*>& h_lepNuW_m_KF);
 
 
 
