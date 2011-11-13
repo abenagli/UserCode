@@ -64,7 +64,7 @@ hChain::Fill (int i, double val)
   }
 
 
-//PG --------------------------------------------------------   
+//RG --------------------------------------------------------   
 
 
 
@@ -245,4 +245,10 @@ hChain::Scale (int index, double factor)
   m_histos.at (index)->Scale (factor) ;
 }
 
+//RG -----------------------------------------------------
+int
+hChain::GetEffectiveEntries(int index)
+{
 
+  return m_histos.at(index)->GetEffectiveEntries();
+}
