@@ -257,6 +257,13 @@ hChain::GetEffectiveEntries(int index)
 void
 hChain::Reset()
 {
- for(int index=0; index<m_histos.size(); index++)
+ for(unsigned int index=0; index<m_histos.size(); index++)
    m_histos.at(index)->Delete();
+}
+
+//RG -------------------------------------------------------
+TH1F*
+hChain::GetHisto(int index)
+{
+  return m_histos.at(index);
 }
