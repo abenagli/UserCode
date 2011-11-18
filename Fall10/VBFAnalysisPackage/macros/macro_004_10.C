@@ -285,7 +285,6 @@ int macro_004_10 (int mass)
   TH1F * signalRegion   = signalRegionMC ; 
 */
 
-/*
   cout << "Martijn\'s test" << endl ;
   TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;
@@ -295,13 +294,14 @@ int macro_004_10 (int mass)
   sidebaRegion->Add (m4_lower_a_DATA) ;
   TH1F * signalRegion = m4_upper_c_DATA->Clone ("signalRegion") ; 
   signalRegion->Add (m4_lower_c_DATA) ;
-*/
 
+/*
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
   TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
   TH1F * sidebaRegion   = m4_sideband_DATA->Clone ("sidebaRegion") ;
   TH1F * signalRegion   = m4_signal_DATA->Clone ("signalRegion") ;  
+*/
 
 /*
   cout << "final analysis closure test" << endl ;
@@ -458,7 +458,7 @@ int macro_004_10 (int mass)
   loops = 0 ; 
   while (fitStatus != 0 && loops < 50)
     {
-      TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
+      fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
       fitStatus = (int)(fitResultPtr) ;
       ++loops ;
     }
