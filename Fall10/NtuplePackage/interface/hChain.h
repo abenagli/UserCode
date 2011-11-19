@@ -37,7 +37,6 @@ struct hChain
   
     TString m_baseName ;
     std::vector <TH1F*> m_histos ;
-//    std::vector <TNtuple*> m_ntuples ;
 
     double findNMin () ;  
     double findNMax () ;
