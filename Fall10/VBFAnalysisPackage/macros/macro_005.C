@@ -123,26 +123,30 @@ TH1F * dumpProfile (TString outputName, TProfile * input)
 
 int macro_005 (int mass)
 {
-  TString inputFile = "../prova" ;
+
 //   TString inputFile = "../testBkg_004_mu_S" ; //PG only muons
 //   TString inputFile = "../testBkg_004_el_S" ; //PG only electrons
-//   TString inputFile = "../testBkg_004_S" ; //PG kinematic fit
-  
-  inputFile += mass ;
-  inputFile += ".root" ;
-  cout << inputFile << endl ;
-  TFile input (inputFile) ;
+  TString inputFile = "../testBkg_004_S" ; //PG kinematic fit
 
   bool makeToys = true ; //PG make toys to eval the error
        makeToys = false ; //PG error as the ratio of the errors of the function
   int nToys = 10000 ;
   bool scaleBand = false ; //PG scale the band according to the pool wrt the MC histo
- 
+  
+  
+  bool subtractResonant = true ; //FC subtract resonant bkg
+  if (subtractResonant) inputFile = "../testBkg_004_noResBkg_" ;
+  
+  inputFile += mass ;
+  inputFile += ".root" ;
+  cout << inputFile << endl ;
+  TFile input (inputFile) ;
+  
+  
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   //PG get the bkg samples
-
   THStack * stack_m4_EvenHigher = (THStack *) input.Get ("stack_m4_EvenHigher") ;
   TH1F * m4_EvenHigher_total = (TH1F*) stack_m4_EvenHigher->GetStack ()->Last () ;  
   m4_EvenHigher_total->SetTitle ("") ;  
@@ -180,7 +184,6 @@ int macro_005 (int mass)
   m4_sideband_total->SetTitle ("") ;
   
   //PG get the signal samples
-
   THStack * stack_m4_EvenHigher_SIG = (THStack *) input.Get ("stack_m4_EvenHigher_SIG") ;
   TH1F * m4_EvenHigher_total_SIG = (TH1F*) stack_m4_EvenHigher_SIG->GetStack ()->Last () ;    
   m4_EvenHigher_total_SIG->SetTitle ("") ;
@@ -218,28 +221,29 @@ int macro_005 (int mass)
   m4_sideband_total_SIG->SetTitle ("") ;
   
   //FC get the WW bkg
-  
-  TH1F * m4_EvenHigher_WW = (TH1F *) input.Get ("m4_EvenHigher_WW") ;      
-  m4_EvenHigher_WW->SetTitle ("") ;
-  TH1F * m4_upper_WW = (TH1F *) input.Get ("m4_upper_WW") ;      
-  m4_upper_WW->SetTitle ("") ;
-  TH1F * m4_upper_a_WW = (TH1F *) input.Get ("m4_upper_a_WW") ;      
-  m4_upper_a_WW->SetTitle ("") ;
-  TH1F * m4_upper_c_WW = (TH1F *) input.Get ("m4_upper_c_WW") ;      
-  m4_upper_c_WW->SetTitle ("") ;
-  TH1F * m4_signal_WW = (TH1F *) input.Get ("m4_signal_WW") ;    
-  m4_signal_WW->SetTitle ("") ;
-  TH1F * m4_lower_WW = (TH1F *) input.Get ("m4_lower_WW") ;      
-  m4_lower_WW->SetTitle ("") ;
-  TH1F * m4_lower_a_WW = (TH1F *) input.Get ("m4_lower_a_WW") ;      
-  m4_lower_a_WW->SetTitle ("") ;
-  TH1F * m4_lower_c_WW = (TH1F *) input.Get ("m4_lower_c_WW") ;      
-  m4_lower_c_WW->SetTitle ("") ;
-  TH1F * m4_sideband_WW = (TH1F *) input.Get ("m4_sideband_WW") ;
-  m4_sideband_WW->SetTitle ("") ;
+  if (subtractResonant) {
+    
+   TH1F * m4_EvenHigher_WW = (TH1F *) input.Get ("m4_EvenHigher_WW") ;      
+   m4_EvenHigher_WW->SetTitle ("") ;
+   TH1F * m4_upper_WW = (TH1F *) input.Get ("m4_upper_WW") ;      
+   m4_upper_WW->SetTitle ("") ;
+   TH1F * m4_upper_a_WW = (TH1F *) input.Get ("m4_upper_a_WW") ;      
+   m4_upper_a_WW->SetTitle ("") ;
+   TH1F * m4_upper_c_WW = (TH1F *) input.Get ("m4_upper_c_WW") ;      
+   m4_upper_c_WW->SetTitle ("") ;
+   TH1F * m4_signal_WW = (TH1F *) input.Get ("m4_signal_WW") ;    
+   m4_signal_WW->SetTitle ("") ;
+   TH1F * m4_lower_WW = (TH1F *) input.Get ("m4_lower_WW") ;      
+   m4_lower_WW->SetTitle ("") ;
+   TH1F * m4_lower_a_WW = (TH1F *) input.Get ("m4_lower_a_WW") ;      
+   m4_lower_a_WW->SetTitle ("") ;
+   TH1F * m4_lower_c_WW = (TH1F *) input.Get ("m4_lower_c_WW") ;      
+   m4_lower_c_WW->SetTitle ("") ;
+   TH1F * m4_sideband_WW = (TH1F *) input.Get ("m4_sideband_WW") ;
+   m4_sideband_WW->SetTitle ("") ;  
+  }
   
   //PG get the data
-  
   TH1F * m4_EvenHigher_DATA = (TH1F *) input.Get ("m4_EvenHigher_DATA") ;      
   m4_EvenHigher_DATA->SetTitle ("") ;
   TH1F * m4_upper_DATA = (TH1F *) input.Get ("m4_upper_DATA") ;      
@@ -263,24 +267,45 @@ int macro_005 (int mass)
   //PG which histograms I use = possible analysis configurations
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-/*
+/*  
   cout << "Martijn\'s test" << endl ;
   TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
   sidebaRegionMC->Add (m4_lower_a_total) ;
   TH1F * signalRegionMC = m4_upper_c_total->Clone ("signalRegionMC") ; 
   signalRegionMC->Add (m4_lower_c_total) ;
+  
+  if (subtractResonant) {  
+   m4_upper_a_DATA->Add (m4_upper_a_WW, -1) ;  //Subtract WW shape   
+   m4_lower_a_DATA->Add (m4_lower_a_WW, -1) ;   
+  } 
+   
   TH1F * sidebaRegion = m4_upper_a_DATA->Clone ("sidebaRegion") ; 
   sidebaRegion->Add (m4_lower_a_DATA) ;
+  
+  if (subtractResonant) {  
+   //FC FIXME: not really rigorous; check for other solutions!!!
+   for (int i = 0; i <= sidebaRegion->GetNbinsX(); i++) {
+     if (sidebaRegion->GetBinContent(i) < 0) { sidebaRegion->SetBinContent(i,0.) ;  sidebaRegion->SetBinError(i,0.) ; }
+   }  
+   
+   TH1F * signalRegionWW = m4_upper_c_WW->Clone ("signalRegionWW") ;  
+   signalRegionWW->Add (m4_lower_c_WW) ;
+  }  
+    
   TH1F * signalRegion = m4_upper_c_DATA->Clone ("signalRegion") ; 
-  signalRegion->Add (m4_lower_c_DATA) ;
-*/
-
+  signalRegion->Add (m4_lower_c_DATA) ; 
+*/  
+  
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
   TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
+  
+  if (subtractResonant) m4_sideband_DATA->Add (m4_sideband_WW, -1) ;
+
   TH1F * sidebaRegion   = m4_sideband_DATA->Clone ("sidebaRegion") ;
-  TH1F * signalRegion   = m4_signal_DATA->Clone ("signalRegion") ;  
-  TH1F * signalRegionWW = m4_signal_WW->Clone ("signalRegionWW") ;  
+  TH1F * signalRegion   = m4_signal_DATA->Clone ("signalRegion") ;
+  
+  if (subtractResonant) TH1F * signalRegionWW = m4_signal_WW->Clone ("signalRegionWW") ;  
   
 /*
   cout << "final analysis closure test" << endl ;
@@ -288,7 +313,7 @@ int macro_005 (int mass)
   TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;  
   TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ; 
   TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
-  TH1F * signalRegionWW = m4_signal_WW->Clone ("signalRegionWW") ;  
+  if (subtractResonant) TH1F * signalRegionWW = m4_signal_WW->Clone ("signalRegionWW") ;  
 */
   
   //PG plot MC signal and background region 
@@ -379,7 +404,7 @@ int macro_005 (int mass)
   loops = 0 ; 
   while (fitStatus != 0 && loops < 30)
     {
-      TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
+      fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
       fitStatus = (int)(fitResultPtr) ;
       ++loops ;
     }
@@ -626,7 +651,7 @@ int macro_005 (int mass)
   (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (sideband_bkg_fitBand, 0.95) ;
 
   //FC set the error to this estimate of the background
-  for (iBin = 1 ; iBin <= sideband_bkg->GetNbinsX () ; ++iBin)
+  for (int iBin = 1 ; iBin <= sideband_bkg->GetNbinsX () ; ++iBin)
   {
     if (sideband_bkg->GetBinCenter(iBin) < startFit) {
       
@@ -634,7 +659,7 @@ int macro_005 (int mass)
       sideband_bkg_fitBand->SetBinError(iBin, 0.);
     }
   }
-
+  
   c1->SetLogy () ;
   sideband_bkg->Draw ("E3") ;
   sideband_bkg_fitBand->SetFillStyle (3001) ;
@@ -644,7 +669,7 @@ int macro_005 (int mass)
   c1->SetLogy (0) ;
   c1->Update () ;
   c1->Print ("sidebandFittedBackground_lin.pdf", "pdf") ;
-  
+
   TH1F sidebandFitPull ("sidebandFitPull", "", 50, -5, 5) ;
   int startFitBin = sideband_bkg->FindBin(startFit);
   int endFitBin   = sideband_bkg->FindBin(endFit);
@@ -694,8 +719,10 @@ int macro_005 (int mass)
   } 
 
 
-  extrapolated_bkg->Add(signalRegionWW, 1);
-//   signalRegionMC->Add(signalRegionWW, 1);
+  if (subtractResonant) {
+    extrapolated_bkg->Add(signalRegionWW, 1);
+    signalRegionMC->Add(signalRegionWW, 1);
+  }
   
   //PG first plot of the result
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -937,7 +964,7 @@ int macro_005 (int mass)
   sidebaRegion->Write();
   signalRegion->Write();
   signalRegionMC->Write();
-  signalRegionWW->Write(); 
+  if (subtractResonant) signalRegionWW->Write(); 
   
   ratio_total->Write();
   h_correctionBand->Write();
