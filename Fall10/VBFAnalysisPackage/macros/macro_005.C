@@ -1,7 +1,6 @@
 #include "./plotUtils.C"
 #include "../interface/Functions.h"
 
-
 void setSqrtErrors (TH1F * input)
 {
   for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
@@ -82,14 +81,6 @@ void setCBPars (TF1 * func, int scale)
   func->SetNpx (10000) ;
   return ;
   
-  //PG alternative parameters
-//  func->SetParameter (0, scale) ;
-//  func->SetParameter (1, 180.) ;
-//  func->SetParameter (2, 23.) ;
-//  func->SetParameter (3, 0.3) ;
-//  func->SetParameter (4, 20.) ;
-//  func->SetParameter (5, 180) ;
-//  func->SetParameter (6, 15) ;
 }
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -132,9 +123,10 @@ TH1F * dumpProfile (TString outputName, TProfile * input)
 
 int macro_005 (int mass)
 {
+  TString inputFile = "../prova" ;
 //   TString inputFile = "../testBkg_004_mu_S" ; //PG only muons
 //   TString inputFile = "../testBkg_004_el_S" ; //PG only electrons
-  TString inputFile = "../testBkg_004_S" ; //PG kinematic fit
+//   TString inputFile = "../testBkg_004_S" ; //PG kinematic fit
   
   inputFile += mass ;
   inputFile += ".root" ;
@@ -145,8 +137,6 @@ int macro_005 (int mass)
        makeToys = false ; //PG error as the ratio of the errors of the function
   int nToys = 10000 ;
   bool scaleBand = false ; //PG scale the band according to the pool wrt the MC histo
-  bool makeBkgFit = false ; //PG smooth the extrap bkg shape with a double exp fit
-                            //PG leave it false by now, it generates a big bias
  
   //PG get the histograms
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -227,6 +217,27 @@ int macro_005 (int mass)
   TH1F * m4_sideband_total_SIG = (TH1F *) stack_m4_sideband_SIG->GetStack ()->Last () ;
   m4_sideband_total_SIG->SetTitle ("") ;
   
+  //FC get the WW bkg
+  
+  TH1F * m4_EvenHigher_WW = (TH1F *) input.Get ("m4_EvenHigher_WW") ;      
+  m4_EvenHigher_WW->SetTitle ("") ;
+  TH1F * m4_upper_WW = (TH1F *) input.Get ("m4_upper_WW") ;      
+  m4_upper_WW->SetTitle ("") ;
+  TH1F * m4_upper_a_WW = (TH1F *) input.Get ("m4_upper_a_WW") ;      
+  m4_upper_a_WW->SetTitle ("") ;
+  TH1F * m4_upper_c_WW = (TH1F *) input.Get ("m4_upper_c_WW") ;      
+  m4_upper_c_WW->SetTitle ("") ;
+  TH1F * m4_signal_WW = (TH1F *) input.Get ("m4_signal_WW") ;    
+  m4_signal_WW->SetTitle ("") ;
+  TH1F * m4_lower_WW = (TH1F *) input.Get ("m4_lower_WW") ;      
+  m4_lower_WW->SetTitle ("") ;
+  TH1F * m4_lower_a_WW = (TH1F *) input.Get ("m4_lower_a_WW") ;      
+  m4_lower_a_WW->SetTitle ("") ;
+  TH1F * m4_lower_c_WW = (TH1F *) input.Get ("m4_lower_c_WW") ;      
+  m4_lower_c_WW->SetTitle ("") ;
+  TH1F * m4_sideband_WW = (TH1F *) input.Get ("m4_sideband_WW") ;
+  m4_sideband_WW->SetTitle ("") ;
+  
   //PG get the data
   
   TH1F * m4_EvenHigher_DATA = (TH1F *) input.Get ("m4_EvenHigher_DATA") ;      
@@ -248,40 +259,9 @@ int macro_005 (int mass)
   TH1F * m4_sideband_DATA = (TH1F *) input.Get ("m4_sideband_DATA") ;
   m4_sideband_DATA->SetTitle ("") ;
 
+  
   //PG which histograms I use = possible analysis configurations
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-/*
-  cout << " A\'B\'C\'D\' test with upper and EvenHigher" << endl ;
-  TH1F * sidebaRegionMC = m4_EvenHigher_total ; //PG analysis
-  TH1F * signalRegionMC = m4_upper_total ; //PG analysis 
-  TH1F * sidebaRegion   = m4_EvenHigher_DATA ;
-  TH1F * signalRegion   = m4_upper_DATA ;  
-*/
-
-/*
-  cout << " A\'B\'C\'D\' test with upper and lower" << endl ;
-  TH1F * sidebaRegionMC = m4_lower_total ; 
-  TH1F * signalRegionMC = m4_upper_total ;  
-  TH1F * sidebaRegion   = m4_lower_DATA ;
-  TH1F * signalRegion   = m4_upper_DATA ;  
-*/
-
-/*
-  cout << "upper sideband analysis" << endl ;
-  TH1F * sidebaRegionMC = m4_upper_total ; 
-  TH1F * signalRegionMC = m4_signal_total ;
-  TH1F * sidebaRegion   = m4_upper_DATA ;
-  TH1F * signalRegion   = m4_signal_DATA ;  
-*/
-
-/*
-  cout << "upper sideband analysis closure test" << endl ;
-  TH1F * sidebaRegionMC = m4_upper_total ; 
-  TH1F * signalRegionMC = m4_signal_total ;  
-  TH1F * sidebaRegion   = sidebaRegionMC ; 
-  TH1F * signalRegion   = signalRegionMC ; 
-*/
 
 /*
   cout << "Martijn\'s test" << endl ;
@@ -300,72 +280,30 @@ int macro_005 (int mass)
   TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
   TH1F * sidebaRegion   = m4_sideband_DATA->Clone ("sidebaRegion") ;
   TH1F * signalRegion   = m4_signal_DATA->Clone ("signalRegion") ;  
-
+  TH1F * signalRegionWW = m4_signal_WW->Clone ("signalRegionWW") ;  
+  
 /*
   cout << "final analysis closure test" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
   TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;  
   TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ; 
   TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
+  TH1F * signalRegionWW = m4_signal_WW->Clone ("signalRegionWW") ;  
 */
-
-/*
-  int injectScale = 1 ;
-  cout << "final analysis closure test with signal injection with scale " << injectScale << endl ;
-  TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
-  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
-  TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ;
-  TH1F * injectSigSideband = m4_sideband_total_SIG->Clone ("injectSigSideband") ;
-  injectSigSideband->Scale (injectScale) ;
-  sidebaRegion->Add (injectSigSideband) ; 
-  setSqrtErrors (sidebaRegion) ; //PG this is valid for many events
-  TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
-  TH1F * injectSigSignal = m4_signal_total_SIG->Clone ("injectSigSignal") ;
-  injectSigSignal->Scale (injectScale) ;
-  signalRegion->Add (injectSigSignal) ; 
-  setSqrtErrors (signalRegion) ; //PG this is valid for many events
-*/
-
-/*
-  cout << "final analysis with outer sidebands" << endl ;
-  TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
-  sidebaRegionMC->Add (m4_lower_a_total) ;  
-  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
-  TH1F * sidebaRegion = m4_upper_a_DATA->Clone ("sidebaRegion") ;
-  sidebaRegion->Add (m4_lower_a_DATA) ;
-  TH1F * signalRegion = m4_signal_DATA->Clone ("signalRegion") ;
-*/
-
-/*
-  cout << "final analysis with outer sidebands closure test" << endl ;
-  TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
-  sidebaRegionMC->Add (m4_lower_a_total) ;  
-  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
-  TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ; 
-  TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
-*/
-
-/*
-  int injectScale = 1 ;
-  cout << "final analysis with outer sidebands closure test with signal injection with scale " << injectScale << endl ;
-  TH1F * sidebaRegionMC = m4_upper_a_total->Clone ("sidebaRegionMC") ; 
-  sidebaRegionMC->Add (m4_lower_a_total) ;  
-  TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
-  TH1F * sidebaRegion   = sidebaRegionMC->Clone ("sidebaRegion") ; 
-  TH1F * injectSigSideband = m4_lower_a_total_SIG->Clone ("injectSigSideband") ;
-  injectSigSideband->Add (m4_upper_a_total_SIG) ;
-  injectSigSideband->Scale (injectScale) ;
-  sidebaRegion->Add (injectSigSideband) ; 
-  setSqrtErrors (sidebaRegion) ; //PG this is valid for many events
-  TH1F * signalRegion   = signalRegionMC->Clone ("signalRegion") ; 
-  TH1F * injectSigSignal = m4_signal_total_SIG->Clone ("injectSigSignal") ;
-  injectSigSignal->Scale (injectScale) ;
-  signalRegion->Add (injectSigSignal) ; 
-  setSqrtErrors (signalRegion) ; //PG this is valid for many events
-*/
-
-  //PG plot MC singal and background region 
+  
+  //PG plot MC signal and background region 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+  int nBins =  m4_signal_DATA->GetNbinsX () ;
+  double m4_min = m4_signal_DATA->GetXaxis ()->GetXmin () ;
+  double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
+ 
+  double binSize = (m4_max - m4_min) / nBins ;
+  double startFit = 200 ; //GeV, bin from where to start the num & den fit for corr factor
+  double endFit = 800 ;   //GeV, bin from where to end the num & den fit for corr factor
+  int fitBins = (endFit-startFit) / binSize ;
+
+  cout << nBins << " " << m4_min << " " << m4_max << " " << binSize << endl ;
+  
 
   TCanvas * c1 = new TCanvas () ;
 
@@ -379,23 +317,18 @@ int macro_005 (int mass)
   leg_sideband->Draw () ;
   c1->Print ("sideband_stack_MC.pdf", "pdf") ;
 
+  TH1F * sidebandMCAndData_pull = getPullPlot (sidebaRegion, sidebaRegionMC, m4_min, m4_max) ;
+  gStyle->SetOptFit(1111);
+  sidebandMCAndData_pull->Draw () ;
+  c1->Print ("sidebandMCAndData_pull.pdf", "pdf") ;
+  
+
   //PG correction factor from the ratio of histograms 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   TH1F * ratio_total = (TH1F *) signalRegionMC->Clone ("ratio") ;
   ratio_total->Divide (sidebaRegionMC) ;
   ratio_total->SetMarkerColor (kOrange) ;
-
-  int nBins =  m4_signal_DATA->GetNbinsX () ;
-  double m4_min = m4_signal_DATA->GetXaxis ()->GetXmin () ;
-  double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
- 
-  double binSize = (m4_max - m4_min) / nBins ;
-  double startFit = 200 ; //GeV, bin from where to start the num & den fit for corr factor
-  double endFit = 800 ;   //GeV, bin from where to end the num & den fit for corr factor
-  int fitBins = (endFit-startFit) / binSize ;
-
-  cout << nBins << " " << m4_min << " " << m4_max << " " << binSize << endl ;
 
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -444,7 +377,7 @@ int macro_005 (int mass)
   fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
   fitStatus = (int)(fitResultPtr) ;
   loops = 0 ; 
-  while (fitStatus != 0 && loops < 50)
+  while (fitStatus != 0 && loops < 30)
     {
       TFitResultPtr fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
       fitStatus = (int)(fitResultPtr) ;
@@ -577,31 +510,69 @@ int macro_005 (int mass)
   leg_correctionFactor->AddEntry (ratio_total, "MC ratio", "pl") ;
 
   c1->DrawFrame (100, 0.01, 800, 2.) ;
-//  correctionPlane->SetStats (0) ;
-//  correctionPlane->Draw ("COLZ") ;
   h_correctionBand->Draw ("E3same") ;
   h_correctionBand->Draw ("Psame") ;
-//  gaussianBand->Draw ("E3same") ;
   gStyle->SetPalette (1) ;
   ratio_total->Draw ("same") ;
   leg_correctionFactor->Draw () ;
   c1->Print ("correctionFactor.pdf", "pdf") ;
 
-  TH1F* correctionPull = new TH1F("correctionPull","correctionPull",25,-3,3) ;
-  for (int i = 0; i < h_correctionBand->GetNbinsX(); i++)
-  {
-    double pull = (h_correctionBand->GetBinContent(i) - ratio->GetBinContent(i)) /
-                   sqrt (h_correctionBand->GetBinError(i)*h_correctionBand->GetBinError(i) + 
-                         ratio->GetBinError(i)*ratio->GetBinError(i) ) ;   
-   
-    correctionPull->Fill(pull) ;
+  
+  //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+  TH1F correctionFactorPull ("correctionFactorPull", "", 50, -5, 5) ;
+//  TH1F pullPlotGaus ("pullPlotGaus", "", 50, -5, 5) ; FIXME this is there only in the case of toys, commented by now, therefore
+  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin) 
+    {
+//      double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;  FIXME this is there only in the case of toys, commented by now, therefore
+//      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ; FIXME this is there only in the case of toys, commented by now, therefore
+//      pullPlotGaus.Fill ((num - mean) / sigma) ; FIXME this is there only in the case of toys, commented by now, therefore
+
+      double num        = ratio_total->GetBinContent (iBin) ;
+      double mean       = h_correctionBand->GetBinContent (iBin) ;
+      double sigma_num  = ratio_total->GetBinError (iBin) ;
+      double sigma_mean = h_correctionBand->GetBinError (iBin) ;
+      
+      double sigma = sqrt(sigma_num*sigma_num + sigma_mean*sigma_mean) ;
+      
+      correctionFactorPull.Fill ((num - mean) / sigma) ;
+    }
+  
+  
+  correctionFactorPull.Fit ("gaus","QL") ;
+  c1->Print ("correctionFactor_pull.pdf", "pdf") ;
+  
+//  pullPlotGaus.Fit ("gaus","L") ;         FIXME this is there only in the case of toys, commented by now, therefore
+//  c1->Print ("pullPlotGaus.pdf", "pdf") ; FIXME this is there only in the case of toys, commented by now, therefore
+
+//PG FIXME this is there only in the case of toys, commented by now, therefore
+//  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
+//  double poolScaleGaus = pullPlotGaus.GetFunction ("gaus")->GetParameter (2) ;
+//  if (poolScaleGaus > 1) 
+//    {
+//      for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin)
+//        {
+//          double newError = poolScaleGaus * gaussianBand->GetBinError (iBin) ;
+//          gaussianBand->SetBinError (iBin, newError) ;
+//        }
+//    }
+// 
+  
+  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
+  if (scaleBand)
+    {
+      double poolScale = correctionFactorPull.GetFunction ("gaus")->GetParameter (2) ;
+      if (poolScale > 1) 
+        {
+          for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
+            {
+              double newError = poolScale * h_correctionBand->GetBinError (iBin) ;
+              h_correctionBand->SetBinError (iBin, newError) ;
+            }
+        }
+    }
     
-  }
-  
-  correctionPull->Draw() ;
-  c1->Print ("correctionPull.pdf", "pdf") ;
-  
-  
   //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   //FC Alternative way of computing the errors from the correction factor to the extrapolated bkg
   TH1F * h_correctionBand_Up ;
@@ -627,102 +598,12 @@ int macro_005 (int mass)
      
      //Only "central" values, no errors
      h_correctionBand_Up->SetBinContent (iBin, UpVal) ;      
-     h_correctionBand_Up->SetBinError (iBin, 0.) ;
      h_correctionBand_Center->SetBinContent (iBin, CenterVal) ;
-     h_correctionBand_Center->SetBinError (iBin, 0.) ;
      h_correctionBand_Down->SetBinContent (iBin, DownVal) ;
-     h_correctionBand_Down->SetBinError (iBin, 0.);
    }
-  //FC end ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-
-  //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-  TH1F pullPlot ("pullPlot", "", 50, -5, 5) ;
-//  TH1F pullPlotGaus ("pullPlotGaus", "", 50, -5, 5) ; FIXME this is there only in the case of toys, commented by now, therefore
-  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin) 
-    {
-      double num = ratio_total->GetBinContent (iBin) ;
-//      double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;  FIXME this is there only in the case of toys, commented by now, therefore
-//      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ; FIXME this is there only in the case of toys, commented by now, therefore
-//      pullPlotGaus.Fill ((num - mean) / sigma) ; FIXME this is there only in the case of toys, commented by now, therefore
-      double mean = h_correctionBand->GetBinContent (iBin) ;
-      double sigma_num  = ratio_total->GetBinError (iBin) ;
-      double sigma_mean = h_correctionBand->GetBinError (iBin) ;
-      
-      double sigma = sqrt(sigma_num*sigma_num + sigma_mean*sigma_mean) ;
-      
-      pullPlot.Fill ((num - mean) / sigma) ;
-    }
-    
-  pullPlot.Fit ("gaus","L") ;
-//  c1->Print ("pullPlot.pdf", "pdf") ;
-//  pullPlotGaus.Fit ("gaus","L") ;         FIXME this is there only in the case of toys, commented by now, therefore
-//  c1->Print ("pullPlotGaus.pdf", "pdf") ; FIXME this is there only in the case of toys, commented by now, therefore
-
-//PG FIXME this is there only in the case of toys, commented by now, therefore
-//  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
-//  double poolScaleGaus = pullPlotGaus.GetFunction ("gaus")->GetParameter (2) ;
-//  if (poolScaleGaus > 1) 
-//    {
-//      for (int iBin = 1 ; iBin <= gaussianBand->GetNbinsX () ; ++iBin)
-//        {
-//          double newError = poolScaleGaus * gaussianBand->GetBinError (iBin) ;
-//          gaussianBand->SetBinError (iBin, newError) ;
-//        }
-//    }
-// 
-
-  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
-  if (scaleBand)
-    {
-      double poolScale = pullPlot.GetFunction ("gaus")->GetParameter (2) ;
-      if (poolScale > 1) 
-        {
-          for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
-            {
-              double newError = poolScale * h_correctionBand->GetBinError (iBin) ;
-              h_correctionBand->SetBinError (iBin, newError) ;
-            }
-        }
-    } 
-  //PG calculate the extrapolated background
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-/*
-  TH1F * extrapolated_bkg = sidebaRegion->Clone ("extrapolated_bkg") ;
-
-  extrapolated_bkg->Multiply (h_correctionBand) ; //PG profile correction
-//  extrapolated_bkg->Multiply (gaussianBand) ; //PG gaus fit correction
-
-  //PG  plot of the result
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
-//  extrapolated_bkg_fitBand->SetFillColor (kGray+2) ;
-//  extrapolated_bkg_fitBand->SetFillStyle (3004) ;
-  
-//  c1->DrawFrame (100, 0.1, 800, 5000) ;
-//  extrapolated_bkg->Draw ("E3same") ;
-//  extrapolated_bkg_fitBand->Draw ("E3same") ;
-//  extrapolated_bkg_fitBand->Draw () ;
-
-  extrapolated_bkg->SetStats (0) ;
-  extrapolated_bkg->SetTitle ("") ;
-  extrapolated_bkg->SetLineColor (kBlack) ;
-  extrapolated_bkg->SetFillColor (kOrange) ;
-
-  extrapolated_bkg->Draw ("E3P") ;
-//  extrapolated_bkg_fitBand->Draw ("E3same") ;
-  c1->Print ("extrapolatedBkg.pdf", "pdf") ;
-  c1->SetLogy () ;
-  c1->Update () ;
-  c1->Print ("extrapolatedBkg_log.pdf", "pdf") ;
-  c1->SetLogy (0) ;
-*/
-  
-  
-  
+   
+   
+  //FC fit the sideband shape
   //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  
   TH1F * sideband_bkg = sidebaRegion->Clone ("sideband_bkg") ;
   
@@ -742,30 +623,15 @@ int macro_005 (int mass)
     
   TH1F * sideband_bkg_fitBand = sidebaRegion->Clone("sideband_bkg_fitBand");
   sideband_bkg_fitBand->Reset();
-  (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (sideband_bkg_fitBand, 0.68) ;
+  (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (sideband_bkg_fitBand, 0.95) ;
 
   //FC set the error to this estimate of the background
   for (iBin = 1 ; iBin <= sideband_bkg->GetNbinsX () ; ++iBin)
   {
     if (sideband_bkg->GetBinCenter(iBin) < startFit) {
       
-      sideband_bkg_fitBand->SetBinContent(iBin, sideband_bkg->GetBinContent(iBin)) ;
-      sideband_bkg_fitBand->SetBinError(iBin, sideband_bkg->GetBinError(iBin));
-    }
-
-    else {
-      double errBkg = 0. ;
-      if (sideband_bkg->GetBinContent (iBin))
-          errBkg = sideband_bkg->GetBinError (iBin) /
-                   sideband_bkg->GetBinContent (iBin) ;
-      double errFit = 0. ;
-      if (sideband_bkg_fitBand->GetBinContent (iBin))
-          errFit = sideband_bkg_fitBand->GetBinError (iBin) /
-                   sideband_bkg_fitBand->GetBinContent (iBin) ;
-
-     
-//       double errTot = sqrt (errFit * errFit + errBkg * errBkg) * sideband_bkg_fitBand->GetBinContent (iBin) ; 
-//       sideband_bkg_fitBand->SetBinError (iBin, errTot) ;
+      sideband_bkg_fitBand->SetBinContent(iBin, 0.) ;
+      sideband_bkg_fitBand->SetBinError(iBin, 0.);
     }
   }
 
@@ -779,178 +645,58 @@ int macro_005 (int mass)
   c1->Update () ;
   c1->Print ("sidebandFittedBackground_lin.pdf", "pdf") ;
   
-
+  TH1F sidebandFitPull ("sidebandFitPull", "", 50, -5, 5) ;
+  int startFitBin = sideband_bkg->FindBin(startFit);
+  int endFitBin   = sideband_bkg->FindBin(endFit);
+  for (int iBin = startFitBin ; iBin <= endFitBin ; ++iBin) 
+    {
+      double num        = sideband_bkg->GetBinContent (iBin) ;
+      double mean       = sideband_bkg_fitBand->GetBinContent (iBin) ;
+      double sigma_num  = sideband_bkg->GetBinError (iBin) ;
+      double sigma_mean = sideband_bkg_fitBand->GetBinError (iBin) ;
+      
+      double sigma = sqrt(sigma_num*sigma_num + sigma_mean*sigma_mean) ;
+      
+      sidebandFitPull.Fill ((num - mean) / sigma) ;
+    }
+  
+  
+  sidebandFitPull.Fit ("gaus","QL") ;
+  c1->Print ("sidebandFit_pull.pdf", "pdf") ;
+  
+  
+  //FC calculate the extrapolated background
+  //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  
   TH1F * extrapolated_bkg_Up = sideband_bkg_fitBand->Clone ("extrapolated_bkg_Up") ;
   extrapolated_bkg_Up->Multiply (h_correctionBand_Up) ; 
   TH1F * extrapolated_bkg_Center = sideband_bkg_fitBand->Clone ("extrapolated_bkg_Center") ;
   extrapolated_bkg_Center->Multiply (h_correctionBand_Center) ; 
   TH1F * extrapolated_bkg_Down = sideband_bkg_fitBand->Clone ("extrapolated_bkg_Down") ;
   extrapolated_bkg_Down->Multiply (h_correctionBand_Down) ; 
- 
 
+  
   TH1F * extrapolated_bkg = sideband_bkg_fitBand->Clone ("extrapolated_bkg") ;
   extrapolated_bkg->Reset();
   
-  for (iBin = 1 ; iBin <= extrapolated_bkg->GetNbinsX () ; ++iBin)
+  int startFitBin = sideband_bkg_fitBand->FindBin(startFit);
+  int endFitBin   = sideband_bkg_fitBand->FindBin(endFit);
+  for (iBin = startFitBin ; iBin <= endFitBin ; ++iBin)
   {
-    if (extrapolated_bkg->GetBinCenter(iBin) < startFit) {
-      
-      double CenterVal = sideband_bkg_fitBand->GetBinContent(iBin);
-      double Err = sideband_bkg_fitBand->GetBinError(iBin);
-    }
-    
-    else {
-      double UpVal = extrapolated_bkg_Up->GetBinContent(iBin) ;
-      double CenterVal = extrapolated_bkg_Center->GetBinContent(iBin) ;
-      double DownVal = extrapolated_bkg_Down->GetBinContent(iBin) ;
+    double UpVal = extrapolated_bkg_Up->GetBinContent(iBin) ;
+    double CenterVal = extrapolated_bkg_Center->GetBinContent(iBin) ;
+    double DownVal = extrapolated_bkg_Down->GetBinContent(iBin) ;
  
-    //Mean of the distances    
+    //Mean of the distances        
     double Err = (fabs(UpVal-CenterVal) + fabs(CenterVal-DownVal))/2. ;
     
     extrapolated_bkg->SetBinContent(iBin, CenterVal) ;
     extrapolated_bkg->SetBinError(iBin, Err) ;
-    }
   } 
 
 
+  extrapolated_bkg->Add(signalRegionWW, 1);
+//   signalRegionMC->Add(signalRegionWW, 1);
   
-/*  
-  TH1F * extrapolated_bkg_Up = sidebaRegion->Clone ("extrapolated_bkg_Up") ;
-  extrapolated_bkg_Up->Multiply (h_correctionBand_Up) ; 
-  TH1F * extrapolated_bkg_Center = sidebaRegion->Clone ("extrapolated_bkg_Center") ;
-  extrapolated_bkg_Center->Multiply (h_correctionBand_Center) ; 
-  TH1F * extrapolated_bkg_Down = sidebaRegion->Clone ("extrapolated_bkg_Down") ;
-  extrapolated_bkg_Down->Multiply (h_correctionBand_Down) ; 
-   
-  TF1 * bkgFitFunc_Up = new TF1 ("bkgFitFunc_Up", doubleExponential, 0., 1000., 4) ;
-  TF1 * bkgFitFunc_Center = new TF1 ("bkgFitFunc_Center", doubleExponential, 0., 1000., 4) ;
-  TF1 * bkgFitFunc_Down = new TF1 ("bkgFitFunc_Down", doubleExponential, 0., 1000., 4) ;
-  setDoubleExpPars (bkgFitFunc_Up) ;
-  setDoubleExpPars (bkgFitFunc_Center) ;
-  setDoubleExpPars (bkgFitFunc_Down) ;
-  
-  //Fit extrapolated_bkg_Up
-  TFitResultPtr fitResultPtrUp = extrapolated_bkg_Up->Fit (bkgFitFunc_Up, "L", "", startFit, endFit) ;
-  fitStatus = (int)(fitResultPtrUp) ;
-  loops = 0 ; 
-  while (fitStatus != 0 && loops < 30)
-  {
-    fitResultPtrUp = extrapolated_bkg_Up->Fit (bkgFitFunc_Up, "L", "", startFit, endFit) ;
-    fitStatus = (int)(fitResultPtrUp) ;
-    ++loops ;
-  }
-  cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
-  
-  //Fit extrapolated_bkg_Center
-  TFitResultPtr fitResultPtrCenter = extrapolated_bkg_Center->Fit (bkgFitFunc_Center, "L", "", startFit, endFit) ;
-  fitStatus = (int)(fitResultPtrCenter) ;
-  loops = 0 ; 
-  while (fitStatus != 0 && loops < 30)
-  {
-    fitResultPtrCenter = extrapolated_bkg_Center->Fit (bkgFitFunc_Center, "L", "", startFit, endFit) ;
-    fitStatus = (int)(fitResultPtrCenter) ;
-    ++loops ;
-  }
-  cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
-  
-  //Fit extrapolated_bkg_Down
-  TFitResultPtr fitResultPtrDown = extrapolated_bkg_Down->Fit (bkgFitFunc_Down, "L", "", startFit, endFit) ;
-  fitStatus = (int)(fitResultPtrDown) ;
-  loops = 0 ; 
-  while (fitStatus != 0 && loops < 30)
-  {
-    fitResultPtrDown = extrapolated_bkg_Down->Fit (bkgFitFunc_Down, "L", "", startFit, endFit) ;
-    fitStatus = (int)(fitResultPtrDown) ;
-    ++loops ;
-  }
-  cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
-  
-  
-  TH1F * extrapolated_bkg_fit = extrapolated_bkg->Clone("extrapolated_bkg_fit");
-  
-  for (iBin = 1 ; iBin <= extrapolated_bkg.GetNbinsX () ; ++iBin)
-  {
-    if (extrapolated_bkg_fit->GetBinCenter(iBin) < startFit) {
-      
-      CenterVal = extrapolated_bkg_fit->GetBinContent(iBin);
-      Err = extrapolated_bkg_fit->GetBinError(iBin);
-    }
-    
-    else {
-      double UpVal = bkgFitFunc_Up->Eval(extrapolated_bkg_Up->GetBinCenter(iBin)) ;
-      double CenterVal = bkgFitFunc_Center->Eval(extrapolated_bkg_Center->GetBinCenter(iBin)) ;
-      double DownVal = bkgFitFunc_Down->Eval(extrapolated_bkg_Down->GetBinCenter(iBin)) ;
-    
-      //Mean of the distances
-      double Err = (fabs(UpVal-CenterVal) + fabs(CenterVal-DownVal))/2. ;
-//     cout << Err << endl;
-      extrapolated_bkg_fit->SetBinContent(iBin, CenterVal) ;
-      extrapolated_bkg_fit->SetBinError(iBin, Err) ;
-    }
-  } 
-
-  //PG NB here I change the background I use,
-  //PG therefore I loose the old bkg!
-  extrapolated_bkg = extrapolated_bkg_fit ;
-  //FC end ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-*/
-  
-
-  //PG fit the extrapolated bkg
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-  if (makeBkgFit)
-    {
-      TF1 * bkgFitFunc = new TF1 ("bkgFitFunc", doubleExponential, 0., 1000., 4) ;
-      setDoubleExpPars (bkgFitFunc) ;
-    
-      TFitResultPtr fitResultPtr2 = extrapolated_bkg->Fit (bkgFitFunc, "L", "", startFit, endFit) ;
-      fitStatus = (int)(fitResultPtr2) ;
-      loops = 0 ; 
-      while (fitStatus != 0 && loops < 30)
-        {
-          fitResultPtr2 = extrapolated_bkg->Fit (bkgFitFunc, "L", "", startFit, endFit) ;
-          fitStatus = (int)(fitResultPtr2) ;
-          ++loops ;
-        }
-      cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
-    
-      TH1F * extrapolated_bkg_fitBand = new TH1F ("extrapolated_bkg_fitBand", "", fitBins, startFit, endFit) ;
-      (TVirtualFitter::GetFitter ())->GetConfidenceIntervals (extrapolated_bkg_fitBand, 0.68) ;
-      
-      //PG set the error to this estimate of the background
-      for (iBin = 1 ; iBin <= extrapolated_bkg.GetNbinsX () ; ++iBin)
-        {
-          double center = extrapolated_bkg->GetBinCenter (iBin) ;
-          int iBinBand = extrapolated_bkg_fitBand->GetXaxis ()->FindBin (center) ;
-
-          double errBkg = 0. ;
-          if (extrapolated_bkg->GetBinContent (iBin))
-            errBkg = extrapolated_bkg->GetBinError (iBin) /
-                     extrapolated_bkg->GetBinContent (iBin) ;
-          double errFit = 0. ;
-          if (extrapolated_bkg_fitBand->GetBinContent (iBinBand))
-            errFit = extrapolated_bkg_fitBand->GetBinError (iBinBand) /
-                     extrapolated_bkg_fitBand->GetBinContent (iBinBand) ;
-
-     
-          double errTot = sqrt (errFit * errFit + errBkg * errBkg) * extrapolated_bkg_fitBand->GetBinContent (iBinBand) ; 
-          extrapolated_bkg_fitBand->SetBinError (iBinBand, errTot) ;                    
-        }
-
-      c1->SetLogy () ;
-      extrapolated_bkg->Draw ("E3") ;
-      extrapolated_bkg_fitBand->SetFillStyle (3001) ;
-      extrapolated_bkg_fitBand->SetFillColor (kBlue) ;
-      extrapolated_bkg_fitBand->Draw ("E3same") ;
-      c1->Print ("fittedBackground.pdf", "pdf") ;
-      c1->SetLogy (0) ;
-      c1->Update () ;
-      c1->Print ("fittedBackground_lin.pdf", "pdf") ;
-      
-      //PG NB here I change the background I use,
-      //PG therefore I loose the old bkg!
-      extrapolated_bkg = extrapolated_bkg_fitBand ;
-    }
   //PG first plot of the result
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -964,7 +710,6 @@ int macro_005 (int mass)
   leg_extrapAndMc->AddEntry (extrapolated_bkg, "extrapolated bkg in SR", "fp") ;
 
   c1->SetLogy () ;
-//  c1->DrawFrame (100, 0.1, 800, 5000) ;
   extrapolated_bkg->Draw ("E3") ;
   signalRegionMC->Draw ("Psame") ;
   leg_extrapAndMc->Draw () ;
@@ -1042,7 +787,7 @@ int macro_005 (int mass)
   TGraphErrors g_background_count ;
   TGraph g_error ;
   TGraphErrors g_pull ;
-  TH1F *gPullHisto = new TH1F("gPullHisto","gPullHisto",100,-2,2);
+  TH1F *gPullHisto = new TH1F("gPullHisto","gPullHisto",50,-2,2);
 
   cout << "mass" 
        << " : (" << "min"
@@ -1058,7 +803,7 @@ int macro_005 (int mass)
        << "\n" ;
 
   
-  double bkg_count_min = 99999999.;  //FC Needed for give a fancier axis range, see later... 
+  double bkg_count_min = 99999999.;  //FC Needed for giving a fancier axis range, see later... 
 
   //PG loop on the mass points
   for (int i = 0 ; i < masses.size () ; ++i)
@@ -1082,8 +827,7 @@ int macro_005 (int mass)
       double min = signalRegion->GetBinLowEdge (minBin) ;
       double max = signalRegion->GetBinLowEdge (maxBin + 1) ;
 
-//      int minBinBkg = extrapolated_bkg->GetXaxis ()->FindBin (mMin.at (i)) ;
-//      int maxBinBkg = extrapolated_bkg->GetXaxis ()->FindBin (mMax.at (i)) ;
+
       int minBinBkg = -1 ;
       int maxBinBkg = -1 ;
       
@@ -1110,7 +854,7 @@ int macro_005 (int mass)
       cout << "MH | " << masses.at (i) 
            << " : (" << min
            << "," << max
-           << ") : " << total //PG the bin width 
+           << ") : " << total
            << " : " << bkg_count
            << " +- " << bkg_count_error
            << " | "
@@ -1119,25 +863,36 @@ int macro_005 (int mass)
            << bkg_count_error / bkg_count << " : "
            << total << " : "
            << endl;
-           
+        
       g_total.SetPoint (i, masses.at (i), total) ;
       g_total.SetPointError (i, 50., sqrt (total)) ;
       g_background_count.SetPoint (i, masses.at (i), bkg_count) ;
       g_background_count.SetPointError (i, 0., bkg_count_error) ;
       g_error.SetPoint (i, masses.at (i), sqrt (bkg_count_error * bkg_count_error + total)) ;
-      
-      
+    
     } //PG loop on the mass points
+
 
   //FC loop on the mass points
   int index = 0;
-  for (int i = startFit; i <= endFit ; ++i)
+  int startFitBin = extrapolated_bkg->FindBin(startFit);
+  int endFitBin   = extrapolated_bkg->FindBin(endFit);
+  for (int i = startFitBin; i <= endFitBin ; i++)
     {
-      int iBin = extrapolated_bkg->FindBin(i) ;
-      double pull = ( signalRegion->GetBinContent(iBin) - extrapolated_bkg->GetBinContent(iBin)) / signalRegion->GetBinContent(iBin) ;
+      double obs = signalRegion->GetBinContent(i) ;
+      double exp = extrapolated_bkg->GetBinContent(i) ;
+      double sigma_obs = sqrt(obs) ;
+      double sigma_exp = extrapolated_bkg->GetBinError(i) ;
       
-      g_pull.SetPoint (index,i,pull) ;
-      gPullHisto->Fill(pull);
+      double pull = (obs - exp)/exp ;
+      double err  = 1./pow(exp,2) * pow(sigma_obs,2) + pow(obs,2)/pow(exp,4) * pow(sigma_exp,2) ;
+      err = err * pow(pull,2) ;
+      err = sqrt (err) ;
+      
+      g_pull.SetPoint (index,signalRegion->GetBinCenter(i),pull) ;
+      g_pull.SetPointError (index,binSize/2,err) ;
+      
+      gPullHisto->Fill(pull) ;
       
       index++ ;
     }
@@ -1161,59 +916,47 @@ int macro_005 (int mass)
   c1->Print ("results.pdf", "pdf") ;
   c1->SetLogy (0) ;
 
-  
-//   c1->DrawFrame (200, 0, 700, 200) ;
-//   c1->SetGridx() ;
-//   c1->SetGridy() ;
-//   g_pull.SetMarkerStyle (20) ;
-//   g_pull.SetMarkerSize (1) ;
-//   g_pull.SetMarkerColor (kOrange) ;
-//   g_pull.Draw("AP") ;
-//   c1->Print("resultPull.pdf", "pdf") ;
-  
-  
   c1->DrawFrame (200, 0, 700, 200) ;
   g_error.SetLineWidth (2) ;
   g_error.Draw ("L") ;
-//  g_expectedCountings.SetMarkerStyle (8) ;
-//  g_expectedCountings.Draw ("LP") ;
   c1->Print ("systematic_and_statistics.pdf", "pdf") ;
-
-  TFile output ("output_004_10.root", "recreate") ;
+  
+  
+  c1->SetGridx() ;
+  c1->SetGridy() ;
+  g_pull.SetMarkerStyle (1) ;
+  g_pull.SetMarkerColor (kOrange) ;
+  g_pull.Draw("AP") ;
+  c1->Print("resultPull.pdf", "pdf") ;
+ 
+  
+  TFile output ("output_005.root", "recreate") ;
   output.cd () ;
   
+  sidebaRegionMC->Write();
+  sidebaRegion->Write();
+  signalRegion->Write();
+  signalRegionMC->Write();
+  signalRegionWW->Write(); 
   
-  ratio_total->Write () ;
-//  gaussianBand->Write () ; //PG FIXME find another way to have this in the root file
-  pullPlot.Write () ;
-//  pullPlotGaus.Write () ; 
-  
-  
-//  extrapolated_bkg_fitBand->Write () ;      //PG FIXME find another way to have this in the root file
-//  if (makeToys) correctionPlane->Write () ; //PG FIXME find another way to have this in the root file
-//  if (makeToys) correctionBand->Write () ;  //PG FIXME find another way to have this in the root file
-  m4_signal_total_SIG->Write ("sig") ;
-  g_total.Write ("g_total") ;
-  g_background_count.Write ("g_background_count") ;
-  g_error.Write ("g_error") ;
-//  g_expectedCountings.Write ("g_expectedCountings") ;
-  
+  ratio_total->Write();
+  h_correctionBand->Write();
   h_correctionBand_Up->Write();
   h_correctionBand_Center->Write();
   h_correctionBand_Down->Write();
   
-  sideband_bkg->Write() ;
-  sideband_bkg_fitBand->Write() ;
-
-  extrapolated_bkg->Write () ;
-//   sideband_bkg_fitBand->Write();
+  sideband_bkg->Write();
+  sideband_bkg_fitBand->Write();
   extrapolated_bkg_Up->Write() ;
   extrapolated_bkg_Center->Write() ;
   extrapolated_bkg_Down->Write() ;
-//   bkgFitFunc_Center->Write();
-//   extrapolated_bkg_fit->Write() ;
-
+  extrapolated_bkg->Write() ;
+  
+  g_total.Write ("g_total") ;
+  g_background_count.Write ("g_background_count") ;
+  g_error.Write ("g_error") ;
   g_pull.Write("gPull") ;
+  
   gPullHisto->Write();
   
   
