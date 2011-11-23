@@ -1,4 +1,5 @@
 #include "HelicityLikelihoodDiscriminant.h"
+#include <cmath>
 
 //using namespace RooFit;
 
