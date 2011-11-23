@@ -1,5 +1,6 @@
 #include "./plotUtils.C"
 #include "../interface/Functions.h"
+ 
 
 void setSqrtErrors (TH1F * input)
 {
@@ -134,8 +135,7 @@ int macro_005 (int mass)
   bool scaleBand = false ; //PG scale the band according to the pool wrt the MC histo
   
   
-  bool subtractResonant = true ; //FC subtract resonant bkg
-  if (subtractResonant) inputFile = "../testBkg_004_noResBkg_" ;
+  bool subtractResonant = true ; //FC subtract resonant WW bkg
   
   inputFile += mass ;
   inputFile += ".root" ;
@@ -143,47 +143,271 @@ int macro_005 (int mass)
   TFile input (inputFile) ;
   
   
-  //PG get the histograms
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+  //FC get the single histograms
+  //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  //PG get the bkg samples
-  THStack * stack_m4_EvenHigher = (THStack *) input.Get ("stack_m4_EvenHigher") ;
-  TH1F * m4_EvenHigher_total = (TH1F*) stack_m4_EvenHigher->GetStack ()->Last () ;  
-  m4_EvenHigher_total->SetTitle ("") ;  
+  //FC get the bkg samples
+  TH1F * m4_EvenHigher_DY   = (TH1F *) input.Get ("m4_EvenHigher_DY") ;
+  TH1F * m4_EvenHigher_TT   = (TH1F *) input.Get ("m4_EvenHigher_TT") ;
+  TH1F * m4_EvenHigher_WW   = (TH1F *) input.Get ("m4_EvenHigher_WW") ;
+  TH1F * m4_EvenHigher_WZ   = (TH1F *) input.Get ("m4_EvenHigher_WZ") ;
+  TH1F * m4_EvenHigher_Wjet = (TH1F *) input.Get ("m4_EvenHigher_Wjet") ;
+  TH1F * m4_EvenHigher_ZZ   = (TH1F *) input.Get ("m4_EvenHigher_ZZ") ;
+  TH1F * m4_EvenHigher_top  = (TH1F *) input.Get ("m4_EvenHigher_top") ;
+  
+  if (subtractResonant == false) {
+   TH1F * m4_EvenHigher_total = (TH1F*) m4_EvenHigher_DY->Clone ("m4_EvenHigher_total");
+   m4_EvenHigher_total->Add(m4_EvenHigher_TT);
+   m4_EvenHigher_total->Add(m4_EvenHigher_WW);
+   m4_EvenHigher_total->Add(m4_EvenHigher_WZ);
+   m4_EvenHigher_total->Add(m4_EvenHigher_Wjet);
+   m4_EvenHigher_total->Add(m4_EvenHigher_ZZ);
+   m4_EvenHigher_total->Add(m4_EvenHigher_top);     
+  }
+  
+  else {
+   TH1F * m4_EvenHigher_total = (TH1F*) m4_EvenHigher_DY->Clone ("m4_EvenHigher_total");
+   m4_EvenHigher_total->Add(m4_EvenHigher_TT);
+   m4_EvenHigher_total->Add(m4_EvenHigher_WZ);
+   m4_EvenHigher_total->Add(m4_EvenHigher_Wjet);
+   m4_EvenHigher_total->Add(m4_EvenHigher_ZZ);
+   m4_EvenHigher_total->Add(m4_EvenHigher_top);     
+  }
 
-  THStack * stack_m4_upper = (THStack *) input.Get ("stack_m4_upper") ;
-  TH1F * m4_upper_total = (TH1F*) stack_m4_upper->GetStack ()->Last () ;
-  m4_upper_total->SetTitle ("") ;
-    
-  THStack * stack_m4_upper_a = (THStack *) input.Get ("stack_m4_upper_a") ;
-  TH1F * m4_upper_a_total = (TH1F*) stack_m4_upper_a->GetStack ()->Last () ;
-  m4_upper_a_total->SetTitle ("") ;
-    
-  THStack * stack_m4_upper_c = (THStack *) input.Get ("stack_m4_upper_c") ;
-  TH1F * m4_upper_c_total = (TH1F*) stack_m4_upper_c->GetStack ()->Last () ;
-  m4_upper_c_total->SetTitle ("") ;
-    
-  THStack * stack_m4_lower = (THStack *) input.Get ("stack_m4_lower") ;
-  TH1F * m4_lower_total = (TH1F *) stack_m4_lower->GetStack ()->Last () ;
-  m4_lower_total->SetTitle ("") ;
-    
-  THStack * stack_m4_lower_a = (THStack *) input.Get ("stack_m4_lower_a") ;
-  TH1F * m4_lower_a_total = (TH1F *) stack_m4_lower_a->GetStack ()->Last () ;
-  m4_lower_a_total->SetTitle ("") ;
-    
-  THStack * stack_m4_lower_c = (THStack *) input.Get ("stack_m4_lower_c") ;
-  TH1F * m4_lower_c_total = (TH1F *) stack_m4_lower_c->GetStack ()->Last () ;
-  m4_lower_c_total->SetTitle ("") ;
-    
-  THStack * stack_m4_signal = (THStack *) input.Get ("stack_m4_signal") ;
-  TH1F * m4_signal_total = (TH1F *) stack_m4_signal->GetStack ()->Last () ;
-  m4_signal_total->SetTitle ("") ;
+  TH1F * m4_upper_DY   = (TH1F *) input.Get ("m4_upper_DY") ;
+  TH1F * m4_upper_TT   = (TH1F *) input.Get ("m4_upper_TT") ;
+  TH1F * m4_upper_WW   = (TH1F *) input.Get ("m4_upper_WW") ;
+  TH1F * m4_upper_WZ   = (TH1F *) input.Get ("m4_upper_WZ") ;
+  TH1F * m4_upper_Wjet = (TH1F *) input.Get ("m4_upper_Wjet") ;
+  TH1F * m4_upper_ZZ   = (TH1F *) input.Get ("m4_upper_ZZ") ;
+  TH1F * m4_upper_top  = (TH1F *) input.Get ("m4_upper_top") ;
+
+  if (subtractResonant == false) {
+   TH1F * m4_upper_total = (TH1F*) m4_upper_DY->Clone ("m4_upper_total");
+   m4_upper_total->Add(m4_upper_TT);
+   m4_upper_total->Add(m4_upper_WW);
+   m4_upper_total->Add(m4_upper_WZ);
+   m4_upper_total->Add(m4_upper_Wjet);
+   m4_upper_total->Add(m4_upper_ZZ);
+   m4_upper_total->Add(m4_upper_top);     
+  }
   
-  THStack * stack_m4_sideband = (THStack *) input.Get ("stack_m4_sideband") ;
-  TH1F * m4_sideband_total = (TH1F *) stack_m4_sideband->GetStack ()->Last () ;
-  m4_sideband_total->SetTitle ("") ;
+  else {
+   TH1F * m4_upper_total = (TH1F*) m4_upper_DY->Clone ("m4_upper_total");
+   m4_upper_total->Add(m4_upper_TT);
+   m4_upper_total->Add(m4_upper_WZ);
+   m4_upper_total->Add(m4_upper_Wjet);
+   m4_upper_total->Add(m4_upper_ZZ);
+   m4_upper_total->Add(m4_upper_top);     
+  }
   
-  //PG get the signal samples
+  TH1F * m4_upper_c_DY   = (TH1F *) input.Get ("m4_upper_c_DY") ;
+  TH1F * m4_upper_c_TT   = (TH1F *) input.Get ("m4_upper_c_TT") ;
+  TH1F * m4_upper_c_WW   = (TH1F *) input.Get ("m4_upper_c_WW") ;
+  TH1F * m4_upper_c_WZ   = (TH1F *) input.Get ("m4_upper_c_WZ") ;
+  TH1F * m4_upper_c_Wjet = (TH1F *) input.Get ("m4_upper_c_Wjet") ;
+  TH1F * m4_upper_c_ZZ   = (TH1F *) input.Get ("m4_upper_c_ZZ") ;
+  TH1F * m4_upper_c_top  = (TH1F *) input.Get ("m4_upper_c_top") ;
+  
+  if (subtractResonant == false) {
+   TH1F * m4_upper_c_total = (TH1F*) m4_upper_c_DY->Clone ("m4_upper_c_total");
+   m4_upper_c_total->Add(m4_upper_c_TT);
+   m4_upper_c_total->Add(m4_upper_c_WW);
+   m4_upper_c_total->Add(m4_upper_c_WZ);
+   m4_upper_c_total->Add(m4_upper_c_Wjet);
+   m4_upper_c_total->Add(m4_upper_c_ZZ);
+   m4_upper_c_total->Add(m4_upper_c_top);     
+  }
+  
+  else {
+   TH1F * m4_upper_c_total = (TH1F*) m4_upper_c_DY->Clone ("m4_upper_c_total");
+   m4_upper_c_total->Add(m4_upper_c_TT);
+   m4_upper_c_total->Add(m4_upper_c_WZ);
+   m4_upper_c_total->Add(m4_upper_c_Wjet);
+   m4_upper_c_total->Add(m4_upper_c_ZZ);
+   m4_upper_c_total->Add(m4_upper_c_top);     
+  }
+  
+  TH1F * m4_upper_a_DY   = (TH1F *) input.Get ("m4_upper_a_DY") ;
+  TH1F * m4_upper_a_TT   = (TH1F *) input.Get ("m4_upper_a_TT") ;
+  TH1F * m4_upper_a_WW   = (TH1F *) input.Get ("m4_upper_a_WW") ;
+  TH1F * m4_upper_a_WZ   = (TH1F *) input.Get ("m4_upper_a_WZ") ;
+  TH1F * m4_upper_a_Wjet = (TH1F *) input.Get ("m4_upper_a_Wjet") ;
+  TH1F * m4_upper_a_ZZ   = (TH1F *) input.Get ("m4_upper_a_ZZ") ;
+  TH1F * m4_upper_a_top  = (TH1F *) input.Get ("m4_upper_a_top") ;
+  
+  if (subtractResonant == false) {
+   TH1F * m4_upper_a_total = (TH1F*) m4_upper_a_DY->Clone ("m4_upper_a_total");
+   m4_upper_a_total->Add(m4_upper_a_TT);
+   m4_upper_a_total->Add(m4_upper_a_WW);
+   m4_upper_a_total->Add(m4_upper_a_WZ);
+   m4_upper_a_total->Add(m4_upper_a_Wjet);
+   m4_upper_a_total->Add(m4_upper_a_ZZ);
+   m4_upper_a_total->Add(m4_upper_a_top);     
+  }
+  
+  else {
+   TH1F * m4_upper_a_total = (TH1F*) m4_upper_a_DY->Clone ("m4_upper_a_total");
+   m4_upper_a_total->Add(m4_upper_a_TT);
+   m4_upper_a_total->Add(m4_upper_a_WZ);
+   m4_upper_a_total->Add(m4_upper_a_Wjet);
+   m4_upper_a_total->Add(m4_upper_a_ZZ);
+   m4_upper_a_total->Add(m4_upper_a_top);     
+  }
+  
+  TH1F * m4_signal_DY   = (TH1F *) input.Get ("m4_signal_DY") ;
+  TH1F * m4_signal_TT   = (TH1F *) input.Get ("m4_signal_TT") ;
+  TH1F * m4_signal_WW   = (TH1F *) input.Get ("m4_signal_WW") ;
+  TH1F * m4_signal_WZ   = (TH1F *) input.Get ("m4_signal_WZ") ;
+  TH1F * m4_signal_Wjet = (TH1F *) input.Get ("m4_signal_Wjet") ;
+  TH1F * m4_signal_ZZ   = (TH1F *) input.Get ("m4_signal_ZZ") ;
+  TH1F * m4_signal_top  = (TH1F *) input.Get ("m4_signal_top") ;
+  
+  if (subtractResonant == false) {
+   TH1F * m4_signal_total = (TH1F*) m4_signal_DY->Clone ("m4_signal_total");
+   m4_signal_total->Add(m4_signal_TT);
+   m4_signal_total->Add(m4_signal_WW);
+   m4_signal_total->Add(m4_signal_WZ);
+   m4_signal_total->Add(m4_signal_Wjet);
+   m4_signal_total->Add(m4_signal_ZZ);
+   m4_signal_total->Add(m4_signal_top);
+   THStack * stack_m4_signal = (THStack *) input.Get ("stack_m4_signal") ;
+  }
+  
+  else {
+   TH1F * m4_signal_total = (TH1F*) m4_signal_DY->Clone ("m4_signal_total");
+   m4_signal_total->Add(m4_signal_TT);
+   m4_signal_total->Add(m4_signal_WZ);
+   m4_signal_total->Add(m4_signal_Wjet);
+   m4_signal_total->Add(m4_signal_ZZ);
+   m4_signal_total->Add(m4_signal_top);
+   THStack * stack_m4_signal = new THStack("stack_m4_signal","");
+   stack_m4_signal->Add(m4_signal_DY);
+   stack_m4_signal->Add(m4_signal_TT);
+   stack_m4_signal->Add(m4_signal_WZ);
+   stack_m4_signal->Add(m4_signal_Wjet);
+   stack_m4_signal->Add(m4_signal_ZZ);
+   stack_m4_signal->Add(m4_signal_top);
+  }
+  
+  TH1F * m4_lower_DY   = (TH1F *) input.Get ("m4_lower_DY") ;
+  TH1F * m4_lower_TT   = (TH1F *) input.Get ("m4_lower_TT") ;
+  TH1F * m4_lower_WW   = (TH1F *) input.Get ("m4_lower_WW") ;
+  TH1F * m4_lower_WZ   = (TH1F *) input.Get ("m4_lower_WZ") ;
+  TH1F * m4_lower_Wjet = (TH1F *) input.Get ("m4_lower_Wjet") ;
+  TH1F * m4_lower_ZZ   = (TH1F *) input.Get ("m4_lower_ZZ") ;
+  TH1F * m4_lower_top  = (TH1F *) input.Get ("m4_lower_top") ;
+  
+  if (subtractResonant == false) {
+   TH1F * m4_lower_total = (TH1F*) m4_lower_DY->Clone ("m4_lower_total");
+   m4_lower_total->Add(m4_lower_TT);
+   m4_lower_total->Add(m4_lower_WW);
+   m4_lower_total->Add(m4_lower_WZ);
+   m4_lower_total->Add(m4_lower_Wjet);
+   m4_lower_total->Add(m4_lower_ZZ);
+   m4_lower_total->Add(m4_lower_top);     
+  }
+  
+  else {
+   TH1F * m4_lower_total = (TH1F*) m4_lower_DY->Clone ("m4_lower_total");
+   m4_lower_total->Add(m4_lower_TT);
+   m4_lower_total->Add(m4_lower_WZ);
+   m4_lower_total->Add(m4_lower_Wjet);
+   m4_lower_total->Add(m4_lower_ZZ);
+   m4_lower_total->Add(m4_lower_top);     
+  }
+  
+  TH1F * m4_lower_c_DY   = (TH1F *) input.Get ("m4_lower_c_DY") ;
+  TH1F * m4_lower_c_TT   = (TH1F *) input.Get ("m4_lower_c_TT") ;
+  TH1F * m4_lower_c_WW   = (TH1F *) input.Get ("m4_lower_c_WW") ;
+  TH1F * m4_lower_c_WZ   = (TH1F *) input.Get ("m4_lower_c_WZ") ;
+  TH1F * m4_lower_c_Wjet = (TH1F *) input.Get ("m4_lower_c_Wjet") ;
+  TH1F * m4_lower_c_ZZ   = (TH1F *) input.Get ("m4_lower_c_ZZ") ;
+  TH1F * m4_lower_c_top  = (TH1F *) input.Get ("m4_lower_c_top") ;
+  
+  if (subtractResonant == false) {
+   TH1F * m4_lower_c_total = (TH1F*) m4_lower_c_DY->Clone ("m4_lower_c_total");
+   m4_lower_c_total->Add(m4_lower_c_TT);
+   m4_lower_c_total->Add(m4_lower_c_WW);
+   m4_lower_c_total->Add(m4_lower_c_WZ);
+   m4_lower_c_total->Add(m4_lower_c_Wjet);
+   m4_lower_c_total->Add(m4_lower_c_ZZ);
+   m4_lower_c_total->Add(m4_lower_c_top);     
+  }
+  
+  else {
+   TH1F * m4_lower_c_total = (TH1F*) m4_lower_c_DY->Clone ("m4_lower_c_total");
+   m4_lower_c_total->Add(m4_lower_c_TT);
+   m4_lower_c_total->Add(m4_lower_c_WZ);
+   m4_lower_c_total->Add(m4_lower_c_Wjet);
+   m4_lower_c_total->Add(m4_lower_c_ZZ);
+   m4_lower_c_total->Add(m4_lower_c_top);     
+  }
+  
+  TH1F * m4_lower_a_DY   = (TH1F *) input.Get ("m4_lower_a_DY") ;
+  TH1F * m4_lower_a_TT   = (TH1F *) input.Get ("m4_lower_a_TT") ;
+  TH1F * m4_lower_a_WW   = (TH1F *) input.Get ("m4_lower_a_WW") ;
+  TH1F * m4_lower_a_WZ   = (TH1F *) input.Get ("m4_lower_a_WZ") ;
+  TH1F * m4_lower_a_Wjet = (TH1F *) input.Get ("m4_lower_a_Wjet") ;
+  TH1F * m4_lower_a_ZZ   = (TH1F *) input.Get ("m4_lower_a_ZZ") ;
+  TH1F * m4_lower_a_top  = (TH1F *) input.Get ("m4_lower_a_top") ;
+  
+  if (subtractResonant == false) {
+   TH1F * m4_lower_a_total = (TH1F*) m4_lower_a_DY->Clone ("m4_lower_a_total");
+   m4_lower_a_total->Add(m4_lower_a_TT);
+   m4_lower_a_total->Add(m4_lower_a_WW);
+   m4_lower_a_total->Add(m4_lower_a_WZ);
+   m4_lower_a_total->Add(m4_lower_a_Wjet);
+   m4_lower_a_total->Add(m4_lower_a_ZZ);
+   m4_lower_a_total->Add(m4_lower_a_top);     
+  }
+  
+  else {
+   TH1F * m4_lower_a_total = (TH1F*) m4_lower_a_DY->Clone ("m4_lower_a_total");
+   m4_lower_a_total->Add(m4_lower_a_TT);
+   m4_lower_a_total->Add(m4_lower_a_WZ);
+   m4_lower_a_total->Add(m4_lower_a_Wjet);
+   m4_lower_a_total->Add(m4_lower_a_ZZ);
+   m4_lower_a_total->Add(m4_lower_a_top);     
+  }
+  
+  TH1F * m4_sideband_DY   = (TH1F *) input.Get ("m4_sideband_DY") ;
+  TH1F * m4_sideband_TT   = (TH1F *) input.Get ("m4_sideband_TT") ;
+  TH1F * m4_sideband_WW   = (TH1F *) input.Get ("m4_sideband_WW") ;
+  TH1F * m4_sideband_WZ   = (TH1F *) input.Get ("m4_sideband_WZ") ;
+  TH1F * m4_sideband_Wjet = (TH1F *) input.Get ("m4_sideband_Wjet") ;
+  TH1F * m4_sideband_ZZ   = (TH1F *) input.Get ("m4_sideband_ZZ") ;
+  TH1F * m4_sideband_top  = (TH1F *) input.Get ("m4_sideband_top") ;
+  
+  if (subtractResonant == false) {
+   TH1F * m4_sideband_total = (TH1F*) m4_sideband_DY->Clone ("m4_sideband_total");
+   m4_sideband_total->Add(m4_sideband_TT);
+   m4_sideband_total->Add(m4_sideband_WW);
+   m4_sideband_total->Add(m4_sideband_WZ);
+   m4_sideband_total->Add(m4_sideband_Wjet);
+   m4_sideband_total->Add(m4_sideband_ZZ);
+   m4_sideband_total->Add(m4_sideband_top);
+   THStack * stack_m4_sideband = (THStack *) input.Get ("stack_m4_sideband") ;
+  }
+  
+  else {
+   TH1F * m4_sideband_total = (TH1F*) m4_sideband_DY->Clone ("m4_sideband_total");
+   m4_sideband_total->Add(m4_sideband_TT);
+   m4_sideband_total->Add(m4_sideband_WZ);
+   m4_sideband_total->Add(m4_sideband_Wjet);
+   m4_sideband_total->Add(m4_sideband_ZZ);
+   m4_sideband_total->Add(m4_sideband_top);
+   THStack * stack_m4_sideband = new THStack("stack_m4_sideband","");
+   stack_m4_sideband->Add(m4_sideband_DY);
+   stack_m4_sideband->Add(m4_sideband_TT);
+   stack_m4_sideband->Add(m4_sideband_WZ);
+   stack_m4_sideband->Add(m4_sideband_Wjet);
+   stack_m4_sideband->Add(m4_sideband_ZZ);
+   stack_m4_sideband->Add(m4_sideband_top);
+  }
+  
+ 
+  //FC get the signal samples
   THStack * stack_m4_EvenHigher_SIG = (THStack *) input.Get ("stack_m4_EvenHigher_SIG") ;
   TH1F * m4_EvenHigher_total_SIG = (TH1F*) stack_m4_EvenHigher_SIG->GetStack ()->Last () ;    
   m4_EvenHigher_total_SIG->SetTitle ("") ;
@@ -220,30 +444,7 @@ int macro_005 (int mass)
   TH1F * m4_sideband_total_SIG = (TH1F *) stack_m4_sideband_SIG->GetStack ()->Last () ;
   m4_sideband_total_SIG->SetTitle ("") ;
   
-  //FC get the WW bkg
-  if (subtractResonant) {
-    
-   TH1F * m4_EvenHigher_WW = (TH1F *) input.Get ("m4_EvenHigher_WW") ;      
-   m4_EvenHigher_WW->SetTitle ("") ;
-   TH1F * m4_upper_WW = (TH1F *) input.Get ("m4_upper_WW") ;      
-   m4_upper_WW->SetTitle ("") ;
-   TH1F * m4_upper_a_WW = (TH1F *) input.Get ("m4_upper_a_WW") ;      
-   m4_upper_a_WW->SetTitle ("") ;
-   TH1F * m4_upper_c_WW = (TH1F *) input.Get ("m4_upper_c_WW") ;      
-   m4_upper_c_WW->SetTitle ("") ;
-   TH1F * m4_signal_WW = (TH1F *) input.Get ("m4_signal_WW") ;    
-   m4_signal_WW->SetTitle ("") ;
-   TH1F * m4_lower_WW = (TH1F *) input.Get ("m4_lower_WW") ;      
-   m4_lower_WW->SetTitle ("") ;
-   TH1F * m4_lower_a_WW = (TH1F *) input.Get ("m4_lower_a_WW") ;      
-   m4_lower_a_WW->SetTitle ("") ;
-   TH1F * m4_lower_c_WW = (TH1F *) input.Get ("m4_lower_c_WW") ;      
-   m4_lower_c_WW->SetTitle ("") ;
-   TH1F * m4_sideband_WW = (TH1F *) input.Get ("m4_sideband_WW") ;
-   m4_sideband_WW->SetTitle ("") ;  
-  }
-  
-  //PG get the data
+  //FC get the data
   TH1F * m4_EvenHigher_DATA = (TH1F *) input.Get ("m4_EvenHigher_DATA") ;      
   m4_EvenHigher_DATA->SetTitle ("") ;
   TH1F * m4_upper_DATA = (TH1F *) input.Get ("m4_upper_DATA") ;      
@@ -274,9 +475,10 @@ int macro_005 (int mass)
   TH1F * signalRegionMC = m4_upper_c_total->Clone ("signalRegionMC") ; 
   signalRegionMC->Add (m4_lower_c_total) ;
   
+  //Subtract the WW shape from data in the sideband region
   if (subtractResonant) {  
-   m4_upper_a_DATA->Add (m4_upper_a_WW, -1) ;  //Subtract WW shape   
-   m4_lower_a_DATA->Add (m4_lower_a_WW, -1) ;   
+   m4_upper_a_DATA->Add (m4_upper_a_WW, -1);   
+   m4_lower_a_DATA->Add (m4_lower_a_WW, -1);   
   } 
    
   TH1F * sidebaRegion = m4_upper_a_DATA->Clone ("sidebaRegion") ; 
@@ -294,19 +496,20 @@ int macro_005 (int mass)
     
   TH1F * signalRegion = m4_upper_c_DATA->Clone ("signalRegion") ; 
   signalRegion->Add (m4_lower_c_DATA) ; 
-*/  
-  
+*/ 
+/*  
   cout << "final analysis" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
   TH1F * signalRegionMC = m4_signal_total->Clone ("signalRegionMC") ;
   
+  //Subtract the WW shape from data in the sideband region
   if (subtractResonant) m4_sideband_DATA->Add (m4_sideband_WW, -1) ;
 
   TH1F * sidebaRegion   = m4_sideband_DATA->Clone ("sidebaRegion") ;
   TH1F * signalRegion   = m4_signal_DATA->Clone ("signalRegion") ;
   
   if (subtractResonant) TH1F * signalRegionWW = m4_signal_WW->Clone ("signalRegionWW") ;  
-  
+*/  
 /*
   cout << "final analysis closure test" << endl ;
   TH1F * sidebaRegionMC = m4_sideband_total->Clone ("sidebaRegionMC") ; 
@@ -598,38 +801,8 @@ int macro_005 (int mass)
         }
     }
     
-  //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-  //FC Alternative way of computing the errors from the correction factor to the extrapolated bkg
-  TH1F * h_correctionBand_Up ;
-  TH1F * h_correctionBand_Center ;
-  TH1F * h_correctionBand_Down ;
-  
-  // prepare the histos
-  h_correctionBand_Up = (TH1F *) h_correctionBand->Clone ("h_correctionBand_Up") ;
-  h_correctionBand_Up->Reset () ;
-
-  h_correctionBand_Center = (TH1F *) h_correctionBand->Clone ("h_correctionBand_Center") ;
-  h_correctionBand_Center->Reset () ;
-  
-  h_correctionBand_Down = (TH1F *) h_correctionBand->Clone ("h_correctionBand_Down") ;
-  h_correctionBand_Down->Reset () ;
-  
-  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
-   {
-     // fill the histos      
-     double UpVal     = h_correctionBand->GetBinContent(iBin) + h_correctionBand->GetBinError(iBin);
-     double CenterVal = h_correctionBand->GetBinContent(iBin) ;
-     double DownVal   = h_correctionBand->GetBinContent(iBin) - h_correctionBand->GetBinError(iBin);
-     
-     //Only "central" values, no errors
-     h_correctionBand_Up->SetBinContent (iBin, UpVal) ;      
-     h_correctionBand_Center->SetBinContent (iBin, CenterVal) ;
-     h_correctionBand_Down->SetBinContent (iBin, DownVal) ;
-   }
-   
-   
+  //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----   
   //FC fit the sideband shape
-  //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  
   TH1F * sideband_bkg = sidebaRegion->Clone ("sideband_bkg") ;
   
   TF1 * bkgFitFunc = new TF1 ("bkgFitFunc", doubleExponential, 0., 1000., 4) ;
@@ -691,33 +864,8 @@ int macro_005 (int mass)
   
   
   //FC calculate the extrapolated background
-  //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  
-  TH1F * extrapolated_bkg_Up = sideband_bkg_fitBand->Clone ("extrapolated_bkg_Up") ;
-  extrapolated_bkg_Up->Multiply (h_correctionBand_Up) ; 
-  TH1F * extrapolated_bkg_Center = sideband_bkg_fitBand->Clone ("extrapolated_bkg_Center") ;
-  extrapolated_bkg_Center->Multiply (h_correctionBand_Center) ; 
-  TH1F * extrapolated_bkg_Down = sideband_bkg_fitBand->Clone ("extrapolated_bkg_Down") ;
-  extrapolated_bkg_Down->Multiply (h_correctionBand_Down) ; 
-
-  
   TH1F * extrapolated_bkg = sideband_bkg_fitBand->Clone ("extrapolated_bkg") ;
-  extrapolated_bkg->Reset();
-  
-  int startFitBin = sideband_bkg_fitBand->FindBin(startFit);
-  int endFitBin   = sideband_bkg_fitBand->FindBin(endFit);
-  for (iBin = startFitBin ; iBin <= endFitBin ; ++iBin)
-  {
-    double UpVal = extrapolated_bkg_Up->GetBinContent(iBin) ;
-    double CenterVal = extrapolated_bkg_Center->GetBinContent(iBin) ;
-    double DownVal = extrapolated_bkg_Down->GetBinContent(iBin) ;
- 
-    //Mean of the distances        
-    double Err = (fabs(UpVal-CenterVal) + fabs(CenterVal-DownVal))/2. ;
-    
-    extrapolated_bkg->SetBinContent(iBin, CenterVal) ;
-    extrapolated_bkg->SetBinError(iBin, Err) ;
-  } 
-
+  extrapolated_bkg->Multiply(h_correctionBand);
 
   if (subtractResonant) {
     extrapolated_bkg->Add(signalRegionWW, 1);
@@ -813,9 +961,17 @@ int macro_005 (int mass)
   TGraphErrors g_total ;
   TGraphErrors g_background_count ;
   TGraph g_error ;
-  TGraphErrors g_pull ;
-  TH1F *gPullHisto = new TH1F("gPullHisto","gPullHisto",50,-2,2);
-
+  
+  //FC Some pull plots
+  TGraphErrors g_pull_total ;
+  TGraphErrors g_pull_forEveryBin ;
+  
+  const int nMasses = masses.size();
+  char hname[100];
+  
+  TH1F *gPullHisto_forMassWin [nMasses] ;
+  TH1F *gPullHisto_forEveryBin = new TH1F("gPullHisto_forEveryBin","gPullHisto_forEveryBin",50,-5,5);
+  
   cout << "mass" 
        << " : (" << "min"
        << "," << "max"
@@ -896,7 +1052,23 @@ int macro_005 (int mass)
       g_background_count.SetPoint (i, masses.at (i), bkg_count) ;
       g_background_count.SetPointError (i, 0., bkg_count_error) ;
       g_error.SetPoint (i, masses.at (i), sqrt (bkg_count_error * bkg_count_error + total)) ;
+      
+      //FC --- --- ---
+      double error = sqrt(total + bkg_count_error*bkg_count_error) ;
+      double pull = (total - bkg_count)/ error ;
+      g_pull_total.SetPoint(i, masses.at (i), pull) ;
+      g_pull_total.SetPointError(i, 50., 0.) ;
     
+      sprintf(hname,"pull_mass_%d",masses.at (i));
+      gPullHisto_forMassWin [i] = new TH1F(hname, hname,30,-5,5);
+      for (int iBin = minBinBkg; iBin <= maxBinBkg; iBin++) {
+
+       double error = sqrt(signalRegion->GetBinContent(iBin) + extrapolated_bkg->GetBinError(iBin)*extrapolated_bkg->GetBinError(iBin));
+       pull = (signalRegion->GetBinContent(iBin) - extrapolated_bkg->GetBinContent(iBin))/error;
+       
+       gPullHisto_forMassWin [i]->Fill(pull);
+      }
+      
     } //PG loop on the mass points
 
 
@@ -906,20 +1078,38 @@ int macro_005 (int mass)
   int endFitBin   = extrapolated_bkg->FindBin(endFit);
   for (int i = startFitBin; i <= endFitBin ; i++)
     {
+      //FC skip the entries below mMin or above mMax 
+      if (signalRegion->GetBinCenter(i) < mMin.at(0) || 
+	  signalRegion->GetBinCenter(i) > mMax.at(mMax.size()-1)) continue;
+
       double obs = signalRegion->GetBinContent(i) ;
       double exp = extrapolated_bkg->GetBinContent(i) ;
       double sigma_obs = sqrt(obs) ;
       double sigma_exp = extrapolated_bkg->GetBinError(i) ;
       
+      double error = sqrt(sigma_obs*sigma_obs + sigma_exp*sigma_exp);     
+      double pull = (obs - exp)/error;
+      g_pull_forEveryBin.SetPoint(index,signalRegion->GetBinCenter(i),pull);
+      g_pull_forEveryBin.SetPointError(index,binSize/2.,0.);
+      gPullHisto_forEveryBin->Fill(pull);
+      
+      /*
       double pull = (obs - exp)/exp ;
       double err  = 1./pow(exp,2) * pow(sigma_obs,2) + pow(obs,2)/pow(exp,4) * pow(sigma_exp,2) ;
       err = err * pow(pull,2) ;
       err = sqrt (err) ;
       
       g_pull.SetPoint (index,signalRegion->GetBinCenter(i),pull) ;
-      g_pull.SetPointError (index,binSize/2,err) ;
+      g_pull.SetPointError (index,binSize/2,err) ;           
       
-      gPullHisto->Fill(pull) ;
+      double err2  = sqrt(sigma_obs*sigma_obs + sigma_exp*sigma_exp) ;
+      double pull2 = (obs - exp)/err2 ;
+      
+      g_pull2.SetPoint (index,signalRegion->GetBinCenter(i),pull) ;
+      g_pull2.SetPointError (index,binSize/2,0.) ;
+      
+      gPullHisto->Fill(pull2) ;
+      */
       
       index++ ;
     }
@@ -933,7 +1123,6 @@ int macro_005 (int mass)
   legendMaquillage (leg_results) ;
   leg_results->AddEntry (&g_total, "measured events in signal window", "p") ;
   leg_results->AddEntry (&g_background_count, "expected bkg in signal window", "f") ;
-
   
   c1->SetLogy () ;
   g_background_count.SetMinimum(bkg_count_min - 300);  //FC For a fancier logarithmic Y-axis
@@ -949,12 +1138,28 @@ int macro_005 (int mass)
   c1->Print ("systematic_and_statistics.pdf", "pdf") ;
   
   
-  c1->SetGridx() ;
-  c1->SetGridy() ;
-  g_pull.SetMarkerStyle (1) ;
-  g_pull.SetMarkerColor (kOrange) ;
-  g_pull.Draw("AP") ;
-  c1->Print("resultPull.pdf", "pdf") ;
+  g_pull_total.SetMarkerStyle(21);
+  g_pull_total.SetMarkerSize(0.9);
+  g_pull_total.GetYaxis()->SetTitle("(total - exp bkg)/err");
+  g_pull_total.Draw("AP");
+  c1->Print ("resultsPull.pdf", "pdf") ;
+  
+  g_pull_forEveryBin.SetMarkerStyle(1);
+  g_pull_forEveryBin.GetYaxis()->SetTitle("(total - exp bkg)/err");
+  g_pull_forEveryBin.GetYaxis()->SetRangeUser(-3,3);
+  g_pull_forEveryBin.Draw("AP");
+  c1->Print ("resultsPull_forEveryBin.pdf", "pdf") ;
+  
+  gPullHisto_forEveryBin->Draw();
+  gPullHisto_forEveryBin->Fit("gaus","QL");
+  c1->Print ("resultsPull_forEveryBin_histo.pdf", "pdf") ;
+  
+//   c1->SetGridx() ;
+//   c1->SetGridy() ;
+//   g_pull.SetMarkerStyle (1) ;
+//   g_pull.SetMarkerColor (kOrange) ;
+//   g_pull.Draw("AP") ;
+//   c1->Print("resultPull.pdf", "pdf") ;
  
   
   TFile output ("output_005.root", "recreate") ;
@@ -968,24 +1173,22 @@ int macro_005 (int mass)
   
   ratio_total->Write();
   h_correctionBand->Write();
-  h_correctionBand_Up->Write();
-  h_correctionBand_Center->Write();
-  h_correctionBand_Down->Write();
+  correctionFactorPull.Write();
   
   sideband_bkg->Write();
   sideband_bkg_fitBand->Write();
-  extrapolated_bkg_Up->Write() ;
-  extrapolated_bkg_Center->Write() ;
-  extrapolated_bkg_Down->Write() ;
+  sidebandFitPull.Write();
   extrapolated_bkg->Write() ;
   
   g_total.Write ("g_total") ;
   g_background_count.Write ("g_background_count") ;
   g_error.Write ("g_error") ;
-  g_pull.Write("gPull") ;
   
-  gPullHisto->Write();
+  g_pull_total.Write("g_pull_total");
+  g_pull_forEveryBin.Write("g_pull_forEveryBin");
+  gPullHisto_forEveryBin->Write();
   
+  for (int i = 0; i<nMasses; i++)  gPullHisto_forMassWin [i]->Write();
   
   output.Close () ;
 
