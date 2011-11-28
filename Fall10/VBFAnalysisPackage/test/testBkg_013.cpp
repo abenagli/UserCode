@@ -204,8 +204,8 @@ int main (int argc, char** argv)
 
 
   cout << "Float_t xAxis [" << xbins.size () << "] = {" ;
-  for (int i = 0 ; i < xbins.size () - 1 ; ++i) cout << xbins.at (i) << ", " ; 
-  cout << xbins.back () << "} ;\n" ; 
+  for (int i = 0 ; i < xbins.size () ; ++i) cout << xbins.at (i) << ", " ; 
+  cout << m4_max << "} ;\n" ; 
    	
   return 0 ;
 }
