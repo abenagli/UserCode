@@ -157,7 +157,7 @@ int macro_005 (int mass)
   gStyle->SetOptFit(1111);
   gStyle->SetFitFormat("6.3g"); 
   gStyle->SetPalette(1);
-  gROOT->ForceStyle();  //If uncommented removes the color from the THStack
+  gROOT->ForceStyle(1);  //If uncommented removes the color from the THStack
   
 
 //   TString inputFile = "../testBkg_004_mu_S" ; //PG only muons
@@ -189,9 +189,9 @@ int macro_005 (int mass)
   bool fitbkg      = false; 
   
   //closure on data - closure on MC - final analysis
-  bool martijn = false;
+  bool martijn = true;
   bool closure = false;
-  bool final   = true;
+  bool final   = false;
 
   inputFile += mass ;
   inputFile += ".root" ;
@@ -555,8 +555,8 @@ int macro_005 (int mass)
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
  
   double binSize = (m4_max - m4_min) / nBins ;
-  double startFit = 200 ; //GeV, bin from where to start the num & den fit for corr factor
-  double endFit = 800 ;   //GeV, bin from where to end the num & den fit for corr factor
+  double startFit = 225 ; //GeV, bin from where to start the num & den fit for corr factor
+  double endFit = 665 ;   //GeV, bin from where to end the num & den fit for corr factor
   int fitBins = (endFit-startFit) / binSize ;
 
   cout << nBins << " " << m4_min << " " << m4_max << " " << binSize << endl ;
@@ -567,16 +567,16 @@ int macro_005 (int mass)
   TLegend * leg_signal = makeLegendTitle (*stack_m4_signal) ;
   stack_m4_signal->Draw ("hist") ;
   leg_signal->Draw () ;
-  c1->Print ("signal_stack.pdf", "pdf") ;
+  c1->Print ("signal_stack.png", "png") ;
 
   TLegend * leg_sideband = makeLegendTitle (*stack_m4_sideband) ;
   stack_m4_sideband->Draw ("hist") ;
   leg_sideband->Draw () ;
-  c1->Print ("sideband_stack_MC.pdf", "pdf") ;
+  c1->Print ("sideband_stack_MC.png", "png") ;
 
   TH1F * sidebandMCAndData_pull = getPullPlot (sidebaRegion, sidebaRegionMC, m4_min, m4_max) ;
   sidebandMCAndData_pull->Draw () ;
-  c1->Print ("sidebandMCAndData_pull.pdf", "pdf") ;
+  c1->Print ("sidebandMCAndData_pull.png", "png") ;
   
 
   //PG correction factor from the ratio of histograms 
@@ -617,19 +617,19 @@ int macro_005 (int mass)
   signalRegionMC->Draw () ;
   num_fit_error->Draw ("E3same") ;
   signalRegionMC->Draw ("sames") ;
-  c1->Print ("numerator_fit.pdf", "pdf") ;
+  c1->Print ("numerator_fit.png", "png") ;
   c1->SetLogy () ;
   signalRegionMC->Draw () ;
   num_fit_error->Draw ("E3same") ;
   signalRegionMC->Draw ("sames") ;
-  c1->Print ("numerator_fit_log.pdf", "pdf") ;
+  c1->Print ("numerator_fit_log.png", "png") ;
   c1->SetLogy (0) ;
 
   signalRegion->Draw () ;
-  c1->Print ("signal.pdf", "pdf") ;
+  c1->Print ("signal.png", "png") ;
   c1->SetLogy () ;
   signalRegion->Draw () ;
-  c1->Print ("signal_log.pdf", "pdf") ;
+  c1->Print ("signal_log.png", "png") ;
   c1->SetLogy (0) ;
 
   
@@ -662,19 +662,19 @@ int macro_005 (int mass)
   sidebaRegionMC->Draw () ;
   den_fit_error->Draw ("E3same") ;
   sidebaRegionMC->Draw ("sames") ;
-  c1->Print ("denominator_fit.pdf", "pdf") ;
+  c1->Print ("denominator_fit.png", "png") ;
   c1->SetLogy () ;
   sidebaRegionMC->Draw () ;
   den_fit_error->Draw ("E3same") ;
   sidebaRegionMC->Draw ("sames") ;
-  c1->Print ("denominator_fit_log.pdf", "pdf") ;
+  c1->Print ("denominator_fit_log.png", "png") ;
   c1->SetLogy (0) ;
 
   sidebaRegion->Draw () ;
-  c1->Print ("sideband.pdf", "pdf") ;
+  c1->Print ("sideband.png", "png") ;
   c1->SetLogy () ;
   sidebaRegion->Draw () ;
-  c1->Print ("sideband_log.pdf", "pdf") ;
+  c1->Print ("sideband_log.png", "png") ;
   c1->SetLogy (0) ;
 
   TH1F * h_correctionBand ;
@@ -752,6 +752,10 @@ int macro_005 (int mass)
         {
           // fill the histo central values
           double center = h_correctionBand->GetBinCenter (iBin) ;
+
+          // skip the bins where the num and den functions don't exist
+          if (center < startFit || center > endFit) continue ;
+
           double corr = numFitFunc->Eval (center) / denFitFunc->Eval (center) ; 
           h_correctionBand->SetBinContent (iBin, corr) ;
           // fill the histo errors
@@ -785,7 +789,7 @@ int macro_005 (int mass)
   gStyle->SetPalette (1) ;
   ratio_total->Draw ("same") ;
   leg_correctionFactor->Draw () ;
-  c1->Print ("correctionFactor.pdf", "pdf") ;
+  c1->Print ("correctionFactor.png", "png") ;
 
   
   //PG look at the point distro wrt the band width, to determine whether the extrap. factor is ok
@@ -798,7 +802,12 @@ int macro_005 (int mass)
 //      double mean = ((TH1F *) aSlices.At (1))->GetBinContent (iBin) ;  FIXME this is there only in the case of toys, commented by now, therefore
 //      double sigma = ((TH1F *) aSlices.At (2))->GetBinContent (iBin) ; FIXME this is there only in the case of toys, commented by now, therefore
 //      pullPlotGaus.Fill ((num - mean) / sigma) ; FIXME this is there only in the case of toys, commented by now, therefore
+      
+      double center = h_correctionBand->GetBinCenter (iBin) ;
 
+      // skip the bins where the num and den functions don't exist
+      if (center < startFit || center > endFit) continue ;
+      
       double num        = ratio_total->GetBinContent (iBin) ;
       double mean       = h_correctionBand->GetBinContent (iBin) ;
       double sigma_num  = ratio_total->GetBinError (iBin) ;
@@ -811,10 +820,10 @@ int macro_005 (int mass)
   
   
   correctionFactorPull.Fit ("gaus","QL") ;
-  c1->Print ("correctionFactor_pull.pdf", "pdf") ;
+  c1->Print ("correctionFactor_pull.png", "png") ;
   
 //  pullPlotGaus.Fit ("gaus","L") ;         FIXME this is there only in the case of toys, commented by now, therefore
-//  c1->Print ("pullPlotGaus.pdf", "pdf") ; FIXME this is there only in the case of toys, commented by now, therefore
+//  c1->Print ("pullPlotGaus.png", "png") ; FIXME this is there only in the case of toys, commented by now, therefore
 
 //PG FIXME this is there only in the case of toys, commented by now, therefore
 //  //PG scale the error on the correction band by the sigma of the pullPlot, if bigger than 1
@@ -879,7 +888,9 @@ int macro_005 (int mass)
     //FC set the error to this estimate of the background
     for (int iBin = 1 ; iBin <= sideband_bkg->GetNbinsX () ; ++iBin)
     {
-      if (sideband_bkg->GetBinCenter(iBin) < startFit) {
+      double center = sideband_bkg->GetBinCenter (iBin) ;
+      
+      if (center < startFit || center > endFit) {
       
         sideband_bkg_fitBand->SetBinContent(iBin, 0.) ;
         sideband_bkg_fitBand->SetBinError(iBin, 0.);
@@ -892,10 +903,10 @@ int macro_005 (int mass)
     sideband_bkg_fitBand->SetFillStyle (3001) ;
     sideband_bkg_fitBand->SetFillColor (kBlue) ;
     sideband_bkg_fitBand->Draw ("E3same") ;
-    c1->Print ("sidebandFittedBackground.pdf", "pdf") ;
+    c1->Print ("sidebandFittedBackground.png", "png") ;
     c1->SetLogy (0) ;
     c1->Update () ;
-    c1->Print ("sidebandFittedBackground_lin.pdf", "pdf") ;
+    c1->Print ("sidebandFittedBackground_lin.png", "png") ;
 
     TH1F sidebandFitPull ("sidebandFitPull", "", 50, -5, 5) ;
     int startFitBin = sideband_bkg->FindBin(startFit);
@@ -913,7 +924,7 @@ int macro_005 (int mass)
       }
   
     sidebandFitPull.Fit ("gaus","QL") ;
-    c1->Print ("sidebandFit_pull.pdf", "pdf") ;
+    c1->Print ("sidebandFit_pull.png", "png") ;
   
   }
   
@@ -970,10 +981,10 @@ int macro_005 (int mass)
     extrapolated_bkg_fitBand->SetFillStyle (3001) ;
     extrapolated_bkg_fitBand->SetFillColor (kBlue) ;
     extrapolated_bkg_fitBand->Draw ("E3same") ;
-    c1->Print ("fittedBackground.pdf", "pdf") ;
+    c1->Print ("fittedBackground.png", "png") ;
     c1->SetLogy (0) ;
     c1->Update () ;
-    c1->Print ("fittedBackground_lin.pdf", "pdf") ;
+    c1->Print ("fittedBackground_lin.png", "png") ;
 
     //LS set the error to this estimate of the background
     for (iBin = 1 ; iBin <= extrapolated_bkg->GetNbinsX () ; ++iBin)
@@ -999,10 +1010,10 @@ int macro_005 (int mass)
   }
 
   extrapolated_bkg->Draw ("E3L") ;
-  c1->Print ("extrapolatedBkg.pdf", "pdf") ;
+  c1->Print ("extrapolatedBkg.png", "png") ;
   c1->SetLogy () ; 
   c1->Update () ; 
-  c1->Print ("extrapolatedBkg_log.pdf", "pdf") ;
+  c1->Print ("extrapolatedBkg_log.png", "png") ;
   c1->SetLogy (0) ; 
 
   
@@ -1023,10 +1034,10 @@ int macro_005 (int mass)
   extrapolated_bkg->Draw ("LE3") ;
   signalRegionMC->Draw ("Psame") ;
   leg_extrapAndMc->Draw () ;
-  c1->Print ("extrapAndMc.pdf", "pdf") ;
+  c1->Print ("extrapAndMc.png", "png") ;
   c1->SetLogy (0) ;
   c1->Update () ;
-  c1->Print ("extrapAndMc_lin.pdf", "pdf") ;
+  c1->Print ("extrapAndMc_lin.png", "png") ;
 
   //PG the pull trend
   pair<TGraphErrors*, TGraphErrors*> extrapAndMc_pulls =
@@ -1034,11 +1045,11 @@ int macro_005 (int mass)
   extrapAndMc_pulls.second->Draw ("AE3") ;
   extrapAndMc_pulls.first->SetMarkerStyle (24) ;
   extrapAndMc_pulls.first->Draw ("samePE") ;
-  c1->Print ("extrapAndMc_pull.pdf", "pdf") ;
+  c1->Print ("extrapAndMc_pull.png", "png") ;
 
   TH1F * extrapAndMc_pull = getPullPlot (signalRegionMC, extrapolated_bkg, startFit, endFit) ;
   extrapAndMc_pull->Draw () ;
-  c1->Print ("extrapAndMc_pull2.pdf", "pdf") ;
+  c1->Print ("extrapAndMc_pull2.png", "png") ;
   
   TLegend * leg_extrapAndData = new TLegend (0.5, 0.8, 0.95, 0.95, NULL, "brNDC") ;
   legendMaquillage (leg_extrapAndData) ;
@@ -1047,28 +1058,24 @@ int macro_005 (int mass)
 
   c1->SetLogy () ;
   signalRegion->SetStats (0) ;
-//  extrapolated_bkg->GetYaxis()->SetRangeUser(0,1200);
-  extrapolated_bkg->Draw ("E3L") ;
+  extrapolated_bkg->Draw ("E3") ;
   signalRegion->SetMarkerStyle (20) ;
-  signalRegion->SetMarkerSize(0.5);
-  signalRegion->Draw ("sameP") ;
+  signalRegion->Draw ("same") ;
   leg_extrapAndData->Draw () ;
-  c1->Print ("extrapAndData.pdf", "pdf") ;
+  c1->Print ("extrapAndData.png", "png") ;
   c1->SetLogy (0) ;
   c1->Update () ;
-  c1->Print ("extrapAndData_lin.pdf", "pdf") ;
-  
+  c1->Print ("extrapAndData_lin.png", "png") ;
   
   pair<TGraphErrors*, TGraphErrors*> extrapAndData_pulls =
     getPullTrend (signalRegion, extrapolated_bkg) ;
   extrapAndData_pulls.second->Draw ("AE3") ;
   extrapAndData_pulls.first->Draw ("samePE") ;
-  c1->Print ("extrapAndData_pull.pdf", "pdf") ;
+  c1->Print ("extrapAndData_pull.png", "png") ;
 
   TH1F * extrapAndData_pull = getPullPlot (signalRegion, extrapolated_bkg, startFit, endFit) ;
-  gStyle->SetOptFit(1111);
   extrapAndData_pull->Draw () ;
-  c1->Print ("extrapAndData_pull2.pdf", "pdf") ;
+  c1->Print ("extrapAndData_pull2.png", "png") ;
   
   
   //PG prepare the windows for the fast cut-n-count thing
@@ -1107,7 +1114,7 @@ int macro_005 (int mass)
   char hname[100];
   
   TH1F *gPullHisto_forMassWin [nMasses] ;
-  TH1F *gPullHisto_forEveryBin = new TH1F("gPullHisto_forEveryBin","gPullHisto_forEveryBin",50,-5,5);
+  TH1F *gPullHisto_forEveryBin = new TH1F("gPullHisto_forEveryBin","gPullHisto_forEveryBin",40,-5,5);
   
   ofstream outFile("./mass_window_counts.txt");  
   outFile << "mass" 
@@ -1229,7 +1236,9 @@ int macro_005 (int mass)
       double pull = (obs - exp)/error;
       g_pull_forEveryBin.SetPoint(index,signalRegion->GetBinCenter(i),pull);
       g_pull_forEveryBin.SetPointError(index,binSize/2.,0.);
-      gPullHisto_forEveryBin->Fill(pull);      
+      
+      //Weight the pull entry with the mean between the observed and the expected number of events
+      gPullHisto_forEveryBin->Fill(pull , (obs+exp)/2.);
 
       index++ ;
     }
@@ -1249,33 +1258,33 @@ int macro_005 (int mass)
   g_background_count.Draw ("AE3") ;
   g_total.Draw ("EPsame") ;
   leg_results->Draw () ;
-  c1->Print ("results.pdf", "pdf") ;
+  c1->Print ("results.png", "png") ;
   c1->SetLogy (0) ;
 
   c1->DrawFrame (200, 0, 700, 200) ;
   g_error.SetLineWidth (2) ;
   g_error.Draw ("L") ;
-  c1->Print ("systematic_and_statistics.pdf", "pdf") ;
+  c1->Print ("systematic_and_statistics.png", "png") ;
   
   
   g_pull_total.SetMarkerStyle(21);
   g_pull_total.SetMarkerSize(0.9);
   g_pull_total.GetYaxis()->SetTitle("total - expbkg");
   g_pull_total.Draw("AP");
-  c1->Print ("resultsPull.pdf", "pdf") ;
+  c1->Print ("resultsPull.png", "png") ;
   
   g_pull_forEveryBin.SetMarkerStyle(1);
   g_pull_forEveryBin.GetYaxis()->SetTitle("(total - exp bkg)/err");
   g_pull_forEveryBin.GetYaxis()->SetRangeUser(-3,3);
   g_pull_forEveryBin.Draw("AP");
-  c1->Print ("resultsPull_forEveryBin.pdf", "pdf") ;
+  c1->Print ("resultsPull_forEveryBin.png", "png") ;
   
   gPullHisto_forEveryBin->Draw();
   gPullHisto_forEveryBin->Fit("gaus","QL");
-  c1->Print ("resultsPull_forEveryBin_histo.pdf", "pdf") ;
+  c1->Print ("resultsPull_forEveryBin_histo.png", "png") ;
 
   
-  TFile output ("output_005_5.root", "recreate") ;
+  TFile output ("output_005.root", "recreate") ;
   output.cd () ;
   
   sidebaRegionMC->Write();
@@ -1288,10 +1297,10 @@ int macro_005 (int mass)
   h_correctionBand->Write();
   correctionFactorPull.Write();
   
-//  sideband_bkg->Write();
-//  sideband_bkg_fitBand->Write();
-//  sidebandFitPull.Write();
-  extrapolated_bkg->Write() ;
+  if (fitsideband) sideband_bkg->Write();
+  if (fitsideband) sideband_bkg_fitBand->Write();
+  if (fitsideband) sidebandFitPull.Write();
+  extrapolated_bkg->Write();
   
   g_total.Write ("g_total") ;
   g_background_count.Write ("g_background_count") ;
