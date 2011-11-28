@@ -230,7 +230,7 @@ double crystalBallLow(double* x, double* par)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-/*** breit-wigner ***/
+/*** gaussian ***/
 double gaussian(double* x, double* par)
 {
   //[0] = N
@@ -374,7 +374,73 @@ double breitWigner_gaussian(double* x, double* par)
 }
 
 
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
+
+/*** polynomial of fourth order ***/
+double pol4order (double* x, double* par)
+{
+  double xx = x[0];
+  double a = par[0];
+  double b = par[1];
+  double c = par[2];
+  double d = par[3];
+  double e = par[4];
+
+  return a + b*pow(xx,1) + c*pow(xx,2) + d*pow(xx,3) + e*pow(xx,4);
+
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** polynomial of fifth order ***/
+double pol5order (double* x, double* par)
+{
+  double xx = x[0];
+  double a = par[0];
+  double b = par[1];
+  double c = par[2];
+  double d = par[3];
+  double e = par[4];
+  double f = par[5];
+
+  return a + b*pow(xx,1) + c*pow(xx,2) + d*pow(xx,3) + e*pow(xx,4) + f*pow(xx,5);
+
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** polynomial of fourth order in the Bernstein base ***/
+double pol4orderBernstein (double* x, double* par)
+{
+  const int degree = 4;
+  double base[degree+1] = {0.};
+
+  double xx = x[0];
+  double a = par[0];
+  double b = par[1];
+  double c = par[2];
+  double d = par[3];
+  double e = par[4];
+  
+  double start = par[5];
+  double end   = par[6];
+
+  for (int i = 0; i <= degree; i++) {
+    //x in [start,end]
+    base[i] = TMath::Binomial(degree, i) * pow((end-xx), (degree-i)) * pow((xx-start), i) / pow((end-start), degree) ;
+    
+    //x in [0,1]
+    //base[i] = TMath::Binomial(degree, i) * pow(xx,i) * pow((1-xx), (degree-i));
+  }
+    
+  return a*base[0] + b*base[1] + c*base[2] + d*base[3] + e*base[4];
+
+}
 
 
 
