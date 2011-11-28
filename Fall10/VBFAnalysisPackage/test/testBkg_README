@@ -60,3 +60,6 @@ testBkg_009.cpp
 
 testBkg_012.cpp
 - optimize the size of sidebands
+
+testBkg_013.cpp
+- prepare a dynamic binning based on data statistics in the signal region
