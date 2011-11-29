@@ -55,6 +55,7 @@ TLegend * makeLegendTitle (THStack stack)
 // --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + 
 
 
+//PG returns the pull trend (first) and the error band (second)
 pair<TGraphErrors *, TGraphErrors *> 
 getPullTrend  (TH1F * hDATA, TH1F * hMC)
 {
@@ -124,9 +125,21 @@ void legendMaquillage (TLegend * leg)
 // --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + 
 
 
+//PG returns the pull plot between two histos, in the min, max range of their x axis.
+//PG error is the combination of the two
+//PG mode = 0      :     unweighted pull plot
+//PG mode = 1      :     events weighted pull plot
+//PG mode = 2      :     unweighted pull plot of normalized histos (cfr shapes)
 TH1F *
-getPullPlot  (TH1F * hDATA, TH1F * hMC, double min, double max)
+getPullPlot  (TH1F * hDATA_orig, TH1F * hMC_orig, double min, double max, int mode = 0)
 {
+  TH1F * hDATA = (TH1F *) hDATA_orig->Clone ("hDATA") ;
+  TH1F * hMC = (TH1F *) hMC_orig->Clone ("hMC") ;
+  if (mode == 2)
+    {
+      hDATA->Scale (1. / hDATA->Integral ()) ;
+      hMC->Scale (1. / hMC->Integral ()) ;    
+    }
   int nbin = 0.3 * hDATA->GetNbinsX () + 3 ;
   std::string name1 = hDATA->GetName () ;
   std::string name2 = hMC->GetName () ; 
@@ -142,11 +155,15 @@ getPullPlot  (TH1F * hDATA, TH1F * hMC, double min, double max)
       int binMC = hMC->GetXaxis ()->FindBin (X) ;
       double MC = hMC->GetBinContent (binMC) ;
       double errMC = hMC->GetBinError (binMC) ;
-      pull->Fill ((DATA - MC) / sqrt (errMC * errMC + DATA)) ;
+      double weight = 1. ;
+      if (mode == 1) weight = 0.5 * (DATA + MC) ;  //PG DATA only?
+      pull->Fill ((DATA - MC) / sqrt (errMC * errMC + DATA), weight) ;
     }
   pull->Fit ("gaus", "QL") ;
   pull->SetFillColor (kGreen + 2) ;
   pull->SetFillStyle (3001) ;
+  delete hDATA ;
+  delete hMC ;
   return pull ;
 }
 
@@ -154,6 +171,7 @@ getPullPlot  (TH1F * hDATA, TH1F * hMC, double min, double max)
 // --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + 
 
 
+//PG this function is not used by now
 TH1F * PullPlot (TH1F* hDATA, TH1F* hMC, double min, double max)
   {
      std::string nameNew = "pp_" ;
@@ -200,6 +218,7 @@ TH1F * PullPlot (TH1F* hDATA, TH1F* hMC, double min, double max)
 // --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + --- + 
 
 
+//PG this function is not used by now
 TH1F * PullPlotAsRatio (TH1F* hDATA, TH1F* hMC, double min, double max)
   {
     std::string nameNew = "ppR_" ;
