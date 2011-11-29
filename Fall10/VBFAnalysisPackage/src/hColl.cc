@@ -5,11 +5,36 @@
 
 using namespace std ;
 
-hColl::hColl (string pN, int b, double m, double M) :
+hColl::hColl (string pN, int b, Float_t * xAxis) :
+ plotName (pN),
+ bins (b),
+ axis (xAxis),
+ logB (0)
+  {
+    colors.push_back (kBlue+2   ) ;
+    colors.push_back (kRed      ) ;
+    colors.push_back (10        ) ;
+    colors.push_back (kCyan+2   ) ;
+    colors.push_back (kOrange+7 ) ;
+    colors.push_back (kGray     ) ;
+    colors.push_back (kMagenta+1) ;
+    colors.push_back (kGreen+2  ) ;
+    colors.push_back (kOrange   ) ;
+    colors.push_back (kViolet+2 ) ;
+    colors.push_back (kRed+3    ) ;
+  } 
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+hColl::hColl (string pN, int b, double m, double M, bool logBins) :
  plotName (pN),
  bins (b),
  min (m),
- max (M) 
+ max (M), 
+ axis (0), 
+ logB (logBins)
   {
     colors.push_back (kBlue+2   ) ;
     colors.push_back (kRed      ) ;
@@ -37,14 +62,16 @@ hColl::~hColl ()
 }
 
 
-
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
 TH1F *
 hColl::addSample (std::string sampleName) 
 {
-  TH1F * dummy = new TH1F ((plotName + "_" + sampleName).c_str (), sampleName.c_str (), bins, min, max) ;
+
+  TH1F * dummy ; 
+  if (axis == 0) dummy = new TH1F ((plotName + "_" + sampleName).c_str (), sampleName.c_str (), bins, min, max) ;
+  else dummy = new TH1F ((plotName + "_" + sampleName).c_str (), sampleName.c_str (), bins, axis) ;
   dummy->SetStats (0) ;
   dummy->SetFillColor (colors.at (collection.size ())) ;
 //  dummy->SetFillColor (20 + 5 * collection.size ()) ;

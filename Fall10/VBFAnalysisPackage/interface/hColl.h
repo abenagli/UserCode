@@ -10,17 +10,19 @@
 
 struct hColl
 {
-  hColl (std::string pN, int b, double m, double M) ;
+  hColl (std::string pN, int b, double m, double M, bool logBins = 0) ;
+  hColl (std::string pN, int b, Float_t * xAxis) ; //PG this does not work
   ~hColl () ;
   TH1F * addSample (std::string sampleName) ;
   void save (TFile * f) ;
   THStack makeStack () ;
 
-
   std::string plotName ;
   int bins ;
   double min ;
   double max ;
+  Float_t * axis ;
+  bool logB ;
   std::vector <TH1F *> collection ;
   std::vector<int> colors ;  
 
