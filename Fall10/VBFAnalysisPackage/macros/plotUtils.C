@@ -137,8 +137,9 @@ getPullPlot  (TH1F * hDATA_orig, TH1F * hMC_orig, double min, double max, int mo
   TH1F * hMC = (TH1F *) hMC_orig->Clone ("hMC") ;
   if (mode == 2)
     {
-      hDATA->Scale (1. / hDATA->Integral ()) ;
-      hMC->Scale (1. / hMC->Integral ()) ;    
+//      hDATA->Scale (1. / hDATA->Integral ()) ;
+//      hMC->Scale (1. / hMC->Integral ()) ;    
+      hMC->Scale (hDATA->Integral () / hMC->Integral ()) ;    
     }
   int nbin = 0.3 * hDATA->GetNbinsX () + 3 ;
   std::string name1 = hDATA->GetName () ;
