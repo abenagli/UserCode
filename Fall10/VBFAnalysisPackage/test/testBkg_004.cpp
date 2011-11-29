@@ -117,9 +117,10 @@ int main (int argc, char** argv)
 //      |   +--------------------+
 //      +-------------------------------  m4
 
-  int nBins = 140;
-  double m4_min = 100. ;
-  double m4_max = 800. ;
+  int nBins = 200 ;
+  double m4_min = 0. ;
+  double m4_max = 1000. ;
+
   //PG the cuts
   TCut generalCut = "" ;
 //  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
