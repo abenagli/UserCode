@@ -71,6 +71,15 @@ hColl::addSample (std::string sampleName)
 
   TH1F * dummy ; 
   if (axis == 0) dummy = new TH1F ((plotName + "_" + sampleName).c_str (), sampleName.c_str (), bins, min, max) ;
+  else if (logB)
+    {
+      int nLogBins = bins ;
+      float xLogMin = 1. ;
+      float xLogMax = 3. ;
+      float xLogWidth = (xLogMax-xLogMin) / nLogBins ;
+      dummy = new TH1F ((plotName + "_" + sampleName).c_str (), sampleName.c_str (), nLogBins, xLogMin, xLogMax) ;
+      BinLogX (dummy) ;
+    }
   else dummy = new TH1F ((plotName + "_" + sampleName).c_str (), sampleName.c_str (), bins, axis) ;
   dummy->SetStats (0) ;
   dummy->SetFillColor (colors.at (collection.size ())) ;
@@ -118,3 +127,16 @@ hColl::makeStack ()
 }
 
 
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+TH1F * 
+hColl::findHisto (string name)
+{
+  for (int i = 0 ; i < collection.size () ; ++i)
+    {
+      if (string (collection.at (i)->GetName ()) == name)
+        return collection.at (i) ;
+    }
+  return 0 ;
+}
