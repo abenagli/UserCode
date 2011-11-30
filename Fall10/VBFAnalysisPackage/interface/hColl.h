@@ -40,6 +40,7 @@ struct hColl
   void save (TFile * f) ;
   THStack makeStack () ;
   TH1F * findHisto (std::string name) ;
+  void normToBinWidths () ;
 
   std::string plotName ;
   int bins ;
@@ -47,6 +48,7 @@ struct hColl
   double max ;
   Float_t * axis ;
   bool logB ;
+  bool isBinWidthNormalized ;
   std::vector <TH1F *> collection ;
   std::vector<int> colors ;  
 

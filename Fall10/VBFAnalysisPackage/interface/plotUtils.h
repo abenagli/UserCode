@@ -22,6 +22,10 @@
 #include "TLatex.h"
 
 
+void normalizeToBinWidths (TH1F * input) ;
+
+
+
 double MyGetMinimum(const TH1F* histo, const double& minval, int binMin=-1, int binMax=-1);
 double MyGetMaximum(const TH1F* histo, const double& maxval, int binMin=-1, int binMax=-1);
 

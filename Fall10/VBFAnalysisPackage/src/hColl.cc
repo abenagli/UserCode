@@ -1,6 +1,8 @@
 #include "hColl.h"
 #include "THStack.h"
 
+#include "plotUtils.h"
+
 #include <iostream>
 
 using namespace std ;
@@ -9,7 +11,8 @@ hColl::hColl (string pN, int b, Float_t * xAxis) :
  plotName (pN),
  bins (b),
  axis (xAxis),
- logB (0)
+ logB (0), 
+ isBinWidthNormalized (0)
   {
     colors.push_back (kBlue+2   ) ;
     colors.push_back (kRed      ) ;
@@ -34,7 +37,8 @@ hColl::hColl (string pN, int b, double m, double M, bool logBins) :
  min (m),
  max (M), 
  axis (0), 
- logB (logBins)
+ logB (logBins), 
+ isBinWidthNormalized (0)
   {
     colors.push_back (kBlue+2   ) ;
     colors.push_back (kRed      ) ;
@@ -139,4 +143,24 @@ hColl::findHisto (string name)
         return collection.at (i) ;
     }
   return 0 ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+void 
+hColl::normToBinWidths ()
+{
+  if (isBinWidthNormalized)
+    {
+      cerr << "ERROR, histograms already normalized, not normalizing again" << endl ;
+      return ;
+    }
+  for (int i = 0 ; i < collection.size () ; ++i)
+    {
+      normalizeToBinWidths (collection.at (i)) ;
+    }
+  isBinWidthNormalized = true ;  
+  return ;
 }

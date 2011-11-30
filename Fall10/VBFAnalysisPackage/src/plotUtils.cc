@@ -4,6 +4,18 @@
 
 
 
+void normalizeToBinWidths (TH1F * input)
+{
+  for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
+    {
+      double content = input->GetBinContent (iBin) ;
+      double error = input->GetBinError (iBin) ;
+      double invBinWidth = 1. / input->GetBinWidth (iBin) ;
+      input->SetBinContent (iBin, content * invBinWidth) ;
+      input->SetBinError (iBin, error * invBinWidth) ;
+    }
+  return ;
+}
 
 
 
