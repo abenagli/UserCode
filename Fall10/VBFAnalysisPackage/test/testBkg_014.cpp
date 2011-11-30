@@ -116,9 +116,14 @@ int main (int argc, char** argv)
 //      |   +--------------------+
 //      +-------------------------------  m4
 
-  //PG calculated with testBkg_013.cpp
+  //PG calculated with testBkg_013.cpp, 10 events
   Float_t xAxis [86] = {0, 165, 170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220, 225, 230, 235, 240, 245, 250, 255, 260, 265, 270, 275, 280, 285, 290, 295, 300, 305, 310, 315, 320, 325, 330, 335, 340, 345, 350, 355, 360, 365, 370, 375, 380, 385, 390, 395, 400, 405, 410, 415, 420, 425, 430, 435, 440, 445, 450, 455, 460, 465, 470, 475, 480, 485, 490, 500, 505, 515, 520, 525, 535, 545, 555, 570, 585, 595, 615, 630, 645, 665, 700, 765, 870, 1000} ;
   int nBins = 85 ; //PG xAxis elements minus one
+
+  //PG calculated with testBkg_013.cpp, 20 events
+//  Float_t xAxis [74] = {0, 165, 170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220, 225, 230, 235, 240, 245, 250, 255, 260, 265, 270, 275, 280, 285, 290, 295, 300, 305, 310, 315, 320, 325, 330, 335, 340, 345, 350, 355, 360, 365, 370, 375, 380, 385, 390, 395, 400, 405, 410, 415, 420, 425, 435, 440, 445, 450, 460, 465, 475, 485, 495, 505, 520, 530, 545, 560, 580, 615, 640, 700, 870, 1000} ;
+//  int nBins = 73 ; //PG xAxis elements minus one
+
   double m4_min = 0. ;
   double m4_max = 1000. ;
   //PG the cuts
@@ -127,7 +132,7 @@ int main (int argc, char** argv)
 //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
 //  generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
 //  generalCut = generalCut && "lep_flavour == 13" ; //PG only electrons
-  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
+  std::string outputRootFullFileName = "testBkg_014_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_cuts_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_noKF_S" + mass + ".root" ;
 //  std::string outputRootFullFileName = "testBkg_004_5GeV_S" + mass + ".root" ;
