@@ -1769,3 +1769,18 @@ TH1F* DrawTStackDataMCRatio(THStack* hs, TH1F* dataGlobalHisto,
   
   return ratioHisto;
 }
+
+
+//-------------------------------------------------------------------
+
+
+void setErrorForEmptyBins (TH1F * input, int error)
+{
+  for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
+    {
+      double content = input->GetBinContent (iBin);
+      if (content == 0)  
+        input->SetBinError (iBin, error);
+    }
+  return ;
+}
