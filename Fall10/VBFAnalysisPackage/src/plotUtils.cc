@@ -1797,7 +1797,7 @@ void setErrorForEmptyBins (TH1F * input)
   //set this weight as the error of the bins with zero content
   for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
     {
-      if (input->GetBinContent(iBin) == 0)  input->GetBinError(iBin, weight);    
+      if (input->GetBinContent(iBin) == 0) input->SetBinError(iBin, weight);
     }
   
   return ;
