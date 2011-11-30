@@ -36,7 +36,7 @@ void DrawTStackError(THStack* hs, bool poisson = false, double syst = 0.);
 TH1F* DrawTStackDataMCRatio(THStack* hs, TH1F* dataGlobalHisto,
                             TGraph* ratioGraph1s, TGraph* ratioGraph2s);
 
-void setErrorForEmptyBins (TH1F * input, int error);
+void setErrorForEmptyBins (TH1F * input);
 
 
 

@@ -1774,13 +1774,31 @@ TH1F* DrawTStackDataMCRatio(THStack* hs, TH1F* dataGlobalHisto,
 //-------------------------------------------------------------------
 
 
-void setErrorForEmptyBins (TH1F * input, int error)
+void setErrorForEmptyBins (TH1F * input)
 {
+  int counter = 0;
+  double weight = 0;
+  double weightSum = 0;
+  
   for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
     {
-      double content = input->GetBinContent (iBin);
-      if (content == 0)  
-        input->SetBinError (iBin, error);
+      //skip empty bins
+      if (input->GetBinContent(iBin) == 0) continue;
+      //evaluate the weight for every bin
+      weight = input->GetBinError(iBin)*input->GetBinError(iBin) / input->GetBinContent(iBin);
+      
+      weightSum += weight;
+      counter++;    
     }
+  
+  //weight = mean of all the previously evaluated weights
+  weight = weightSum/counter;
+  std::cout << weight << std::endl;
+  //set this weight as the error of the bins with zero content
+  for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
+    {
+      if (input->GetBinContent(iBin) == 0)  input->GetBinError(iBin, weight);    
+    }
+  
   return ;
 }
