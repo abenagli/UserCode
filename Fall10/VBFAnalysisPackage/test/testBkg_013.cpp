@@ -272,7 +272,7 @@ int main (int argc, char** argv)
     } //PG loop on the bins of the histogram
 
 
-  cout << "Float_t xAxis [" << xbins.size () << "] = {" ;
+  cout << "Float_t xAxis [" << xbins.size () + 1 << "] = {" ;
   for (int i = 0 ; i < xbins.size () ; ++i) cout << xbins.at (i) << ", " ; 
   cout << m4_max << "} ;\n" ; 
    	
