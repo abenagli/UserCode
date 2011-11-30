@@ -1793,7 +1793,7 @@ void setErrorForEmptyBins (TH1F * input)
   
   //weight = mean of all the previously evaluated weights
   weight = weightSum/counter;
-  std::cout << weight << std::endl;
+
   //set this weight as the error of the bins with zero content
   for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
     {
