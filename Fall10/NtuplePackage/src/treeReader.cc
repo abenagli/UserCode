@@ -167,11 +167,11 @@ std::vector<int>* treeReader::GetInt(const std::string &name)
   else return new std::vector<int>;
 }
 
-std::vector<long long int>* treeReader::GetLongLongInt(const std::string &name)
+std::vector<Long64_t>* treeReader::GetLongLongInt(const std::string &name)
 {
-  std::map<std::string,std::vector<long long int> * >::const_iterator it_LLI = m_LLIvectors.find(name);
+  std::map<std::string,std::vector<Long64_t> * >::const_iterator it_LLI = m_LLIvectors.find(name);
   if( it_LLI != m_LLIvectors.end() ) return m_LLIvectors[name];
-  else return new std::vector<long long int>;
+  else return new std::vector<Long64_t>;
 }
 
 std::vector<std::string>* treeReader::GetString(const std::string &name)

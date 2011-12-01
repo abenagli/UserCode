@@ -31,7 +31,7 @@ class treeReader
     std::vector<double>*                 GetDouble     (const std::string &name);
     std::vector<float>*                  GetFloat      (const std::string &name);
     std::vector<int>*                    GetInt        (const std::string &name);
-    std::vector<long long int>*          GetLongLongInt(const std::string &name);
+    std::vector<Long64_t>*               GetLongLongInt(const std::string &name);
     std::vector<std::string>*            GetString     (const std::string &name);
     
     
@@ -43,7 +43,7 @@ class treeReader
     std::map <std::string, std::vector<double> * >                 m_Dvectors ;
     std::map <std::string, std::vector<float> * >                  m_Fvectors ;
     std::map <std::string, std::vector<int> * >                    m_Ivectors ;
-    std::map <std::string, std::vector<long long int> * >          m_LLIvectors ;
+    std::map <std::string, std::vector<Long64_t> * >               m_LLIvectors ;
     std::map <std::string, std::vector<std::string> * >            m_Svectors ;
     
     TTree * m_tree ;
@@ -75,4 +75,3 @@ class treeReader
 // }
 
 #endif
-
