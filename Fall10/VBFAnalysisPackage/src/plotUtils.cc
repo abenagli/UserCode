@@ -1802,3 +1802,55 @@ void setErrorForEmptyBins (TH1F * input)
   
   return ;
 }
+
+
+//-------------------------------------------------------------------
+
+
+void setErrorForEmptyBins_v2 (TH1F * input)
+{
+  double errorUp   = 0;
+  double errorDown = 0;
+  
+  for (int iBin = 1 ; iBin <= input->GetNbinsX () ; ++iBin)
+    {
+      //skip non-empty bins
+      if (input->GetBinContent(iBin) != 0) continue;
+      
+      //set the j position on the empty bin
+      int j = iBin;
+
+      //if you are not on the first bin
+      if (j != 1) {
+
+        while (input->GetBinContent(j) == 0 && j > 1) {
+           j--;
+           errorDown = input->GetBinError(j);
+         }
+      }
+
+      j = iBin;
+      
+      //if you are not on the last bin
+      if (j != input->GetNbinsX()) {
+
+        while (input->GetBinContent(j) == 0 && j < input->GetNbinsX()) {
+           j++;
+           errorUp = input->GetBinError(j);        
+         }
+      }
+
+
+      if (errorUp == 0)   input->SetBinError(iBin, errorDown);
+      if (errorDown == 0) input->SetBinError(iBin, errorUp);
+      
+      //set the error of the empty bin as the mean of errorUp and errorDown
+      else input->SetBinError(iBin, (errorDown+errorUp)/2.);
+      
+      errorUp   = 0;
+      errorDown = 0;
+
+    }
+  
+  return ;
+}

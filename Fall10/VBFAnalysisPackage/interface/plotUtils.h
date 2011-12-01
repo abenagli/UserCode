@@ -37,7 +37,7 @@ TH1F* DrawTStackDataMCRatio(THStack* hs, TH1F* dataGlobalHisto,
                             TGraph* ratioGraph1s, TGraph* ratioGraph2s);
 
 void setErrorForEmptyBins (TH1F * input);
-
+void setErrorForEmptyBins_v2 (TH1F * input);
 
 
 
