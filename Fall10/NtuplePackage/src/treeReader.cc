@@ -14,6 +14,8 @@ m_verbosity (verbosity)
  {
   TBranchElement* bre = (TBranchElement*) iBranch ;
   std::string bname = bre->GetClassName () ;      
+  if (m_verbosity)
+    std::cout << bname << "   ";
   if (bname.find ("Event") != std::string::npos) continue ;
   
   if (bname.find ("vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >") != std::string::npos)
@@ -50,6 +52,15 @@ m_verbosity (verbosity)
    std::vector<int> * dummy = new std::vector<int> ;
    m_Ivectors[bre->GetName ()] = dummy ;
    m_tree->SetBranchAddress (bre->GetName (), &m_Ivectors[bre->GetName ()]) ;
+  }
+  
+  if (bname.find ("vector<long long>") != std::string::npos)
+  {
+   if (m_verbosity)
+     std::cout << "LLIV | setting " << bre->GetName () << " for type : " << bre->GetClassName () << "\n" ;
+   std::vector<Long64_t> * dummy = new std::vector<Long64_t> ;
+   m_LLIvectors[bre->GetName ()] = dummy ;
+   m_tree->SetBranchAddress (bre->GetName (), &m_LLIvectors[bre->GetName ()]) ;
   }
 
   if (bname.find ("vector<string>") != std::string::npos)
