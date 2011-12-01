@@ -35,6 +35,7 @@ ARCHL = -m64
 
 CXX  =  c++
 CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS)
+
 CPP  =  c++
 CPPFLAGS  = -Wall -I$(HDR) $(ROOTCFLAGS)
 
@@ -43,7 +44,7 @@ LDFLAGS  =  -rdynamic -shared $(ARCHL)
 SONAME	 =  libEvent.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
-GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) -lGenVector
+GLIBS    =  $(ROOTGLIBS) -lGenVector
 
 
 #################################################
