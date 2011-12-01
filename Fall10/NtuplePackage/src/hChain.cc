@@ -246,7 +246,7 @@ hChain::Scale (int index, double factor)
 }
 
 //RG -----------------------------------------------------
-int
+double
 hChain::GetEffectiveEntries(int index)
 {
 

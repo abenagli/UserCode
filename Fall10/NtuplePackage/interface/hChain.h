@@ -20,7 +20,7 @@ struct hChain
   
   void SetColors (std::vector<int> colors) ;
   void Fill (int i, double val) ;
-  int  GetEffectiveEntries(int index);
+  double  GetEffectiveEntries(int index);
   TH1F* GetHisto (int index);
   void SetBinContent (int i, int bin, double val) ;
   void Print (bool isLog = false, int rebin = 1, TString altName = "default") ;
