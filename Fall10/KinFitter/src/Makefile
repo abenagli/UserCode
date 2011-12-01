@@ -3,10 +3,7 @@ OBJ      = ../obj/
 LIB      = ../lib/
 BIN      =  ../bin/
 PRG      =  ../test/
-SCRIPT   = ../scripts/
 
-
-Shell   =  .sh
 HdrSuf  =  .h
 SrcSuf  =  .cc
 ObjSuf  =  .o
@@ -14,22 +11,24 @@ PrgSuf  =  .cpp
 BinSuf  =  .exe
 LibSuf  =  .so
 
-HDRS  =  $(wildcard $(HDR)*$(HdrSuf))
-SRCS  =  $(wildcard *$(SrcSuf))
-_OBJS  =  $(patsubst %$(SrcSuf), %$(ObjSuf), $(SRCS))
-OBJS   =  $(addprefix $(OBJ),$(_OBJS))
-PRGS  =  $(wildcard $(PRG)*$(PrgSuf))
-_BINS    =  $(wildcard $(PRG)*$(PrgSuf))
-__BINS   =  $(_BINS:$(PrgSuf)=$(BinSuf))
-___BINS  =  $(notdir $(__BINS))
-BINS	 =  $(addprefix $(BIN),${___BINS})
-
+HDRS      =  $(wildcard $(HDR)*$(HdrSuf))
+SRCS      =  $(wildcard *$(SrcSuf))
+_OBJS     =  $(patsubst %$(SrcSuf), %$(ObjSuf), $(SRCS))
+OBJS      =  $(addprefix $(OBJ),$(_OBJS))
+PRGS      =  $(wildcard $(PRG)*$(PrgSuf))
+_BINS     =  $(wildcard $(PRG)*$(PrgSuf))
+__BINS    =  $(_BINS:$(PrgSuf)=$(BinSuf))
+___BINS   =  $(notdir $(__BINS))
+BINS	  =  $(addprefix $(BIN),${___BINS})
 LINKDEF   =  $(wildcard ${HDR}*LinkDef.h)
 DICTHDRS  =  $(patsubst $(LINKDEF),,$(HDRS)) $(LINKDEF)
 
 
+
 ROOTCFLAGS    = $(shell root-config --cflags)
 ROOTGLIBS     = $(shell root-config --glibs)
+
+
 
 ARCHL = -m64
 
@@ -96,12 +95,19 @@ exe: $(BINS)
 
 
 test:
+	@echo ""
 	@echo "HDRS = $(HDRS)"
+	@echo ""
 	@echo "DICTHDRS = $(DICTHDRS)"
+	@echo ""
 	@echo "SRCS = $(SRCS)"
+	@echo ""
 	@echo "OBJS = $(OBJS)"
+	@echo ""
 	@echo "PRGS = $(PRGS)"
+	@echo ""
 	@echo "BINS = $(BINS)"
+	@echo ""
 
 
 $(OBJ)%$(ObjSuf): %$(SrcSuf) $(HDRS)
@@ -117,12 +123,12 @@ $(OBJ)mydict.cc: $(DICTHDRS)
 	rootcint -f $(OBJ)mydict.cc -c -p ${CXXFLAGS} $(DICTHDRS)
 
 $(LIB)$(SONAME): $(OBJS) $(OBJ)mydict.o
-	@echo "Linking $(SONAME):" 
-	$(LD) $(LDFLAGS) $(OBJS) $(OBJ)mydict.o $(SOFLAGS) -o $(LIB)$(SONAME) 
+	@echo "Linking $(SONAME):"
+	$(LD) $(LDFLAGS) $(OBJS) $(OBJ)mydict.o $(SOFLAGS) -o $(LIB)$(SONAME)
 
 $(BIN)%$(BinSuf): $(PRG)%$(PrgSuf) $(HDRS) $(LIB)$(SONAME)
 	$(CPP) $(CPPFLAGS) -L$(LIB) $(GLIBS) -lKinFitter  -o $@ $<
 
 
 clean:
-	rm -f $(OBJ)*$(ObjSuf) $(LIB)*$(LibSuf) $(OBJ)mydict*
+	rm -f $(OBJ)*$(ObjSuf) $(LIB)*$(LibSuf) $(OBJ)mydict* $(BIN)*$(BinSuf)

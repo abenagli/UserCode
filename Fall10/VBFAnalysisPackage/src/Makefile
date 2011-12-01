@@ -1,9 +1,8 @@
-HDR   = ../interface/
-OBJ   = ../obj/
-LIB   = ../lib/
-BIN   =  ../bin/
-PRG  =  ../test/
-
+HDR      = ../interface/
+OBJ      = ../obj/
+LIB      = ../lib/
+BIN      =  ../bin/
+PRG      =  ../test/
 
 HdrSuf  =  .h
 SrcSuf  =  .cc
@@ -12,26 +11,22 @@ PrgSuf  =  .cpp
 BinSuf  =  .exe
 LibSuf  =  .so
 
-
-HDRS  =  $(wildcard $(HDR)*$(HdrSuf)) $(wildcard $(HDR)/*/*$(HdrSuf))
-SRCS  =  $(wildcard *$(SrcSuf)) $(wildcard */*$(SrcSuf))
-_OBJS  =  $(patsubst %$(SrcSuf), %$(ObjSuf), $(SRCS))
-OBJS   =  $(addprefix $(OBJ),$(_OBJS))
-PRGS  =  $(wildcard $(PRG)*$(PrgSuf))
-_BINS    =  $(wildcard $(PRG)*$(PrgSuf))
-__BINS   =  $(_BINS:$(PrgSuf)=$(BinSuf))
-___BINS  =  $(notdir $(__BINS))
-BINS	 =  $(addprefix $(BIN),${___BINS})
-
+HDRS      =  $(wildcard $(HDR)*$(HdrSuf)) $(wildcard $(HDR)/*/*$(HdrSuf))
+SRCS      =  $(wildcard *$(SrcSuf)) $(wildcard */*$(SrcSuf))
+_OBJS     =  $(patsubst %$(SrcSuf), %$(ObjSuf), $(SRCS))
+OBJS      =  $(addprefix $(OBJ),$(_OBJS))
+PRGS      =  $(wildcard $(PRG)*$(PrgSuf))
+_BINS     =  $(wildcard $(PRG)*$(PrgSuf))
+__BINS    =  $(_BINS:$(PrgSuf)=$(BinSuf))
+___BINS   =  $(notdir $(__BINS))
+BINS	  =  $(addprefix $(BIN),${___BINS})
 LINKDEF   =  $(wildcard ${HDR}*LinkDef.h)
 DICTHDRS  =  $(patsubst $(LINKDEF),,$(HDRS)) $(LINKDEF)
 
 
+
 ROOTCFLAGS    = $(shell root-config --cflags)
 ROOTGLIBS     = $(shell root-config --glibs)
-
-CLHEPCFLAGS   =  $(shell clhep-config --include)
-CLHEPLIBS     =  $(shell clhep-config --libs)
 
 NTUPLEPACKAGEFLAGS = $(shell ntuplepkg-config --include)
 NTUPLEPACKAGELIBS = $(shell ntuplepkg-config --libs)
@@ -44,16 +39,17 @@ KINFITTERPACKAGELIBS = $(shell kinfitpkg-config --libs)
 ARCHL = -m64
 
 CXX  =  c++
-CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
+CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
+
 CPP  =  c++
-CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS) -L/opt/exp_soft/cms/mylib_sl5/
+CPPFLAGS  = -Wall -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)
 SONAME	 =  libVBF.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
-GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) -lGenVector -lFoam -lMinuit -lRooFitCore -lRooFit -lTMVA -lMLP -lXMLIO  -lTreePlayer  $(NTUPLEPACKAGELIBS) $(KINFITTERPACKAGELIBS)
+GLIBS    =  $(ROOTGLIBS) -lGenVector -lFoam -lMinuit -lRooFitCore -lRooFit -lMLP -lXMLIO -lTMVA -lTreePlayer $(NTUPLEPACKAGELIBS) $(KINFITTERPACKAGELIBS)
 
 
 #################################################
@@ -64,9 +60,9 @@ LibSuf  =  .dylib
 
 ARCHL = -m32
 
-CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
-CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
 SONAME	 =  libVBF.dylib
@@ -82,9 +78,9 @@ LibSuf  =  .dylib
 
 ARCHL = -m64
 
-CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
-CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
 SONAME	 =  libVBF.dylib
