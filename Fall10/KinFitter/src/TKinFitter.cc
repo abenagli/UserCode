@@ -1266,14 +1266,14 @@ void TKinFitter::printMatrix(const TMatrixD &matrix, const TString name) {
   //edm::LogVerbatim log("KinFitter");
 
   const Int_t nCols  = matrix.GetNcols();
-  const Int_t nRows  = matrix.GetNrows();
+  //const Int_t nRows  = matrix.GetNrows();
   const Int_t colsPerSheet = 5;
   char topbar[100];
   Int_t nk = 6+13*TMath::Min(colsPerSheet, nCols);
   for(Int_t i = 0; i < nk; i++) topbar[i] = '-';
   topbar[nk] = 0;
 
-  Int_t sw = (70-name.Length())/2;
+  //Int_t sw = (70-name.Length())/2;
  
 //  log << std::setfill('=') << std::setw(sw) << "=  " << name << std::setw(sw) << std::left << "  ="  << "\n"
 //      << std::setfill(' ') << std::right << "\n";
