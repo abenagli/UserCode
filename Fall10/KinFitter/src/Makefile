@@ -36,7 +36,7 @@ ARCHL = -m64
 CXX  =  c++
 CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(ROOTCFLAGS) 
 CPP  =  c++
-CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(ROOTCFLAGS)
+CPPFLAGS  = -Wall -I$(HDR) $(ROOTCFLAGS)
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)
@@ -54,9 +54,9 @@ LibSuf  =  .dylib
 
 ARCHL = -m32
 
-CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS)
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS)
 
-CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS)
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
 SONAME	 =  libKinFitter.dylib
@@ -72,9 +72,9 @@ LibSuf  =  .dylib
 
 ARCHL = -m64
 
-CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS)
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS)
 
-CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS)
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
 SONAME	 =  libKinFitter.dylib
