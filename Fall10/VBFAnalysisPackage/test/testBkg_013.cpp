@@ -225,15 +225,15 @@ int main (int argc, char** argv)
       VBFAnalysisVariables vars ;
       SetVBFPreselectionTreeBranches (vars, chain) ;
 
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower->GetName (), cutLowerExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_c->GetName (), cutLower_cExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_a->GetName (), cutLower_aExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_signal->GetName (), cutSignalExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper->GetName (), cutUpperExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_c->GetName (), cutUpper_cExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_a->GetName (), cutUpper_aExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_EvenHigher->GetName (), cutEvenHigherExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_sideband->GetName (), cutSidebandExtended) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower->GetName (), cutLower) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_c->GetName (), cutLower_c) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_a->GetName (), cutLower_a) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_signal->GetName (), cutSignal) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper->GetName (), cutUpper) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_c->GetName (), cutUpper_c) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_a->GetName (), cutUpper_a) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_EvenHigher->GetName (), cutEvenHigher) ;
+      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_sideband->GetName (), cutSideband) ;
 
       ++index ;   
     } //PG loop over samples
