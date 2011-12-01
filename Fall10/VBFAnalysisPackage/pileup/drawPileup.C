@@ -4,7 +4,7 @@
 
 void drawPileup(const std::string& fileName)
 {
-  TFile* f = TFile::Open(fileName.c_str(),"READ");
+  TFile* f = TFile::Open(((fileName)+".root").c_str(),"READ");
   TH1F* h = (TH1F*)(f -> Get("pileup") );
   
   TCanvas* c = new TCanvas("c","pileup");
@@ -31,4 +31,13 @@ void drawPileup(const std::string& fileName)
     else
       std::cout << " " << " // " << std::setprecision(0) << int(h->GetBinCenter(bin)) << std::endl;
   }
+  
+  
+  
+  TFile* o = new TFile(((fileName)+"_plot.root").c_str(),"RECREATE");
+  o -> cd();
+  
+  h -> Write();
+  
+  o -> Close();
 }
