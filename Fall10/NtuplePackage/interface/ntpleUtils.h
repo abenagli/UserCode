@@ -66,6 +66,40 @@ double deltaR (const double& eta1, const double& phi1,
 
 
 
+
+/** redefine x binning of a histogram */
+template <class THisto>
+void BinLogX(THisto* h)
+{
+  TAxis* axis = h -> GetXaxis();
+  int bins = axis -> GetNbins();
+  
+  float from = axis -> GetXmin();
+  float to = axis -> GetXmax();
+  float width = (to - from) / bins;
+  float* new_bins = new float[bins + 1] ;
+  
+  for(int i = 0; i <= bins; ++i)
+    new_bins[i] = pow(10, from + i*width);
+  
+  axis -> Set(bins,new_bins);
+  delete new_bins;
+  
+  // std::cout << std::endl;
+  // for(int bin = 0; bin <= h.GetNbinsX()+1; ++bin)
+  // {
+  //   std::cout << "BIN: " << bin
+  //             << "   lowEdge: " << h.GetBinLowEdge (bin)
+  //             << "   higEdge: " << h.GetBinLowEdge (bin) + h.GetBinWidth (bin)
+  //             << std::endl ;
+  // }
+}
+
+
+
+
+
+
 /** define the map of all possible matching */
 template <class T1, class T2>
 std::map<float, std::pair<int, int> > MatchingDRMap(const std::vector<T1>& collection1,
