@@ -48,6 +48,7 @@ int main(int argc, char** argv)
   int entryMODULO         = gConfigParser -> readIntOption("Options::entryMODULO");
   int verbosity           = gConfigParser -> readIntOption("Options::verbosity");
   int dataFlag            = gConfigParser -> readIntOption("Options::dataFlag");
+  int MCFlag              = gConfigParser -> readIntOption("Options::MCFlag");
   float crossSection      = gConfigParser -> readFloatOption("Options::crossSection");
   int TMVA4JetTraining    = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
@@ -80,16 +81,16 @@ int main(int argc, char** argv)
   stepName = "AllEvents/totalEvents";
   std::map<int,int> totalEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
-  stepName = "NonScrapedEvents/passedEvents";
-  std::map<int,int> nonScrapedEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
+  //stepName = "NonScrapedEvents/passedEvents";
+  //std::map<int,int> nonScrapedEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
-  stepName = "GoodVtxEvents/passedEvents";
-  std::map<int,int> goodVtxEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
+  //stepName = "GoodVtxEvents/passedEvents";
+  //std::map<int,int> goodVtxEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
-  stepName = "LeptonsFilterEvents/passedEvents";
+  stepName = "LeptonsFilterEvents/totalEvents";
   std::map<int,int> leptonFilterEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
-  stepName = "JetFilter"+jetAlgorithm+"Events/passedEvents";
+  stepName = "JetFilter"+jetAlgorithm+"Events/totalEvents";
   std::map<int,int> jetFilterEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
   
@@ -141,6 +142,7 @@ int main(int argc, char** argv)
   InitializeVBFPreselectionTree(vars, outputRootFullFileName);
   vars.mH = atof(higgsMass.c_str());
   vars.dataFlag = dataFlag;
+  vars.MCFlag = MCFlag;
   vars.totEvents = totalEvents[1];
   vars.crossSection = crossSection;
   vars.TMVA4Jet = -1;
@@ -163,14 +165,16 @@ int main(int argc, char** argv)
   // STEP 2 - no scraping
   step = 2;
   SetStepNames(stepNames, "Skim: no scraping", step, verbosity);
-  stepEvents[step] = nonScrapedEvents[1];
+  //stepEvents[step] = nonScrapedEvents[1];
+  stepEvents[step] = totalEvents[1];
   
   
   //*********************
   // STEP 3 - good vertex
   step = 3;
   SetStepNames(stepNames, "Skim: good vertex", step, verbosity);
-  stepEvents[step] = goodVtxEvents[1];
+  //stepEvents[step] = goodVtxEvents[1];
+  stepEvents[step] = totalEvents[1];
   
   
   //*********************
@@ -212,7 +216,9 @@ int main(int argc, char** argv)
         
     vars.runId   = reader.GetInt("runId")->at(0);
     vars.lumiId  = reader.GetInt("lumiId")->at(0);
-    vars.eventId = reader.GetInt("eventId")->at(0);
+    
+    vars.eventId = reader.GetLongLongInt("eventId")->at(0);
+    
     vars.eventNaiveId += 1;
     
     vars.eventWeight = 1.;
@@ -287,7 +293,7 @@ int main(int argc, char** argv)
     
     
     
-
+    
     //*****************
     // STEP 7 - Good PV
     step += 1;
