@@ -1,6 +1,7 @@
 #include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
+#include "plotUtils.h"
 #include "HiggsMassWindows.h"
 #include "Functions.h"
 
