@@ -30,7 +30,7 @@ int main(int argc, char** argv)
   
   //[Input]
   std::string baseDir = gConfigParser -> readStringOption("Input::baseDir");
-  
+  std::string analysisMethod = gConfigParser -> readStringOption("Input::analysisMethod");
   //[Output]
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
