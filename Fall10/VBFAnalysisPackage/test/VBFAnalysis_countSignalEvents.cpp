@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 #include "TH1F.h"
 #include "TGraph.h"
