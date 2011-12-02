@@ -22,6 +22,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   vars.m_reducedTree -> Branch("mH",           &vars.mH,                     "mH/F");
   vars.m_reducedTree -> Branch("dataFlag",     &vars.dataFlag,         "dataFlag/I");
+  vars.m_reducedTree -> Branch("MCFlag",       &vars.MCFlag,             "MCFlag/I");
   vars.m_reducedTree -> Branch("totEvents",    &vars.totEvents,       "totEvents/I");
   vars.m_reducedTree -> Branch("crossSection", &vars.crossSection, "crossSection/F");
   vars.m_reducedTree -> Branch("TMVA4Jet",     &vars.TMVA4Jet,         "TMVA4Jet/I");
@@ -38,6 +39,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   
   // PU variables
+  vars.m_reducedTree -> Branch("PUtrue",          &vars.PUtrue_n,               "PUtrue_n/I");
   vars.m_reducedTree -> Branch("PUit_n",          &vars.PUit_n,                   "PUit_n/I");
   vars.m_reducedTree -> Branch("PUoot_n",         &vars.PUoot_n,                 "PUoot_n/I");
   vars.m_reducedTree -> Branch("rhoForIsolation", &vars.rhoForIsolation, "rhoForIsolation/F");
@@ -159,7 +161,18 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("leadingJ_ptD",                 &vars.leadingJ_ptD,                                 "leadingJ_ptD/F");
   vars.m_reducedTree -> Branch("leadingJ_chargedMultiplicity", &vars.leadingJ_chargedMultiplicity, "leadingJ_chargedMultiplicity/I");
   vars.m_reducedTree -> Branch("leadingJ_neutralMultiplicity", &vars.leadingJ_neutralMultiplicity, "leadingJ_neutralMultiplicity/I");
-  
+  vars.m_reducedTree -> Branch("jet1", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_jet1);
+  vars.m_reducedTree -> Branch("jet2", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_jet2);
+  vars.m_reducedTree -> Branch("jet3", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_jet3);
+  vars.m_reducedTree -> Branch("jet4", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_jet4);
+  vars.m_reducedTree -> Branch("jet5", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_jet5);
+  vars.m_reducedTree -> Branch("jet6", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_jet6);
+  vars.m_reducedTree -> Branch("jet1_bTag", &vars.jet1_bTag, "jet1_bTag/F");
+  vars.m_reducedTree -> Branch("jet2_bTag", &vars.jet2_bTag, "jet2_bTag/F");
+  vars.m_reducedTree -> Branch("jet3_bTag", &vars.jet3_bTag, "jet3_bTag/F");
+  vars.m_reducedTree -> Branch("jet4_bTag", &vars.jet4_bTag, "jet4_bTag/F");
+  vars.m_reducedTree -> Branch("jet5_bTag", &vars.jet5_bTag, "jet5_bTag/F");
+  vars.m_reducedTree -> Branch("jet6_bTag", &vars.jet6_bTag, "jet6_bTag/F");
   
   // W-jet variables
   vars.m_reducedTree -> Branch("WJ1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1);
@@ -505,6 +518,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   
   vars.selectIt_leadingJet = -1;
   
+  
   vars.leadingJ = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_leadingJ = NULL;
   
@@ -512,6 +526,27 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.leadingJ_ptD = -99.;
   vars.leadingJ_chargedMultiplicity = -1;
   vars.leadingJ_neutralMultiplicity = -1;
+  
+  
+  vars.jet1 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_jet1 = NULL;
+  vars.jet2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_jet2 = NULL;
+  vars.jet3 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_jet3 = NULL;
+  vars.jet4 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_jet4 = NULL;
+  vars.jet5 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_jet5 = NULL;
+  vars.jet6 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_jet6 = NULL;
+  
+  vars.jet1_bTag = -99.;
+  vars.jet2_bTag = -99.;
+  vars.jet3_bTag = -99.;
+  vars.jet4_bTag = -99.;
+  vars.jet5_bTag = -99.;
+  vars.jet6_bTag = -99.;
   
   
   
@@ -714,8 +749,10 @@ void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
 {
   if( dataFlag == 0 )
   {
-    vars.PUit_n = (int)(reader.GetInt("mc_PUit_NumInteractions")->at(0));
-    vars.PUoot_n = (int)(reader.GetInt("mc_PUoot_NumInteractions")->at(0)+reader.GetInt("mc_PUoot_NumInteractions")->at(1));
+    //vars.PUtrue_n = (int)(reader.GetInt("mc_PUit_TrueNumInteractions")->at(0));
+    vars.PUit_n   = (int)(reader.GetInt("mc_PUit_NumInteractions")->at(0));
+    vars.PUoot_n  = (int)(reader.GetInt("mc_PUoot_early_NumInteractions")->at(0) + 
+                          reader.GetInt("mc_PUoot_late_NumInteractions")->at(0));
   }
   
   vars.rhoForIsolation = reader.GetFloat("rho_isolation")->at(0);
@@ -758,8 +795,8 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lep_z       = vars.leptons_z.at(vars.selectIt_lep);
   vars.lep_dxy_BS  = vars.leptons_dxy_BS.at(vars.selectIt_lep);
   vars.lep_dz_BS   = vars.leptons_dz_BS.at(vars.selectIt_lep);
-  vars.lep_dxy_PV  = vars.leptons_dxy_PV.at(vars.selectIt_lep);
-  vars.lep_edxy_PV = vars.leptons_edxy_PV.at(vars.selectIt_lep);
+  //vars.lep_dxy_PV  = vars.leptons_dxy_PV.at(vars.selectIt_lep);
+  //vars.lep_edxy_PV = vars.leptons_edxy_PV.at(vars.selectIt_lep);
   vars.lep_dz_PV   = vars.leptons_dz_PV.at(vars.selectIt_lep);
   vars.lep_tkIso   = vars.leptons_tkIso.at(vars.selectIt_lep);
   vars.lep_emIso   = vars.leptons_emIso.at(vars.selectIt_lep);
@@ -830,8 +867,8 @@ void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, co
   vars.leptons_z.push_back(reader.GetFloat("electrons_z")->at(eleIt));
   vars.leptons_dxy_BS.push_back(reader.GetFloat("electrons_dxy_BS")->at(eleIt));
   vars.leptons_dz_BS.push_back(reader.GetFloat("electrons_dz_BS")->at(eleIt));
-  vars.leptons_dxy_PV.push_back(reader.GetFloat("electrons_dxy_PV")->at(eleIt));
-  vars.leptons_edxy_PV.push_back(reader.GetFloat("electrons_edxy_PV")->at(eleIt));
+  //vars.leptons_dxy_PV.push_back(reader.GetFloat("electrons_dxy_PV")->at(eleIt));
+  //vars.leptons_edxy_PV.push_back(reader.GetFloat("electrons_edxy_PV")->at(eleIt));
   vars.leptons_dz_PV.push_back(reader.GetFloat("electrons_dz_PV")->at(eleIt));
   
   vars.electrons_isEB.push_back(reader.GetInt("electrons_isEB")->at(eleIt));
@@ -861,8 +898,8 @@ void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
   vars.leptons_z.push_back(reader.GetFloat("muons_z")->at(muIt));
   vars.leptons_dxy_BS.push_back(reader.GetFloat("muons_dxy_BS")->at(muIt));
   vars.leptons_dz_BS.push_back(reader.GetFloat("muons_dz_BS")->at(muIt));
-  vars.leptons_dxy_PV.push_back(reader.GetFloat("muons_dxy_PV")->at(muIt));
-  vars.leptons_edxy_PV.push_back(reader.GetFloat("muons_edxy_PV")->at(muIt));
+  //vars.leptons_dxy_PV.push_back(reader.GetFloat("muons_dxy_PV")->at(muIt));
+  //vars.leptons_edxy_PV.push_back(reader.GetFloat("muons_edxy_PV")->at(muIt));
   vars.leptons_dz_PV.push_back(reader.GetFloat("muons_dz_PV")->at(muIt));
   
   vars.muons_tracker.push_back(reader.GetInt("muons_tracker")->at(muIt));
@@ -998,8 +1035,7 @@ void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 
 
 
-void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD,
-                     const float& JESScaleVariation, TH2F* JECUncertainty)
+void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD, const float& JESScaleVariation, TH2F* JECUncertainty)
 {
   ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);  
   
@@ -1046,10 +1082,10 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd_pt30;
   }
 
-  vars.jets_etaEtaMoment.push_back( reader.GetFloat("jets_etaetaMoment")->at(jetIt) );
-  vars.jets_phiPhiMoment.push_back( reader.GetFloat("jets_phiphiMoment")->at(jetIt) );
-  vars.jets_etaPhiMoment.push_back( reader.GetFloat("jets_etaphiMoment")->at(jetIt) );
-  vars.jets_ptD.push_back( reader.GetFloat("jets_ptD")->at(jetIt) );
+  //vars.jets_etaEtaMoment.push_back( reader.GetFloat("jets_etaetaMoment")->at(jetIt) );
+  //vars.jets_phiPhiMoment.push_back( reader.GetFloat("jets_phiphiMoment")->at(jetIt) );
+  //vars.jets_etaPhiMoment.push_back( reader.GetFloat("jets_etaphiMoment")->at(jetIt) );
+  //vars.jets_ptD.push_back( reader.GetFloat("jets_ptD")->at(jetIt) );
   
   if(jetType == "Calo")
   {
@@ -1089,6 +1125,45 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
   vars.jets_bTag.push_back( reader.GetFloat("trackCountingHighEffBJetTags")->at(jetIt) );
   vars.jets_bTagOrdered.push_back( reader.GetFloat("trackCountingHighEffBJetTags")->at(jetIt) );
   
+  
+  
+  if( vars.jets.size() == 1 )
+  {
+    vars.jet1 = jet;
+    vars.p_jet1 = &vars.jet1;
+    vars.jet1_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+  }
+  if( vars.jets.size() == 2 )
+  {
+    vars.jet2 = jet;
+    vars.p_jet2 = &vars.jet2;
+    vars.jet2_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+  }
+  if( vars.jets.size() == 3 )
+  {
+    vars.jet3 = jet;
+    vars.p_jet3 = &vars.jet3;
+    vars.jet3_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+  }
+  if( vars.jets.size() == 4 )
+  {
+    vars.jet4 = jet;
+    vars.p_jet4 = &vars.jet4;
+    vars.jet4_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+  }
+  if( vars.jets.size() == 5 )
+  {
+    vars.jet5 = jet;
+    vars.p_jet5 = &vars.jet5;
+    vars.jet5_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+  }
+  if( vars.jets.size() == 6 )
+  {
+    vars.jet6 = jet;
+    vars.p_jet6 = &vars.jet6;
+    vars.jet6_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+  }
+  
 }
 
 
@@ -1110,7 +1185,7 @@ void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, 
   vars.p_leadingJ = &vars.leadingJ;
   
   vars.leadingJ_bTag = vars.jets_bTag.at(vars.selectIt_leadingJet);
-  vars.leadingJ_ptD = vars.jets_ptD.at(vars.selectIt_leadingJet);
+  //vars.leadingJ_ptD = vars.jets_ptD.at(vars.selectIt_leadingJet);
   vars.leadingJ_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_leadingJet);
   vars.leadingJ_neutralMultiplicity = vars.jets_neutralMultiplicity.at(vars.selectIt_leadingJet);
 }
@@ -1141,8 +1216,8 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJ2_met_Dphi = deltaPhi(vars.WJ2.phi(),vars.met.phi());
   vars.WJ1_bTag = vars.jets_bTag.at(vars.selectIt_W.at(0));
   vars.WJ2_bTag = vars.jets_bTag.at(vars.selectIt_W.at(1));
-  vars.WJ1_ptD = vars.jets_ptD.at(vars.selectIt_W.at(0));
-  vars.WJ2_ptD = vars.jets_ptD.at(vars.selectIt_W.at(1));
+  //vars.WJ1_ptD = vars.jets_ptD.at(vars.selectIt_W.at(0));
+  //vars.WJ2_ptD = vars.jets_ptD.at(vars.selectIt_W.at(1));
   vars.WJ1_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_W.at(0));
   vars.WJ2_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_W.at(1));
   vars.WJ1_neutralMultiplicity = vars.jets_neutralMultiplicity.at(vars.selectIt_W.at(0));
@@ -1212,8 +1287,8 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
     
     vars.tagJ1_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(0));
     vars.tagJ2_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(1));
-    vars.tagJ1_ptD = vars.jets_ptD.at(vars.selectIt_tag.at(0));
-    vars.tagJ2_ptD = vars.jets_ptD.at(vars.selectIt_tag.at(1));
+    //vars.tagJ1_ptD = vars.jets_ptD.at(vars.selectIt_tag.at(0));
+    //vars.tagJ2_ptD = vars.jets_ptD.at(vars.selectIt_tag.at(1));
     vars.tagJ1_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_tag.at(0));
     vars.tagJ2_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_tag.at(1));
     vars.tagJ1_neutralMultiplicity = vars.jets_neutralMultiplicity.at(vars.selectIt_tag.at(0));

@@ -24,12 +24,13 @@ struct VBFAnalysisVariables
   
   // input parameters
   float mH;
+  int dataFlag;
+  int MCFlag; 
   int totEvents;
   float crossSection;
-  int dataFlag; 
   int runId;
   int lumiId;
-  long long int eventId;
+  Long64_t eventId;
   int eventNaiveId;
   
   float eventWeight;
@@ -42,6 +43,7 @@ struct VBFAnalysisVariables
   
   
   // PV variables
+  int PUtrue_n;
   int PUit_n;
   int PUoot_n;
   float rhoForIsolation;
@@ -105,6 +107,9 @@ struct VBFAnalysisVariables
   int lep_numberOfValidMuonHits;
   int lep_pixelLayersWithMeasurement;
   
+  int lep_mcMatched;
+  float lep_mcMatchDR;
+  
   
   
   // met variables
@@ -125,6 +130,9 @@ struct VBFAnalysisVariables
   
   float met_et;
   float met_phi;
+  
+  int met_mcMatched;
+  float met_mcMatchDR;
   
   float lepMet_pt;
   float lepMet_mt;
@@ -184,6 +192,26 @@ struct VBFAnalysisVariables
   int leadingJ_chargedMultiplicity;
   int leadingJ_neutralMultiplicity;
   
+  ROOT::Math::XYZTVector jet1;
+  ROOT::Math::XYZTVector* p_jet1;
+  ROOT::Math::XYZTVector jet2;
+  ROOT::Math::XYZTVector* p_jet2;
+  ROOT::Math::XYZTVector jet3;
+  ROOT::Math::XYZTVector* p_jet3;
+  ROOT::Math::XYZTVector jet4;
+  ROOT::Math::XYZTVector* p_jet4;
+  ROOT::Math::XYZTVector jet5;
+  ROOT::Math::XYZTVector* p_jet5;
+  ROOT::Math::XYZTVector jet6;
+  ROOT::Math::XYZTVector* p_jet6;
+  
+  float jet1_bTag;
+  float jet2_bTag;
+  float jet3_bTag;
+  float jet4_bTag;
+  float jet5_bTag;
+  float jet6_bTag;
+  
   
   
   // W-jet variables
@@ -230,6 +258,11 @@ struct VBFAnalysisVariables
   int WJ2_neutralMultiplicity;
   float WJ1_QGLikelihood;
   float WJ2_QGLikelihood;
+  
+  int WJ1_mcMatched;
+  int WJ2_mcMatched;
+  float WJ1_mcMatchDR;
+  float WJ2_mcMatchDR;
   
   float WJJ_Deta;
   float WJJ_Dphi;

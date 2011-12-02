@@ -9,9 +9,10 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   //-------------
   
   reducedTree -> SetBranchAddress("mH",           &vars.mH);
+  reducedTree -> SetBranchAddress("dataFlag",     &vars.dataFlag);
+  reducedTree -> SetBranchAddress("MCFlag",       &vars.MCFlag);
   reducedTree -> SetBranchAddress("totEvents",    &vars.totEvents);
   reducedTree -> SetBranchAddress("crossSection", &vars.crossSection);
-  reducedTree -> SetBranchAddress("dataFlag",     &vars.dataFlag);
   reducedTree -> SetBranchAddress("runId",        &vars.runId);
   reducedTree -> SetBranchAddress("lumiId",       &vars.lumiId);
   reducedTree -> SetBranchAddress("eventId",      &vars.eventId);
@@ -25,10 +26,11 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   
   // PU variables
-  reducedTree -> SetBranchAddress("PUit_n", &vars.PUit_n);
-  reducedTree -> SetBranchAddress("PUoot_n", &vars.PUoot_n);
+  reducedTree -> SetBranchAddress("PUtrue_n",        &vars.PUit_n);
+  reducedTree -> SetBranchAddress("PUit_n",          &vars.PUit_n);
+  reducedTree -> SetBranchAddress("PUoot_n",         &vars.PUoot_n);
   reducedTree -> SetBranchAddress("rhoForIsolation", &vars.rhoForIsolation);
-  reducedTree -> SetBranchAddress("rhoForJets", &vars.rhoForJets);
+  reducedTree -> SetBranchAddress("rhoForJets",      &vars.rhoForJets);
   
   
   // PV variables
@@ -76,6 +78,9 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lep_numberOfValidMuonHits",      &vars.lep_numberOfValidMuonHits);
   reducedTree -> SetBranchAddress("lep_pixelLayersWithMeasurement", &vars.lep_pixelLayersWithMeasurement);
   
+  reducedTree -> SetBranchAddress("lep_mcMatched", &vars.lep_mcMatched);
+  reducedTree -> SetBranchAddress("lep_mcMatchDR", &vars.lep_mcMatchDR);
+  
   
   // btag variables
   reducedTree -> SetBranchAddress("nBTag_TCHEL_pt20",  &vars.nBTag_TCHEL_pt20);
@@ -112,6 +117,9 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("lepMet_mt",   &vars.lepMet_mt);
   reducedTree -> SetBranchAddress("lepMet_Dphi", &vars.lepMet_Dphi);
   
+  reducedTree -> SetBranchAddress("met_mcMatched", &vars.met_mcMatched);
+  reducedTree -> SetBranchAddress("met_mcMatchDR", &vars.met_mcMatchDR);
+  
   
   // jet variables
   reducedTree -> SetBranchAddress("nJets",      &vars.nJets);
@@ -143,6 +151,25 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("leadingJ_chargedMultiplicity", &vars.leadingJ_chargedMultiplicity);
   reducedTree -> SetBranchAddress("leadingJ_neutralMultiplicity", &vars.leadingJ_neutralMultiplicity);
   
+  vars.p_jet1 = new ROOT::Math::XYZTVector; 
+  vars.p_jet2 = new ROOT::Math::XYZTVector; 
+  vars.p_jet3 = new ROOT::Math::XYZTVector; 
+  vars.p_jet4 = new ROOT::Math::XYZTVector; 
+  vars.p_jet5 = new ROOT::Math::XYZTVector; 
+  vars.p_jet6 = new ROOT::Math::XYZTVector; 
+  reducedTree -> SetBranchAddress("jet1", &vars.p_jet1);
+  reducedTree -> SetBranchAddress("jet2", &vars.p_jet2);
+  reducedTree -> SetBranchAddress("jet3", &vars.p_jet3);
+  reducedTree -> SetBranchAddress("jet4", &vars.p_jet4);
+  reducedTree -> SetBranchAddress("jet5", &vars.p_jet5);
+  reducedTree -> SetBranchAddress("jet6", &vars.p_jet6);
+  reducedTree -> SetBranchAddress("jet1_bTag", &vars.jet1_bTag);
+  reducedTree -> SetBranchAddress("jet2_bTag", &vars.jet2_bTag);
+  reducedTree -> SetBranchAddress("jet3_bTag", &vars.jet3_bTag);
+  reducedTree -> SetBranchAddress("jet4_bTag", &vars.jet4_bTag);
+  reducedTree -> SetBranchAddress("jet5_bTag", &vars.jet5_bTag);
+  reducedTree -> SetBranchAddress("jet6_bTag", &vars.jet6_bTag);
+  
   
   // W-jet variables
   vars.p_WJ1    = new ROOT::Math::XYZTVector;
@@ -170,7 +197,12 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("WJ2_chargedMultiplicity", &vars.WJ2_chargedMultiplicity);
   reducedTree -> SetBranchAddress("WJ1_neutralMultiplicity", &vars.WJ1_neutralMultiplicity);
   reducedTree -> SetBranchAddress("WJ2_neutralMultiplicity", &vars.WJ2_neutralMultiplicity);
-
+  
+  reducedTree -> SetBranchAddress("WJ1_mcMatched", &vars.WJ1_mcMatched);
+  reducedTree -> SetBranchAddress("WJ1_mcMatchDR", &vars.WJ1_mcMatchDR);
+  reducedTree -> SetBranchAddress("WJ2_mcMatched", &vars.WJ2_mcMatched);
+  reducedTree -> SetBranchAddress("WJ2_mcMatchDR", &vars.WJ2_mcMatchDR);
+  
   reducedTree -> SetBranchAddress("WJJ",      &vars.p_WJJ);
   reducedTree -> SetBranchAddress("WJJ_Deta", &vars.WJJ_Deta);
   reducedTree -> SetBranchAddress("WJJ_Dphi", &vars.WJJ_Dphi);

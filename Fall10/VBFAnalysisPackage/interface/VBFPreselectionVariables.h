@@ -21,12 +21,13 @@ struct VBFPreselectionVariables
   // input parameters
   float mH;
   int dataFlag;
+  int MCFlag;
   int totEvents;
   float crossSection;
   int TMVA4Jet;
   int runId; 
   int lumiId; 
-  long long int eventId; 
+  Long64_t eventId; 
   int eventNaiveId; 
   
   float eventWeight;
@@ -39,6 +40,7 @@ struct VBFPreselectionVariables
   
   
   // PU variables
+  int PUtrue_n;
   int PUit_n;
   int PUoot_n;
   float rhoForIsolation;
@@ -147,6 +149,7 @@ struct VBFPreselectionVariables
   float lep_mcMatchDR;
   
   
+  
   // met variables
   ROOT::Math::XYZTVector met;
   ROOT::Math::XYZTVector* p_met;
@@ -227,7 +230,7 @@ struct VBFPreselectionVariables
   int nJets_cnt_pt20;
   int nJets_fwd_pt20;
   int nJets_btw_pt20;
-
+  
   int nJets_pt25;
   int nJets_cnt_pt25;
   int nJets_fwd_pt25;
@@ -241,6 +244,7 @@ struct VBFPreselectionVariables
   float jets_bTag1;
   float jets_bTag2;
   
+  
   int selectIt_leadingJet;
   
   ROOT::Math::XYZTVector leadingJ;
@@ -250,6 +254,27 @@ struct VBFPreselectionVariables
   float leadingJ_ptD;
   int leadingJ_chargedMultiplicity;
   int leadingJ_neutralMultiplicity;
+  
+    
+  ROOT::Math::XYZTVector jet1;
+  ROOT::Math::XYZTVector* p_jet1;
+  ROOT::Math::XYZTVector jet2;
+  ROOT::Math::XYZTVector* p_jet2;
+  ROOT::Math::XYZTVector jet3;
+  ROOT::Math::XYZTVector* p_jet3;
+  ROOT::Math::XYZTVector jet4;
+  ROOT::Math::XYZTVector* p_jet4;
+  ROOT::Math::XYZTVector jet5;
+  ROOT::Math::XYZTVector* p_jet5;
+  ROOT::Math::XYZTVector jet6;
+  ROOT::Math::XYZTVector* p_jet6;  
+  
+  float jet1_bTag;
+  float jet2_bTag;
+  float jet3_bTag;
+  float jet4_bTag;
+  float jet5_bTag;
+  float jet6_bTag;
   
   
   
