@@ -27,8 +27,8 @@ public:
   RooSpinZero5DV2(const char *name, const char *title,
 	   double _h1,
 	   double _h2,
-	   double _Phi,
 	   double _hs,
+	   double _Phi,
 	   double _Phi1,
 	   double _mZZ,
 	   double _fppVal,
@@ -77,8 +77,8 @@ protected:
   string title_;
   double h1 ;
   double h2 ;
-  double Phi ;
   double hs ;
+  double Phi ;
   double Phi1 ;
   double mZZ ; 
   double fppVal ;
