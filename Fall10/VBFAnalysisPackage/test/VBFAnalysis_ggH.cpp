@@ -3,6 +3,7 @@
 #include "ntpleUtils.h"
 #include "analysisUtils.h"
 #include "readJSONFile.h"
+#include "HelicityLikelihoodDiscriminant.h"
 #include "QGLikelihoodCalculator.h"
 #include "VBFKinematicFit.h"
 
@@ -311,6 +312,8 @@ int main(int argc, char** argv)
   
   // define the quark-gluon likelihood
   QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator();
+  // define the angular likelihood
+  HelicityLikelihoodDiscriminant* helicitylikeli = new HelicityLikelihoodDiscriminant();  
   
   
   
@@ -825,19 +828,19 @@ int main(int argc, char** argv)
     bool isBTagged = false;
     bool isAntiBTagged = true;
     
-    if( vars.nBTag_TCHEM_pt30 > 0 ) isBTagged = true;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
     
-    //if( (vars.nJets >=1) && (vars.jets_bTag1 > 4.00) ) isBTagged = true;
-    //if( (vars.nJets >=2) && (vars.jets_bTag2 > 2.50) ) isBTagged = true;
-    //if( vars.WJ1_bTag > 3.30 ) isBTagged = true;
-    //if( vars.WJ2_bTag > 3.30 ) isBTagged = true;
-    //if( (vars.thirdJ.Pt() > 0.) && (vars.thirdJ_bTag > 3.30) ) isBTagged = true;
+    // standard b-tag veto
+    if( vars.nBTag_TCHEM_pt30 > 0 ) isBTagged = true;
+    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.nJets_cnt_pt30 > 2) && (isBTagged == true) ) continue;
     //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
     
-    //if( (vars.nJets >=1) && (vars.jets_bTag1 < 4.00) ) isAntiBTagged = false;
-    //if( (vars.nJets >=2) && (vars.jets_bTag2 < 2.50) ) isAntiBTagged = false;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isAntiBTagged == false) ) continue;
+    
+    // b-tag selection
+    //if( vars.nBTag_TCHEM_pt30 == 1 ) isBTagged = true;
+    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == false) ) continue;
+    //
+    //if( vars.WJ1_bTag > 3.30 ) continue;
+    //if( vars.WJ2_bTag > 3.30 ) continue;
     
     
     // fill distributions
@@ -1006,6 +1009,19 @@ int main(int argc, char** argv)
       vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
       vars.WJ1_QGLikelihood = QGLikelihoodDummy;
     }
+    
+    TLorentzVector lep_tlv(vars.lep_KF.Px(),vars.lep_KF.Py(),vars.lep_KF.Pz(),vars.lep_KF.E());
+    TLorentzVector nu_tlv ( vars.nu_KF.Px(), vars.nu_KF.Py(), vars.nu_KF.Pz(), vars.nu_KF.E());
+    TLorentzVector WJ1_tlv(vars.WJ1_KF.Px(),vars.WJ1_KF.Py(),vars.WJ1_KF.Pz(),vars.WJ1_KF.E());
+    TLorentzVector WJ2_tlv(vars.WJ2_KF.Px(),vars.WJ2_KF.Py(),vars.WJ2_KF.Pz(),vars.WJ2_KF.E());
+        
+    HelicityLikelihoodDiscriminant::HelicityAngles hangles;
+    if( vars.lep_charge < 0 ) hangles = helicitylikeli -> computeHelicityAngles(lep_tlv,nu_tlv,WJ1_tlv,WJ2_tlv);
+    else                      hangles = helicitylikeli -> computeHelicityAngles(nu_tlv,lep_tlv,WJ1_tlv,WJ2_tlv);
+    helicitylikeli -> setMeasurables(hangles);
+    double sProb = helicitylikeli -> getSignalProbability();
+    double bProb = helicitylikeli -> getBkgdProbability();
+    vars.helicityLikelihood = sProb/(sProb+bProb);  
     
     
     // fill distributions
