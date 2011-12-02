@@ -9,26 +9,7 @@
 #include <cmath>
 
 
-template <class THisto>
-void BinLogX (THisto* h)
-{
- TAxis* axis = h -> GetXaxis();
- int bins = axis -> GetNbins();
-
- float from = axis -> GetXmin();
- float to = axis -> GetXmax();
- float width = (to - from) / bins;
- float* new_bins = new float[bins + 1] ;
-
- for(int i = 0; i <= bins; ++i)
-   new_bins[i] = pow (10, from + i*width);
-
- axis -> Set(bins,new_bins);
- delete new_bins;
-}
-
-
-//PG --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+#include "plotUtils.h"
 
 
 struct hColl
