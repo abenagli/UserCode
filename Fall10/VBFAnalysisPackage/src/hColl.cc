@@ -80,7 +80,7 @@ hColl::addSample (std::string sampleName)
       int nLogBins = bins ;
       float xLogMin = 1. ;
       float xLogMax = 3. ;
-      float xLogWidth = (xLogMax-xLogMin) / nLogBins ;
+      //float xLogWidth = (xLogMax-xLogMin) / nLogBins ;
       dummy = new TH1F ((plotName + "_" + sampleName).c_str (), sampleName.c_str (), nLogBins, xLogMin, xLogMax) ;
       BinLogX (dummy) ;
     }
@@ -137,7 +137,7 @@ hColl::makeStack ()
 TH1F * 
 hColl::findHisto (string name)
 {
-  for (int i = 0 ; i < collection.size () ; ++i)
+  for (unsigned int i = 0 ; i < collection.size () ; ++i)
     {
       if (string (collection.at (i)->GetName ()) == name)
         return collection.at (i) ;
@@ -157,7 +157,7 @@ hColl::normToBinWidths ()
       cerr << "ERROR, histograms already normalized, not normalizing again" << endl ;
       return ;
     }
-  for (int i = 0 ; i < collection.size () ; ++i)
+  for (unsigned int i = 0 ; i < collection.size () ; ++i)
     {
       normalizeToBinWidths (collection.at (i)) ;
     }
