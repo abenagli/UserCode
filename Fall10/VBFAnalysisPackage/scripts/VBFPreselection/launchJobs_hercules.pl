@@ -69,7 +69,7 @@ while (<LISTOFSamples>)
   
   chomp($_);
   
-  ($sample,$dummy,$color,$linestyle,$fillstyle,$dataFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
+  ($sample,$dummy,$color,$linestyle,$fillstyle,$dataFlag,$MCFlag,$mH,$crossSection,$dummy,$dummy) = split(" ") ;
   $subsample = substr($sample,0,1);
   if($subsample eq "#")
   {
@@ -140,6 +140,7 @@ while (<LISTOFSamples>)
                                    "%g | sed -e s%JOBIT%".$jobIt.
                                    "%g | sed -e s%MASS%".$mH.
                                    "%g | sed -e s%DATAFLAG%".$dataFlag.
+                                   "%g | sed -e s%MCFLAG%".$MCFlag.
                                    "%g | sed -e s%CROSSECTION%".$crossSection.
                                    "%g | sed -e s%OUTPUTFILENAME%".$OUTPUTFILEName.
                                    "%g | sed -e s%OUTPUTROOTFILEPATH%".$OUTPUTSAVEPath."/".$sample."/".
