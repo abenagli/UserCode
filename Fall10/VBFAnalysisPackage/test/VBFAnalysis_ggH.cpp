@@ -239,71 +239,128 @@ int main(int argc, char** argv)
   chain -> SetBranchAddress("HLT_Names",&HLT_Names);
   chain -> SetBranchAddress("HLT_Accept",&HLT_Accept);
   
-  std::vector<std::string> HLTPathNames_e_DATA;
-  std::vector<std::string> HLTPathNames_mu_DATA;
-  std::vector<std::string> HLTPathNames_e_MC;
-  std::vector<std::string> HLTPathNames_mu_MC;
+  std::vector<float> HLTLumi_e;
+  std::vector<float> HLTLumi_mu;
   
-  // data
+  std::pair<int,int> dummyHLTRunRanges;
+  std::vector<std::pair<int,int> > HLTRunRanges_e;
+  std::vector<std::pair<int,int> > HLTRunRanges_mu;
   
-  // 5.0E32 epoch 160404-163869
-  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
-  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
-  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
-  // 1.0E33 epoch 165088-166967
-  HLTPathNames_e_DATA.push_back("HLT_Ele17_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT15_v2");
-  HLTPathNames_e_DATA.push_back("HLT_Ele17_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT15_v4");
-  // 1.4E33 epoch 167039-167913
-  HLTPathNames_e_DATA.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  // 2.0E33 epoch 170249-173198
-  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v1");
-  // 3.0E33 epoch 173236-173692
-  HLTPathNames_e_DATA.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  std::vector<std::string> dummyHLTPathNames;
+  std::vector<std::vector<std::string> > HLTPathNames_e_DATA;
+  std::vector<std::vector<std::string> > HLTPathNames_mu_DATA;
   
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v1");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v2");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v4");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v5");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v6");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v7");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v8");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v9");
-  /*
-  // 5.0E32 epoch 160404-163869
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v5");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v6");
-  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v1");
-  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v2");
-  // 1.0E33 epoch 165088-166967
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v8");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v9");
-  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v3");
-  // 1.4E33 epoch 167039-167913
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v11");
-  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v5");
-  // 2.0E33 epoch 170249-173198
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu17_v13");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu20_v8");
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu24_v8");
-  HLTPathNames_mu_DATA.push_back("HLT_Mu30_v7");
-  HLTPathNames_mu_DATA.push_back("HLT_Mu40_v5");
-  // 3.0E33 epoch 173236-173692
-  HLTPathNames_mu_DATA.push_back("HLT_IsoMu20_v9");
-  HLTPathNames_mu_DATA.push_back("HLT_Mu40_v6");
-  */
+  std::vector<std::vector<std::string> > HLTPathNames_e_MC;
+  std::vector<std::vector<std::string> > HLTPathNames_mu_MC;
   
-  // mc
   
-  // electron
-  HLTPathNames_e_MC.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
+  //----------------
+  // data - electron
   
-  // muon
-  HLTPathNames_mu_MC.push_back("HLT_IsoMu24_v1");
-  //HLTPathNames_mu_MC.push_back("HLT_Mu24_v1");
-  /*
-  HLTPathNames_mu_MC.push_back("HLT_IsoMu17_v5");
-  HLTPathNames_mu_MC.push_back("HLT_Mu30_v1");
-  */
+  HLTLumi_e.push_back(0.);
+  
+  // 0-th
+  HLTLumi_e.push_back(HLTLumi_e.at(0)+216.12);
+  dummyHLTRunRanges.first = 160404; dummyHLTRunRanges.second = 163869; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
+  HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+  
+  // 1-th
+  HLTLumi_e.push_back(HLTLumi_e.at(1)+2248.51);
+  dummyHLTRunRanges.first = 165088; dummyHLTRunRanges.second = 176309; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  dummyHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+  dummyHLTPathNames.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v1");
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v1");
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+  
+  // 2-th
+  HLTLumi_e.push_back(HLTLumi_e.at(2)+1221.00);
+  dummyHLTRunRanges.first = 176461; dummyHLTRunRanges.second = 178162; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Ele30_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_PFMHT25_v1");
+  HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+  
+  // 3-th
+  HLTLumi_e.push_back(HLTLumi_e.at(3)+551.07);
+  dummyHLTRunRanges.first = 178420; dummyHLTRunRanges.second = 180252; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Ele27_WP80_DiCentralPFJet25_PFMHT15_v4");
+  dummyHLTPathNames.push_back("HLT_Ele27_WP80_DiCentralPFJet25_PFMHT15_v5");
+  HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+  
+  
+  //------------
+  // data - muon
+  
+  HLTLumi_mu.push_back(0.);
+  
+  // 0-th
+  HLTLumi_mu.push_back(HLTLumi_mu.at(0)+1908.31);
+  dummyHLTRunRanges.first = 160404; dummyHLTRunRanges.second = 173198; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_IsoMu24_v1");
+  dummyHLTPathNames.push_back("HLT_IsoMu24_v2");
+  dummyHLTPathNames.push_back("HLT_IsoMu24_v4");
+  dummyHLTPathNames.push_back("HLT_IsoMu24_v5");
+  dummyHLTPathNames.push_back("HLT_IsoMu24_v6");
+  dummyHLTPathNames.push_back("HLT_IsoMu24_v7");
+  dummyHLTPathNames.push_back("HLT_IsoMu24_v8");
+  HLTPathNames_mu_DATA.push_back(dummyHLTPathNames);
+  
+  // 1-th
+  HLTLumi_mu.push_back(HLTLumi_mu.at(1)+2328.39);
+  dummyHLTRunRanges.first = 173236; dummyHLTRunRanges.second = 180252; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
+  dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v6");
+  dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v7");
+  HLTPathNames_mu_DATA.push_back(dummyHLTPathNames);
+  
+  
+  //--------------
+  // mc - electron
+  
+  // 0-th
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+  HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  
+  // 1-th
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  
+  // 2-th
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  
+  // 3-th
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  
+  
+  //----------
+  // mc - muon
+  
+  // 0-th
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_IsoMu24_v9");
+  HLTPathNames_mu_MC.push_back(dummyHLTPathNames);
+  
+  // 1-th
+  dummyHLTPathNames.clear();
+  dummyHLTPathNames.push_back("HLT_Mu24_eta2p1_v1");
+  HLTPathNames_mu_MC.push_back(dummyHLTPathNames);
   
   
   
@@ -436,8 +493,8 @@ int main(int argc, char** argv)
     {
       if(AcceptEventByRunAndLumiSection(vars.runId, vars.lumiId, jsonMap) == false) skipEvent = true;      
       
-      std::pair<int,Long64_t int> eventLSandID(vars.lumiId, vars.eventId);
-      std::pair<int,std::pair<int,Long64_t int> > eventRUNandLSandID(vars.runId, eventLSandID);
+      std::pair<int,Long64_t> eventLSandID(vars.lumiId, vars.eventId);
+      std::pair<int,std::pair<int,Long64_t> > eventRUNandLSandID(vars.runId, eventLSandID);
       if( eventsMap[eventRUNandLSandID] == 1 ) skipEvent = true;
       else eventsMap[eventRUNandLSandID] = 1;
     }
@@ -494,17 +551,59 @@ int main(int argc, char** argv)
       }
     }
     
+
+    unsigned int HLTPeriod = -1;
+    std::vector<float> HLTLumi;
+    std::vector<std::pair<int,int> > HLTRunRanges;
     std::vector<std::string> HLTPathNames;
-    if( (vars.dataFlag == 1) && (vars.lep_flavour == 11) ) HLTPathNames = HLTPathNames_e_DATA;
-    if( (vars.dataFlag == 1) && (vars.lep_flavour == 13) ) HLTPathNames = HLTPathNames_mu_DATA;
-    if( (vars.dataFlag == 0) && (vars.lep_flavour == 11) ) HLTPathNames = HLTPathNames_e_MC;
-    if( (vars.dataFlag == 0) && (vars.lep_flavour == 13) ) HLTPathNames = HLTPathNames_mu_MC;
     
-    for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
+    
+    // on data
+    if( vars.dataFlag == 1 )
     {
-      if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound) == true )
-        skipEvent = false;
+      if( vars.lep_flavour == 11 ) HLTRunRanges = HLTRunRanges_e;
+      if( vars.lep_flavour == 13 ) HLTRunRanges = HLTRunRanges_mu;
+      
+      for(HLTPeriod = 0; HLTPeriod < HLTRunRanges.size(); ++HLTPeriod)
+        if( (vars.runId >= (HLTRunRanges.at(HLTPeriod)).first) &&
+            (vars.runId <= (HLTRunRanges.at(HLTPeriod)).second) )
+          break;
+      
+      if( vars.lep_flavour == 11 ) HLTPathNames = HLTPathNames_e_DATA.at(HLTPeriod);
+      if( vars.lep_flavour == 13 ) HLTPathNames = HLTPathNames_mu_DATA.at(HLTPeriod);
+      
+      for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
+      {
+        if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound) == true )
+          skipEvent = false;
+      }
     }
+    
+    
+    // on mc
+    else
+    {
+      if( vars.lep_flavour == 11 ) HLTLumi = HLTLumi_e;
+      if( vars.lep_flavour == 13 ) HLTLumi = HLTLumi_mu;
+      
+      float dummyLumi = r.Uniform(0.,4236.7);
+      
+      for(HLTPeriod = 0; HLTPeriod < HLTLumi.size()-1; ++HLTPeriod)
+        if( (dummyLumi >= HLTLumi.at(HLTPeriod)) &&
+            (dummyLumi <=  HLTLumi.at(HLTPeriod+1) ) )
+          break;
+      
+      if( vars.lep_flavour == 11 ) HLTPathNames = HLTPathNames_e_MC.at(HLTPeriod);
+      if( vars.lep_flavour == 13 ) HLTPathNames = HLTPathNames_mu_MC.at(HLTPeriod);
+      
+      for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
+      {
+        if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound) == true )
+          skipEvent = false;
+      }
+    }
+    
+    
     
     if( pathFound == false )
       std::cout << ">>>>>>>>> AcceptHLTPath::Warning: no paths found in the HLT menu" << std::endl;  
@@ -516,44 +615,47 @@ int main(int argc, char** argv)
     //// electron trigger emulation
     if( HLTCUT == 1 )
     {
+      if( (vars.lep_flavour == 11) && (vars.lep_isEB == 1) )
+      {
+        if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.125) ) continue;
+        if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.125) ) continue;
+        if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.125) ) continue;
+        
+        if( vars.lep_sigmaIetaIeta > 0.011 ) continue;
+        if( fabs(vars.lep_DphiIn)  > 0.070 ) continue;
+        if( fabs(vars.lep_DetaIn)  > 0.008 ) continue;
+        if( vars.lep_HOverE        > 0.050 ) continue;
+      }
+      if( (vars.lep_flavour == 11) && (vars.lep_isEB == 0) )
+      {
+        if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.075) ) continue;
+        if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.075) ) continue;
+        if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.075) ) continue;
+        
+        if( vars.lep_sigmaIetaIeta  > 0.031 ) continue;
+        if( fabs(vars.lep_DphiIn)   > 0.020 ) continue;
+        if( fabs(vars.lep_DetaIn)   > 0.005 ) continue;
+        if( vars.lep_HOverE         > 0.025 ) continue;
+      }
+      
       if( (vars.lep_flavour == 11) && (vars.lep.pt() < 30.) ) continue;
+      if( (vars.lep_flavour == 11) && (HLTPeriod == 2) && (vars.lep.pt() < 33.) ) continue;
       if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > 2.5) ) continue;
-      //if( (vars.lep_flavour == 11) && (vars.lep_isEB == 1) )
-      //{
-      //  if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.125) ) continue;
-      //  if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.125) ) continue;
-      //  if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.125) ) continue;
-      //  
-      //  if( vars.lep_sigmaIetaIeta > 0.011 ) continue;
-      //  if( fabs(vars.lep_DphiIn)  > 0.070 ) continue;
-      //  if( fabs(vars.lep_DetaIn)  > 0.008 ) continue;
-      //  if( vars.lep_HOverE        > 0.050 ) continue;
-      //}
-      //if( (vars.lep_flavour == 11) && (vars.lep_isEB == 0) )
-      //{
-      //  if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.075) ) continue;
-      //  if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.075) ) continue;
-      //  if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.075) ) continue;
-      //  
-      //  if( vars.lep_sigmaIetaIeta  > 0.031 ) continue;
-      //  if( fabs(vars.lep_DphiIn)   > 0.020 ) continue;
-      //  if( fabs(vars.lep_DetaIn)   > 0.005 ) continue;
-      //  if( vars.lep_HOverE         > 0.025 ) continue;
-      //}
-      if( (vars.lep_flavour == 11) && (metCUT == 1) && (vars.met.Et() < 30.) ) continue;
-      //if( (vars.lep_flavour == 11) && (std::max(vars.WJ1.pt(),vars.WJ2.pt()) < 35.) ) continue;
-      //if( (vars.lep_flavour == 11) && (std::min(vars.WJ1.pt(),vars.WJ2.pt()) < 30.) ) continue;
+      
+      if( (vars.lep_flavour == 11) && (metCUT == 1) && (HLTPeriod == 1) && (vars.met.Et() < 30.) ) continue;
+      if( (vars.lep_flavour == 11) && (metCUT == 1) && (HLTPeriod == 2) && (vars.met.Et() < 35.) ) continue;
+      if( (vars.lep_flavour == 11) && (metCUT == 1) && (HLTPeriod == 3) && (vars.met.Et() < 30.) ) continue;
     }
     
     //// muon trigger emulation
-    if( HLTCUT == 1 )
-    {
-      if( (vars.lep_flavour == 13) && (vars.lep.pt() < 25.) ) continue;
-      if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > 2.1) ) continue;
-      //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_tkIso  > 1.000) ) continue;
-      //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_emIso  > 1.000) ) continue;
-      //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_hadIso > 1.000) ) continue;
-    }
+    //if( HLTCUT == 1 )
+    //{
+    //  if( (vars.lep_flavour == 13) && (vars.lep.pt() < 25.) ) continue;
+    //  if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > 2.1) ) continue;
+    //  //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_tkIso  > 1.000) ) continue;
+    //  //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_emIso  > 1.000) ) continue;
+    //  //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_hadIso > 1.000) ) continue;
+    //}
     
     
     // fill distributions
@@ -609,7 +711,7 @@ int main(int argc, char** argv)
       if( vars.lep_standalone != 1 ) isId = false;
       if( vars.lep_global     != 1 ) isId = false;
       
-      if( fabs(vars.lep_dxy_PV)             > muDxyMAX )                      isId = false;
+      //if( fabs(vars.lep_dxy_PV)             > muDxyMAX )                      isId = false;
       if( vars.lep_normalizedChi2           > muNormalizedChi2MAX )           isId = false;
       if( vars.lep_numberOfValidTrackerHits < muNumberOfValidTrackerHitsMIN ) isId = false;
       if( vars.lep_numberOfValidMuonHits    < muNumberOfValidMuonHitsMIN )    isId = false;
