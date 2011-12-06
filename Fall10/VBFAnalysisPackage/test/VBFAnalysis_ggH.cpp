@@ -58,6 +58,7 @@ int main(int argc, char** argv)
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
   int firstSTEP = gConfigParser -> readIntOption("Options::firstSTEP");
   float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
+  int dataRunFlag = gConfigParser -> readFloatOption("Options::dataRunFlag");
   int verbosity = gConfigParser -> readIntOption("Options::verbosity"); 
   int trainMVA = gConfigParser -> readIntOption("Options::trainMVA"); 
   int applyMVA = gConfigParser -> readIntOption("Options::applyMVA"); 
@@ -518,7 +519,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -660,7 +661,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -780,7 +781,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -813,7 +814,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -837,7 +838,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -865,7 +866,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -908,7 +909,7 @@ int main(int argc, char** argv)
     
     // Fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -947,7 +948,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -972,7 +973,7 @@ int main(int argc, char** argv)
     
     // Fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -997,7 +998,7 @@ int main(int argc, char** argv)
     
     // fill distributions    
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1026,7 +1027,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1054,7 +1055,7 @@ int main(int argc, char** argv)
     //
     //// fill distributions
     //stepEvents[step] += 1;
-    //stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    //stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     //if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     //if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     //if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1079,7 +1080,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1128,7 +1129,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1159,7 +1160,7 @@ int main(int argc, char** argv)
     //
     //// fill distributions
     //stepEvents[step] += 1;
-    //stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    //stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     //if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     //if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     //if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1184,7 +1185,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1209,7 +1210,7 @@ int main(int argc, char** argv)
     
     // fill distributions
     stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n);
+    stepEvents_PURescaled[step] += PURescaleFactor(vars.PUit_n,0,dataRunFlag,vars.MCFlag);
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;

@@ -74,9 +74,10 @@ drawTStack::drawTStack(const std::string& inputDir,
     int linestyle;
     int fillstyle;
     int dataFlag;
+    int MCFlag;
     double mH;
     
-    listFile >> sample >> sumName >> color >> linestyle >> fillstyle >> dataFlag >> mH >> crossSection >> scaleFactor >> jetAlgorithm;
+    listFile >> sample >> sumName >> color >> linestyle >> fillstyle >> dataFlag >> MCFlag >> mH >> crossSection >> scaleFactor >> jetAlgorithm;
 
     if(sample.size() == 0)
       continue;
@@ -95,6 +96,8 @@ drawTStack::drawTStack(const std::string& inputDir,
               << fillstyle << " "
               << std::setw(3)
               << dataFlag << " "
+              << std::setw(5)
+              << MCFlag << " "
               << std::setw(6)
               << mH << " "
               << std::setw(10)
@@ -180,7 +183,7 @@ void drawTStack::Initialize()
 
 int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const std::string& histoName,
                                const std::string& mode,
-                               const float& lumi, const int& step,
+                               const int& dataRunFlag, const float& lumi, const int& step,
                                const int& nBins,
                                const bool& PURescale,
                                const bool& weightEvent,
@@ -226,8 +229,10 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
       //std::cout << "MakeHistogram::Dumping tree variable " << (variableNames.at(jj)+">>"+histoName).c_str() << std::endl;
       
       std::string cutExtended = m_generalCut;
+      char dataRunFlagChar[50]; sprintf(dataRunFlagChar,"%d",dataRunFlag);
+      
       if(PURescale)
-        cutExtended += " * (PURescaleFactor(PUit_n))";
+        cutExtended += " * (PURescaleFactor(PUit_n,0,"+std::string(dataRunFlagChar)+",MCFlag))";
       if(weightEvent)
         cutExtended += " * (eventWeight)";
       if(cut)
@@ -706,7 +711,7 @@ void drawTStack::FindMinimumMaximum(const std::string& mode)
 
 void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string& histoName,
                       const std::string& mode,
-                      const float& lumi, const int& step,
+                      const int& dataRunFlag, const float& lumi, const int& step,
                       const int& nBins,
                       const bool& PURescale,
                       const bool& weightEvent,
@@ -719,7 +724,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   // Draw::MakeHistograms
   int nHists = MakeHistograms(variableNames,histoName,
                               mode,
-                              lumi,step,
+                              dataRunFlag,lumi,step,
                               nBins,
                               PURescale,
                               weightEvent,

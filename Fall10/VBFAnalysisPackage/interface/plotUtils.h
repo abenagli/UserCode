@@ -80,7 +80,7 @@ class drawTStack
   
   int MakeHistograms(std::vector<std::string>& variableNames, const std::string& histoName,
                      const std::string& mode,
-                     const float& lumi, const int& step,
+                     const int& dataRunFlag, const float& lumi, const int& step,
                      const int& nBins,
                      const bool& PURescale = true,
                      const bool& weightEvent = true,
@@ -91,7 +91,7 @@ class drawTStack
   
   void Draw(std::vector<std::string>& variableNames, const std::string& histoName,
             const std::string& mode,
-            const float& lumi, const int& step,
+            const int& dataRunFlag, const float& lumi, const int& step,
             const int& nBins,
             const bool& PURescale = true,
             const bool& weightEvent = true,
