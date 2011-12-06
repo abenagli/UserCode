@@ -189,7 +189,7 @@ int parseConfigFile (const TString& config)
 
 
 
-double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& dataFlag, const int& MCFlag)
+double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& dataRunFlag, const int& MCFlag)
 {
   if(nPU_MC < 0.)
     return 1.;
@@ -292,7 +292,7 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
     double* distrPUDown_DATA = NULL;
     
     
-    if(dataFlag == 20111)  // Run2011A
+    if(dataRunFlag == 20111)  // Run2011A
     {
       double dummyPU_DATA[] = {
 	0.005929510, // 0
@@ -414,7 +414,7 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
     }
     
     
-    if(dataFlag == 20112)  // Run2011B
+    if(dataRunFlag == 20112)  // Run2011B
     {
       double dummyPU_DATA[] = {
 	0.000191236, // 0
@@ -536,7 +536,7 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
     }
     
     
-    if(dataFlag == 201112)  // Run2011A + Run2011B
+    if(dataRunFlag == 201112)  // Run2011A + Run2011B
     {
       double dummyPU_DATA[] = {
 	0.002859418, // 0
