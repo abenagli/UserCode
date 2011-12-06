@@ -3,49 +3,19 @@
 
 
 
-void drawPileupScaled()
+void drawPileupScaled(const std::string& fileName)
 {
   gStyle -> SetOptStat(1100);
   
   
-  double distrPU_DATA[] = {
-    0.002859418, // 0
-    0.012560310, // 1
-    0.029963130, // 2
-    0.051312994, // 3
-    0.070971273, // 4
-    0.084786385, // 5
-    0.091462672, // 6
-    0.091925524, // 7
-    0.087999381, // 8
-    0.081412680, // 9
-    0.073399492, // 10
-    0.064719088, // 11
-    0.055832654, // 12
-    0.047066260, // 13
-    0.038698819, // 14
-    0.030981110, // 15
-    0.024117511, // 16
-    0.018240983, // 17
-    0.013399664, // 18
-    0.009560713, // 19
-    0.006628135, // 20
-    0.004467347, // 21
-    0.002929458, // 22
-    0.001870567, // 23
-    0.001164142, // 24
-    0.000706805, // 25
-    0.000419059, // 26
-    0.000242856, // 27
-    0.000137700, // 28
-    0.000076458, // 29
-    0.000041610, // 30
-    0.000022214, // 31
-    0.000011642, // 32
-    0.000005994, // 33
-    0.000005955, // 34
-    0.000000000  // 35
-  };
+  TFile* f = TFile::Open(((fileName)+".root").c_str(),"READ");
+  TH1F* h = (TH1F*)( f->Get("pileup") );
+  h -> Scale(1./h->Integral());
+  
+  double distrPU_DATA[35];
+  for(int bin = 1; bin <= 35; ++bin)
+    distrPU_DATA[bin-1] = h->GetBinContent(bin); 
+  
   
   
   // define histograms
@@ -158,6 +128,17 @@ void drawPileupScaled()
   
   
   
+  
+  std::cout << "\n--- PU ---" << std::endl;
+  for(int bin = 1; bin <= h_PU->GetNbinsX(); ++bin)
+  {
+    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h_PU -> GetBinContent(bin);
+    
+    if( bin < h_PU->GetNbinsX() )
+      std::cout << "," << " // " << std::setprecision(0) << int(h_PU->GetBinCenter(bin)) << std::endl;
+    else
+      std::cout << " " << " // " << std::setprecision(0) << int(h_PU->GetBinCenter(bin)) << std::endl;
+  }
   
   std::cout << "\n--- PUUp ---" << std::endl;
   for(int bin = 1; bin <= h_PUUp->GetNbinsX(); ++bin)

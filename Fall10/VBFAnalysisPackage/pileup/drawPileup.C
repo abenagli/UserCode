@@ -5,7 +5,7 @@
 void drawPileup(const std::string& fileName)
 {
   TFile* f = TFile::Open(((fileName)+".root").c_str(),"READ");
-  TH1F* h = (TH1F*)(f -> Get("pileup") );
+  TH1F* h = (TH1F*)( f->Get("pileup") );
   
   TCanvas* c = new TCanvas("c","pileup");
   c -> cd();
