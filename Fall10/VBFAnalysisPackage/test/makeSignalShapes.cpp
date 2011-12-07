@@ -13,7 +13,6 @@ NB Kinematic Fit applied (_KF in the vars name)
 #include "hFactory.h"
 #include "h2Factory.h"
 #include "stdHisto.h"
-#include "RooFitFunctions.h"
 
 #include <cstdlib>
 #include <iomanip>
@@ -87,7 +86,11 @@ int main (int argc, char** argv)
       std::cerr << ">>>>> VBFAnalysis::usage: " << argv[0] << " configFileName" << std::endl ;
       return 1 ;
     }
-
+  
+  RooRealVar x ("x", "higgs mass", 200., 1000.) ;
+  int xBinning = 160 ; //PG 5 GeV binning
+  int xBinning = 80 ; //PG 10 GeV binning
+  
   float LUMI = 2145. ; //PG to have output in 1/fb
   x.setBins (xBinning) ;
 

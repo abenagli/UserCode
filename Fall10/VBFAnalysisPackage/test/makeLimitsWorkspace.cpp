@@ -87,7 +87,7 @@ int main (int argc, char** argv)
   
   RooRealVar x ("x", "higgs mass", 200., 1000.) ;
   int xBinning = 160 ; //PG 5 GeV binning
-  int xBinning = 80 ; //PG 10 GeV binning                                                                                                                                         
+  //int xBinning = 80 ; //PG 10 GeV binning
   
   float LUMI = 2145. ; //PG to have output in 1/fb
   x.setBins (xBinning) ;
