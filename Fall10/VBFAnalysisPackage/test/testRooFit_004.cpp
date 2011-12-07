@@ -10,7 +10,6 @@ testRooFit_004.exe cfg/2011-10-18-listaFile.txt
 #include "hFactory.h"
 #include "h2Factory.h"
 #include "stdHisto.h"
-#include "RooFitFunctions.h"
 
 #include <iomanip>
 #include <string>
@@ -97,6 +96,10 @@ int main (int argc, char** argv)
       return 1 ;
     }
 
+  RooRealVar x ("x", "higgs mass", 200., 1000.) ;                                                                                                                                
+  int xBinning = 160 ; //PG 5 GeV binning                                                                                                                                        
+  //int xBinning = 80 ; //PG 10 GeV binning                                                                                                                                        
+  
   float LUMI = 2145. ; //PG to have output in 1/fb
   x.setBins (xBinning) ;
 

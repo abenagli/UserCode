@@ -40,7 +40,7 @@ using namespace std ;
 
 int main (int argc, char** argv)
 {
-  //  RooRealVar x ("x", "higgs mass", 200., 1000.) ;
+  //RooRealVar x ("x", "higgs mass", 200., 1000.) ;
   //int xBinning = 160 ; //PG 5 GeV binning
   //int xBinning = 80 ; //PG 10 GeV binning
 
