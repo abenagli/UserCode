@@ -132,34 +132,34 @@ void drawPileupScaled(const std::string& fileName)
   std::cout << "\n--- PU ---" << std::endl;
   for(int bin = 1; bin <= h_PU->GetNbinsX(); ++bin)
   {
-    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h_PU -> GetBinContent(bin);
-    
-    if( bin < h_PU->GetNbinsX() )
-      std::cout << "," << " // " << std::setprecision(0) << int(h_PU->GetBinCenter(bin)) << std::endl;
+    if( int(h_PU->GetBinCenter(bin)) < 10 )
+      std::cout << "distrPU_DATA[" << int(h_PU->GetBinCenter(bin)) <<"]  = ";
     else
-      std::cout << " " << " // " << std::setprecision(0) << int(h_PU->GetBinCenter(bin)) << std::endl;
+      std::cout << "distrPU_DATA[" << int(h_PU->GetBinCenter(bin)) <<"] = ";      
+    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h_PU -> GetBinContent(bin);
+    std::cout << ";" << std::endl;
   }
   
   std::cout << "\n--- PUUp ---" << std::endl;
   for(int bin = 1; bin <= h_PUUp->GetNbinsX(); ++bin)
   {
-    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h_PUUp -> GetBinContent(bin);
-    
-    if( bin < h_PUUp->GetNbinsX() )
-      std::cout << "," << " // " << std::setprecision(0) << int(h_PUUp->GetBinCenter(bin)) << std::endl;
+    if( int(h_PUUp->GetBinCenter(bin)) < 10 )
+      std::cout << "distrPUUp_DATA[" << int(h_PUUp->GetBinCenter(bin)) <<"]  = ";
     else
-      std::cout << " " << " // " << std::setprecision(0) << int(h_PUUp->GetBinCenter(bin)) << std::endl;
+      std::cout << "distrPUUp_DATA[" << int(h_PUUp->GetBinCenter(bin)) <<"] = ";      
+    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h_PUUp -> GetBinContent(bin);
+    std::cout << ";" << std::endl;
   }
   
   std::cout << "\n--- PUDown ---" << std::endl;
   for(int bin = 1; bin <= h_PUDown->GetNbinsX(); ++bin)
   {
-    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h_PUDown -> GetBinContent(bin);
-    
-    if( bin < h_PUDown->GetNbinsX() )
-      std::cout << "," << " // " << std::setprecision(0) << int(h_PUDown->GetBinCenter(bin)) << std::endl;
+    if( int(h_PUDown->GetBinCenter(bin)) < 10 )
+      std::cout << "distrPUDown_DATA[" << int(h_PUDown->GetBinCenter(bin)) <<"]  = ";
     else
-      std::cout << " " << " // " << std::setprecision(0) << int(h_PUDown->GetBinCenter(bin)) << std::endl;
+      std::cout << "distrPUDown_DATA[" << int(h_PUDown->GetBinCenter(bin)) <<"] = ";      
+    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h_PUDown -> GetBinContent(bin);
+    std::cout << ";" << std::endl;
   }
   
 }
