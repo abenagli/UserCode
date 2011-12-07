@@ -12,7 +12,6 @@ testRooFit_001.exe
 #include "hFactory.h"
 #include "h2Factory.h"
 #include "stdHisto.h"
-#include "RooFitFunctions.h"
 
 #include <iomanip>
 #include <string>
@@ -41,7 +40,19 @@ using namespace std ;
 
 int main (int argc, char** argv)
 {
+  //  RooRealVar x ("x", "higgs mass", 200., 1000.) ;
+  //int xBinning = 160 ; //PG 5 GeV binning
+  //int xBinning = 80 ; //PG 10 GeV binning
 
+  //RooRealVar N ("N", "rel amplitude second exp", 0., 1.) ;
+  //RooRealVar L1 ("L1", "rel attentuation first exp",  0., 1.) ;
+  //RooRealVar L2 ("L2", "rel attentuation first exp",  0., 1.) ;
+  //
+  //RooGenericPdf RFdoubleExp ("RFdoubleExp", "double exponential",
+  //                           //"N1 * exp (-1 * L1 * x) + N2 * exp (-1 * L2 * x)",
+  //                           "exp (-1 * @1 * @0) + @2 * exp (-1 * @3 * @0)",
+  //                           RooArgSet (x, L1, N, L2)) ;
+    
 //  N1.setVal (10.) ;
 //  L1.setVal (0.012) ;
 //  N2.setVal (5.) ;
@@ -58,4 +69,3 @@ int main (int argc, char** argv)
 
   return 0 ;
 }
-

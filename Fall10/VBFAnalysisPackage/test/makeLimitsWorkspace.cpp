@@ -32,6 +32,7 @@ testRooFit_004.exe cfg/2011-10-18-listaFile.txt
 #include "RooArgSet.h"
 #include "RooDataHist.h"
 #include "RooHistPdf.h"
+#include "RooGenericPdf.h"
 #include "RooWorkspace.h"
 
 #include "hColl.h"
