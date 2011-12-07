@@ -81,16 +81,18 @@ TH1F* GetTotalHisto(const std::string& histoName, const std::string& inputFileLi
     }
     
     if( isFirstFile )
-      totalHisto = (TH1F*)(histo->Clone());
-    else
-      totalHisto -> Add(histo);
-    
-    if( !isFirstFile )
     {
-      f -> Close();
-      delete f;
+      totalHisto = (TH1F*)(histo->Clone());
       isFirstFile = false;
     }
+    
+    else
+    {
+      totalHisto -> Add(histo);
+      f -> Close();
+      delete f;
+    }
+    
   }
 
   return totalHisto;
