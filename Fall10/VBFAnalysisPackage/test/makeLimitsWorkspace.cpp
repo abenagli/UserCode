@@ -10,7 +10,6 @@ testRooFit_004.exe cfg/2011-10-18-listaFile.txt
 #include "hFactory.h"
 #include "h2Factory.h"
 #include "stdHisto.h"
-#include "RooFitFunctions.h"
 
 #include <iomanip>
 #include <string>
@@ -85,7 +84,11 @@ int main (int argc, char** argv)
       std::cerr << ">>>>> VBFAnalysis::usage: " << argv[0] << " configFileName" << std::endl ;
       return 1 ;
     }
-
+  
+  RooRealVar x ("x", "higgs mass", 200., 1000.) ;
+  int xBinning = 160 ; //PG 5 GeV binning
+  int xBinning = 80 ; //PG 10 GeV binning                                                                                                                                         
+  
   float LUMI = 2145. ; //PG to have output in 1/fb
   x.setBins (xBinning) ;
 
@@ -199,17 +202,28 @@ int main (int argc, char** argv)
         } //PG in case of DATA
 
     } //PG loop over samples
-
+  
+  
+  
+  RooRealVar N ("N", "rel amplitude second exp", 0., 1.) ;
+  RooRealVar L1 ("L1", "rel attentuation first exp",  0., 1.) ;
+  RooRealVar L2 ("L2", "rel attentuation first exp",  0., 1.) ;
+  
+  RooGenericPdf RFdoubleExp ("RFdoubleExp", "double exponential",
+                             //"N1 * exp (-1 * L1 * x) + N2 * exp (-1 * L2 * x)",
+                             "exp (-1 * @1 * @0) + @2 * exp (-1 * @3 * @0)",
+                             RooArgSet (x, L1, N, L2)) ;
+  
   RooWorkspace w ("w") ;
   w.import (x) ;
   w.import (N) ;
   w.import (L1) ;
   w.import (L2) ;
   w.import (RFdoubleExp) ;
-//  w.import (*data_DS) ;
+  //w.import (*data_DS) ;
   RooDataHist * data_obs = new RooDataHist ("data_obs", "data_obs", *data_DS->get (), *data_DS) ;
   w.import (*data_obs) ;
-
+  
   //PG loop on signal histo collections
   for (map<string, hColl*>::const_iterator iMap = signalz.begin () ; 
        iMap != signalz.end () ; 
