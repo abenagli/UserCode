@@ -60,6 +60,6 @@ ZZ    /gwteraz/users/benaglia/data/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_max
 #
 DATA  /gwteraz/users/benaglia/data/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Summer11_EGMu/data_Run2011A-05Aug2011-v1/VBFAnalysis_PFlow.root                                 
 DATA  /gwteraz/users/benaglia/data/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Summer11_EGMu/data_Run2011A-May10ReReco-v1/VBFAnalysis_PFlow.root                                                   
-zaDATA  /gwteraz/users/benaglia/data/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Summer11_EGMu/data_Run2011A-PromptReco-v4/VBFAnalysis_PFlow.root                                                    
+DATA  /gwteraz/users/benaglia/data/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Summer11_EGMu/data_Run2011A-PromptReco-v4/VBFAnalysis_PFlow.root                                                    
 DATA  /gwteraz/users/benaglia/data/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Summer11_EGMu/data_Run2011A-PromptReco-v6/VBFAnalysis_PFlow.root                                                    
 #
