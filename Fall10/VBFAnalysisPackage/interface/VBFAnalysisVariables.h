@@ -34,6 +34,7 @@ struct VBFAnalysisVariables
   int eventNaiveId;
   
   float eventWeight;
+  float PUWeight;
   
   
   
@@ -42,7 +43,7 @@ struct VBFAnalysisVariables
   
   
   
-  // PV variables
+  // PU variables
   int PUtrue_n;
   int PUit_n;
   int PUoot_n;
