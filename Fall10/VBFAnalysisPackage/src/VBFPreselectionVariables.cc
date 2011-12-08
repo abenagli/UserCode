@@ -98,6 +98,8 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep_pixelLayersWithMeasurement", &vars.lep_pixelLayersWithMeasurement, "lep_pixelLayersWithMeasurement/I");
   vars.m_reducedTree -> Branch("lep_mcMatched", &vars.lep_mcMatched, "lep_mcMatched/I");
   vars.m_reducedTree -> Branch("lep_mcMatchDR", &vars.lep_mcMatchDR, "lep_mcMatchDR/F");
+  vars.m_reducedTree -> Branch("lep_hltMatched", &vars.lep_hltMatched, "lep_hltMatched/I");
+  vars.m_reducedTree -> Branch("lep_hltMatchPt", &vars.lep_hltMatchPt, "lep_hltMatchPt/F");
   
   
   // met variables
@@ -173,6 +175,18 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("jet4_bTag", &vars.jet4_bTag, "jet4_bTag/F");
   vars.m_reducedTree -> Branch("jet5_bTag", &vars.jet5_bTag, "jet5_bTag/F");
   vars.m_reducedTree -> Branch("jet6_bTag", &vars.jet6_bTag, "jet6_bTag/F");
+  vars.m_reducedTree -> Branch("jet1_hltMatched", &vars.jet1_hltMatched, "jet1_hltMatched/I");
+  vars.m_reducedTree -> Branch("jet2_hltMatched", &vars.jet2_hltMatched, "jet2_hltMatched/I");
+  vars.m_reducedTree -> Branch("jet3_hltMatched", &vars.jet3_hltMatched, "jet3_hltMatched/I");
+  vars.m_reducedTree -> Branch("jet4_hltMatched", &vars.jet4_hltMatched, "jet4_hltMatched/I");
+  vars.m_reducedTree -> Branch("jet5_hltMatched", &vars.jet5_hltMatched, "jet5_hltMatched/I");
+  vars.m_reducedTree -> Branch("jet6_hltMatched", &vars.jet6_hltMatched, "jet6_hltMatched/I");
+  vars.m_reducedTree -> Branch("jet1_hltMatchPt", &vars.jet1_hltMatchPt, "jet1_hltMatchPt/F");
+  vars.m_reducedTree -> Branch("jet2_hltMatchPt", &vars.jet2_hltMatchPt, "jet2_hltMatchPt/F");
+  vars.m_reducedTree -> Branch("jet3_hltMatchPt", &vars.jet3_hltMatchPt, "jet3_hltMatchPt/F");
+  vars.m_reducedTree -> Branch("jet4_hltMatchPt", &vars.jet4_hltMatchPt, "jet4_hltMatchPt/F");
+  vars.m_reducedTree -> Branch("jet5_hltMatchPt", &vars.jet5_hltMatchPt, "jet5_hltMatchPt/F");
+  vars.m_reducedTree -> Branch("jet6_hltMatchPt", &vars.jet6_hltMatchPt, "jet6_hltMatchPt/F");
   
   // W-jet variables
   vars.m_reducedTree -> Branch("WJ1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1);
@@ -426,6 +440,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lep_mcMatched = -1;
   vars.lep_mcMatchDR = -99.;
   
+  vars.lep_hltMatched = 0;
+  vars.lep_hltMatchPt = -99.;
   
   // met variables 
   vars.met = ROOT::Math::XYZTVector(0., 0., 0., 0.);
@@ -548,7 +564,19 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.jet5_bTag = -99.;
   vars.jet6_bTag = -99.;
   
+  vars.jet1_hltMatched = 0;
+  vars.jet2_hltMatched = 0;
+  vars.jet3_hltMatched = 0;
+  vars.jet4_hltMatched = 0;
+  vars.jet5_hltMatched = 0;
+  vars.jet6_hltMatched = 0;
   
+  vars.jet1_hltMatchPt = -99;
+  vars.jet2_hltMatchPt = -99;
+  vars.jet3_hltMatchPt = -99;
+  vars.jet4_hltMatchPt = -99;
+  vars.jet5_hltMatchPt = -99;
+  vars.jet6_hltMatchPt = -99;
   
   // W-jet variables
   vars.selectIt_W.clear();
@@ -802,7 +830,6 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.lep_emIso   = vars.leptons_emIso.at(vars.selectIt_lep);
   vars.lep_hadIso  = vars.leptons_hadIso.at(vars.selectIt_lep);
   
-
   // if electron
   vars.selectIt_ele = -1;
   if(vars.leptonFlavours.at(vars.selectIt_lep) == "electron")
@@ -826,6 +853,23 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.lep_mishits = vars.electrons_mishits.at(vars.selectIt_ele);
     vars.lep_dist = vars.electrons_dist.at(vars.selectIt_ele);
     vars.lep_dcot = vars.electrons_dcot.at(vars.selectIt_ele);
+    
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    for ( unsigned int hltEleIt = 0; hltEleIt < reader.Get4V("goodHLT_electrons")->size(); ++hltEleIt )
+    {
+      ROOT::Math::XYZTVector ele_hlt = reader.Get4V("goodHLT_electrons")->at(hltEleIt);
+      float thisDR = deltaR(ele_hlt.eta(), ele_hlt.phi(), vars.lep.eta(), vars.lep.phi());
+      // discard hlt ele more distant than dr = 0.1 from the offline ele
+      if ( thisDR > 0.1 ) continue;
+      vars.lep_hltMatched = 1;
+      if ( thisDR * fabs(vars.lep.pt() - ele_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(vars.lep.pt() - ele_hlt.pt()); 
+        vars.lep_hltMatchPt = vars.lep.pt();
+      }
+    }
+    
   }
   
   // if muon
@@ -847,6 +891,23 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.lep_numberOfValidTrackerHits = vars.muons_numberOfValidTrackerHits.at(vars.selectIt_mu);
     vars.lep_numberOfValidMuonHits = vars.muons_numberOfValidMuonHits.at(vars.selectIt_mu);
     vars.lep_pixelLayersWithMeasurement = vars.muons_pixelLayersWithMeasurement.at(vars.selectIt_mu);
+    
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    for ( unsigned int hltMuIt = 0; hltMuIt < reader.Get4V("goodHLT_muons")->size(); ++hltMuIt )
+    {
+      ROOT::Math::XYZTVector mu_hlt = reader.Get4V("goodHLT_muons")->at(hltMuIt);
+      float thisDR = deltaR(mu_hlt.eta(), mu_hlt.phi(), vars.lep.eta(), vars.lep.phi());
+      // discard hlt mu more distant than dr = 0.1 from the offline mu
+      if ( thisDR > 0.1 ) continue;
+      vars.lep_hltMatched = 1;
+      if ( thisDR * fabs(vars.lep.pt() - mu_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(vars.lep.pt() - mu_hlt.pt()); 
+        vars.lep_hltMatchPt = vars.lep.pt();
+      }
+    }
+
   }
   
 }
@@ -1132,36 +1193,132 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     vars.jet1 = jet;
     vars.p_jet1 = &vars.jet1;
     vars.jet1_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
+    {
+      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
+      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
+      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
+      if ( thisDR > 0.5 ) continue;
+      vars.jet1_hltMatched = 1;
+      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
+        vars.jet1_hltMatchPt = jet.pt();
+      }
+    }
+
   }
   if( vars.jets.size() == 2 )
   {
     vars.jet2 = jet;
     vars.p_jet2 = &vars.jet2;
     vars.jet2_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
+    {
+      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
+      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
+      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
+      if ( thisDR > 0.5 ) continue;
+      vars.jet2_hltMatched = 1;
+      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
+        vars.jet2_hltMatchPt = jet.pt();
+      }
+    }
+
   }
   if( vars.jets.size() == 3 )
   {
     vars.jet3 = jet;
     vars.p_jet3 = &vars.jet3;
     vars.jet3_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
+    {
+      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
+      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
+      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
+      if ( thisDR > 0.5 ) continue;
+      vars.jet3_hltMatched = 1;
+      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
+        vars.jet3_hltMatchPt = jet.pt();
+      }
+    }
+
   }
   if( vars.jets.size() == 4 )
   {
     vars.jet4 = jet;
     vars.p_jet4 = &vars.jet4;
     vars.jet4_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
+    {
+      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
+      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
+      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
+      if ( thisDR > 0.5 ) continue;
+      vars.jet4_hltMatched = 1;
+      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
+        vars.jet4_hltMatchPt = jet.pt();
+      }
+    }
+
   }
   if( vars.jets.size() == 5 )
   {
     vars.jet5 = jet;
     vars.p_jet5 = &vars.jet5;
     vars.jet5_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
+    {
+      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
+      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
+      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
+      if ( thisDR > 0.5 ) continue;
+      vars.jet5_hltMatched = 1;
+      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
+        vars.jet5_hltMatchPt = jet.pt();
+      }
+    }
+
   }
   if( vars.jets.size() == 6 )
   {
     vars.jet6 = jet;
     vars.p_jet6 = &vars.jet6;
     vars.jet6_bTag = vars.jets_bTag.at(vars.jets.size()-1);
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
+    {
+      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
+      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
+      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
+      if ( thisDR > 0.5 ) continue;
+      vars.jet6_hltMatched = 1;
+      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
+        vars.jet6_hltMatchPt = jet.pt();
+      }
+    }
+
   }
   
 }
