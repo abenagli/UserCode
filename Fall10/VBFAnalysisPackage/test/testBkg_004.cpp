@@ -80,8 +80,9 @@ int main (int argc, char** argv)
       return 1 ;
     }
 
-  float LUMI = 2145. ; //PG to have output in 1/fb
-
+//   float LUMI = 2145. ; //PG to have output in 1/fb
+  float LUMI = 4236.79 ; //PG to have output in 1/fb
+  
   string mass = argv[2] ;
 
   string inputFileList (argv[1]) ;
@@ -123,13 +124,14 @@ int main (int argc, char** argv)
 
   //PG the cuts
   TCut generalCut = "" ;
+//   TCut generalCut = "helicityLikelihood > 0.5" ;
 //  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
 //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
 //   generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
 //   generalCut = generalCut && "lep_flavour == 11" ; //PG only electrons
   
-  std::string outputRootFullFileName = "testBkg_004_S" + mass + ".root" ;
-//   std::string outputRootFullFileName = "testBkg_004_mu_S" + mass + ".root" ;
+  std::string outputRootFullFileName = "testBkg_004_S" + mass + "_2011AB.root" ;
+//   std::string outputRootFullFileName = "testBkg_004_mu_S" + mass + "_2011AB.root" ;
 //   std::string outputRootFullFileName = "testBkg_004_el_S" + mass + ".root" ;
   
 //  std::string outputRootFullFileName = "testBkg_004_cuts_S" + mass + ".root" ;
@@ -188,31 +190,31 @@ int main (int argc, char** argv)
     {
 
       TCut cutLower = generalCut && lower ;
-      TCut cutLowerExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutLower.GetTitle (), LUMI) ;    
+      TCut cutLowerExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutLower.GetTitle (), LUMI) ;    
 
       TCut cutLower_c = generalCut && lower_c ;
-      TCut cutLower_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutLower_c.GetTitle (), LUMI) ;    
+      TCut cutLower_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutLower_c.GetTitle (), LUMI) ;    
 
       TCut cutLower_a = generalCut && lower_a ;
-      TCut cutLower_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutLower_a.GetTitle (), LUMI) ;    
+      TCut cutLower_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutLower_a.GetTitle (), LUMI) ;    
 
       TCut cutSignal = generalCut && signal ;
-      TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutSignal.GetTitle (), LUMI) ;    
+      TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutSignal.GetTitle (), LUMI) ;    
 
       TCut cutUpper = generalCut && upper ;
-      TCut cutUpperExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutUpper.GetTitle (), LUMI) ;    
+      TCut cutUpperExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutUpper.GetTitle (), LUMI) ;    
 
       TCut cutUpper_c = generalCut && upper_c ;
-      TCut cutUpper_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutUpper_c.GetTitle (), LUMI) ;    
+      TCut cutUpper_cExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutUpper_c.GetTitle (), LUMI) ;    
 
       TCut cutUpper_a = generalCut && upper_a ;
-      TCut cutUpper_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutUpper_a.GetTitle (), LUMI) ;    
+      TCut cutUpper_aExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutUpper_a.GetTitle (), LUMI) ;    
 
       TCut cutEvenHigher = generalCut && EvenHigher ;
-      TCut cutEvenHigherExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutEvenHigher.GetTitle (), LUMI) ;    
+      TCut cutEvenHigherExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutEvenHigher.GetTitle (), LUMI) ;    
 
       TCut cutSideband = generalCut && (upper || lower) ;
-      TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n) * eventWeight", cutSideband.GetTitle (), LUMI) ;    
+      TCut cutSidebandExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutSideband.GetTitle (), LUMI) ;    
 
       cout << " reading " << iColl->first << endl ;
       if (iColl->first.find ("ggH") != string::npos || iColl->first.find ("qqH") != string::npos) 
@@ -292,6 +294,8 @@ int main (int argc, char** argv)
       ++index ;   
     } //PG loop over samples
 
+
+  
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
   outputRootFile->cd () ;
 
