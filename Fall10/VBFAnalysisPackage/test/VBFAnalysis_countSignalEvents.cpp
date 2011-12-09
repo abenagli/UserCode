@@ -167,7 +167,9 @@ int main(int argc, char** argv)
 	}
       }
     }
-    
+
+  inputFile -> Close(); 
+
   }
   
   
@@ -219,7 +221,7 @@ int main(int argc, char** argv)
   }
   
   outFile -> Close();
-  
+ 
   
   return 0;
 }
