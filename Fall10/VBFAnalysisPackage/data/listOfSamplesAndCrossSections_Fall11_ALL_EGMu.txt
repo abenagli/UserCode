@@ -51,11 +51,11 @@ TTJets_TuneZ2_7TeV-madgraph-tauola_kaussen-SQWaT_PAT_42X_Fall11_v1              
 DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_kaussen-SQWaT_PAT_42X_Fall11_v2                      3_Z+jets_madgraph      8 1 1001    0 20113 -1.       3048.000 1.0    PFlow
 QCD_Pt-20to30_EMEnriched_TuneZ2_7TeV-pythia6_govoni-SQWaT_PAT_42X_Fall11_v1                      1_QCD                 51 1 1001    0 20113 -1.    2450000.000 1.0    PFlow
 QCD_Pt-30to80_EMEnriched_TuneZ2_7TeV-pythia_govoni-SQWaT_PAT_42X_Fall11_v1                       1_QCD                 51 1 1001    0 20113 -1.    3870000.000 1.0    PFlow
-##QCD_Pt-80to170_EMEnriched_TuneZ2_7TeV-pythia6_Summer11-PU_S4_START42_V11-v1                      1_QCD                 51 1 1001    0 20113 -1.     140000.000 1.0    PFlow
+##QCD_Pt-80to170_EMEnriched_TuneZ2_7TeV-pythia6_Summer11-PU_S4_START42_V11-v1                      1_QCD                 51 1 1001    0 20112 -1.     140000.000 1.0    PFlow
 ##QCD_Pt-20to30_BCtoE_TuneZ2_7TeV-pythia6_Summer11-PU_S3_START42_V11-v2                            1_QCD                 51 1 1001    0 20113 -1.     132000.000 1.0    PFlow 
-QCD_Pt-30to80_BCtoE_TuneZ2_7TeV-pythia6_govoni-SQWaT_PAT_42X_Fall11_v1                           1_QCD                 51 1 1001    0 20113 -1.     137000.000 1.0    PFlow 
+QCD_Pt-30to80_BCtoE_TuneZ2_7TeV-pythia6_govoni-SQWaT_PAT_42X_Fall11_v1                           1_QCD                 51 1 1001    0 20112 -1.     137000.000 1.0    PFlow 
 QCD_Pt-80to170_BCtoE_TuneZ2_7TeV-pythia_govoni-SQWaT_PAT_42X_Fall11_v1                           1_QCD                 51 1 1001    0 20113 -1.       9360.000 1.0    PFlow 
-##QCD_Pt-20_MuEnrichedPt-15_TuneZ2_7TeV-pythia6_Summer11-PU_S4_START42_V11-v1                      1_QCD                 51 1 1001    0 20113 -1.      84700.000 1.0    PFlow 
+##QCD_Pt-20_MuEnrichedPt-15_TuneZ2_7TeV-pythia6_Summer11-PU_S4_START42_V11-v1                      1_QCD                 51 1 1001    0 20112 -1.      84700.000 1.0    PFlow 
 WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_lannon-SQWaT_PAT_42X_Fall11_v1                            5_W+jets_madgraph     92 1 1001    0 20113 -1.      31314.000 1.0    PFlow
 ##*** *** 1 1 1 1 1 1 1 1 ***
 SingleElectron_abenagli-SQWaT_PAT_42X_2011A_May10ReReco-v1_v1    0_data_ele_mu    1 1 1001    1 0 -1.    1.000 1.0    PFlow
