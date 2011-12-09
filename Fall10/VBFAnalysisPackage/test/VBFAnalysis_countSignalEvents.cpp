@@ -1,6 +1,7 @@
 #include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
+#include "PUUtils.h"
 #include "HiggsMassWindows.h"
 
 #include <iostream>
@@ -65,6 +66,7 @@ int main(int argc, char** argv)
   //[Options]
   int step    = gConfigParser -> readIntOption("Options::step");
   int PUScale = gConfigParser -> readIntOption("Options::PUScale");
+  std::string pileupFileName = gConfigParser -> readStringOption("Options::pileupFileName");
   
   
   
@@ -76,6 +78,12 @@ int main(int argc, char** argv)
   int PUit_n;
   int PUoot_n;
   float lepNuW_m_KF;
+  
+  
+  
+  // get the data pileup distribution
+  TFile* inFile_pileup = TFile::Open(pileupFileName.c_str(),"READ");
+  TH1F* distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileup") );
   
   
   
@@ -134,6 +142,13 @@ int main(int argc, char** argv)
     if ( tree -> GetEntries() == 0 ) continue; 
     
     
+    
+    // get the mc pileup distribution
+    TH1F* distrPU_MC = (TH1F*)( inputFile->Get("nPUit") );
+    distrPU_MC -> Scale(1./distrPU_MC->Integral());
+    
+    
+    
     // set tree branches
     tree -> SetBranchAddress("mH",           &mH);
     tree -> SetBranchAddress("eventWeight",  &eventWeight);
@@ -148,7 +163,7 @@ int main(int argc, char** argv)
     for(int entry = 0; entry < tree->GetEntries(); ++entry)
     {
       tree -> GetEntry(entry);
-      double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(PUit_n,PUScale) * eventWeight;
+      double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(distrPU_DATA,distrPU_MC,PUit_n,PUScale) * eventWeight;
       
       int mass = int(int(mH)%1000);
       
