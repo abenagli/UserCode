@@ -218,10 +218,13 @@ int main(int argc, char** argv)
   
   // define clone trees
   std::map<int, TTree*> cloneTrees;
-  for(int step = firstSTEP; step <= nStep; ++step)
+  
+  for(int step = 1; step <= nStep; ++step)
   {
+    if( (step < firstSTEP) && (step != 2) ) continue;
+    
     char treeName[50];
-    sprintf(treeName, "ntu_%d", step);;
+    sprintf(treeName, "ntu_%d", step);
     cloneTrees[step] = chain -> CloneTree(0);
     cloneTrees[step] -> SetName(treeName); 
     AddVBFAnalysisTreeBranches(vars,cloneTrees[step]);
@@ -533,8 +536,8 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP ) cloneTrees[step] -> Fill();    
-    
+    if( step == 2 ) cloneTrees[step] -> Fill();
+        
     
     
     
@@ -617,7 +620,7 @@ int main(int argc, char** argv)
     if( pathFound == false )
       std::cout << ">>>>>>>>> AcceptHLTPath::Warning: no paths found in the HLT menu" << std::endl;  
     
-    if( (HLTCUT == 1) && (skipEvent == true) ) continue;
+    //if( (HLTCUT == 1) && (skipEvent == true) ) continue;
     
     
     
@@ -1135,6 +1138,9 @@ int main(int argc, char** argv)
     vars.helicityLikelihood = sProb/(sProb+bProb);  
     
     
+    //if( vars.helicityLikelihood < 0.6 ) continue;
+    
+    
     // fill distributions
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
@@ -1270,13 +1276,15 @@ int main(int argc, char** argv)
   
   
   
-  for(step = firstSTEP; step <= nStep; ++step)
+  for(step = 1; step <= nStep; ++step)
   {
+    if( (step < firstSTEP) && (step != 2) ) continue;
     cloneTrees[step] -> AutoSave();
   } 
   
   
-   
+  
+  distrPU_MC -> Write();
   events -> Write();
   events_PURescaled -> Write();
   events_plus_int -> Write();

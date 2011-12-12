@@ -153,8 +153,10 @@ int main(int argc, char** argv)
       hint = (TH1F*)(inFile->Get("extrapolated_bkg"));
       
       xWidth = data -> GetBinWidth(1);
-      xMin = 225.;
-      xMax = 800.;
+      //xMin = 225.;
+      //xMax = 800.;
+      xMin = GetLepNuWMMIN(mass);
+      xMax = GetLepNuWMMAX(mass);
       nBins = int( (xMax - xMin)/xWidth );
       binMin = 1;
       binMax = nBins;
