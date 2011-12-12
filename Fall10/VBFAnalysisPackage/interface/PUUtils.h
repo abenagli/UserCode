@@ -1,10 +1,13 @@
 #ifndef PUUtils_h
 #define PUUtils_h
 
+#include "histoFunc.h"
+
 #include <iostream>
 #include <iomanip>
 
 #include "TH1F.h"
+#include "TF1.h"
 
 
 

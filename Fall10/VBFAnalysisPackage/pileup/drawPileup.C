@@ -24,12 +24,12 @@ void drawPileup(const std::string& fileName)
   
   for(int bin = 1; bin <= h->GetNbinsX(); ++bin)
   {
-    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h -> GetBinContent(bin);
-
-    if( bin < h->GetNbinsX() )
-      std::cout << "," << " // " << std::setprecision(0) << int(h->GetBinCenter(bin)) << std::endl;
+    if( int(h->GetBinCenter(bin)) < 10 )
+      std::cout << "distrPU_DATA[" << int(h->GetBinCenter(bin)) <<"]  = ";
     else
-      std::cout << " " << " // " << std::setprecision(0) << int(h->GetBinCenter(bin)) << std::endl;
+      std::cout << "distrPU_DATA[" << int(h->GetBinCenter(bin)) <<"] = ";
+    std::cout << std::fixed << std::setprecision(9) << std::setw(11) << h -> GetBinContent(bin);
+    std::cout << ";" << std::endl;
   }
   
   

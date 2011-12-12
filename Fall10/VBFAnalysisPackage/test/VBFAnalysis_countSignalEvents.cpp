@@ -103,9 +103,11 @@ int main(int argc, char** argv)
   
   
   // Define counters and histograms
+  std::map<int,float> S;
   std::map<int,float> ggS;
   std::map<int,float> qqS;
   
+  std::map<int,TH1F*> h_S;
   std::map<int,TH1F*> h_ggS;
   std::map<int,TH1F*> h_qqS;
   
@@ -113,6 +115,9 @@ int main(int argc, char** argv)
   {
     int mass = masses[iMass];
     char histoName[50];
+    
+    sprintf(histoName,"H%d",mass);
+    h_S[mass] = new TH1F(histoName,"",nBins,xMin,xMax);
     
     sprintf(histoName,"ggH%d",mass);
     h_ggS[mass] = new TH1F(histoName,"",nBins,xMin,xMax);
@@ -167,19 +172,15 @@ int main(int argc, char** argv)
       
       int mass = int(int(mH)%1000);
       
+      h_S[mass] -> Fill(lepNuW_m_KF,weight);
+      if( mH < 1000 ) h_ggS[mass] -> Fill(lepNuW_m_KF,weight);
+      else            h_qqS[mass] -> Fill(lepNuW_m_KF,weight);
+      
       if( (lepNuW_m_KF >= GetLepNuWMMIN(mass)) && (lepNuW_m_KF < GetLepNuWMMAX(mass)) )
       {
-        if( mH < 1000 )
-        {
-          ggS[mass] += weight;
-          h_ggS[mass] -> Fill(lepNuW_m_KF,weight);
-	}
-        
-        else
-        {
-          qqS[mass] += weight;
-          h_qqS[mass] -> Fill(lepNuW_m_KF,weight);
-	}
+        S[mass] += weight;
+        if( mH < 1000 ) ggS[mass] += weight;
+        else            qqS[mass] += weight;
       }
     }
 
@@ -218,7 +219,7 @@ int main(int argc, char** argv)
     int mass = masses[iMass];
     
     std::cout << ">>> Higgs mass: " << mass
-              << "        S: "      << std::fixed << std::setprecision(3) << std::setw(7) << ggS[mass]+qqS[mass]
+              << "        S: "      << std::fixed << std::setprecision(3) << std::setw(7) << S[mass]
               << std::endl;
   }
   
@@ -231,6 +232,7 @@ int main(int argc, char** argv)
   {
     int mass = masses[iMass];
     
+    h_S[mass]   -> Write();
     h_ggS[mass] -> Write();
     h_qqS[mass] -> Write();
   }

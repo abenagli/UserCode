@@ -145,8 +145,10 @@ int main(int argc, char** argv)
   TF1* func;
   TF1* func_sig;
   
-  TH1F* hint = new TH1F("hint","",nBinsFit,xFitMIN1,xFitMAX2);
-  TH1F* hint_sig = new TH1F("hint_sig","",nBinsFit,xFitMIN1,xFitMAX2);
+  //TH1F* hint = new TH1F("hint","",nBinsFit,xFitMIN1,xFitMAX2);
+  //TH1F* hint_sig = new TH1F("hint_sig","",nBinsFit,xFitMIN1,xFitMAX2);
+  TH1F* hint = new TH1F("hint","",nBins,xMin,xMax);
+  TH1F* hint_sig = new TH1F("hint_sig","",nBins,xMin,xMax);
   
   TH1F* h_chi2     = new TH1F("h_chi2","",     100,    0.,   3.);
   TH1F* h_diff_obs = new TH1F("h_diff_obs","",2000,-1000.,1000.);
@@ -268,6 +270,7 @@ int main(int argc, char** argv)
       outFile -> cd();
       std::stringstream weight;
       weight << "( 1. )";
+      //weight << "( 1. ) * ( (lepNuW_m_KF < " << lepNuWMMIN << ") || ( lepNuW_m_KF >= " << lepNuWMMAX << ") )";
       std::string extendedCut = weight.str() + " * " + WMassCut;      
       
       tree -> Draw((varName+" >>+ h_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
@@ -306,7 +309,7 @@ int main(int argc, char** argv)
       // fill histogram
       outFile -> cd();
       std::stringstream weight;
-      weight << "( 1000 * " << lumi << " * 1. * eventWeight / totEvents * crossSection * PURescaleFactor(PUit_n) )";
+      weight << "( 1000 * " << lumi << " * 1. * eventWeight / totEvents * crossSection * eventWeight * PUWeight )";
       std::string extendedCut = weight.str() + " * " + WMassCut;      
       
       tree -> Draw((varName+" >>+ h_mcSum_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
@@ -334,7 +337,7 @@ int main(int argc, char** argv)
       // fill histogram
       outFile -> cd();
       std::stringstream weight;
-      weight << "( 1000 * " << lumi << " * 1. * eventWeight / totEvents * crossSection * PURescaleFactor(PUit_n) )";
+      weight << "( 1000 * " << lumi << " * 1. * eventWeight / totEvents * crossSection * eventWeight * PUWeight )";
       std::string extendedCut = weight.str() + " * " + WMassCut;      
       
       tree -> Draw((varName+" >>+ h_sig_lepNuW_m").c_str(),extendedCut.c_str(),"goff");

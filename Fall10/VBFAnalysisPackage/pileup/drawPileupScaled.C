@@ -26,7 +26,7 @@ void drawPileupScaled(const std::string& fileName)
   
   TH1F* h_PU     = new TH1F("h_PU",    "",nBins,xMin,xMax);
   TH1F* h_PUUp   = new TH1F("h_PUUp",  "",nBins,xMin,xMax);
-  TH1F* h_PUDown = new TH1F("h_PUDodn","",nBins,xMin,xMax);
+  TH1F* h_PUDown = new TH1F("h_PUDown","",nBins,xMin,xMax);
   
   
   

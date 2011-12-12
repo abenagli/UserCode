@@ -620,7 +620,7 @@ int main(int argc, char** argv)
     if( pathFound == false )
       std::cout << ">>>>>>>>> AcceptHLTPath::Warning: no paths found in the HLT menu" << std::endl;  
     
-    //if( (HLTCUT == 1) && (skipEvent == true) ) continue;
+    if( (HLTCUT == 1) && (skipEvent == true) ) continue;
     
     
     

@@ -183,7 +183,7 @@ void drawTStack::Initialize()
 
 int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const std::string& histoName,
                                const std::string& mode,
-                               const int& dataRunFlag, const float& lumi, const int& step,
+                               const float& lumi, const int& step,
                                const int& nBins,
                                const bool& PURescale,
                                const bool& weightEvent,
@@ -229,10 +229,9 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
       //std::cout << "MakeHistogram::Dumping tree variable " << (variableNames.at(jj)+">>"+histoName).c_str() << std::endl;
       
       std::string cutExtended = m_generalCut;
-      char dataRunFlagChar[50]; sprintf(dataRunFlagChar,"%d",dataRunFlag);
       
       if(PURescale)
-        cutExtended += " * (PURescaleFactor(PUit_n,0,"+std::string(dataRunFlagChar)+",MCFlag))";
+        cutExtended += " * (PUWeight)";
       if(weightEvent)
         cutExtended += " * (eventWeight)";
       if(cut)
@@ -711,7 +710,7 @@ void drawTStack::FindMinimumMaximum(const std::string& mode)
 
 void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string& histoName,
                       const std::string& mode,
-                      const int& dataRunFlag, const float& lumi, const int& step,
+                      const float& lumi, const int& step,
                       const int& nBins,
                       const bool& PURescale,
                       const bool& weightEvent,
@@ -724,7 +723,7 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   // Draw::MakeHistograms
   int nHists = MakeHistograms(variableNames,histoName,
                               mode,
-                              dataRunFlag,lumi,step,
+                              lumi,step,
                               nBins,
                               PURescale,
                               weightEvent,
