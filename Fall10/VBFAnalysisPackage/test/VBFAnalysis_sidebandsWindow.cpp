@@ -83,9 +83,9 @@ int main(int argc, char** argv)
   analysisMethod  = gConfigParser -> readStringOption("Options::analysisMethod");
   
   
-  int nBins = 200;
+  int nBins = 160;
   float xMin = 0.;
-  float xMax = 1000.;
+  float xMax = 800.;
   float xWidth = (xMax-xMin)/nBins;
   
   
@@ -115,8 +115,8 @@ int main(int argc, char** argv)
 
   
     
-  TH2F * Chi2Array = new TH2F ("Chi2Array","",nLowSbCuts+1,LowSbcutMin,LowSbcutMax+LowSbcutStep,
-                                              nUpSbCuts+1, UpSbcutMin, UpSbcutMax+UpSbcutStep);
+  TH2F * Chi2Array = new TH2F ("Chi2Array","#chi^{2}/ndf m_{l#nujj} signal-sideband",nLowSbCuts+1,LowSbcutMin,LowSbcutMax+LowSbcutStep,
+                                                                                     nUpSbCuts+1, UpSbcutMin, UpSbcutMax+UpSbcutStep);
 
   for (int iLowSbcut = 0; iLowSbcut <= nLowSbCuts; iLowSbcut++)
   {
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     float LowSbcut = LowSbcutMax - iLowSbcut * LowSbcutStep;
   
     char LowSbcutChar[10];
-    sprintf(LowSbcutChar,"%.1f",LowSbcut);
+    sprintf(LowSbcutChar,"%.0f",LowSbcut);
      
     
     for (int iUpSbcut = 0; iUpSbcut <= nUpSbCuts; iUpSbcut++)
@@ -133,12 +133,12 @@ int main(int argc, char** argv)
       float UpSbcut = UpSbcutMax - iUpSbcut * UpSbcutStep;
   
       char UpSbcutChar[10];
-      sprintf(UpSbcutChar,"%.1f",UpSbcut);
+      sprintf(UpSbcutChar,"%.0f",UpSbcut);
       
             
       string sbRegion = "( ( (WJJ_m >= " + string(LowSbcutChar) + ") && (WJJ_m < 65.) ) || ( (WJJ_m >= 95.) && (WJJ_m < " + string(UpSbcutChar) + " ) ) )"; 
       
-       cout << ">>>>>>>>>  sideband Region: " << sbRegion << endl;
+      cout << ">>>>>>>>>  sideband Region: " << "( WJJ_m >= " + string(LowSbcutChar) + " && WJJ_m < 65 ) || ( WJJ_m >= 95 && WJJ_m < " + string(UpSbcutChar) + " )" << endl;
       
       
       //-------------------------------
@@ -179,6 +179,11 @@ int main(int argc, char** argv)
   
       double Chi2 = h_mcSum_sigRegion->Chi2Test(h_mcSum_sbRegion, "WW,CHI2/NDF"); 
       Chi2Array -> Fill(LowSbcut + LowSbcutStep/2., UpSbcut + UpSbcutStep/2., Chi2);
+      
+      
+      // Normalize to unit area to compare the m4 shape signal/sideband
+      h_mcSum_sigRegion -> Scale(1./h_mcSum_sigRegion -> Integral());
+      h_mcSum_sbRegion  -> Scale(1./h_mcSum_sbRegion  -> Integral());
       
       
       if(iLowSbcut == 0 && iUpSbcut == 0) h_mcSum_sigRegion -> Write("h_mcSum_sigRegion");
