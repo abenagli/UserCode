@@ -147,7 +147,8 @@ struct VBFPreselectionVariables
   
   int lep_mcMatched;
   float lep_mcMatchDR;
-  
+  int lep_hltMatched;
+  float lep_hltMatchPt;  
   
   
   // met variables
@@ -276,6 +277,18 @@ struct VBFPreselectionVariables
   float jet5_bTag;
   float jet6_bTag;
   
+  int jet1_hltMatched;
+  int jet2_hltMatched;
+  int jet3_hltMatched;
+  int jet4_hltMatched;
+  int jet5_hltMatched;
+  int jet6_hltMatched;
+  float jet1_hltMatchPt;
+  float jet2_hltMatchPt;
+  float jet3_hltMatchPt;
+  float jet4_hltMatchPt;
+  float jet5_hltMatchPt;
+  float jet6_hltMatchPt;
   
   
   // W-jet variables
