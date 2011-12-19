@@ -107,6 +107,10 @@ struct VBFPreselectionVariables
   int selectIt_ele;
   int selectIt_mu;
   
+  int selectIt_lep2;
+  int selectIt_ele2;
+  int selectIt_mu2;
+  
   ROOT::Math::XYZTVector lep;
   ROOT::Math::XYZTVector* p_lep;
   
@@ -149,6 +153,52 @@ struct VBFPreselectionVariables
   float lep_mcMatchDR;
   int lep_hltMatched;
   float lep_hltMatchPt;  
+  int lep_hltPass;
+  
+  
+  ROOT::Math::XYZTVector lep2;
+  ROOT::Math::XYZTVector* p_lep2;
+  
+  float lep2_charge;
+  int lep2_flavour;
+  float lep2_pt;
+  float lep2_eta;
+  float lep2_phi;
+  float lep2_zepp;
+  float lep2_z;
+  float lep2_dxy_BS;
+  float lep2_dz_BS;
+  float lep2_dB;
+  float lep2_edB;
+  float lep2_dz_PV;
+  float lep2_tkIso;
+  float lep2_emIso;
+  float lep2_hadIso;
+  int lep2_isEB;
+  float lep2_etaSC;
+  float lep2_sigmaIetaIeta;
+  float lep2_DphiIn;
+  float lep2_DetaIn;
+  float lep2_HOverE;
+  float lep2_fbrem;
+  float lep2_EOverP;
+  int lep2_mishits;
+  float lep2_dist;
+  float lep2_dcot;
+  int lep2_tracker;
+  int lep2_standalone;
+  int lep2_global;
+  float lep2_normalizedChi2;
+  int lep2_numberOfMatches;
+  int lep2_numberOfValidTrackerHits;
+  int lep2_numberOfValidMuonHits;
+  int lep2_pixelLayersWithMeasurement;
+  
+  int lep2_mcMatched;
+  float lep2_mcMatchDR;
+  int lep2_hltMatched;
+  float lep2_hltMatchPt;
+  int lep2_hltPass;
   
   
   // met variables
@@ -481,7 +531,7 @@ struct VBFPreselectionVariables
 
 
 TFile* GetOutputRootFile(VBFPreselectionVariables& vars);
-void InitializeVBFPreselectionTree(VBFPreselectionVariables&, const std::string&);
+void InitializeVBFPreselectionTree(VBFPreselectionVariables&, const std::string&, const int& doTnP = false);
 void FillVBFPreselectionTree(VBFPreselectionVariables& vars);
 
 void ClearVBFPreselectionVariables(VBFPreselectionVariables&);
@@ -493,6 +543,7 @@ void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
 void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
 void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader);
+void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType,
 		     const float& JESScaleVariation, TH2F* JECUncertainty);
 void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT);

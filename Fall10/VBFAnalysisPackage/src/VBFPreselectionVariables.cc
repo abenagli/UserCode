@@ -9,7 +9,7 @@ TFile* GetOutputRootFile(VBFPreselectionVariables& vars)
 
 
 
-void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::string& outputRootFileName)
+void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::string& outputRootFileName, const int& doTnP)
 {
   //-------------
   // Reduced tree
@@ -100,6 +100,51 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep_mcMatchDR", &vars.lep_mcMatchDR, "lep_mcMatchDR/F");
   vars.m_reducedTree -> Branch("lep_hltMatched", &vars.lep_hltMatched, "lep_hltMatched/I");
   vars.m_reducedTree -> Branch("lep_hltMatchPt", &vars.lep_hltMatchPt, "lep_hltMatchPt/F");
+  vars.m_reducedTree -> Branch("lep_hltPass",    &vars.lep_hltPass,  "lep_hltMatchPass/I");
+  
+  if( doTnP == 1 )
+  {
+    vars.m_reducedTree -> Branch("lep2",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_lep2);
+    vars.m_reducedTree -> Branch("lep2_charge",  &vars.lep2_charge,   "lep2_charge/F");
+    vars.m_reducedTree -> Branch("lep2_flavour", &vars.lep2_flavour, "lep2_flavour/I");
+    vars.m_reducedTree -> Branch("lep2_pt",      &vars.lep2_pt,           "lep2_pt/F");
+    vars.m_reducedTree -> Branch("lep2_eta",     &vars.lep2_eta,         "lep2_eta/F");
+    vars.m_reducedTree -> Branch("lep2_phi",     &vars.lep2_phi,         "lep2_phi/F");
+    vars.m_reducedTree -> Branch("lep2_zepp",    &vars.lep2_zepp,       "lep2_zepp/F");
+    vars.m_reducedTree -> Branch("lep2_z",       &vars.lep2_z,             "lep2_z/F");
+    vars.m_reducedTree -> Branch("lep2_dxy_BS",  &vars.lep2_dxy_BS,   "lep2_dxy_BS/F");
+    vars.m_reducedTree -> Branch("lep2_dz_BS",   &vars.lep2_dz_BS,     "lep2_dz_BS/F");
+    vars.m_reducedTree -> Branch("lep2_dB",      &vars.lep2_dB,           "lep2_dB/F");
+    vars.m_reducedTree -> Branch("lep2_edB",     &vars.lep2_edB,         "lep2_edB/F");
+    vars.m_reducedTree -> Branch("lep2_dz_PV",   &vars.lep2_dz_PV,     "lep2_dz_PV/F");
+    vars.m_reducedTree -> Branch("lep2_tkIso",   &vars.lep2_tkIso,     "lep2_tkIso/F");
+    vars.m_reducedTree -> Branch("lep2_emIso",   &vars.lep2_emIso,     "lep2_emIso/F");
+    vars.m_reducedTree -> Branch("lep2_hadIso",  &vars.lep2_hadIso,   "lep2_hadIso/F");
+    vars.m_reducedTree -> Branch("lep2_isEB",              &vars.lep2_isEB,                           "lep2_isEB/I");
+    vars.m_reducedTree -> Branch("lep2_etaSC",             &vars.lep2_etaSC,                         "lep2_etaSC/F");
+    vars.m_reducedTree -> Branch("lep2_sigmaIetaIeta",     &vars.lep2_sigmaIetaIeta,         "lep2_sigmaIetaIeta/F");
+    vars.m_reducedTree -> Branch("lep2_DphiIn",            &vars.lep2_DphiIn,                       "lep2_DphiIn/F");
+    vars.m_reducedTree -> Branch("lep2_DetaIn",            &vars.lep2_DetaIn,                       "lep2_DetaIn/F");
+    vars.m_reducedTree -> Branch("lep2_HOverE",            &vars.lep2_HOverE,                       "lep2_HOverE/F");
+    vars.m_reducedTree -> Branch("lep2_fbrem",             &vars.lep2_fbrem,                         "lep2_fbrem/F");
+    vars.m_reducedTree -> Branch("lep2_EOverP",            &vars.lep2_EOverP,                       "lep2_EOverP/F");
+    vars.m_reducedTree -> Branch("lep2_mishits",           &vars.lep2_mishits,                     "lep2_mishits/I");
+    vars.m_reducedTree -> Branch("lep2_dist",              &vars.lep2_dist,                           "lep2_dist/F");
+    vars.m_reducedTree -> Branch("lep2_dcot",              &vars.lep2_dcot,                           "lep2_dcot/F");
+    vars.m_reducedTree -> Branch("lep2_tracker",                    &vars.lep2_tracker,                                       "lep2_tracker/I");
+    vars.m_reducedTree -> Branch("lep2_standalone",                 &vars.lep2_standalone,                                 "lep2_standalone/I");
+    vars.m_reducedTree -> Branch("lep2_global",                     &vars.lep2_global,                                         "lep2_global/I");
+    vars.m_reducedTree -> Branch("lep2_normalizedChi2",             &vars.lep2_normalizedChi2,                         "lep2_normalizedChi2/F");
+    vars.m_reducedTree -> Branch("lep2_numberOfMatches",            &vars.lep2_numberOfMatches,                       "lep2_numberOfMatches/I");
+    vars.m_reducedTree -> Branch("lep2_numberOfValidTrackerHits",   &vars.lep2_numberOfValidTrackerHits,     "lep2_numberOfValidTrackerHits/I");
+    vars.m_reducedTree -> Branch("lep2_numberOfValidMuonHits",      &vars.lep2_numberOfValidMuonHits,           "lep2_numberOfValidMuonHits/I");
+    vars.m_reducedTree -> Branch("lep2_pixelLayersWithMeasurement", &vars.lep2_pixelLayersWithMeasurement, "lep2_pixelLayersWithMeasurement/I");
+    vars.m_reducedTree -> Branch("lep2_mcMatched", &vars.lep2_mcMatched, "lep2_mcMatched/I");
+    vars.m_reducedTree -> Branch("lep2_mcMatchDR", &vars.lep2_mcMatchDR, "lep2_mcMatchDR/F");
+    vars.m_reducedTree -> Branch("lep2_hltMatched", &vars.lep2_hltMatched, "lep2_hltMatched/I");
+    vars.m_reducedTree -> Branch("lep2_hltMatchPt", &vars.lep2_hltMatchPt, "lep2_hltMatchPt/F");
+    vars.m_reducedTree -> Branch("lep2_hltPass",    &vars.lep2_hltPass,       "lep2_hltPass/I");
+  }
   
   
   // met variables
@@ -399,6 +444,10 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.selectIt_ele = -1;
   vars.selectIt_mu = -1;
 
+  vars.selectIt_lep2 = -1;
+  vars.selectIt_ele2 = -1;
+  vars.selectIt_mu2 = -1;
+
   vars.lep = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_lep = NULL;
   
@@ -439,8 +488,54 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   
   vars.lep_mcMatched = -1;
   vars.lep_mcMatchDR = -99.;
-  vars.lep_hltMatched = 0;
+  vars.lep_hltMatched = -1;
   vars.lep_hltMatchPt = -99.;
+  vars.lep_hltPass = -99;
+  
+  
+  vars.lep2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
+  vars.p_lep2 = NULL;
+  
+  vars.lep2_charge = -1.;
+  vars.lep2_flavour = -1;
+  vars.lep2_pt = -1.;
+  vars.lep2_eta = -99.;
+  vars.lep2_phi = -99.;
+  vars.lep2_zepp = -99.;
+  vars.lep2_z = -99.;
+  vars.lep2_dxy_BS = -99.;
+  vars.lep2_dz_BS = -99.;
+  vars.lep2_dB = -99.;
+  vars.lep2_edB = -99.;
+  vars.lep2_dz_PV = -99.;
+  vars.lep2_tkIso = -1.;
+  vars.lep2_emIso = -1.;
+  vars.lep2_hadIso = -1.;
+  vars.lep2_isEB = -1;
+  vars.lep2_etaSC = -1.;
+  vars.lep2_sigmaIetaIeta = -1.;
+  vars.lep2_DphiIn = -99.;
+  vars.lep2_DetaIn = -99.;
+  vars.lep2_HOverE = -1.;
+  vars.lep2_fbrem = -1.;
+  vars.lep2_mishits = -1;
+  vars.lep2_dist = -99.;
+  vars.lep2_dcot = -99.;
+  vars.lep2_EOverP = -1.;
+  vars.lep2_tracker = -1;
+  vars.lep2_standalone = -1;
+  vars.lep2_global = -1;
+  vars.lep2_normalizedChi2 = -1.;
+  vars.lep2_numberOfMatches = -1;
+  vars.lep2_numberOfValidTrackerHits = -1;
+  vars.lep2_numberOfValidMuonHits = -1;
+  vars.lep2_pixelLayersWithMeasurement = -1;
+  
+  vars.lep2_mcMatched = -1;
+  vars.lep2_mcMatchDR = -99.;
+  vars.lep2_hltMatched = -1;
+  vars.lep2_hltMatchPt = -99.;
+  vars.lep2_hltPass = -99;
   
   
   // met variables 
@@ -856,6 +951,7 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
     vars.lep_dcot = vars.electrons_dcot.at(vars.selectIt_ele);
     
     // hlt matching
+    vars.lep_hltMatched = 0;
     float thisDR_DPT = 1000.;
     for(unsigned int hltEleIt = 0; hltEleIt < reader.Get4V("goodHLT_electrons")->size(); ++hltEleIt)
     {
@@ -867,7 +963,8 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
       if( thisDR * fabs(vars.lep.pt() - ele_hlt.pt()) < thisDR_DPT ) 
       {
         thisDR_DPT = thisDR * fabs(vars.lep.pt() - ele_hlt.pt()); 
-        vars.lep_hltMatchPt = vars.lep.pt();
+        vars.lep_hltMatchPt = ele_hlt.pt();
+        vars.lep_hltPass = reader.GetInt("goodHLT_electrons_pass")->at(hltEleIt);
       }
     }
     
@@ -895,6 +992,7 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
     
     // hlt matching
     float thisDR_DPT = 1000.;
+    vars.lep_hltMatched = 0;
     for(unsigned int hltMuIt = 0; hltMuIt < reader.Get4V("goodHLT_muons")->size(); ++hltMuIt)
     {
       ROOT::Math::XYZTVector mu_hlt = reader.Get4V("goodHLT_muons")->at(hltMuIt);
@@ -905,7 +1003,116 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
       if( thisDR * fabs(vars.lep.pt() - mu_hlt.pt()) < thisDR_DPT ) 
       {
         thisDR_DPT = thisDR * fabs(vars.lep.pt() - mu_hlt.pt()); 
-        vars.lep_hltMatchPt = vars.lep.pt();
+        vars.lep_hltMatchPt = mu_hlt.pt();
+        vars.lep_hltPass = reader.GetInt("goodHLT_muons_pass")->at(hltMuIt);
+      }
+    }
+    
+  }
+  
+}
+
+
+
+void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader)
+{
+  vars.lep2 = vars.leptons.at(vars.selectIt_lep2);
+  vars.p_lep2 = &vars.lep2;
+  
+  vars.lep2_pt      = vars.p_lep2->pt();
+  vars.lep2_eta     = vars.p_lep2->eta();
+  vars.lep2_phi     = vars.p_lep2->phi();
+  vars.lep2_charge  = vars.leptonCharges.at(vars.selectIt_lep2);
+  vars.lep2_z       = vars.leptons_z.at(vars.selectIt_lep2);
+  vars.lep2_dxy_BS  = vars.leptons_dxy_BS.at(vars.selectIt_lep2);
+  vars.lep2_dz_BS   = vars.leptons_dz_BS.at(vars.selectIt_lep2);
+  vars.lep2_dB      = vars.leptons_dB.at(vars.selectIt_lep2);
+  vars.lep2_edB     = vars.leptons_edB.at(vars.selectIt_lep2);
+  vars.lep2_dz_PV   = vars.leptons_dz_PV.at(vars.selectIt_lep2);
+  vars.lep2_tkIso   = vars.leptons_tkIso.at(vars.selectIt_lep2);
+  vars.lep2_emIso   = vars.leptons_emIso.at(vars.selectIt_lep2);
+  vars.lep2_hadIso  = vars.leptons_hadIso.at(vars.selectIt_lep2);
+  
+
+  // if electron
+  vars.selectIt_ele2 = -1;
+  if(vars.leptonFlavours.at(vars.selectIt_lep2) == "electron")
+  {
+    for(unsigned int eleIt = 0; eleIt < vars.electrons.size(); ++eleIt)
+    {
+      ROOT::Math::XYZTVector ele = vars.electrons.at(eleIt);
+      if( deltaR(ele.eta(), ele.phi(), vars.lep2.eta(), vars.lep2.phi()) < 0.0001 )
+        vars.selectIt_ele2 = eleIt;
+    }
+    
+    vars.lep2_flavour = 11;
+    vars.lep2_isEB = vars.electrons_isEB.at(vars.selectIt_ele2);
+    vars.lep2_etaSC = vars.electrons_etaSC.at(vars.selectIt_ele2);
+    vars.lep2_sigmaIetaIeta = vars.electrons_sigmaIetaIeta.at(vars.selectIt_ele2);
+    vars.lep2_DphiIn = vars.electrons_DphiIn.at(vars.selectIt_ele2);
+    vars.lep2_DetaIn = vars.electrons_DetaIn.at(vars.selectIt_ele2);
+    vars.lep2_HOverE = vars.electrons_HOverE.at(vars.selectIt_ele2);
+    vars.lep2_fbrem  = vars.electrons_fbrem.at(vars.selectIt_ele2);
+    vars.lep2_EOverP = vars.electrons_EOverP.at(vars.selectIt_ele2);
+    vars.lep2_mishits = vars.electrons_mishits.at(vars.selectIt_ele2);
+    vars.lep2_dist = vars.electrons_dist.at(vars.selectIt_ele2);
+    vars.lep2_dcot = vars.electrons_dcot.at(vars.selectIt_ele2);
+    
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    vars.lep2_hltMatched = 0;
+    for(unsigned int hltEleIt = 0; hltEleIt < reader.Get4V("goodHLT_electrons")->size(); ++hltEleIt)
+    {
+      ROOT::Math::XYZTVector ele_hlt = reader.Get4V("goodHLT_electrons")->at(hltEleIt);
+      float thisDR = deltaR(ele_hlt.eta(), ele_hlt.phi(), vars.lep2.eta(), vars.lep2.phi());
+      // discard hlt ele more distant than dr = 0.1 from the offline ele
+      if( thisDR > 0.1 ) continue;
+      vars.lep2_hltMatched = 1;
+      if( thisDR * fabs(vars.lep2.pt() - ele_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(vars.lep2.pt() - ele_hlt.pt()); 
+        vars.lep2_hltMatchPt = ele_hlt.pt();
+        vars.lep2_hltPass = reader.GetInt("goodHLT_electrons_pass")->at(hltEleIt);
+      }
+    }
+    
+  }
+  
+  // if muon
+  if(vars.leptonFlavours.at(vars.selectIt_lep2) == "muon")
+  { 
+    for(unsigned int muIt = 0; muIt < vars.muons.size(); ++muIt)
+    {
+      ROOT::Math::XYZTVector mu = vars.muons.at(muIt);
+        if(deltaR(mu.eta(), mu.phi(), vars.lep2.eta(), vars.lep2.phi()) < 0.0001)
+          vars.selectIt_mu2 = muIt;
+    }
+
+    vars.lep2_flavour = 13;    
+    vars.lep2_tracker = vars.muons_tracker.at(vars.selectIt_mu2);
+    vars.lep2_standalone = vars.muons_standalone.at(vars.selectIt_mu2);
+    vars.lep2_global = vars.muons_global.at(vars.selectIt_mu2);
+    vars.lep2_normalizedChi2 = vars.muons_normalizedChi2.at(vars.selectIt_mu2);
+    vars.lep2_numberOfMatches = vars.muons_numberOfMatches.at(vars.selectIt_mu2);
+    vars.lep2_numberOfValidTrackerHits = vars.muons_numberOfValidTrackerHits.at(vars.selectIt_mu2);
+    vars.lep2_numberOfValidMuonHits = vars.muons_numberOfValidMuonHits.at(vars.selectIt_mu2);
+    vars.lep2_pixelLayersWithMeasurement = vars.muons_pixelLayersWithMeasurement.at(vars.selectIt_mu2);
+    
+    // hlt matching
+    float thisDR_DPT = 1000.;
+    vars.lep2_hltMatched = 0;
+    for(unsigned int hltMuIt = 0; hltMuIt < reader.Get4V("goodHLT_muons")->size(); ++hltMuIt)
+    {
+      ROOT::Math::XYZTVector mu_hlt = reader.Get4V("goodHLT_muons")->at(hltMuIt);
+      float thisDR = deltaR(mu_hlt.eta(), mu_hlt.phi(), vars.lep2.eta(), vars.lep2.phi());
+      // discard hlt mu more distant than dr = 0.1 from the offline mu
+      if( thisDR > 0.1 ) continue;
+      vars.lep2_hltMatched = 1;
+      if( thisDR * fabs(vars.lep2.pt() - mu_hlt.pt()) < thisDR_DPT ) 
+      {
+        thisDR_DPT = thisDR * fabs(vars.lep2.pt() - mu_hlt.pt()); 
+        vars.lep2_hltMatchPt = mu_hlt.pt();
+        vars.lep2_hltPass = reader.GetInt("goodHLT_muons_pass")->at(hltMuIt);
       }
     }
     
