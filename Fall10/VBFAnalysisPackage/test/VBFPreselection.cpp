@@ -52,6 +52,7 @@ int main(int argc, char** argv)
   float crossSection      = gConfigParser -> readFloatOption("Options::crossSection");
   int TMVA4JetTraining    = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
+  int doTnP               = gConfigParser -> readIntOption("Options::doTnP"); 
   
   
   int nJetCntMIN    = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
@@ -139,7 +140,7 @@ int main(int argc, char** argv)
   
   // define variable container
   VBFPreselectionVariables vars;
-  InitializeVBFPreselectionTree(vars, outputRootFullFileName);
+  InitializeVBFPreselectionTree(vars, outputRootFullFileName, doTnP);
   vars.mH = atof(higgsMass.c_str());
   vars.dataFlag = dataFlag;
   vars.MCFlag = MCFlag;
@@ -491,8 +492,8 @@ int main(int argc, char** argv)
           ( pixelLayersWithMeasurement > 0 ) &&
           ( numberOfValidTrackerHits > 10 ) &&
           ( numberOfValidMuonHits > 0 ) &&
-          ( numberOfMatches > 1 ) 
-        ) 
+          ( numberOfMatches > 1 ) && 
+          ( 1 == 1 ) )
       {
         isTightMuon = true;
         SetMuonVariables(vars, reader, muIt);
@@ -541,6 +542,16 @@ int main(int argc, char** argv)
     if(vars.selectIt_lep == -1) continue;
     SetLeptonVariables(vars, reader);
     
+    if( doTnP == 1 )
+    {
+      std::vector<int> blacklistIt_lep;
+      blacklistIt_lep.push_back(vars.selectIt_lep);
+      
+      vars.selectIt_lep2 = SelectLepton(vars.leptons, "maxPt", 20.,&blacklistIt_lep);
+      if(vars.selectIt_lep2 == -1) continue;
+      SetLepton2Variables(vars, reader);
+      if( ((vars.lep+vars.lep2).mass() < 50.) || ((vars.lep+vars.lep2).mass() > 130.) ) continue;
+    }
     
     // fIll event counters
     stepEvents[step] += 1;
@@ -558,7 +569,7 @@ int main(int argc, char** argv)
 
     if( nMu_loose > 0 ) continue;
     if( (leptonFLAVOUR == "e") && (nMu > 0) ) continue;
-    if( (leptonFLAVOUR == "mu") && (nMu > 1) ) continue;
+    if( (leptonFLAVOUR == "mu") && (doTnP == 0) && (nMu > 1) ) continue;
     
     
     // fIll event counters
@@ -575,7 +586,7 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "electron veto", step, verbosity);
     
     if( nEle_loose > 0 ) continue;
-    if( (leptonFLAVOUR == "e") && (nEle > 1) ) continue;
+    if( (leptonFLAVOUR == "e") && (doTnP == 0) && (nEle > 1) ) continue;
     if( (leptonFLAVOUR == "mu") && (nEle > 0) ) continue;
     
     
@@ -775,7 +786,8 @@ int main(int argc, char** argv)
     // >= n cnt jets 
     if( vars.nJets_cnt < nJetCntMIN ) continue;
     
-    SetLeadingJetVariables(vars, reader, jetEtaCNT);
+    if( vars.nJets_cnt > 0 )
+      SetLeadingJetVariables(vars, reader, jetEtaCNT);
     
     
     // fIll event counters
