@@ -90,7 +90,8 @@ int main (int argc, char** argv)
   int xBinning = 160 ; //PG 5 GeV binning
   //int xBinning = 80 ; //PG 10 GeV binning
   
-  float LUMI = 2145. ; //PG to have output in 1/fb
+//   float LUMI = 2145. ; //PG to have output in 1/fb
+  float LUMI = 4236.79 ;
   x.setBins (xBinning) ;
 
   string inputFileList (argv[1]) ;
@@ -119,7 +120,7 @@ int main (int argc, char** argv)
   hColl signal_600 ("signal_600", 80, 200., 1000.) ; signalz["600"] = &signal_600 ;
 
   TCut cutSignal = "WJJ_m > 65 && WJJ_m < 95 && lepNuW_m_KF >= 200" ;
-  TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PURescaleFactor(PUit_n)", cutSignal.GetTitle (), LUMI) ;    
+  TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutSignal.GetTitle (), LUMI) ;    
 
   //PG loop over samples
   int index = 0 ;
@@ -163,12 +164,15 @@ int main (int argc, char** argv)
           iColl->second->SetBranchAddress ("WJJ_m", &WJJ_m) ;
           float lepNuW_m_KF ;
           iColl->second->SetBranchAddress ("lepNuW_m_KF", &lepNuW_m_KF) ;
-          int PUit_n ;
-          iColl->second->SetBranchAddress ("PUit_n", &PUit_n) ;
           float crossSection ;
           iColl->second->SetBranchAddress ("crossSection", &crossSection) ;
           int totEvents ;
           iColl->second->SetBranchAddress ("totEvents", &totEvents) ;
+          float PUWeight ;
+          iColl->second->SetBranchAddress ("PUWeight", &PUWeight) ;
+          float eventWeight ;
+          iColl->second->SetBranchAddress ("eventWeight", &eventWeight) ;
+          
 
           for (int i = 0 ; i < iColl->second->GetEntries () ; ++i)
             {
@@ -176,7 +180,7 @@ int main (int argc, char** argv)
               if (WJJ_m < 65 || WJJ_m > 95) continue ;
               if (lepNuW_m_KF < 200) continue ;
               x = lepNuW_m_KF ;
-              double weight = (1./totEvents) * crossSection * LUMI * PURescaleFactor (PUit_n) ; 
+              double weight = (1./totEvents) * crossSection * LUMI * PUWeight * eventWeight ; 
               sig->add (RooArgSet (x), weight) ;
             }
         } //PG in case of higgs signal
