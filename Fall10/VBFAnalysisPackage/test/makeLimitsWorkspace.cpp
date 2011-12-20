@@ -110,14 +110,14 @@ int main (int argc, char** argv)
   TH1::SetDefaultSumw2 (kTRUE) ;
 
   map<string, hColl *> signalz ;
-  hColl signal_250 ("signal_250", 80, 200., 1000.) ; signalz["250"] = &signal_250 ;
-  hColl signal_300 ("signal_300", 80, 200., 1000.) ; signalz["300"] = &signal_300 ;
-  hColl signal_350 ("signal_350", 80, 200., 1000.) ; signalz["350"] = &signal_350 ;
-  hColl signal_400 ("signal_400", 80, 200., 1000.) ; signalz["400"] = &signal_400 ;
-  hColl signal_450 ("signal_450", 80, 200., 1000.) ; signalz["450"] = &signal_450 ;
-  hColl signal_500 ("signal_500", 80, 200., 1000.) ; signalz["500"] = &signal_500 ;
-  hColl signal_550 ("signal_550", 80, 200., 1000.) ; signalz["550"] = &signal_550 ;
-  hColl signal_600 ("signal_600", 80, 200., 1000.) ; signalz["600"] = &signal_600 ;
+  hColl signal_250 ("signal_250", 160, 200., 1000.) ; signalz["250"] = &signal_250 ;
+  hColl signal_300 ("signal_300", 160, 200., 1000.) ; signalz["300"] = &signal_300 ;
+  hColl signal_350 ("signal_350", 160, 200., 1000.) ; signalz["350"] = &signal_350 ;
+  hColl signal_400 ("signal_400", 160, 200., 1000.) ; signalz["400"] = &signal_400 ;
+  hColl signal_450 ("signal_450", 160, 200., 1000.) ; signalz["450"] = &signal_450 ;
+  hColl signal_500 ("signal_500", 160, 200., 1000.) ; signalz["500"] = &signal_500 ;
+  hColl signal_550 ("signal_550", 160, 200., 1000.) ; signalz["550"] = &signal_550 ;
+  hColl signal_600 ("signal_600", 160, 200., 1000.) ; signalz["600"] = &signal_600 ;
 
   TCut cutSignal = "WJJ_m > 65 && WJJ_m < 95 && lepNuW_m_KF >= 200" ;
   TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutSignal.GetTitle (), LUMI) ;    
@@ -143,6 +143,7 @@ int main (int argc, char** argv)
           TH1F * histo = signalz[mass]->addSample (iColl->first.c_str ()) ;
           iColl->second->Draw (TString ("lepNuW_m_KF >> ") + histo->GetName (), cutSignalExtended) ;
 
+
           //PG fill the RooDataSets
           //PG --- --- --- --- --- --- --- --- --- --- ---
 
@@ -159,7 +160,7 @@ int main (int argc, char** argv)
               sig = sig_DS[mass] ;
               cout << "found " << sig->GetName () << " RooDataSet" << endl ;
             }
-    
+
           float WJJ_m ;
           iColl->second->SetBranchAddress ("WJJ_m", &WJJ_m) ;
           float lepNuW_m_KF ;
@@ -183,6 +184,7 @@ int main (int argc, char** argv)
               double weight = (1./totEvents) * crossSection * LUMI * PUWeight * eventWeight ; 
               sig->add (RooArgSet (x), weight) ;
             }
+
         } //PG in case of higgs signal
 
       //PG in case of DATA
@@ -205,26 +207,40 @@ int main (int argc, char** argv)
             }
           data_DS = rds ;
         } //PG in case of DATA
+      
+      
+      //Free the memory used  
+      iColl->second->Delete("");
 
     } //PG loop over samples
   
-  
-  
+ 
+
   RooRealVar N ("N", "rel amplitude second exp", 0., 1.) ;
-  RooRealVar L1 ("L1", "rel attentuation first exp",  0., 1.) ;
-  RooRealVar L2 ("L2", "rel attentuation first exp",  0., 1.) ;
+  RooRealVar L1 ("L1", "rel attenuation first exp",  0., 1.) ;
+  RooRealVar L2 ("L2", "rel attenuation first exp",  0., 1.) ;
+  RooRealVar mu ("mu", "mu",  0., 1.) ;
+  RooRealVar kT ("kT", "kT",  0., 1.) ;
   
   RooGenericPdf RFdoubleExp ("RFdoubleExp", "double exponential",
                              //"N1 * exp (-1 * L1 * x) + N2 * exp (-1 * L2 * x)",
                              "exp (-1 * @1 * @0) + @2 * exp (-1 * @3 * @0)",
                              RooArgSet (x, L1, N, L2)) ;
   
+  RooGenericPdf RFAttenuatedDoubleExp ("RFAttenuatedDoubleExp", "double exponential with turn-on",
+                             "1. / ( exp(-1.*(@0 - @1)/ @2 ) + 1.) * exp (-1 * @3 * @0) + @4 * exp (-1 * @5 * @0)",
+                             RooArgSet (x, mu, kT, L1, N, L2)) ;
+                             
+                             
   RooWorkspace w ("w") ;
   w.import (x) ;
   w.import (N) ;
   w.import (L1) ;
   w.import (L2) ;
+  w.import (mu) ;
+  w.import (kT) ;
   w.import (RFdoubleExp) ;
+  w.import (RFAttenuatedDoubleExp) ;
   //w.import (*data_DS) ;
   RooDataHist * data_obs = new RooDataHist ("data_obs", "data_obs", *data_DS->get (), *data_DS) ;
   w.import (*data_obs) ;
@@ -278,7 +294,7 @@ int main (int argc, char** argv)
 //  data_DS->Write () ;
   outputRootFile->Close () ;
   delete outputRootFile ;
-  
+ 
   return 0 ;
 }
 
