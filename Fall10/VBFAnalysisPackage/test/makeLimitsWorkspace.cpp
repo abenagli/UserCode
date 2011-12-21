@@ -86,11 +86,17 @@ int main (int argc, char** argv)
       return 1 ;
     }
   
-  RooRealVar x ("x", "higgs mass", 200., 1000.) ;
-  int xBinning = 160 ; //PG 5 GeV binning
-  //int xBinning = 80 ; //PG 10 GeV binning
   
-//   float LUMI = 2145. ; //PG to have output in 1/fb
+  // lepNuW_m_KF from signal (mJJ in [65,95] GeV) or sideband (mJJ in [55,65] U [95,115] GeV) region
+  string mode = "useSignalRegion" ;
+  //string mode = "useSidebandRegion" ;
+  
+  cout << "Usage mode: " << mode << endl;
+  
+  
+  RooRealVar x ("x", "higgs mass", 200., 800.) ;
+  int xBinning = 120 ; // 5 GeV binning
+  
   float LUMI = 4236.79 ;
   x.setBins (xBinning) ;
 
@@ -119,9 +125,17 @@ int main (int argc, char** argv)
   hColl signal_550 ("signal_550", 160, 200., 1000.) ; signalz["550"] = &signal_550 ;
   hColl signal_600 ("signal_600", 160, 200., 1000.) ; signalz["600"] = &signal_600 ;
 
-  TCut cutSignal = "WJJ_m > 65 && WJJ_m < 95 && lepNuW_m_KF >= 200" ;
-  TCut cutSignalExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutSignal.GetTitle (), LUMI) ;    
+  TCut cutSignal   = "WJJ_m > 65 && WJJ_m < 95 && lepNuW_m_KF >= 200 && lepNuW_m_KF <= 800 " ;
+  TCut cutSideband = "((WJJ_m > 55 && WJJ_m < 65) || (WJJ_m > 95 && WJJ_m < 115)) && lepNuW_m_KF >= 200 && lepNuW_m_KF <= 800 " ;
+  TCut cutExtended ;
+  
+  if (mode == "useSignalRegion")
+   cutExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutSignal.GetTitle (), LUMI) ;    
 
+  if (mode == "useSidebandRegion")
+   cutExtended = Form ("(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight", cutSideband.GetTitle (), LUMI) ;    
+   
+   
   //PG loop over samples
   int index = 0 ;
   for (map<string, TChain *>::iterator iColl = collections.begin () ;
@@ -141,7 +155,7 @@ int main (int argc, char** argv)
           //PG --- --- --- --- --- --- --- --- --- --- ---
                   
           TH1F * histo = signalz[mass]->addSample (iColl->first.c_str ()) ;
-          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + histo->GetName (), cutSignalExtended) ;
+          iColl->second->Draw (TString ("lepNuW_m_KF >> ") + histo->GetName (), cutExtended) ;
 
 
           //PG fill the RooDataSets
@@ -178,8 +192,17 @@ int main (int argc, char** argv)
           for (int i = 0 ; i < iColl->second->GetEntries () ; ++i)
             {
               iColl->second->GetEntry (i) ;
-              if (WJJ_m < 65 || WJJ_m > 95) continue ;
-              if (lepNuW_m_KF < 200) continue ;
+              
+              if (mode == "useSignalRegion") {
+                if (WJJ_m < 65 || WJJ_m > 95) continue ;
+                if (lepNuW_m_KF < 200 || lepNuW_m_KF > 800) continue ;
+              }
+              
+              if (mode == "useSidebandRegion") {
+                if (WJJ_m < 55 || (WJJ_m > 65 && WJJ_m < 95) || WJJ_m > 115) continue ;
+                if (lepNuW_m_KF < 200 || lepNuW_m_KF > 800) continue ;
+              }
+              
               x = lepNuW_m_KF ;
               double weight = (1./totEvents) * crossSection * LUMI * PUWeight * eventWeight ; 
               sig->add (RooArgSet (x), weight) ;
@@ -200,8 +223,17 @@ int main (int argc, char** argv)
           for (int i = 0 ; i < iColl->second->GetEntries () ; ++i)
             {
               iColl->second->GetEntry (i) ;
-              if (WJJ_m < 65 || WJJ_m > 95) continue ;
-              if (lepNuW_m_KF < 200) continue ;
+
+              if (mode == "useSignalRegion") {
+                if (WJJ_m < 65 || WJJ_m > 95) continue ;
+                if (lepNuW_m_KF < 200 || lepNuW_m_KF > 800) continue ;
+              }
+              
+              if (mode == "useSidebandRegion") {
+                if (WJJ_m < 55 || (WJJ_m > 65 && WJJ_m < 95) || WJJ_m > 115) continue ;
+                if (lepNuW_m_KF < 200 || lepNuW_m_KF > 800) continue ;
+              }
+              
               x = lepNuW_m_KF ;
               rds->add (RooArgSet (x)) ;            
             }
@@ -254,18 +286,40 @@ int main (int argc, char** argv)
       TH1F * total = (TH1F *) stack.GetStack ()->Last () ;
       cout << "   TH1F integral : " << total->Integral () << endl ;
       string name = "RDH_" + iMap->first ;
-      RooDataHist bdata (name.c_str (), name.c_str (), RooArgList (x), total) ;
-      name = "PDF_" + iMap->first ;
-      RooHistPdf pdf (name.c_str (), name.c_str (), RooArgList (x), bdata, 8) ;
-      w.import (pdf) ;
 
+
+      // *** ROOT v5.33 ***
+      //RooDataHist bdata (name.c_str (), name.c_str (), RooArgList (x), total) ;
+      //name = "PDF_" + iMap->first ;
+      //RooHistPdf pdf (name.c_str (), name.c_str (), RooArgList (x), bdata, 8) ;
+      //w.import (pdf) ; 
+
+
+      // *** ROOT v5.27 ***
+      RooDataHist * bdata = new RooDataHist (name.c_str (), name.c_str (), RooArgList (x), total) ;
+      name = "PDF_" + iMap->first ;
+      RooHistPdf * pdf = new RooHistPdf (name.c_str (), name.c_str (), RooArgList (x), *bdata, 8) ;
+      w.import (*pdf) ;
+
+      
       for (int iHist = 0 ; iHist < iMap->second->collection.size () ; ++iHist)
         {
           name = "RDH_" + string (iMap->second->collection.at (iHist)->GetName ()) ;
-          RooDataHist bdata_single (name.c_str (), name.c_str (), RooArgList (x), iMap->second->collection.at (iHist)) ;
+
+
+          // *** ROOT v5.33 ***
+          //RooDataHist bdata_single (name.c_str (), name.c_str (), RooArgList (x), iMap->second->collection.at (iHist)) ;
+          //name = "PDF_" + string (iMap->second->collection.at (iHist)->GetName ()) ;
+          //RooHistPdf pdf_single (name.c_str (), name.c_str (), RooArgList (x), bdata_single, 8) ;
+          //w.import (pdf_single) ;
+  
+
+          // *** ROOT v5.27 ***
+          RooDataHist * bdata_single = new RooDataHist (name.c_str (), name.c_str (), RooArgList (x), iMap->second->collection.at (iHist)) ;
           name = "PDF_" + string (iMap->second->collection.at (iHist)->GetName ()) ;
-          RooHistPdf pdf_single (name.c_str (), name.c_str (), RooArgList (x), bdata_single, 8) ;
-          w.import (pdf_single) ;
+          RooHistPdf * pdf_single = new RooHistPdf (name.c_str (), name.c_str (), RooArgList (x), *bdata_single, 8) ;
+          w.import (*pdf_single) ;
+          
         }
     } //PG loop on signal histo collections
 
@@ -287,10 +341,15 @@ int main (int argc, char** argv)
 */
 
   // define out file names
-  std::string outputRootFullFileName = "limitsWS.root" ;
+  string outputRootFullFileName ;
+  if (mode == "useSignalRegion")   outputRootFullFileName = "limitsWS_signalWJJ.root" ;
+  if (mode == "useSidebandRegion") outputRootFullFileName = "limitsWS_sidebandWJJ.root" ;
+  
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
   outputRootFile->cd () ;
+  
   w.Write () ;
+  w.Print () ;
 //  data_DS->Write () ;
   outputRootFile->Close () ;
   delete outputRootFile ;
