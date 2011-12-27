@@ -154,7 +154,7 @@ while(<SAMPLESListFile>)
   system($command);
 
   $jobOutput = $sampleDir."/output.txt" ;
-  $command = "bsub -o ".$jobOutput." -q cmslong < ".$sampleJobFile."\n" ; 
+  $command = "bsub -o ".$jobOutput." -q cmslong < ".$sampleJobFile ; 
   print SAMPLEJOBLISTFILE "echo \"".$command."\"\n";
   print SAMPLEJOBLISTFILE $command."\n";
  
