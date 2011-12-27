@@ -53,6 +53,7 @@ int main(int argc, char** argv)
   int TMVA4JetTraining    = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
   int doTnP               = gConfigParser -> readIntOption("Options::doTnP"); 
+  int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy"); 
   
   
   int nJetCntMIN    = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
@@ -226,6 +227,7 @@ int main(int argc, char** argv)
     
     SetPUVariables(vars, reader, dataFlag);
     SetHLTVariables(vars, reader);
+    if (doPDFstudy) SetPDFVariables(vars, reader);
     SetPVVariables(vars, reader);
     
     //if( vars.eventId != 177044 ) continue;
