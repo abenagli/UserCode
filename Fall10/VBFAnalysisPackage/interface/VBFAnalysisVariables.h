@@ -423,6 +423,11 @@ struct VBFAnalysisVariables
   float mc_H_phi;
   float mc_H_m;
   
+  // PDF variables
+  std::vector<float> PDF_weights;
+  std::vector<float>* p_PDF_weights;
+  
+  
 };
 
 

@@ -142,6 +142,7 @@ int main(int argc, char** argv)
   float lepWJ1DphiMAX = gConfigParser -> readFloatOption("Cuts::lepWJ1DphiMAX");
   
   int massDependentCUTS = gConfigParser -> readIntOption("Cuts::massDependentCUTS");
+  int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy"); 
   
   float MVAMIN = gConfigParser -> readFloatOption("Cuts::MVAMIN");
   
@@ -486,15 +487,13 @@ int main(int argc, char** argv)
     vars.tagJ1 = *(vars.p_tagJ1);
     vars.tagJ2 = *(vars.p_tagJ2);
     vars.thirdJ = *(vars.p_thirdJ);
-    
+
+    if (doPDFstudy > 0) vars.PDF_weights = *(vars.p_PDF_weights) ;
+
     GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
                    vars.lep,vars.nu,vars.WJ1,vars.WJ2);
     
     vars.PUWeight = PURescaleFactor(distrPU_DATA,distrPU_MC,vars.PUit_n,0);
-    
-    
-    
-    
     
     
     //*********************************
