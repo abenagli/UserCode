@@ -50,6 +50,10 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("HLT_Names",  "std::vector<std::string>", &vars.p_HLT_Names);
   vars.m_reducedTree -> Branch("HLT_Accept", "std::vector<float>",       &vars.p_HLT_Accept);
   
+
+  // PDF variables
+  vars.m_reducedTree -> Branch("PDF_weights", "std::vector<float>",       &vars.p_PDF_weights);
+
   
   // PV variables
   vars.m_reducedTree -> Branch("PV_n",              &vars.PV_n,                           "PV_n/I");
@@ -892,6 +896,12 @@ void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.p_HLT_Accept = &(vars.HLT_Accept);
 }
 
+
+void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader)
+{
+  vars.PDF_weights = *(reader.GetFloat("PDFWeights"));
+  vars.p_PDF_weights = &(vars.PDF_weights);
+}
 
 
 void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader)

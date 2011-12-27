@@ -54,6 +54,10 @@ struct VBFPreselectionVariables
   std::vector<float> HLT_Accept;
   std::vector<float>* p_HLT_Accept;
   
+
+  // PDF variables
+  std::vector<float> PDF_weights;
+  std::vector<float>* p_PDF_weights;
   
   
   // PV variables
@@ -539,6 +543,7 @@ void DeleteVBFPreselectionVariables(VBFPreselectionVariables&);
 
 void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag);
 void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader);
+void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader);
 void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
 void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
