@@ -41,6 +41,7 @@ int main(int argc, char** argv)
       if ((entry % 1000) == 0) cout << "event " << entry << endl ;   
       reader.GetInt ("isEB") ;
       std::vector<float>                  * PDFWeights   = reader.GetFloat ("PDFWeights") ; 
+      cout << "number of weights : " << PDFWeights->size () << endl ;
       for (unsigned int i = 0 ; i < PDFWeights->size () ; ++i)
         {
           h_pesi.Fill (i, PDFWeights->at (i)) ;
