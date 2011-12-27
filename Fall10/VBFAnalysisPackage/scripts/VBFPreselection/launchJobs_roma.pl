@@ -48,11 +48,6 @@ print "OUTPUTSAVEPath = "   .$OUTPUTSAVEPath."\n" ;
 print "OUTPUTFILEName = "   .$OUTPUTFILEName."\n" ;
 print "JOBModulo = "        .$JOBModulo."\n\n" ;
 
-
-
-
-
-
 $sampleJobListFile = "./lancia.sh";
 open(SAMPLEJOBLISTFILE, ">", $sampleJobListFile);
 
@@ -79,15 +74,8 @@ while (<LISTOFSamples>)
   print("Sample: ".$sample."\n") ;  
   system ("mkdir ".$sample."_".$JETAlgorithm."\n") ;
   
-  
-  
-    
-  
-  
   $LISTOFFiles = "./list_".$sample.".txt" ;
   system ("ls -l ".$INPUTSAVEPath.$sample." | grep root | awk '{print \$9}' > ".$LISTOFFiles."\n") ;
-  
-  
   
   $totNumber = 0;
   $jobNumber = 0;
@@ -108,10 +96,6 @@ while (<LISTOFSamples>)
   print "NumberOfJobs = ".$jobNumber."\n";
   
   
-  
-  
-  
-  
   ################
   # loop over jobs 
   ################
@@ -130,10 +114,6 @@ while (<LISTOFSamples>)
     $command = "chmod 777 ".$tempBjob ;
     system ($command) ;
     
-
-
-    
-    
     $tempo1 = "./tempo1" ;
     system ("cat ".$JOBCfgTemplate."   | sed -e s%JETALGORITHM%".$JETAlgorithm.
                                    "%g | sed -e s%JETTYPE%".$JETType.
@@ -146,11 +126,6 @@ while (<LISTOFSamples>)
                                    "%g | sed -e s%OUTPUTROOTFILEPATH%".$OUTPUTSAVEPath."/".$sample."/".
                                    "%g > ".$tempo1) ;
     
-    
-    
-    
-    
-    
     ######################
     # make job files
     ######################    
@@ -159,7 +134,7 @@ while (<LISTOFSamples>)
     $command = "cd ".$BASEDir ;
     print SAMPLEJOBFILE $command."\n";
 
-    $command = "source ./scripts/setup.sh" ;
+    $command = "source ./scripts/setup.csh" ;
     print SAMPLEJOBFILE $command."\n";
     
     $command = "cd ".$jobDir ;
@@ -173,10 +148,6 @@ while (<LISTOFSamples>)
     
     #$command = "chmod 777 /data_CMS/cms/abenagli/tmp/".$sample."_JOB".$jobIt."/";
     #print SAMPLEJOBFILE $command."\n";
-    
-    
-    
-    
     
     $it = 0;
     $JOBLISTOFFiles = $jobDir."/list.txt";
@@ -202,8 +173,6 @@ while (<LISTOFSamples>)
       ++$it;
     }
     
-    
-    
     $tempo2 = "./tempo2" ;    
     system ("cat ".$tempo1." | sed -e s%INPUTFILELIST%".$JOBLISTOFFiles."%g > ".$tempo2) ;
     
@@ -212,26 +181,18 @@ while (<LISTOFSamples>)
     system ("mv ".$tempo2." ".$JOBCfgFile) ;
     system ("rm ./tempo*") ;
     
-    
-    
-    
-    
-    
     $command = "unbuffer ".$EXEName." ".$JOBCfgFile." >> ".$jobDir."/out.txt" ;
     print SAMPLEJOBFILE $command."\n";    
-    
-    
     
     ############
     # submit job
     ############
-    
-    $command = "echo \"qsub -V -q production -d ".$jobDir." ".$tempBjob."\"\n" ;
+
+    $jobOutput = $jobDir."/output_".$jobIt.".sh" ;
+    $command = "bsub -o ".$jobOutput." -q cmslong < ".$tempBjob."\n" ; 
+    print SAMPLEJOBLISTFILE "echo \"".$command."\"\n";
     print SAMPLEJOBLISTFILE $command."\n";
-    
-    $command = "qsub -V -q production -d ".$jobDir." ".$tempBjob."\n" ; 
-    print SAMPLEJOBLISTFILE $command."\n";
-    
+ 
     #print "\n" ;
   }
 
