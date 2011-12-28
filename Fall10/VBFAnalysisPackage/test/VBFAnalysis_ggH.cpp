@@ -222,7 +222,8 @@ int main(int argc, char** argv)
   
   for(int step = 1; step <= nStep; ++step)
   {
-    if( (step < firstSTEP) && (step != 2) ) continue;
+//    if( (step < firstSTEP) && (step != 2) ) continue;
+    if( (step < firstSTEP)) continue;
     
     char treeName[50];
     sprintf(treeName, "ntu_%d", step);
@@ -535,7 +536,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step == 2 ) cloneTrees[step] -> Fill();
+//    if( step == 2 ) cloneTrees[step] -> Fill();
         
     
     
@@ -1277,7 +1278,8 @@ int main(int argc, char** argv)
   
   for(step = 1; step <= nStep; ++step)
   {
-    if( (step < firstSTEP) && (step != 2) ) continue;
+//    if( (step < firstSTEP) && (step != 2) ) continue;
+    if( (step < firstSTEP)) continue;
     cloneTrees[step] -> AutoSave();
   } 
   
