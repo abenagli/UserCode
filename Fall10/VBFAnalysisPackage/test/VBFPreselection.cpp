@@ -928,7 +928,9 @@ int main(int argc, char** argv)
       SetThirdJetVariables(vars, reader);
       SetHVariables(vars, reader);
       if(vars.mH > 0.) SetMCVariables(vars, reader);
+//        std::cout << "debug" << std::endl ; //DEBUG
       if( (vars.mH > 0.) && (vars.mH < 1000.) ) vars.eventWeight = HiggsPtKFactors(vars.mc_H_pt,vars.mH);
+//        std::cout << "debug" << std::endl ; //DEBUG
       
       
       // fIll event counters
