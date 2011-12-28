@@ -379,7 +379,7 @@ int main(int argc, char** argv)
   
   
   // define the quark-gluon likelihood
-  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator();
+  //  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator();
   // define the angular likelihood
   HelicityLikelihoodDiscriminant* helicitylikeli = new HelicityLikelihoodDiscriminant();  
   
@@ -488,7 +488,7 @@ int main(int argc, char** argv)
     vars.tagJ2 = *(vars.p_tagJ2);
     vars.thirdJ = *(vars.p_thirdJ);
 
-    if (doPDFstudy > 0) vars.PDF_weights = *(vars.p_PDF_weights) ;
+    //    if (doPDFstudy > 0) vars.PDF_weights = *(vars.p_PDF_weights) ;
 
     GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
                    vars.lep,vars.nu,vars.WJ1,vars.WJ2);
@@ -1112,10 +1112,10 @@ int main(int argc, char** argv)
     DoKinematicFit(vars,0.1,"MIB");
     
     
-    if( vars.WJ1.pt() > 0. )
-      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
-    if( vars.WJ2.pt() > 0. )
-      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    //    if( vars.WJ1.pt() > 0. )
+    //      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    //    if( vars.WJ2.pt() > 0. )
+    //      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
     if( vars.WJ2.pt() > vars.WJ1.pt() )
     {
       float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
