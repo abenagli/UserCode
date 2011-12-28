@@ -24,10 +24,6 @@ while (<USERCONFIG>)
     $User_Preferences{$var} = $value;
 }
 
-
-
-
-
 print "BASEDir = "          .$BASEDir."\n" ;
 print "SELECTIONSCfgTemplate = ".$SELECTIONSCfgTemplate."\n";
 print "EXEName = ".$EXEName."\n";
@@ -89,8 +85,8 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white                                                                                                                                     
   s/\s+$//;               # no trailing white                                                                                                                                    
   
-  ($sample,$sampleName,$color,$linestyle,$fillstyle,$dataFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
-  $nullSample = "";
+ ($sample,$sampleName,$color,$linestyle,$fillstyle,$dataFlag,$MCFlag,$mH,$crossSection,$scale,$jetalgo) = split(" ") ;
+   $nullSample = "";
   if($sample eq $nullSample)
 {
     next;
@@ -131,6 +127,7 @@ while(<SAMPLESListFile>)
                                        "%g | sed -e s%DATAFLAG%".$dataFlag.
                                        "%g | sed -e s%MASS%".$mH.
                                        "%g > ".$selectionsCfgFile);
+
   
   $sampleJobFile = $sampleDir."/job.sh";
   open(SAMPLEJOBFILE, ">", $sampleJobFile);
