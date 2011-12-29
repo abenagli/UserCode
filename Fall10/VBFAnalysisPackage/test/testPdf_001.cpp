@@ -199,6 +199,22 @@ int main (int argc, char** argv)
         }
     } //PG loop over samples
 
+  //PG renormalize up and down shapes to the central one
+  //PG -------------------------------------------------
+  
+  for (map<string,TH1F * >::iterator iShapes = PDFUp_shapes.begin () ; 
+       iShapes != PDFUp_shapes.end () ;
+       ++iShapes) 
+    {   
+      iShapes->second->Scale (shapes[iShapes->first].at (0)->Integral () / iShapes->second->Integral ()) ;
+    }
+  for (map<string,TH1F * >::iterator iShapes = PDFDown_shapes.begin () ; 
+       iShapes != PDFDown_shapes.end () ;
+       ++iShapes) 
+    {   
+      iShapes->second->Scale (shapes[iShapes->first].at (0)->Integral () / iShapes->second->Integral ()) ;
+    }
+
   //PG save up, down central shapes for inspection
   //PG -------------------------------------------
   
