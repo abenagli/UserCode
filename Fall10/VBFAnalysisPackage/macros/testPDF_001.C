@@ -30,9 +30,9 @@ scale_ggH500_PDFDown->Scale (1./scale_ggH500_PDFDown->Integral ()) ;
 TH1F * scale_ggH500_0 = ggH500_0->Clone ("scale_ggH500_0")
 scale_ggH500_0->Scale (1./scale_ggH500_0->Integral ()) ;
 
-//scale_ggH500_PDFUp->Divide (scale_ggH500_0) ;
-//scale_ggH500_PDFDown->Divide (scale_ggH500_0) ;
-//scale_ggH500_0->Divide (scale_ggH500_0) ;
+scale_ggH500_PDFUp->Divide (scale_ggH500_0) ;
+scale_ggH500_PDFDown->Divide (scale_ggH500_0) ;
+scale_ggH500_0->Divide (scale_ggH500_0) ;
 
 TCanvas c3 ;
 
