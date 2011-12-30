@@ -52,7 +52,9 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
 
   // PDF variables
-  vars.m_reducedTree -> Branch("PDF_weights", "std::vector<float>",       &vars.p_PDF_weights);
+  vars.m_reducedTree -> Branch("PDF_weights_CT10", "std::vector<float>",       &vars.p_PDF_weights_CT10);
+  vars.m_reducedTree -> Branch("PDF_weights_MSTW2008nlo68cl", "std::vector<float>",       &vars.p_PDF_weights_MSTW2008nlo68cl);
+  vars.m_reducedTree -> Branch("PDF_weights_NNPDF20", "std::vector<float>",       &vars.p_PDF_weights_NNPDF20);
 
   
   // PV variables
@@ -899,8 +901,14 @@ void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
-  vars.PDF_weights = *(reader.GetFloat("PDFWeights"));
-  vars.p_PDF_weights = &(vars.PDF_weights);
+  vars.PDF_weights_CT10 = *(reader.GetFloat("CT10pdfWeights"));
+  vars.p_PDF_weights_CT10 = &(vars.PDF_weights_CT10);
+
+  vars.PDF_weights_MSTW2008nlo68cl = *(reader.GetFloat("MSTW2008nlo68clpdfWeights"));
+  vars.p_PDF_weights_MSTW2008nlo68cl = &(vars.PDF_weights_MSTW2008nlo68cl);
+
+  vars.PDF_weights_NNPDF20 = *(reader.GetFloat("NNPDF20pdfWeights"));
+  vars.p_PDF_weights_NNPDF20 = &(vars.PDF_weights_NNPDF20);
 }
 
 

@@ -56,8 +56,14 @@ struct VBFPreselectionVariables
   
 
   // PDF variables
-  std::vector<float> PDF_weights;
-  std::vector<float>* p_PDF_weights;
+  std::vector<float> PDF_weights_CT10 ;
+  std::vector<float>* p_PDF_weights_CT10 ;
+  
+  std::vector<float> PDF_weights_MSTW2008nlo68cl ;
+  std::vector<float>* p_PDF_weights_MSTW2008nlo68cl ;
+  
+  std::vector<float> PDF_weights_NNPDF20 ;
+  std::vector<float>* p_PDF_weights_NNPDF20 ;
   
   
   // PV variables

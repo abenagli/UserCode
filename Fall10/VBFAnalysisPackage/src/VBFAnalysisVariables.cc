@@ -320,8 +320,14 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("mc_H_m",   &vars.mc_H_m);
 
   // PDF variables
-  vars.p_PDF_weights = new std::vector<float> ;
-  reducedTree -> SetBranchAddress("PDF_weights", &vars.p_PDF_weights);
+  vars.p_PDF_weights_CT10 = new std::vector<float> ;
+  reducedTree -> SetBranchAddress ("PDF_weights_CT10", &vars.p_PDF_weights_CT10) ;
+
+  vars.p_PDF_weights_MSTW2008nlo68cl = new std::vector<float> ;
+  reducedTree -> SetBranchAddress ("PDF_weights_MSTW2008nlo68cl", &vars.p_PDF_weights_MSTW2008nlo68cl) ;
+
+  vars.p_PDF_weights_NNPDF20 = new std::vector<float> ;
+  reducedTree -> SetBranchAddress ("PDF_weights_NNPDF20", &vars.p_PDF_weights_NNPDF20) ;
 
 }
 

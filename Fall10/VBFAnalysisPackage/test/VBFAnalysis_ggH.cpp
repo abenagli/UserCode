@@ -489,8 +489,6 @@ int main(int argc, char** argv)
     vars.tagJ2 = *(vars.p_tagJ2);
     vars.thirdJ = *(vars.p_thirdJ);
 
-    //    if (doPDFstudy > 0) vars.PDF_weights = *(vars.p_PDF_weights) ;
-
     GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
                    vars.lep,vars.nu,vars.WJ1,vars.WJ2);
     
