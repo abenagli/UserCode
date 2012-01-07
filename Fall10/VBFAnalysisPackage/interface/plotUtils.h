@@ -201,6 +201,7 @@ class drawTStack
   bool m_xAxisRange;
   double m_xRangeMin;
   double m_xRangeMax;
+  double m_xWidth;
   bool m_xAxisTitle;
   std::string m_xTitle;
   

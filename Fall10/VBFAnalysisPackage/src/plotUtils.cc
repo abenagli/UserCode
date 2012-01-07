@@ -221,7 +221,13 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     TTree* tree = (TTree*)(inFile -> Get(treeName));
     
     // MakeHistogram:: dump tree variable(s) into histogram
-    TH1F* histo = new TH1F(histoName.c_str(),"", nBins, m_xRangeMin, m_xRangeMax);    
+    float m_xWidth = (m_xRangeMax-m_xRangeMin) / nBins;
+    char xRangeMinChar[50];
+    sprintf(xRangeMinChar,"%.10f",m_xRangeMin);
+    char xRangeMaxChar[50];
+    sprintf(xRangeMaxChar,"%.10f",m_xRangeMax);
+    TH1F* histoTemp = new TH1F((histoName+"Temp").c_str(),"",nBins,  m_xRangeMin,       m_xRangeMax);
+    TH1F* histo     = new TH1F(histoName.c_str(),         "",nBins+2,m_xRangeMin-m_xWidth,m_xRangeMax+m_xWidth);
     histo -> Sumw2();
     
     for(unsigned int jj = 0; jj < variableNames.size(); ++jj)
@@ -237,12 +243,19 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
       if(cut)
         cutExtended += " * ("+cut->at(jj)+")";
       
-      c1 = new TCanvas();
-      c1 -> cd();      
-      tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName).c_str(), cutExtended.c_str());      
-      delete c1;
-      c1 = NULL;
+      tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName+"Temp").c_str(), cutExtended.c_str(),"goff");
     }
+    
+    histo -> SetBinContent(1,histoTemp->GetBinContent(0));
+    histo -> SetBinError(1,histoTemp->GetBinError(0));
+    for(int bin = 1; bin <= nBins; ++bin)
+    {
+      histo -> SetBinContent(bin+1,histoTemp->GetBinContent(bin));
+      histo -> SetBinError(bin+1,histoTemp->GetBinError(bin));
+    }
+
+    histo -> SetBinContent(nBins+2,histoTemp->GetBinContent(nBins+1));
+    histo -> SetBinError(nBins+2,histoTemp->GetBinError(nBins+1));
     
     
     // MakeHistogram::get event histogram
@@ -409,7 +422,7 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     histo_summed -> GetXaxis() -> SetTitleOffset(1.25);
     
     if( m_xAxisRange )
-      histo_summed->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
+      histo_summed->GetXaxis()->SetRangeUser(m_xRangeMin-m_xWidth, m_xRangeMax+m_xWidth);
     
     std::string xAxisTitle = histoName;
     if( m_xAxisTitle ) xAxisTitle = m_xTitle;
@@ -861,7 +874,7 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   m_bkgStack -> GetXaxis() -> SetTitleSize(0.04);
   m_bkgStack -> GetXaxis() -> SetLabelSize(0.03);
   m_bkgStack -> GetXaxis() -> SetTitleOffset(1.25);
-  if(m_xAxisRange) m_bkgStack->GetXaxis()->SetRangeUser(m_xRangeMin, m_xRangeMax);
+  if(m_xAxisRange) m_bkgStack->GetXaxis()->SetRangeUser(m_xRangeMin-m_xWidth, m_xRangeMax+m_xWidth);
   
   // set y-axis properties
   m_bkgStack->GetYaxis()->SetTitle(((TH1F*)(m_bkgStack->GetStack()->Last()))->GetYaxis()->GetTitle());
