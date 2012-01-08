@@ -54,7 +54,7 @@ Tbar_TuneZ2_t-channel_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3       
 Tbar_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3     3_top        60 1 1001    0 20113 -1.          7.870 1.0    PFlow
 TTJets_TuneZ2_7TeV-madgraph-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3               3_top        60 1 1001    0 20113 -1.        157.500 1.0    PFlow
 DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v3_2      2_Z+jets      8 1 1001    0 20113 -1.       3048.000 1.0    PFlow
-QCD_Pt-30to80_EMEnriched_TuneZ2_7TeV-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3     1_QCD        51 1 1001    0 20113 -1.    2450000.000 1.0    PFlow
+QCD_Pt-20to30_EMEnriched_TuneZ2_7TeV-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3     1_QCD        51 1 1001    0 20113 -1.    2450000.000 1.0    PFlow
 QCD_Pt-30to80_EMEnriched_TuneZ2_7TeV-pythia_abenagli-SQWaT_PAT_42X_Fall11_v3      1_QCD        51 1 1001    0 20113 -1.    3870000.000 1.0    PFlow
 QCD_Pt-80to170_EMEnriched_TuneZ2_7TeV-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3    1_QCD        51 1 1001    0 20113 -1.     140000.000 1.0    PFlow
 QCD_Pt-20to30_BCtoE_TuneZ2_7TeV-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3          1_QCD        51 1 1001    0 20113 -1.     132000.000 1.0    PFlow 
