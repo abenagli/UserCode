@@ -936,7 +936,7 @@ void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
 
 
 
-void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
   if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetPDFVariables" << std::endl;
   
