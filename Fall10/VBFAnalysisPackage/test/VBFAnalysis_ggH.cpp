@@ -23,7 +23,7 @@
 
 
 void SetStepNames(std::map<int, std::string>&, const std::string&, const int&, bool);
-bool AcceptHLTPath(const std::vector<std::string>&, const std::vector<float>&, const std::string&, bool& pathFound);
+bool AcceptHLTPath(const std::vector<std::string>&, const std::vector<float>&, const std::string&, bool& pathFound, const bool& verbosity = false);
 
 
 
@@ -59,6 +59,7 @@ int main(int argc, char** argv)
   int entryMAX = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
   int firstSTEP = gConfigParser -> readIntOption("Options::firstSTEP");
+  std::string dataRunFlag  = gConfigParser -> readStringOption("Options::dataRunFlag");
   float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   int verbosity = gConfigParser -> readIntOption("Options::verbosity"); 
   int trainMVA = gConfigParser -> readIntOption("Options::trainMVA"); 
@@ -142,7 +143,6 @@ int main(int argc, char** argv)
   float lepWJ1DphiMAX = gConfigParser -> readFloatOption("Cuts::lepWJ1DphiMAX");
   
   int massDependentCUTS = gConfigParser -> readIntOption("Cuts::massDependentCUTS");
-  int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy"); 
   
   float MVAMIN = gConfigParser -> readFloatOption("Cuts::MVAMIN");
   
@@ -161,11 +161,14 @@ int main(int argc, char** argv)
   TChain* chain = new TChain(treeName.c_str());
   if(!FillChain(*chain, inputFileList.c_str())) return 1;
   
-  TH1F* distrPU_MC = GetTotalHisto("nPUit", inputFileList.c_str());
-  distrPU_MC -> Scale(1./distrPU_MC->Integral());
   TFile* inFile_pileup = TFile::Open(pileupFileName.c_str(),"READ");
-  TH1F* distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileup") );
   
+  TH1F* distrPU_MC = GetTotalHisto("nPUtrue", inputFileList.c_str());
+  distrPU_MC -> Scale(1./distrPU_MC->Integral());
+  
+  TH1F* distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileup") );
+  distrPU_DATA -> Scale(1./distrPU_DATA->Integral());
+    
   
   // define map with events
   std::map<std::pair<int,std::pair<int,int> >,int> eventsMap;  
@@ -179,7 +182,7 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 16;
+  int nStep = 18;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
   TH1F* events_PURescaled = new TH1F("events_PURescaled", "events_PURescaled", nStep, 0., 1.*nStep);
@@ -222,8 +225,8 @@ int main(int argc, char** argv)
   
   for(int step = 1; step <= nStep; ++step)
   {
-//    if( (step < firstSTEP) && (step != 2) ) continue;
-    if( (step < firstSTEP)) continue;
+    if( (step < firstSTEP) && (step != 6) ) continue;
+    //if( step < firstSTEP ) continue;
     
     char treeName[50];
     sprintf(treeName, "ntu_%d", step);
@@ -251,6 +254,11 @@ int main(int argc, char** argv)
   chain -> SetBranchAddress("HLT_Names",&HLT_Names);
   chain -> SetBranchAddress("HLT_Accept",&HLT_Accept);
   
+  int HLTLumiIt;
+  
+  std::vector<std::string> HLTLabels_e;
+  std::vector<std::string> HLTLabels_mu;
+  
   std::vector<float> HLTLumi_e;
   std::vector<float> HLTLumi_mu;
   
@@ -270,109 +278,175 @@ int main(int argc, char** argv)
   // data - electron
   
   HLTLumi_e.push_back(0.);
+  HLTLumiIt = 0;
   
-  // 0-th
-  HLTLumi_e.push_back(HLTLumi_e.at(0)+216.12);
-  dummyHLTRunRanges.first = 160404; dummyHLTRunRanges.second = 163869; HLTRunRanges_e.push_back(dummyHLTRunRanges);
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
-  HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+  if( (dataRunFlag == "2011A") || (dataRunFlag == "2011AB") )
+  {
+    // 0-th - Run2011A
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+211.60);
+    dummyHLTRunRanges.first = 160404; dummyHLTRunRanges.second = 163869; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2");
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
+    HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+    ++HLTLumiIt;
+    
+    // 1-th - Run2011A
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+1956.66);
+    dummyHLTRunRanges.first = 165088; dummyHLTRunRanges.second = 173692; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    dummyHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+    dummyHLTPathNames.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v1");
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v1");
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+    ++HLTLumiIt;
+  }
   
-  // 1-th
-  HLTLumi_e.push_back(HLTLumi_e.at(1)+2248.51);
-  dummyHLTRunRanges.first = 165088; dummyHLTRunRanges.second = 176309; HLTRunRanges_e.push_back(dummyHLTRunRanges);
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  dummyHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
-  dummyHLTPathNames.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v1");
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v1");
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
-  
-  // 2-th
-  HLTLumi_e.push_back(HLTLumi_e.at(2)+1221.00);
-  dummyHLTRunRanges.first = 176461; dummyHLTRunRanges.second = 178162; HLTRunRanges_e.push_back(dummyHLTRunRanges);
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Ele30_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_PFMHT25_v1");
-  HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
-  
-  // 3-th
-  HLTLumi_e.push_back(HLTLumi_e.at(3)+551.07);
-  dummyHLTRunRanges.first = 178420; dummyHLTRunRanges.second = 180252; HLTRunRanges_e.push_back(dummyHLTRunRanges);
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Ele27_WP80_DiCentralPFJet25_PFMHT15_v4");
-  dummyHLTPathNames.push_back("HLT_Ele27_WP80_DiCentralPFJet25_PFMHT15_v5");
-  HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+  if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
+  {
+    // 0-th - Run2011B
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+337.50);
+    dummyHLTRunRanges.first = 175832; dummyHLTRunRanges.second = 176309; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+    ++HLTLumiIt;
+    
+    // 1-th - Run2011B
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+1359.20);
+    dummyHLTRunRanges.first = 176461; dummyHLTRunRanges.second = 178380; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele30_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_PFMHT25_v1");
+    HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+    ++HLTLumiIt;
+    
+    // 2-th - Run2011B
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+815.5);
+    dummyHLTRunRanges.first = 178420; dummyHLTRunRanges.second = 180252; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele27_WP80_DiCentralPFJet25_PFMHT15_v4");
+    dummyHLTPathNames.push_back("HLT_Ele27_WP80_DiCentralPFJet25_PFMHT15_v5");
+    HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
+    ++HLTLumiIt;  
+  }
   
   
   //------------
   // data - muon
   
   HLTLumi_mu.push_back(0.);
+  HLTLumiIt = 0;
   
-  // 0-th
-  HLTLumi_mu.push_back(HLTLumi_mu.at(0)+1908.31);
-  dummyHLTRunRanges.first = 160404; dummyHLTRunRanges.second = 173198; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_IsoMu24_v1");
-  dummyHLTPathNames.push_back("HLT_IsoMu24_v2");
-  dummyHLTPathNames.push_back("HLT_IsoMu24_v4");
-  dummyHLTPathNames.push_back("HLT_IsoMu24_v5");
-  dummyHLTPathNames.push_back("HLT_IsoMu24_v6");
-  dummyHLTPathNames.push_back("HLT_IsoMu24_v7");
-  dummyHLTPathNames.push_back("HLT_IsoMu24_v8");
-  HLTPathNames_mu_DATA.push_back(dummyHLTPathNames);
+  if( (dataRunFlag == "2011A") || (dataRunFlag == "2011AB") )
+  { 
+    // 0-th - Run2011A
+    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+1921.73);
+    dummyHLTRunRanges.first = 160404; dummyHLTRunRanges.second = 173198; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_IsoMu24_v1");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_v2");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_v4");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_v5");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_v6");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_v7");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_v8");
+    HLTPathNames_mu_DATA.push_back(dummyHLTPathNames);
+    ++HLTLumiIt;
+    
+    // 1-th - Run2011A
+    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+246.53);
+    dummyHLTRunRanges.first = 173236; dummyHLTRunRanges.second = 173692; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
+    HLTPathNames_mu_DATA.push_back(dummyHLTPathNames);
+    ++HLTLumiIt;
+  }
   
-  // 1-th
-  HLTLumi_mu.push_back(HLTLumi_mu.at(1)+2328.39);
-  dummyHLTRunRanges.first = 173236; dummyHLTRunRanges.second = 180252; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
-  dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v6");
-  dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v7");
-  HLTPathNames_mu_DATA.push_back(dummyHLTPathNames);
+  if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
+  { 
+    // 0-th - Run2011B
+    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+2512.20);
+    dummyHLTRunRanges.first = 175832; dummyHLTRunRanges.second = 180252; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v6");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v7");
+    HLTPathNames_mu_DATA.push_back(dummyHLTPathNames);
+    ++HLTLumiIt;
+  }
+  
   
   
   //--------------
   // mc - electron
   
-  // 0-th
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
-  HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  if( (dataRunFlag == "2011A") || (dataRunFlag == "2011AB") )
+  {
+    // 0-th - Run2011A
+    HLTLabels_e.push_back("2011A-0");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+    
+    // 1-th - Run2011A
+    HLTLabels_e.push_back("2011A-1");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  }
   
-  // 1-th
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  HLTPathNames_e_MC.push_back(dummyHLTPathNames);
-  
-  // 2-th
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  HLTPathNames_e_MC.push_back(dummyHLTPathNames);
-  
-  // 3-th
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
-  HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
+  { 
+    // 2-th - Run2011B
+    HLTLabels_e.push_back("2011B-0");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+    
+    // 3-th - Run2011B
+    HLTLabels_e.push_back("2011B-1");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+    
+    // 4-th - Run2011B
+    HLTLabels_e.push_back("2011B-2");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  }
   
   
   //----------
   // mc - muon
   
-  // 0-th
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_IsoMu24_v9");
-  HLTPathNames_mu_MC.push_back(dummyHLTPathNames);
+  if( (dataRunFlag == "2011A") || (dataRunFlag == "2011AB") )
+  {
+    // 0-th - Run2011A
+    HLTLabels_mu.push_back("2011A-0");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_IsoMu24_v9");
+    HLTPathNames_mu_MC.push_back(dummyHLTPathNames);
+    
+    // 1-th - Run2011A
+    HLTLabels_mu.push_back("2011A-1");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
+    HLTPathNames_mu_MC.push_back(dummyHLTPathNames);
+  }
   
-  // 1-th
-  dummyHLTPathNames.clear();
-  dummyHLTPathNames.push_back("HLT_Mu24_eta2p1_v1");
-  HLTPathNames_mu_MC.push_back(dummyHLTPathNames);
+  if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
+  {
+    // 0-th - Run2011B
+    HLTLabels_mu.push_back("2011B-0");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
+    HLTPathNames_mu_MC.push_back(dummyHLTPathNames);
+  }
   
   
   
@@ -380,7 +454,7 @@ int main(int argc, char** argv)
   
   
   // define the quark-gluon likelihood
-  //  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator();
+  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator();
   // define the angular likelihood
   HelicityLikelihoodDiscriminant* helicitylikeli = new HelicityLikelihoodDiscriminant();  
   
@@ -390,26 +464,13 @@ int main(int argc, char** argv)
   TMVA::Reader* MVAReader = new TMVA::Reader();
   if( applyMVA == 1 )
   {
-    MVAReader -> AddVariable("jets_bTag1",  &vars.jets_bTag1);
-    MVAReader -> AddVariable("jets_bTag2",  &vars.jets_bTag2);
-    MVAReader -> AddVariable("lep_eta",     &vars.lep_eta);
-    MVAReader -> AddVariable("met_et",      &vars.met_et);
-    MVAReader -> AddVariable("lepMet_mt",   &vars.lepMet_mt);
-    MVAReader -> AddVariable("lepMet_Dphi", &vars.lepMet_Dphi);
-    MVAReader -> AddVariable("WJJ_m",       &vars.WJJ_m);
-    MVAReader -> AddVariable("WJJ_DR",      &vars.WJJ_DR);
-    MVAReader -> AddVariable("lepMetW_Dphi",&vars.lepMetW_Dphi);
-    MVAReader -> AddVariable("lepWJJ_pt1",  &vars.lepWJJ_pt1);
-    MVAReader -> AddVariable("lepWJJ_pt2",  &vars.lepWJJ_pt2);
-    MVAReader -> AddVariable("lepWJJ_pt3",  &vars.lepWJJ_pt3);
-    MVAReader -> AddVariable("lepNuW_m",    &vars.lepNuW_m);
-    MVAReader -> AddVariable("tagJJ_Deta",  &vars.tagJJ_Deta);
-    MVAReader -> AddVariable("tagJJ_m",     &vars.tagJJ_m);
-    MVAReader -> AddVariable("WJ1_zepp",    &vars.WJ1_zepp);
-    MVAReader -> AddVariable("WJ2_zepp",    &vars.WJ2_zepp);
-    MVAReader -> AddVariable("lep_zepp",    &vars.lep_zepp);
+    MVAReader -> AddVariable("lepNuW_cphi",  &vars.lepNuW_cphi);
+    MVAReader -> AddVariable("lepNuZ_cphi",  &vars.lepNuZ_cphi);
+    MVAReader -> AddVariable("lep_ctheta",   &vars.lep_ctheta);
+    MVAReader -> AddVariable("WJ1_ctheta",   &vars.WJ1_ctheta);
+    MVAReader -> AddVariable("lepNu_ctheta", &vars.lepNu_ctheta);
     
-    MVAReader -> BookMVA("kBDT",MVAWeightsFile);
+    MVAReader -> BookMVA("kBDT_H250",MVAWeightsFile);
   }
   
   
@@ -446,7 +507,9 @@ int main(int argc, char** argv)
   stepNames[13] = "13) W pt";
   stepNames[14] = "14) kinematic fit";
   stepNames[15] = "15) W mass";
-  stepNames[16] = "16) Higgs mass";
+  stepNames[16] = "16) helicity likelihood";
+  stepNames[17] = "17) helicity BDT";
+  stepNames[18] = "18) Higgs mass";
   
   
   
@@ -488,11 +551,15 @@ int main(int argc, char** argv)
     vars.tagJ1 = *(vars.p_tagJ1);
     vars.tagJ2 = *(vars.p_tagJ2);
     vars.thirdJ = *(vars.p_thirdJ);
-
+    
     GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
                    vars.lep,vars.nu,vars.WJ1,vars.WJ2);
     
-    vars.PUWeight = PURescaleFactor(distrPU_DATA,distrPU_MC,vars.PUit_n,0);
+    vars.PUWeight = PURescaleFactor(distrPU_DATA,distrPU_MC,vars.PUtrue_n,0);
+    
+    
+    
+    
     
     
     //*********************************
@@ -534,8 +601,9 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-//    if( step == 2 ) cloneTrees[step] -> Fill();
-        
+    //if( step == 2 ) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+    
     
     
     
@@ -550,19 +618,20 @@ int main(int argc, char** argv)
     bool pathFound = false;
     skipEvent = true;
 
-    if( verbosity == 1)
-    {
-      for(unsigned int HLTIt = 0; HLTIt < (*HLT_Names).size(); ++HLTIt)
-      {
-        std::cout << "HLT_Bit: "       << std::setw(3)  << HLTIt
-                  << "   HLT_Name: "   << std::setw(50) << (*HLT_Names).at(HLTIt)
-                  << "   HLT_Accept: " << std::setw(2)  <<(*HLT_Accept).at(HLTIt)
-                  << std::endl;    
-      }
-    }
+    //if( verbosity == 1)
+    //{
+    //  for(unsigned int HLTIt = 0; HLTIt < (*HLT_Names).size(); ++HLTIt)
+    //  {
+    //    std::cout << "HLT_Bit: "       << std::setw(3)  << HLTIt
+    //              << "   HLT_Name: "   << std::setw(50) << (*HLT_Names).at(HLTIt)
+    //              << "   HLT_Accept: " << std::setw(2)  <<(*HLT_Accept).at(HLTIt)
+    //              << std::endl;    
+    //  }
+    //}
     
-
+    
     unsigned int HLTPeriod = -1;
+    std::string HLTLabel = "";
     std::vector<float> HLTLumi;
     std::vector<std::pair<int,int> > HLTRunRanges;
     std::vector<std::string> HLTPathNames;
@@ -584,7 +653,7 @@ int main(int argc, char** argv)
       
       for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
       {
-        if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound) == true )
+        if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound,verbosity) == true )
           skipEvent = false;
       }
     }
@@ -596,7 +665,10 @@ int main(int argc, char** argv)
       if( vars.lep_flavour == 11 ) HLTLumi = HLTLumi_e;
       if( vars.lep_flavour == 13 ) HLTLumi = HLTLumi_mu;
       
-      float dummyLumi = r.Uniform(0.,4236.7);
+      float dummyLumi = 0.;
+      if( dataRunFlag == "2011A")  dummyLumi = r.Uniform(0.,2168.26);
+      if( dataRunFlag == "2011B")  dummyLumi = r.Uniform(0.,2512.20);
+      if( dataRunFlag == "2011AB") dummyLumi = r.Uniform(0.,4680.46);
       
       for(HLTPeriod = 0; HLTPeriod < HLTLumi.size()-1; ++HLTPeriod)
         if( (dummyLumi >= HLTLumi.at(HLTPeriod)) &&
@@ -608,12 +680,15 @@ int main(int argc, char** argv)
       
       for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
       {
-        if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound) == true )
+        if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound,verbosity) == true )
           skipEvent = false;
       }
     }
     
     
+    if( vars.lep_flavour == 11 ) HLTLabel = HLTLabels_e.at(HLTPeriod);
+    if( vars.lep_flavour == 13 ) HLTLabel = HLTLabels_mu.at(HLTPeriod);
+      
     
     if( pathFound == false )
       std::cout << ">>>>>>>>> AcceptHLTPath::Warning: no paths found in the HLT menu" << std::endl;  
@@ -623,49 +698,59 @@ int main(int argc, char** argv)
     
     
     //// electron trigger emulation
-    if( HLTCUT == 1 )
+    if( (HLTCUT == 1) && (vars.lep_flavour == 11) )
     {
-      if( (vars.lep_flavour == 11) && (vars.lep_isEB == 1) )
-      {
-        if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.125) ) continue;
-        if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.125) ) continue;
-        if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.125) ) continue;
-        
-        if( vars.lep_sigmaIetaIeta > 0.011 ) continue;
-        if( fabs(vars.lep_DphiIn)  > 0.070 ) continue;
-        if( fabs(vars.lep_DetaIn)  > 0.008 ) continue;
-        if( vars.lep_HOverE        > 0.050 ) continue;
-      }
-      if( (vars.lep_flavour == 11) && (vars.lep_isEB == 0) )
-      {
-        if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.075) ) continue;
-        if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.075) ) continue;
-        if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.075) ) continue;
-        
-        if( vars.lep_sigmaIetaIeta  > 0.031 ) continue;
-        if( fabs(vars.lep_DphiIn)   > 0.020 ) continue;
-        if( fabs(vars.lep_DetaIn)   > 0.005 ) continue;
-        if( vars.lep_HOverE         > 0.025 ) continue;
-      }
+      //if( vars.lep_isEB == 1 )
+      //{
+      //  if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.125) ) continue;
+      //  if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.125) ) continue;
+      //  if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.125) ) continue;
+      //  
+      //  if( vars.lep_sigmaIetaIeta > 0.011 ) continue;
+      //  if( fabs(vars.lep_DphiIn)  > 0.070 ) continue;
+      //  if( fabs(vars.lep_DetaIn)  > 0.008 ) continue;
+      //  if( vars.lep_HOverE        > 0.050 ) continue;
+      //}
+      //else
+      //{
+      //  if( (isoCUT == 1) && (vars.lep_tkIso/vars.lep.pt()  > 0.075) ) continue;
+      //  if( (isoCUT == 1) && (vars.lep_emIso/vars.lep.pt()  > 0.075) ) continue;
+      //  if( (isoCUT == 1) && (vars.lep_hadIso/vars.lep.pt() > 0.075) ) continue;
+      //  
+      //  if( vars.lep_sigmaIetaIeta  > 0.031 ) continue;
+      //  if( fabs(vars.lep_DphiIn)   > 0.020 ) continue;
+      //  if( fabs(vars.lep_DetaIn)   > 0.005 ) continue;
+      //  if( vars.lep_HOverE         > 0.025 ) continue;
+      //}
       
-      if( (vars.lep_flavour == 11) && (vars.lep.pt() < 30.) ) continue;
-      if( (vars.lep_flavour == 11) && (HLTPeriod == 2) && (vars.lep.pt() < 33.) ) continue;
-      if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > 2.5) ) continue;
+      if( (HLTLabel == "2011A-0") && (vars.lep.pt() < 30.) ) continue;
+      if( (HLTLabel == "2011A-1") && (vars.lep.pt() < 30.) ) continue;
+      if( (HLTLabel == "2011B-0") && (vars.lep.pt() < 30.) ) continue;
+      if( (HLTLabel == "2011B-1") && (vars.lep.pt() < 33.) ) continue;
+      if( (HLTLabel == "2011B-2") && (vars.lep.pt() < 30.) ) continue;
       
-      if( (vars.lep_flavour == 11) && (metCUT == 1) && (HLTPeriod == 1) && (vars.met.Et() < 30.) ) continue;
-      if( (vars.lep_flavour == 11) && (metCUT == 1) && (HLTPeriod == 2) && (vars.met.Et() < 35.) ) continue;
-      if( (vars.lep_flavour == 11) && (metCUT == 1) && (HLTPeriod == 3) && (vars.met.Et() < 30.) ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011A-0") && (vars.met.Et() <  0.) ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011A-1") && (vars.met.Et() < 30.) ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011B-0") && (vars.met.Et() < 30.) ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011B-1") && (vars.met.Et() < 35.) ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011B-2") && (vars.met.Et() < 30.) ) continue;
     }
     
     //// muon trigger emulation
-    //if( HLTCUT == 1 )
-    //{
-    //  if( (vars.lep_flavour == 13) && (vars.lep.pt() < 25.) ) continue;
-    //  if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > 2.1) ) continue;
-    //  //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_tkIso  > 1.000) ) continue;
-    //  //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_emIso  > 1.000) ) continue;
-    //  //if( (vars.lep_flavour == 13) && (isoCUT == 1) && (vars.lep_hadIso > 1.000) ) continue;
-    //}
+    if( (HLTCUT == 1) && (vars.lep_flavour == 13) )
+    {
+      if( (HLTLabel == "2011A-0") && (vars.lep.pt() < 25.) ) continue;
+      if( (HLTLabel == "2011A-1") && (vars.lep.pt() < 25.) ) continue;
+      if( (HLTLabel == "2011B-0") && (vars.lep.pt() < 25.) ) continue;
+      
+      if( (HLTLabel == "2011A-0") && (fabs(vars.lep.eta()) > 5.) ) continue;
+      if( (HLTLabel == "2011A-1") && (fabs(vars.lep.eta()) > 2.1) ) continue;
+      if( (HLTLabel == "2011B-0") && (fabs(vars.lep.eta()) > 2.1) ) continue;
+      
+      //if( (isoCUT == 1) && (vars.lep_tkIso  > 1.000) ) continue;
+      //if( (isoCUT == 1) && (vars.lep_emIso  > 1.000) ) continue;
+      //if( (isoCUT == 1) && (vars.lep_hadIso > 1.000) ) continue;
+    }
     
     
     // fill distributions
@@ -721,7 +806,7 @@ int main(int argc, char** argv)
       if( vars.lep_standalone != 1 ) isId = false;
       if( vars.lep_global     != 1 ) isId = false;
       
-      //if( fabs(vars.lep_dxy_PV)             > muDxyMAX )                      isId = false;
+      if( fabs(vars.lep_dB)                 > muDxyMAX )                      isId = false;
       if( vars.lep_normalizedChi2           > muNormalizedChi2MAX )           isId = false;
       if( vars.lep_numberOfValidTrackerHits < muNumberOfValidTrackerHitsMIN ) isId = false;
       if( vars.lep_numberOfValidMuonHits    < muNumberOfValidMuonHitsMIN )    isId = false;
@@ -739,6 +824,7 @@ int main(int argc, char** argv)
     bool isAntiIsolated = true;
     
     float rho = vars.rhoForIsolation;
+    //float rho = vars.rhoForJetsPFlow;
     //float rho = 0.;
     
     if( vars.lep_flavour == 11 )
@@ -777,14 +863,14 @@ int main(int argc, char** argv)
     
     
     // vertex compatibility
-    bool is3DIP = true;
-    
-    if( vars.lep_flavour == 11 )
-      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > ele3DipMAX ) is3DIP = false;
-    
-    if( vars.lep_flavour == 13 )
-      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > mu3DipMAX ) is3DIP = false;
-    
+    //bool is3DIP = true;
+    //
+    //if( vars.lep_flavour == 11 )
+    //  if( fabs(vars.lep_dB/vars.lep_edB) > ele3DipMAX ) is3DIP = false;
+    //
+    //if( vars.lep_flavour == 13 )
+    //  if( fabs(vars.lep_dB/vars.lep_edB) > mu3DipMAX ) is3DIP = false;
+    //
     //if( is3DIP == false ) continue;
     
     
@@ -841,8 +927,8 @@ int main(int argc, char** argv)
     step += 1;
     //SetStepNames(stepNames, "lepton mt", step, verbosity);
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (lepMetMtCUT == 1) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (lepMetMtCUT == 1) && (vars.lepNu_m > 110.) ) continue;
+    if( (trainMVA == 0) && (lepMetMtCUT == 1) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
+    //if( (trainMVA == 0) && (lepMetMtCUT == 1) && (vars.lepNu_m > 110.) ) continue;
     
     
     // fill distributions
@@ -853,7 +939,8 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+    if( step == 6 ) cloneTrees[step] -> Fill();
+    //if( step >= firstSTEP ) cloneTrees[step] -> Fill();
     
     
     
@@ -943,13 +1030,13 @@ int main(int argc, char** argv)
     
     // standard b-tag veto
     if( vars.nBTag_TCHEM_pt30 > 0 ) isBTagged = true;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (vars.nJets_cnt_pt30 > 2) && (isBTagged == true) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == true) ) continue;
+    if( (trainMVA == 0) && (vars.nJets_cnt_pt30 > 2) && (isBTagged == true) ) continue;
+    //if( ( (trainMVA == 0) && (isBTagged == true) ) continue;
     
     
     // b-tag selection
     //if( vars.nBTag_TCHEM_pt30 == 1 ) isBTagged = true;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) ) && (isBTagged == false) ) continue;
+    //if( ( (trainMVA == 0) && (isBTagged == false) ) continue;
     //
     //if( vars.WJ1_bTag > 3.30 ) continue;
     //if( vars.WJ2_bTag > 3.30 ) continue;
@@ -1001,8 +1088,8 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "lep-met angles", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepMet_Dphi) > lepMetDphiMAX) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepMet_Dphi) > lepMetDphiMAX) ) continue;
     
     
     // fill distributions    
@@ -1026,12 +1113,12 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "WJ1-WJ2 angle cuts", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) < WJJDetaMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) > WJJDetaMAX) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) < WJJDphiMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) > WJJDphiMAX) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) > WJJDRMAX) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) < WJJDetaMIN) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaEta(vars.WJ1.eta(),vars.WJ2.eta())) > WJJDetaMAX) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) < WJJDphiMIN) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaPhi(vars.WJ1.phi(),vars.WJ2.phi())) > WJJDphiMAX) ) continue;
     
     
     // fill distributions
@@ -1083,8 +1170,8 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "W pt", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.WJ1+vars.WJ2).Pt() < WPtMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.lep+vars.met).Pt() < WPtMIN) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.WJ1+vars.WJ2).Pt() < WPtMIN) ) continue;
+    if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.lep+vars.met).Pt() < WPtMIN) ) continue;
     
     
     // fill distributions
@@ -1108,13 +1195,15 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
     
     
+    // kinematic fit
     DoKinematicFit(vars,0.1,"MIB");
     
     
-    //    if( vars.WJ1.pt() > 0. )
-    //      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
-    //    if( vars.WJ2.pt() > 0. )
-    //      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    // qg likelihood
+    if( vars.WJ1.pt() > 0. )
+      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    if( vars.WJ2.pt() > 0. )
+      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
     if( vars.WJ2.pt() > vars.WJ1.pt() )
     {
       float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
@@ -1122,6 +1211,8 @@ int main(int argc, char** argv)
       vars.WJ1_QGLikelihood = QGLikelihoodDummy;
     }
     
+    
+    // helicity likelihood
     TLorentzVector lep_tlv(vars.lep_KF.Px(),vars.lep_KF.Py(),vars.lep_KF.Pz(),vars.lep_KF.E());
     TLorentzVector nu_tlv ( vars.nu_KF.Px(), vars.nu_KF.Py(), vars.nu_KF.Pz(), vars.nu_KF.E());
     TLorentzVector WJ1_tlv(vars.WJ1_KF.Px(),vars.WJ1_KF.Py(),vars.WJ1_KF.Pz(),vars.WJ1_KF.E());
@@ -1136,7 +1227,8 @@ int main(int argc, char** argv)
     vars.helicityLikelihood = sProb/(sProb+bProb);  
     
     
-    //if( vars.helicityLikelihood < 0.6 ) continue;
+    // helicity bdt
+    if( applyMVA == 1 ) vars.mva = MVAReader -> EvaluateMVA("kBDT_H250");
     
     
     // fill distributions
@@ -1148,37 +1240,6 @@ int main(int argc, char** argv)
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
     if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
-    ////*****************************************
-    //// STEP XX - Initial cuts - Helicity angles
-    //step += 1;
-    ////SetStepNames(stepNames, "Helicity angles", step, verbosity);
-    //
-    //
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lep_ctheta < lepCthetaMIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lep_ctheta > lepCthetaMAX) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.WJ1_ctheta < WJ1CthetaMIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.WJ1_ctheta > WJ1CthetaMAX) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lepNu_ctheta < lepNuCthetaMIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (vars.lepNu_ctheta > lepNuCthetaMAX) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (std::min(vars.WJ1_lep_Dphi,vars.WJ2_lep_Dphi) < lepWJ1DphiMIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (std::min(vars.WJ1_lep_Dphi,vars.WJ2_lep_Dphi) > lepWJ1DphiMAX) ) continue;
-    //
-    //
-    //// fill distributions
-    //stepEvents[step] += 1;
-    //stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
-    //if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    //if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    //if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    //if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    //
-    //if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -1191,8 +1252,8 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "W mass", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && ( (vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
+    if( (trainMVA == 0) && ( (vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
+    if( (trainMVA == 0) && ( (vars.WJ1+vars.WJ2).mass() > WJJMassMAX) ) continue;
     
     
     // fill distributions
@@ -1210,14 +1271,60 @@ int main(int argc, char** argv)
     
     
     
+    //*********************************************
+    // STEP 16 - Initial cuts - helicity likelihood
+    step += 1;
+    //SetStepNames(stepNames, "helicity likelihood", step, verbosity);
+    
+    if( vars.helicityLikelihood > 0.6 )
+    {
+      // fill distributions
+      stepEvents[step] += 1;
+      stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
+      if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+      if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+      if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+      if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+      
+      if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    }
+    
+    
+    
+    
+    
+    
+    //**************************************
+    // STEP 17 - Initial cuts - helicity BDT
+    step += 1;
+    //SetStepNames(stepNames, "helicity BDT", step, verbosity);
+    
+    if( vars.mva > -0.25 )
+    {
+      // fill distributions
+      stepEvents[step] += 1;
+      stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
+      if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+      if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+      if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+      if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+      
+      if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    }
+    
+    
+    
+    
+    
+    
     //************************************
-    // STEP 16 - Initial cuts - Higgs mass
+    // STEP 18 - Initial cuts - Higgs mass
     step += 1;
     //SetStepNames(stepNames, "Higgs mass cut", step, verbosity);
     
     
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m_KF) < lepNuWMMIN) ) continue;
-    if( ( (trainMVA == 0) && (applyMVA == 0) ) && (fabs(vars.lepNuW_m_KF) > lepNuWMMAX) ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepNuW_m_KF) < lepNuWMMIN) ) continue;
+    if( (trainMVA == 0) && (fabs(vars.lepNuW_m_KF) > lepNuWMMAX) ) continue;
     
     
     // fill distributions
@@ -1276,8 +1383,8 @@ int main(int argc, char** argv)
   
   for(step = 1; step <= nStep; ++step)
   {
-//    if( (step < firstSTEP) && (step != 2) ) continue;
-    if( (step < firstSTEP)) continue;
+    if( (step < firstSTEP) && (step != 6) ) continue;
+    //if( step < firstSTEP ) continue;
     cloneTrees[step] -> AutoSave();
   } 
   
@@ -1322,7 +1429,8 @@ void SetStepNames(std::map<int, std::string>& stepNames, const std::string& step
 bool AcceptHLTPath(const std::vector<std::string>& HLT_Names,
                    const std::vector<float>& HLT_Accept,
                    const std::string& HLTPathName,
-                   bool& pathFound)
+                   bool& pathFound,
+                   const bool& verbosity)
 {
   bool acceptEvent = false;
   
@@ -1332,7 +1440,10 @@ bool AcceptHLTPath(const std::vector<std::string>& HLT_Names,
     {
       pathFound = true;
       if( HLT_Accept.at(HLTIt) == 1 )
+      {
         acceptEvent = true;
+        if( verbosity ) std::cout << ">>> AcceptHLTPath::path " << HLTPathName << " has fired" << std::endl; 
+      }
     }
   }
   
