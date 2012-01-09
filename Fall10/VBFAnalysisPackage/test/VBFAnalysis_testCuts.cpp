@@ -768,7 +768,7 @@ void DrawSignificance(std::map<int,std::map<std::string,std::vector<TH1F*> > >& 
   g_significance.at(0) -> GetXaxis() -> SetTitle("Higgs mass   (GeV/c^{2})");
   g_significance.at(0) -> GetYaxis() -> SetTitle("S / #sqrt{S+B}");
   g_significance.at(0) -> SetMinimum(0.);
-  g_significance.at(0) -> SetMaximum(2.);
+  g_significance.at(0) -> SetMaximum(3.);
   g_significance.at(0) -> Draw("APL");
   
   for(unsigned int iCut = 0; iCut < cutValues.size(); ++iCut)
