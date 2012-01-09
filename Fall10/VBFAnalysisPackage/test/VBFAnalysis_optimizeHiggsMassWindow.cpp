@@ -1,6 +1,7 @@
 #include "treeReader.h"
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
+#include "HiggsMassWindows.h"
 
 #include <iostream>
 #include <vector>
@@ -63,9 +64,8 @@ int main(int argc, char** argv)
   float mH;
   int totEvents;
   float eventWeight;
+  float PUWeight;
   float crossSection;
-  int PUit_n;
-  int PUoot_n;
   float lepNuW_m;
   float lepNuW_m_KF;
   
@@ -76,23 +76,14 @@ int main(int argc, char** argv)
   TFile* outFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
   
   // Define the output graph
-  int nMasses = 8;
-  int* masses = new int[nMasses];
-  masses[0] = 250;
-  masses[1] = 300;
-  masses[2] = 350;
-  masses[3] = 400;
-  masses[4] = 450;
-  masses[5] = 500;
-  masses[6] = 550;
-  masses[7] = 600;
-  
+  std::vector<int> masses = GetMasses();
+  unsigned int nMasses = masses.size();
   
   std::map<int,TGraph*> g_significance;
   std::map<int,TGraph*> g_significance_KF;
   std::map<int,TGraph2D*> g_asymmSignificance;
   std::map<int,TGraph2D*> g_asymmSignificance_KF;
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
@@ -115,7 +106,7 @@ int main(int argc, char** argv)
   std::map<int,std::vector<std::pair<float,float> > > S_KF;
   std::map<int,std::vector<std::pair<float,float> > > B_KF;
   
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
@@ -142,7 +133,7 @@ int main(int argc, char** argv)
   std::map<int,std::vector<std::pair<std::pair<float,float>,float> > > asymmS_KF;
   std::map<int,std::vector<std::pair<std::pair<float,float>,float> > > asymmB_KF;
   
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
@@ -206,18 +197,16 @@ int main(int argc, char** argv)
     tree -> SetBranchAddress("mH",           &mH);
     tree -> SetBranchAddress("totEvents",    &totEvents);
     tree -> SetBranchAddress("eventWeight",  &eventWeight);
+    tree -> SetBranchAddress("PUWeight",     &PUWeight);
     tree -> SetBranchAddress("crossSection", &crossSection);
-    tree -> SetBranchAddress("PUit_n",       &PUit_n);
-    //tree -> SetBranchAddress("PUoot_n",      &PUoot_n);
     tree -> SetBranchAddress("lepNuW_m",     &lepNuW_m);
     tree -> SetBranchAddress("lepNuW_m_KF",  &lepNuW_m_KF);
-    
     
     for(int entry = 0; entry < tree->GetEntries(); ++entry)
     {
       tree -> GetEntry(entry);
       if( entry%100 == 0) std::cout << ">>>>>> reading entry " << entry << " of " << tree->GetEntries() << "\r" << std::flush;
-      double weight = lumi * 1000 * 1. * eventWeight / totEvents * crossSection * PURescaleFactor(PUit_n); 
+      double weight = lumi * 1000 * 1. / totEvents * crossSection * eventWeight * PUWeight;
       
       
       //------------------
@@ -229,7 +218,7 @@ int main(int argc, char** argv)
 
         
         // loop on the masses
-        for(int iMass = 0; iMass < nMasses; ++iMass)
+        for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
         {
           int mass = masses[iMass];
           char token[50];
@@ -266,7 +255,7 @@ int main(int argc, char** argv)
         
         
         // loop on the masses
-        for(int iMass = 0; iMass < nMasses; ++iMass)
+        for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
         {
           int mass = masses[iMass];
           char token[50];
@@ -301,7 +290,7 @@ int main(int argc, char** argv)
   
   outFile -> cd();
   
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     

@@ -1,6 +1,7 @@
 #include "ConfigParser.h"
 #include "ntpleUtils.h"
 #include "setTDRStyle.h"
+#include "HiggsMassWindows.h"
 
 #include <iostream>
 #include <string>
@@ -13,8 +14,8 @@
 
 
 
-int nBins = 140;
-float xMin = 100.;
+int nBins = 320;
+float xMin = 0.;
 float xMax = 800.;
 float xWidth = (xMax-xMin)/nBins;
 
@@ -46,7 +47,7 @@ void DrawHistograms(std::map<std::string,std::vector<TH1F*> >& histoMap,
 
 void DrawSignificance(std::map<int,std::map<std::string,std::vector<TH1F*> > >& sigHistoMap, std::map<std::string,std::vector<TH1F*> >& bkgHistoMap,
                       const std::string& cutName, const std::string& varName, const std::vector<std::string>& cutValues, const std::string& cutType,
-                      const int& nMasses, int* masses, float* lepNuWMMIN, float* lepNuWMMAX);
+                      const std::vector<int>& masses);
 
 
 
@@ -103,41 +104,13 @@ int main(int argc, char** argv)
   
   
   // define histograms
-  int nMasses = 8;
-  int* masses = new int[nMasses];
-  masses[0] = 250;
-  masses[1] = 300;
-  masses[2] = 350;
-  masses[3] = 400;
-  masses[4] = 450;
-  masses[5] = 500;
-  masses[6] = 550;
-  masses[7] = 600;
-  
-  float* lepNuWMMIN = new float[nMasses];
-  lepNuWMMIN[0] = 225.;
-  lepNuWMMIN[1] = 270.;
-  lepNuWMMIN[2] = 310.;
-  lepNuWMMIN[3] = 355.;
-  lepNuWMMIN[4] = 390.;
-  lepNuWMMIN[5] = 415.;
-  lepNuWMMIN[6] = 470.;
-  lepNuWMMIN[7] = 485.;
-  
-  float* lepNuWMMAX = new float[nMasses];
-  lepNuWMMAX[0] = 275.;
-  lepNuWMMAX[1] = 330.;
-  lepNuWMMAX[2] = 390.;
-  lepNuWMMAX[3] = 445.;
-  lepNuWMMAX[4] = 510.;
-  lepNuWMMAX[5] = 575.;
-  lepNuWMMAX[6] = 610.;
-  lepNuWMMAX[7] = 665.;
+  std::vector<int> masses = GetMasses();
   
   std::map<std::string,std::string> cutNames;
   std::map<std::string,std::string> cutTypes;
   std::map<std::string,std::vector<std::string> > cutValues;
   std::map<int,std::map<std::string,std::vector<TH1F*> > > sigHistoMap;
+  std::map<std::string,std::vector<TH1F*> > sig200HistoMap;
   std::map<std::string,std::vector<TH1F*> > sig250HistoMap;
   std::map<std::string,std::vector<TH1F*> > sig300HistoMap;
   std::map<std::string,std::vector<TH1F*> > sig350HistoMap;
@@ -158,7 +131,9 @@ int main(int argc, char** argv)
   
   
   
-  /*
+  
+  
+  
   //----------------
   // cut on WJJ_Dphi
   dummyVarName = "WJJ_Dphi";
@@ -172,6 +147,7 @@ int main(int argc, char** argv)
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
@@ -196,6 +172,7 @@ int main(int argc, char** argv)
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
@@ -220,6 +197,7 @@ int main(int argc, char** argv)
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
@@ -244,6 +222,7 @@ int main(int argc, char** argv)
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
@@ -268,6 +247,7 @@ int main(int argc, char** argv)
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
@@ -292,6 +272,7 @@ int main(int argc, char** argv)
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
@@ -302,9 +283,10 @@ int main(int argc, char** argv)
   sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  */
   
   
+  
+  /*
   //----------------
   // cut WJJ_m
   dummyVarName = "WJJ_m";
@@ -319,34 +301,7 @@ int main(int argc, char** argv)
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
-  sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig400HistoMap[dummyVarName]  = InitializeHistograms("sig400", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig450HistoMap[dummyVarName]  = InitializeHistograms("sig450", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig500HistoMap[dummyVarName]  = InitializeHistograms("sig500", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig550HistoMap[dummyVarName]  = InitializeHistograms("sig550", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  
-  
-  
-  
-  
-  /*
-  //----------------
-  // cut on lep_eta
-  dummyVarName = " ";
-  dummyCutType = " ";
-  dummyCutValues.clear();
-  dummyCutValues.push_back("nJets_cnt_pt30 < 4");
-  dummyCutValues.push_back("nJets_pt30 < 4");
-  
-  dummyCutName = "nJets";
-  cutNames[dummyVarName] = dummyCutName;
-  cutValues[dummyVarName] = dummyCutValues;
-  cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
@@ -358,6 +313,35 @@ int main(int argc, char** argv)
   bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   */
+  
+  
+  
+  /*
+  //-------------
+  // cut on nJets
+  dummyVarName = " ";
+  dummyCutType = " ";
+  dummyCutValues.clear();
+  dummyCutValues.push_back("nJets_cnt_pt30 < 4");
+  dummyCutValues.push_back("nJets_pt30 < 4");
+  
+  dummyCutName = "nJets";
+  cutNames[dummyVarName] = dummyCutName;
+  cutValues[dummyVarName] = dummyCutValues;
+  cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig400HistoMap[dummyVarName]  = InitializeHistograms("sig400", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig450HistoMap[dummyVarName]  = InitializeHistograms("sig450", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig500HistoMap[dummyVarName]  = InitializeHistograms("sig500", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig550HistoMap[dummyVarName]  = InitializeHistograms("sig550", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  */
+  
   
   
   
@@ -395,6 +379,8 @@ int main(int argc, char** argv)
       getline(iss,token3,'_');
       
       // fill histograms
+      if( (token2 == "M-200") || (token3 == "M-200") )
+        FillHistograms(sig200HistoMap,tree,dummyVarName,dummyCutValues,dummyCutType);
       if( (token2 == "M-250") || (token3 == "M-250") )
         FillHistograms(sig250HistoMap,tree,dummyVarName,dummyCutValues,dummyCutType);
       if( (token2 == "M-300") || (token3 == "M-300") )
@@ -414,6 +400,7 @@ int main(int argc, char** argv)
     }
   }
   
+  sigHistoMap[200] = sig200HistoMap;
   sigHistoMap[250] = sig250HistoMap;
   sigHistoMap[300] = sig300HistoMap;
   sigHistoMap[350] = sig350HistoMap;
@@ -472,7 +459,7 @@ int main(int argc, char** argv)
     
     NormalizeHistograms(bkgNormHistoMap,dummyVarName,cutValues[dummyVarName]);
     DrawHistograms(bkgNormHistoMap,dummyCutName,dummyVarName,cutValues[dummyVarName],cutTypes[dummyVarName]);
-    DrawSignificance(sigHistoMap,bkgHistoMap,dummyCutName,dummyVarName,cutValues[dummyVarName],cutTypes[dummyVarName],nMasses,masses,lepNuWMMIN,lepNuWMMAX);
+    DrawSignificance(sigHistoMap,bkgHistoMap,dummyCutName,dummyVarName,cutValues[dummyVarName],cutTypes[dummyVarName],masses);
   }
   
   
@@ -543,10 +530,10 @@ void FillHistograms(std::map<std::string,std::vector<TH1F*> >& histoMap,
   
   
   // define common cut and weight
-  //std::string commonCut = "(1 == 1) * ((WJJ_m >= 65.) && (WJJ_m < 95.))";
-  std::string commonCut = "(1 == 1)";
+  //std::string commonCut = "(1 == 1)";
+  std::string commonCut = "(1 == 1) * ((WJJ_m >= 65.) && (WJJ_m < 95.))";
   char lumiChar[50]; sprintf(lumiChar,"%f",lumi);
-  std::string weight = "( 1000 * " + std::string(lumiChar) + " * 1. / totEvents * crossSection * PURescaleFactor(PUit_n) )";
+  std::string weight = "( 1000 * " + std::string(lumiChar) + " * 1. / totEvents * crossSection * eventWeight * PUWeight )";
   
   
   //-------
@@ -682,7 +669,7 @@ void DrawHistograms(std::map<std::string,std::vector<TH1F*> >& histoMap,
 
 void DrawSignificance(std::map<int,std::map<std::string,std::vector<TH1F*> > >& sigHistoMap, std::map<std::string,std::vector<TH1F*> >& bkgHistoMap,
                       const std::string& cutName, const std::string& varName, const std::vector<std::string>& cutValues, const std::string& cutType,
-                      const int& nMasses, int* masses, float* lepNuWMMIN, float* lepNuWMMAX)
+                      const std::vector<int>& masses)
 {
   // define canvas
   TCanvas* c = new TCanvas(("c_significance_"+varName).c_str());
@@ -733,7 +720,8 @@ void DrawSignificance(std::map<int,std::map<std::string,std::vector<TH1F*> > >& 
   
   
   // loop on masses and fill the graphs
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  unsigned int nMasses = masses.size();
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
@@ -745,8 +733,8 @@ void DrawSignificance(std::map<int,std::map<std::string,std::vector<TH1F*> > >& 
     {
       float binCenter = xMin + 0.5*xWidth + xWidth*(bin-1);
       
-      if( (binCenter >= lepNuWMMIN[iMass]) && (binMin == -1) ) binMin = bin;
-      if( (binCenter >= lepNuWMMIN[iMass]) && (binCenter < lepNuWMMAX[iMass]) ) binMax = bin;
+      if( (binCenter >= GetLepNuWMMIN(mass)) && (binMin == -1) ) binMin = bin;
+      if( (binCenter >= GetLepNuWMMIN(mass)) && (binCenter < GetLepNuWMMAX(mass)) ) binMax = bin;
     }
     
     

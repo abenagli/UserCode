@@ -15,13 +15,13 @@
 
 
 double fitFunc(double* x, double* par);
+double fitFuncToSample(double* x, double* par);
 
 int fitHiggsMassBinned(TH1F* h_lepNuW_m,
                        float xFitMIN1, float xFitMAX1, float xFitMIN2, float xFitMAX2, float xWidth,
                        TF1** func, bool computeCL = false, TH1F* hint = NULL);
 
-std::string method = "";
-std::string analysisMethod = "";
+std::string fitMethod = "";
 std::string varName = "lepNuW_m_KF"; 
 std::string WMassCut = "( (WJJ_m >= 65.) && (WJJ_m < 95.) )";
 //std::string WMassCut = "( ( (WJJ_m >= 55.) && (WJJ_m < 65.) ) || ( (WJJ_m >= 95.) && (WJJ_m < 120.) ) )";
@@ -70,25 +70,24 @@ int main(int argc, char** argv)
   
   
   //[Options]
-  int step        = gConfigParser -> readIntOption("Options::step");
-  int onData      = gConfigParser -> readIntOption("Options::onData");
-  int onMC        = gConfigParser -> readIntOption("Options::onMC");
-  int toyMAX      = gConfigParser -> readIntOption("Options::toyMAX");
-  method          = gConfigParser -> readStringOption("Options::method");
-  analysisMethod  = gConfigParser -> readStringOption("Options::analysisMethod");
+  int step   = gConfigParser -> readIntOption("Options::step");
+  int onData = gConfigParser -> readIntOption("Options::onData");
+  int onMC   = gConfigParser -> readIntOption("Options::onMC");
+  int toyMAX = gConfigParser -> readIntOption("Options::toyMAX");
+  fitMethod  = gConfigParser -> readStringOption("Options::fitMethod");
   
   //[Cuts]
   float lepNuWMMIN = GetLepNuWMMIN(higgsMass);
   float lepNuWMMAX = GetLepNuWMMAX(higgsMass);
-  float xFitMIN1 = GetXFitMIN1(higgsMass,analysisMethod);
-  float xFitMAX1 = GetXFitMAX1(higgsMass,analysisMethod);
-  float xFitMIN2 = GetXFitMIN2(higgsMass,analysisMethod);
-  float xFitMAX2 = GetXFitMAX2(higgsMass,analysisMethod);
+  float xFitMIN1 = GetXFitMIN1(higgsMass,fitMethod);
+  float xFitMAX1 = GetXFitMAX1(higgsMass,fitMethod);
+  float xFitMIN2 = GetXFitMIN2(higgsMass,fitMethod);
+  float xFitMAX2 = GetXFitMAX2(higgsMass,fitMethod);
   
-  int nBins = 200;
   float xMin = 0.;
   float xMax = 1000.;
-  float xWidth = (xMax-xMin)/nBins;
+  float xWidth = GetBinWidth();
+  int nBins = int((xMax-xMin)/xWidth);
   
   int nBinsFit = int((xFitMAX2-xFitMIN1)/xWidth);
   
@@ -117,7 +116,7 @@ int main(int argc, char** argv)
   
   
   // Define the output file
-  std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + method + "_" + jetAlgorithm + "_H" + std::string(higgsMassChar) + ".root";
+  std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + fitMethod + "_" + jetAlgorithm + "_H" + std::string(higgsMassChar) + ".root";
   TFile* outFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
   TDirectory* MCDir = outFile -> mkdir("MC");
   TDirectory* dataDir = outFile -> mkdir("data");
@@ -172,9 +171,8 @@ int main(int argc, char** argv)
   float chi2_sig;
   
   int nPar = -1;
-  if(method == "doubleExponential" ) nPar = 4;
-  if(method == "attenuatedExponential" ) nPar = 4;
-  if(method == "attenuatedDoubleExponential" ) nPar = 6;
+  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") ) nPar = 4;
+  if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") ) nPar = 6;
   
   float* par = new float[nPar];
   float* parErr = new float[nPar];
@@ -309,7 +307,7 @@ int main(int argc, char** argv)
       // fill histogram
       outFile -> cd();
       std::stringstream weight;
-      weight << "( 1000 * " << lumi << " * 1. * eventWeight / totEvents * crossSection * eventWeight * PUWeight )";
+      weight << "( 1000 * " << lumi << " * 1. / totEvents * crossSection * eventWeight * PUWeight )";
       std::string extendedCut = weight.str() + " * " + WMassCut;      
       
       tree -> Draw((varName+" >>+ h_mcSum_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
@@ -386,7 +384,7 @@ int main(int argc, char** argv)
     std::cout << "**************************" << std::endl;
     
     N_observed  = h_lepNuW_m->Integral(binMin,binMax);
-    N_estimated = func->Integral(lepNuWMMIN,lepNuWMMAX) / xWidth;
+    N_estimated = hint->Integral(binMin,binMax);
     N_estimated_err = bandIntegral;
     
     std::cout << "Number of events OBSERVED  in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_observed << std::endl;  
@@ -413,25 +411,36 @@ int main(int argc, char** argv)
   // ON MC - FIT MASS DISTRIBUTION
   //------------------------------
   
-  TF1* f_toSample = new TF1("f_toSample",doubleExponential,xFitMIN1,xFitMAX2,4);
+  TF1* f_toSample = new TF1("f_toSample",fitFuncToSample,xMin,xMax,1+6);
   f_toSample -> SetNpx(10000);
   f_toSample -> SetLineColor(kBlue);
   f_toSample -> SetLineWidth(2);
+
+  f_toSample -> FixParameter(0,160.);
+  f_toSample -> SetParameter(1,190.);
+  f_toSample -> SetParameter(2,20.);
+  f_toSample -> SetParameter(3,10.);
+  f_toSample -> SetParameter(4,0.013);
+  f_toSample -> SetParameter(5,5.);
+  f_toSample -> SetParameter(6,0.005);
   
-  f_toSample -> SetParameter(0,3.);
-  f_toSample -> SetParameter(1,0.005);
-  f_toSample -> SetParameter(2,10.);
-  f_toSample -> SetParameter(3,0.012);
+  f_toSample -> SetParName(1,"#mu");
+  f_toSample -> SetParName(2,"kT");
+  f_toSample -> SetParName(3,"N1");
+  f_toSample -> SetParName(4,"#lambda1");
+  f_toSample -> SetParName(5,"N2");
+  f_toSample -> SetParName(6,"#lambda2");
   
-  f_toSample -> SetParName(0,"N1");
-  f_toSample -> SetParName(1,"#lambda1");
-  f_toSample -> SetParName(2,"N2");
-  f_toSample -> SetParName(3,"#lambda2");
-  
-  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",xFitMIN1,xFitMAX2);
-  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",xFitMIN1,xFitMAX2);
-  h_mcSum_lepNuW_m -> Fit("f_toSample","QRL+","",xFitMIN1,xFitMAX2);
-  
+  TFitResultPtr fitResultPtr = h_mcSum_lepNuW_m -> Fit("f_toSample","QLRS+","",xFitMIN1,xFitMAX2);
+  fitStatus = (int)(fitResultPtr);
+  int counter = 0;
+  while( counter < 100 )
+  {
+    fitResultPtr = h_mcSum_lepNuW_m -> Fit("f_toSample","QLRS+","",xFitMIN1,xFitMAX2);
+    fitStatus = (int)(fitResultPtr);
+    if( fitStatus == 0 ) break;
+    ++counter;
+  }
   
   TH1F* temp = new TH1F("temp","",nBins,xMin,xMax);
   temp -> Sumw2();
@@ -517,13 +526,13 @@ int main(int argc, char** argv)
       }
             
       N_observed  = h_lepNuW_m->Integral(binMin,binMax);
-      N_estimated = func->Integral(lepNuWMMIN,lepNuWMMAX) / xWidth;
+      N_estimated = hint->Integral(binMin,binMax);
       N_estimated_err = bandIntegral;
       
       if( toyIt < 10 )
       {
         std::cout << "toy: " << toyIt << std::endl;
-        std::cout << "Number of events EXPECTED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_expected << std::endl;
+        //std::cout << "Number of events EXPECTED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_expected << std::endl;
         std::cout << "Number of events OBSERVED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_observed << std::endl;
         std::cout << "Number of events ESTIMATED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_estimated << " +/- " << N_estimated_err << std::endl;
         
@@ -567,13 +576,13 @@ int main(int argc, char** argv)
       }
             
       N_observed_sig  = h_lepNuW_m_sig->Integral(binMin,binMax);
-      N_estimated_sig = func_sig->Integral(lepNuWMMIN,lepNuWMMAX) / xWidth;
+      N_estimated_sig = hint_sig->Integral(binMin,binMax);
       N_estimated_err_sig = bandIntegral_sig;
       
       if( toyIt < 10 )
       {
         std::cout << "-------------------------------------------------------------" << std::endl;      
-        std::cout << "Number of events EXPECTED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_expected_sig << std::endl;
+        //std::cout << "Number of events EXPECTED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_expected_sig << std::endl;
         std::cout << "Number of events OBSERVED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_observed_sig << std::endl;
         std::cout << "Number of events ESTIMATED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_estimated_sig << " +/- " << N_estimated_err_sig << std::endl;
         std::cout << std::endl;
@@ -687,12 +696,31 @@ double fitFunc(double* x, double* par)
   if( (xx >= xMax1) && (xx < xMin2) ) TF1::RejectPoint();
   if( xx >= xMax2 )                   TF1::RejectPoint();  
   
-  if( method == "doubleExponential" )
+  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
     return doubleExponential(x,&par[4]);
-  if( method == "attenuatedExponential" )
-    return attenuatedExponential(x,&par[4]);
-  if( method == "attenuatedDoubleExponential" )
+  if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
     return attenuatedDoubleExponential(x,&par[4]);
+  else
+    return -1.;
+}
+
+
+
+double fitFuncToSample(double* x, double* par)
+{
+  // variable
+  double xx = x[0];
+  // ranges
+  double xMin = par[0];
+  //std::cout << "x: " << xx << "   xMin: " << xMin << std::endl; 
+  
+  // fit function ranges
+  if( xx < xMin ) return 0.;
+  
+  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
+    return doubleExponential(x,&par[1]);
+  if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+    return attenuatedDoubleExponential(x,&par[1]);
   else
     return -1.;
 }
@@ -704,9 +732,8 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
                        TF1** func, bool computeCL, TH1F* hint)
 {
   int nPar = -1;
-  if(method == "doubleExponential" ) nPar = 4;
-  if(method == "attenuatedExponential" ) nPar = 4;
-  if(method == "attenuatedDoubleExponential" ) nPar = 6;
+  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") ) nPar = 4;
+  if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") ) nPar = 6;
   
   (*func) = new TF1("func",fitFunc,0.,1000.,4+nPar);
   (*func) -> FixParameter(0,xFitMIN1);
@@ -716,7 +743,7 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
   
   
   
-  if( method == "doubleExponential" )
+  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
   {
     //-------------------
     // double exponential
@@ -733,7 +760,7 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
   
   
   
-  if( method == "attenuatedExponential" )
+  if( (fitMethod == "attenuatedExponential") || (fitMethod == "attenuatedExponentialNoHoles") )
   {
     //------------------------------
     // attenuated exponential
@@ -754,15 +781,15 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
   
   
   
-  if( method == "attenuatedDoubleExponential" )
+  if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
   {
     //------------------------------
     // attenuated double exponential
     
-    (*func) -> SetParameter(4,180.);
-    (*func) -> SetParameter(5,11.);
+    (*func) -> SetParameter(4,190.);
+    (*func) -> SetParameter(5,20.);
     (*func) -> SetParameter(6,10.);
-    (*func) -> SetParameter(7,0.012);
+    (*func) -> SetParameter(7,0.013);
     (*func) -> SetParameter(8,5.);
     (*func) -> SetParameter(9,0.005);
     
@@ -800,26 +827,28 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
   
   
   
+  //TVirtualFitter::SetDefaultFitter("Fumili2");
   (*func) -> SetNpx(10000);
   (*func) -> SetLineWidth(2);
   (*func) -> SetLineColor(kRed);
   TFitResultPtr fitResultPtr = h_lepNuW_m -> Fit("func","QLRS+","",xFitMIN1,xFitMAX2);
   int fitStatus = (int)(fitResultPtr);
   int counter = 0;
-  if( (fitStatus != 0) && (counter < 100) )
+  while( counter < 10 )
   {
     fitResultPtr = h_lepNuW_m -> Fit("func","QLRS+","",xFitMIN1,xFitMAX2);
     fitStatus = (int)(fitResultPtr);
+    if( fitStatus == 0 ) break;
+    
     ++counter;
   }
+  //std::cout << "computeCL: " << computeCL << "   fitStatus: " << fitStatus << "   counter: " << counter << std::endl;
   
   hint -> Reset();
-  
   if( (computeCL) && (fitStatus == 0) )
   {
     //Create a histogram to hold the confidence intervals
     (TVirtualFitter::GetFitter()) -> GetConfidenceIntervals(hint,0.68);
-    
     hint -> SetStats(kFALSE);
     hint -> SetMarkerSize(0);
     hint -> SetFillColor(kRed);
