@@ -39,12 +39,21 @@ struct VBFPreselectionVariables
   
   
   
+  // MC variables
+  float genPtHat;
+  float genWeight;
+  int genNUP;
+  
+  
+  
   // PU variables
   int PUtrue_n;
   int PUit_n;
-  int PUoot_n;
+  int PUoot_early_n;
+  int PUoot_late_n;
   float rhoForIsolation;
   float rhoForJets;
+  float rhoForJetsPFlow;
   
   
   
@@ -54,16 +63,18 @@ struct VBFPreselectionVariables
   std::vector<float> HLT_Accept;
   std::vector<float>* p_HLT_Accept;
   
-
+  
+  
   // PDF variables
   std::vector<float> PDF_weights_CT10 ;
   std::vector<float>* p_PDF_weights_CT10 ;
-  
+
   std::vector<float> PDF_weights_MSTW2008nlo68cl ;
   std::vector<float>* p_PDF_weights_MSTW2008nlo68cl ;
-  
+
   std::vector<float> PDF_weights_NNPDF20 ;
   std::vector<float>* p_PDF_weights_NNPDF20 ;
+  
   
   
   // PV variables
@@ -547,24 +558,25 @@ void FillVBFPreselectionTree(VBFPreselectionVariables& vars);
 void ClearVBFPreselectionVariables(VBFPreselectionVariables&);
 void DeleteVBFPreselectionVariables(VBFPreselectionVariables&);
 
-void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag);
-void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
-void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt);
-void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader);
+void SetGenVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag, const int& verbosity = 0);
+void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag, const int& verbosity = 0);
+void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
+void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
+void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
+void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt, const int& verbosity = 0);
+void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt, const int& verbosity = 0);
+void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
+void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType,
-		     const float& JESScaleVariation, TH2F* JECUncertainty);
-void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT);
+		     const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity = 0);
+void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT, const int& verbosity = 0);
 void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD,
-                     const float& JESScaleVariation, TH2F* JECUncertainty);
-void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT);
-void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader);
-void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader);
+                     const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity = 0);
+void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT, const int& verbosity = 0);
+void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
+void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
+void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
+void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
+void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
 
 #endif

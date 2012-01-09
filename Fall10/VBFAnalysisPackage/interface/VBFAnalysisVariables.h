@@ -43,12 +43,26 @@ struct VBFAnalysisVariables
   
   
   
+  // PDF variables
+  std::vector<float> PDF_weights_CT10 ;
+  std::vector<float>* p_PDF_weights_CT10 ;
+  
+  std::vector<float> PDF_weights_MSTW2008nlo68cl ;
+  std::vector<float>* p_PDF_weights_MSTW2008nlo68cl ;
+  
+  std::vector<float> PDF_weights_NNPDF20 ;
+  std::vector<float>* p_PDF_weights_NNPDF20 ;
+  
+  
+  
   // PU variables
   int PUtrue_n;
   int PUit_n;
-  int PUoot_n;
+  int PUoot_early_n;
+  int PUoot_late_n;
   float rhoForIsolation;
   float rhoForJets;
+  float rhoForJetsPFlow;
   
   
   
@@ -84,8 +98,8 @@ struct VBFAnalysisVariables
   float lep_z;
   float lep_dxy_BS;
   float lep_dz_BS;
-  float lep_dxy_PV;
-  float lep_edxy_PV;
+  float lep_dB;
+  float lep_edB;
   float lep_dz_PV;
   float lep_tkIso;
   float lep_emIso;
@@ -422,17 +436,6 @@ struct VBFAnalysisVariables
   float mc_H_eta;
   float mc_H_phi;
   float mc_H_m;
-  
-  // PDF variables
-  std::vector<float> PDF_weights_CT10 ;
-  std::vector<float>* p_PDF_weights_CT10 ;
-  
-  std::vector<float> PDF_weights_MSTW2008nlo68cl ;
-  std::vector<float>* p_PDF_weights_MSTW2008nlo68cl ;
-  
-  std::vector<float> PDF_weights_NNPDF20 ;
-  std::vector<float>* p_PDF_weights_NNPDF20 ;
-  
   
 };
 
