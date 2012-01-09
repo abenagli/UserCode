@@ -38,24 +38,32 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("mva", &vars.mva, "mva/F");
   
   
+  // Gen variables
+  vars.m_reducedTree -> Branch("genPtHat", &vars.genPtHat,  "genPtHat/F");
+  vars.m_reducedTree -> Branch("genWeight",&vars.genWeight,"genWeight/F");
+  vars.m_reducedTree -> Branch("genNUP",   &vars.genNUP,      "genNUP/I");
+  
+  
   // PU variables
   vars.m_reducedTree -> Branch("PUtrue_n",        &vars.PUtrue_n,               "PUtrue_n/I");
   vars.m_reducedTree -> Branch("PUit_n",          &vars.PUit_n,                   "PUit_n/I");
-  vars.m_reducedTree -> Branch("PUoot_n",         &vars.PUoot_n,                 "PUoot_n/I");
+  vars.m_reducedTree -> Branch("PUoot_early_n",   &vars.PUoot_early_n,     "PUoot_early_n/I");
+  vars.m_reducedTree -> Branch("PUoot_late_n",    &vars.PUoot_late_n,       "PUoot_late_n/I");
   vars.m_reducedTree -> Branch("rhoForIsolation", &vars.rhoForIsolation, "rhoForIsolation/F");
   vars.m_reducedTree -> Branch("rhoForJets",      &vars.rhoForJets,           "rhoForJets/F");
+  vars.m_reducedTree -> Branch("rhoForJetsPFlow", &vars.rhoForJetsPFlow, "rhoForJetsPFlow/F");
   
   
   // HLT variables
   vars.m_reducedTree -> Branch("HLT_Names",  "std::vector<std::string>", &vars.p_HLT_Names);
   vars.m_reducedTree -> Branch("HLT_Accept", "std::vector<float>",       &vars.p_HLT_Accept);
   
-
+  
   // PDF variables
-  vars.m_reducedTree -> Branch("PDF_weights_CT10", "std::vector<float>",       &vars.p_PDF_weights_CT10);
-  vars.m_reducedTree -> Branch("PDF_weights_MSTW2008nlo68cl", "std::vector<float>",       &vars.p_PDF_weights_MSTW2008nlo68cl);
-  vars.m_reducedTree -> Branch("PDF_weights_NNPDF20", "std::vector<float>",       &vars.p_PDF_weights_NNPDF20);
-
+  vars.m_reducedTree -> Branch("PDF_weights_CT10",            "std::vector<float>",            &vars.p_PDF_weights_CT10);
+  vars.m_reducedTree -> Branch("PDF_weights_MSTW2008nlo68cl", "std::vector<float>", &vars.p_PDF_weights_MSTW2008nlo68cl);
+  vars.m_reducedTree -> Branch("PDF_weights_NNPDF20",         "std::vector<float>",         &vars.p_PDF_weights_NNPDF20);
+  
   
   // PV variables
   vars.m_reducedTree -> Branch("PV_n",              &vars.PV_n,                           "PV_n/I");
@@ -392,11 +400,20 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.mva = -99.; 
   
   
+  // GEN variables
+  vars.genPtHat = -1.;
+  vars.genWeight = -1.;
+  vars.genNUP = -1;
+  
+  
   // PU variables
+  vars.PUtrue_n = -1;
   vars.PUit_n = -1;
-  vars.PUoot_n = -1;
+  vars.PUoot_early_n = -1;
+  vars.PUoot_late_n = -1;
   vars.rhoForIsolation = -99.;
   vars.rhoForJets = -99.;
+  vars.rhoForJetsPFlow = -99.;
   
   
   // PV variables
@@ -874,24 +891,43 @@ void DeleteVBFPreselectionVariables(VBFPreselectionVariables& vars)
 
 
 
-void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag)
+void SetGenVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetGenVariables" << std::endl;
+  
   if( dataFlag == 0 )
   {
-    //vars.PUtrue_n = (int)(reader.GetInt("mc_PUit_TrueNumInteractions")->at(0));
-    vars.PUit_n   = (int)(reader.GetInt("mc_PUit_NumInteractions")->at(0));
-    vars.PUoot_n  = (int)(reader.GetInt("mc_PUoot_early_NumInteractions")->at(0) + 
-                          reader.GetInt("mc_PUoot_late_NumInteractions")->at(0));
+    vars.genPtHat  = reader.GetFloat("mc_ptHat")->at(0);
+    vars.genWeight = reader.GetFloat("mc_weight")->at(0);
+    vars.genNUP    = (int)(reader.GetFloat("mc_NUP")->at(0));
   }
-  
-  vars.rhoForIsolation = reader.GetFloat("rho_isolation")->at(0);
-  vars.rhoForJets = reader.GetFloat("rho_jets")->at(0);
 }
 
 
 
-void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& dataFlag, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetPUVariables" << std::endl;
+  
+  if( dataFlag == 0 )
+  {
+    vars.PUtrue_n      = (int)(reader.GetFloat("mc_PUit_TrueNumInteractions")->at(0));
+    vars.PUit_n        = (int)(reader.GetInt("mc_PUit_NumInteractions")->at(0));
+    vars.PUoot_early_n = (int)(reader.GetInt("mc_PUoot_early_NumInteractions")->at(0));
+    vars.PUoot_late_n  = (int)(reader.GetInt("mc_PUoot_late_NumInteractions")->at(0));
+  }
+  
+  vars.rhoForIsolation = reader.GetFloat("rho_isolation")->at(0);
+  vars.rhoForJets      = reader.GetFloat("rho_jets")->at(0);
+  vars.rhoForJetsPFlow = reader.GetFloat("rho_jetsPFlow")->at(0);
+}
+
+
+
+void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
+{
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetHLTVariables" << std::endl;
+  
   vars.HLT_Names =  *(reader.GetString("HLT_Names"));
   vars.p_HLT_Names = &(vars.HLT_Names);
   vars.HLT_Accept =  *(reader.GetFloat("HLT_Accept"));
@@ -899,8 +935,11 @@ void SetHLTVariables(VBFPreselectionVariables& vars, treeReader& reader)
 }
 
 
+
 void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetPDFVariables" << std::endl;
+  
   vars.PDF_weights_CT10 = *(reader.GetFloat("CT10pdfWeights"));
   vars.p_PDF_weights_CT10 = &(vars.PDF_weights_CT10);
 
@@ -912,8 +951,11 @@ void SetPDFVariables(VBFPreselectionVariables& vars, treeReader& reader)
 }
 
 
-void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader)
+
+void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetPVVariables" << std::endl;
+  
   vars.PV_n = (int)(reader.GetFloat("PV_d0")->size());
   vars.PV_d0 = reader.GetFloat("PV_d0")->at(0);
   vars.PV_nTracks = reader.GetInt("PV_nTracks")->at(0);
@@ -924,8 +966,10 @@ void SetPVVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 
 
-void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetLeptonVariables" << std::endl;
+  
   vars.lep = vars.leptons.at(vars.selectIt_lep);
   vars.p_lep = &vars.lep;
   
@@ -1032,8 +1076,10 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 
 
-void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetLepton2Variables" << std::endl;
+  
   vars.lep2 = vars.leptons.at(vars.selectIt_lep2);
   vars.p_lep2 = &vars.lep2;
   
@@ -1140,8 +1186,10 @@ void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader)
 
 
 
-void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt)
+void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetElectronVariables" << std::endl;
+  
   vars.electrons.push_back( reader.Get4V("electrons")->at(eleIt) );
   vars.leptons.push_back( reader.Get4V("electrons")->at(eleIt) );
   vars.leptonCharges.push_back( reader.GetFloat("electrons_charge")->at(eleIt) );
@@ -1173,8 +1221,10 @@ void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, co
 
 
 
-void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& muIt)
+void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& muIt, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetMuonVariables" << std::endl;
+  
   vars.muons.push_back( reader.Get4V("muons")->at(muIt) );
   vars.leptons.push_back( reader.Get4V("muons")->at(muIt) );
   vars.leptonCharges.push_back( reader.GetFloat("muons_charge")->at(muIt) );
@@ -1202,8 +1252,10 @@ void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 
 
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, 
-                     const float& JESScaleVariation, TH2F* JECUncertainty)
+                     const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetMetVariables" << std::endl;
+  
   // met
   if(jetType == "Calo")
     vars.met = reader.Get4V("type1Met")->at(0);
@@ -1261,8 +1313,10 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
 
 
 
-void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT)
+void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetBTagVariables" << std::endl;
+  
   for(unsigned int jetIt = 0; jetIt < (reader.Get4V("jets")->size()); ++jetIt)
   {
     ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);
@@ -1322,8 +1376,10 @@ void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 
 
 
-void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD, const float& JESScaleVariation, TH2F* JECUncertainty)
+void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetJetVariables" << std::endl;
+  
   ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);  
   
   
@@ -1369,10 +1425,10 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     if( fabs(jet.eta()) >= jetEtaFWD ) ++vars.nJets_fwd_pt30;
   }
 
-  //vars.jets_etaEtaMoment.push_back( reader.GetFloat("jets_etaetaMoment")->at(jetIt) );
-  //vars.jets_phiPhiMoment.push_back( reader.GetFloat("jets_phiphiMoment")->at(jetIt) );
-  //vars.jets_etaPhiMoment.push_back( reader.GetFloat("jets_etaphiMoment")->at(jetIt) );
-  //vars.jets_ptD.push_back( reader.GetFloat("jets_ptD")->at(jetIt) );
+  vars.jets_etaEtaMoment.push_back( reader.GetFloat("jets_etaetaMoment")->at(jetIt) );
+  vars.jets_phiPhiMoment.push_back( reader.GetFloat("jets_phiphiMoment")->at(jetIt) );
+  vars.jets_etaPhiMoment.push_back( reader.GetFloat("jets_etaphiMoment")->at(jetIt) );
+  vars.jets_ptD.push_back( reader.GetFloat("jets_ptD")->at(jetIt) );
   
   if(jetType == "Calo")
   {
@@ -1545,8 +1601,10 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
 
 
 
-void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT)
+void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetLeadingJetVariables" << std::endl;
+  
   float jetPtMAX = -9999.;
   for(unsigned int jetIt = 0; jetIt < vars.jets.size(); ++jetIt)
   {
@@ -1562,15 +1620,17 @@ void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, 
   vars.p_leadingJ = &vars.leadingJ;
   
   vars.leadingJ_bTag = vars.jets_bTag.at(vars.selectIt_leadingJet);
-  //vars.leadingJ_ptD = vars.jets_ptD.at(vars.selectIt_leadingJet);
+  vars.leadingJ_ptD = vars.jets_ptD.at(vars.selectIt_leadingJet);
   vars.leadingJ_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_leadingJet);
   vars.leadingJ_neutralMultiplicity = vars.jets_neutralMultiplicity.at(vars.selectIt_leadingJet);
 }
 
 
 
-void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetWJJVariables" << std::endl;
+  
   if( (vars.selectIt_W.at(0) == -1) || (vars.selectIt_W.at(1) == -1) ) return;
   
   vars.WJ1 = vars.jets.at(vars.selectIt_W.at(0));
@@ -1593,8 +1653,8 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
   vars.WJ2_met_Dphi = deltaPhi(vars.WJ2.phi(),vars.met.phi());
   vars.WJ1_bTag = vars.jets_bTag.at(vars.selectIt_W.at(0));
   vars.WJ2_bTag = vars.jets_bTag.at(vars.selectIt_W.at(1));
-  //vars.WJ1_ptD = vars.jets_ptD.at(vars.selectIt_W.at(0));
-  //vars.WJ2_ptD = vars.jets_ptD.at(vars.selectIt_W.at(1));
+  vars.WJ1_ptD = vars.jets_ptD.at(vars.selectIt_W.at(0));
+  vars.WJ2_ptD = vars.jets_ptD.at(vars.selectIt_W.at(1));
   vars.WJ1_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_W.at(0));
   vars.WJ2_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_W.at(1));
   vars.WJ1_neutralMultiplicity = vars.jets_neutralMultiplicity.at(vars.selectIt_W.at(0));
@@ -1620,8 +1680,10 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 
 
-void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetHVariables" << std::endl;
+  
   vars.lepNu_nSolutions = GetNeutrino(vars.nu1,vars.nu2,vars.lep,vars.met,vars.WJ1,vars.WJ2);
   vars.p_nu1 = &(vars.nu1);
   vars.p_nu2 = &(vars.nu2);
@@ -1651,8 +1713,10 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 
 
-void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetTagJJVariables" << std::endl;
+  
   if( (vars.selectIt_tag.at(0) != -1) && (vars.selectIt_tag.at(1) != -1) )
   {
     vars.tagJ1 = vars.jets.at(vars.selectIt_tag.at(0));
@@ -1664,8 +1728,8 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
     
     vars.tagJ1_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(0));
     vars.tagJ2_bTag = vars.jets_bTag.at(vars.selectIt_tag.at(1));
-    //vars.tagJ1_ptD = vars.jets_ptD.at(vars.selectIt_tag.at(0));
-    //vars.tagJ2_ptD = vars.jets_ptD.at(vars.selectIt_tag.at(1));
+    vars.tagJ1_ptD = vars.jets_ptD.at(vars.selectIt_tag.at(0));
+    vars.tagJ2_ptD = vars.jets_ptD.at(vars.selectIt_tag.at(1));
     vars.tagJ1_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_tag.at(0));
     vars.tagJ2_chargedMultiplicity = vars.jets_chargedMultiplicity.at(vars.selectIt_tag.at(1));
     vars.tagJ1_neutralMultiplicity = vars.jets_neutralMultiplicity.at(vars.selectIt_tag.at(0));
@@ -1739,8 +1803,10 @@ void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 
 
-void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetThirdJetVariables" << std::endl;
+  
   float jetPtMAX = -9999.;
   for(int jetIt = 0; jetIt < (int)vars.jets.size(); ++jetIt)
   {
@@ -1793,8 +1859,10 @@ void SetThirdJetVariables(VBFPreselectionVariables& vars, treeReader& reader)
 
 
 
-void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader)
+void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity)
 {
+  if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetMCVariables" << std::endl;
+  
   // lepton
   vars.mc_lep = reader.Get4V("mcF1_fromV1")->at(0);
   vars.p_mc_lep = &vars.mc_lep;
