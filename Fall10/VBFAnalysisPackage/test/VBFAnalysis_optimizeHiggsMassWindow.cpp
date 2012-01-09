@@ -81,16 +81,16 @@ int main(int argc, char** argv)
   
   std::map<int,TGraph*> g_significance;
   std::map<int,TGraph*> g_significance_KF;
-  std::map<int,TGraph2D*> g_asymmSignificance;
-  std::map<int,TGraph2D*> g_asymmSignificance_KF;
+  //std::map<int,TGraph2D*> g_asymmSignificance;
+  //std::map<int,TGraph2D*> g_asymmSignificance_KF;
   for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
     g_significance[mass] = new TGraph();
     g_significance_KF[mass] = new TGraph();
-    g_asymmSignificance[mass] = new TGraph2D();
-    g_asymmSignificance_KF[mass] = new TGraph2D();   
+    //g_asymmSignificance[mass] = new TGraph2D();
+    //g_asymmSignificance_KF[mass] = new TGraph2D();   
   }
   
   
@@ -124,6 +124,7 @@ int main(int argc, char** argv)
   }
   
   
+  /*
   // Define counters
   // asymmetric windows
   int nPointsLow = 25;
@@ -152,6 +153,7 @@ int main(int argc, char** argv)
         asymmB_KF[mass].push_back( dummy2 );
       }
   }
+  */
   
   
   
@@ -166,17 +168,10 @@ int main(int argc, char** argv)
     if(i < nSigTrees) inputFullFileName = baseDir + "/" + inputSigDirs.at(i)   + "/" + inputFileName + ".root";
     else              inputFullFileName = baseDir + "/" + inputBkgDirs.at(i-nSigTrees) + "/" + inputFileName + ".root";
     TFile* inputFile = TFile::Open(inputFullFileName.c_str());
-    std::string token1,token2,token3;
-    
     
     if( i < nSigTrees)
     {
       std::cout << ">>> VBFAnalysis_optimizeHiggsMassWindow::signal tree in " << inputSigDirs.at(i) << " opened" << std::endl;    
-      std::istringstream iss(inputSigDirs.at(i));
-      getline(iss,token1,'_');
-      getline(iss,token1,'_');
-      getline(iss,token2,'_');
-      getline(iss,token3,'_');
     }
     else
     {
@@ -205,29 +200,28 @@ int main(int argc, char** argv)
     for(int entry = 0; entry < tree->GetEntries(); ++entry)
     {
       tree -> GetEntry(entry);
-      if( entry%100 == 0) std::cout << ">>>>>> reading entry " << entry << " of " << tree->GetEntries() << "\r" << std::flush;
+      if( entry%1000 == 0) std::cout << ">>>>>> reading entry " << entry << " of " << tree->GetEntries() << "\r" << std::flush;
+      
       double weight = lumi * 1000 * 1. / totEvents * crossSection * eventWeight * PUWeight;
+      
       
       
       //------------------
       // symmetric windows
-      for(unsigned int point = 0; point < (S[250]).size(); ++point)
+      for(unsigned int point = 0; point < (S[200]).size(); ++point)
       {
 	//std::cout << "point: " << point << std::endl;
-        float window = ((S[250]).at(point)).first;
-
+        float window = ((S[200]).at(point)).first;
+        
         
         // loop on the masses
         for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
         {
           int mass = masses[iMass];
-          char token[50];
-          sprintf(token,"M-%d",mass);          
           
-	  
           if( (lepNuW_m >= mass-window) && (lepNuW_m < mass+window) )
           {
-            if( (mH > 0) && ( (token == token2) || (token == token3) ) ) 
+            if( (mH > 0) && (int(mH)%1000 == mass) ) 
               ((S[mass]).at(point)).second += weight;
             if( mH <= 0 )
               ((B[mass]).at(point)).second += weight;
@@ -236,7 +230,7 @@ int main(int argc, char** argv)
           
           if( (lepNuW_m_KF >= mass-window) && (lepNuW_m_KF < mass+window) )
           {
-            if( (mH > 0) && ( (token == token2) || (token == token3) ) ) 
+            if( (mH > 0) && (int(mH)%1000 == mass) ) 
               ((S_KF[mass]).at(point)).second += weight;
             if( mH <= 0 )
               ((B_KF[mass]).at(point)).second += weight;
@@ -245,13 +239,14 @@ int main(int argc, char** argv)
       }
       
       
+      /*
       //-------------------
       // asymmetric windows
-      for(unsigned int point = 0; point < (asymmS[250]).size(); ++point)
+      for(unsigned int point = 0; point < (asymmS[200]).size(); ++point)
       {
 	//std::cout << "point: " << point << std::endl;
-        float windowLow = (((asymmS[250]).at(point)).first).first;
-        float windowHig = (((asymmS[250]).at(point)).first).second;
+        float windowLow = (((asymmS[200]).at(point)).first).first;
+        float windowHig = (((asymmS[200]).at(point)).first).second;
         
         
         // loop on the masses
@@ -279,8 +274,8 @@ int main(int argc, char** argv)
               ((asymmB_KF[mass]).at(point)).second += weight;
           }
 	}
-      }
-    }    
+      }*/
+    }
   }
   
   
@@ -325,6 +320,7 @@ int main(int argc, char** argv)
     
     
     
+    /*
     // asymmetric windows
     for(unsigned int point = 0; point < (asymmS[mass]).size(); ++point)
     {
@@ -353,6 +349,7 @@ int main(int argc, char** argv)
     std::stringstream asymmGraphName_KF;
     asymmGraphName_KF << "g_asymmSignificance_KF_" << mass; 
     g_asymmSignificance_KF[mass] -> Write(asymmGraphName_KF.str().c_str());
+    */
   }
   
   outFile -> Close();
