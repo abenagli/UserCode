@@ -2,6 +2,7 @@
 #include "ntpleUtils.h"
 #include "setTDRStyle.h"
 #include "Functions.h"
+#include "HiggsMassWindows.h"
 
 #include <iostream>
 #include <string>
@@ -25,18 +26,13 @@ float lumi = 1.;
 
 TFile* outFile;
 
-int nMasses = 8;
-int* masses = new int[nMasses];
-float* widths = new float[nMasses];
-float* xFitMin = new float[nMasses];
-float* xFitMax = new float[nMasses];
-
-
+float* xFitMin;
+float* xFitMax;
 
 void FillHistograms(TTree* tree_1, TTree* tree_2,
                     const std::string& label, std::map<std::string,TH1F*>& histoMap_1, std::map<std::string,TH1F*>& histoMap_2);
 
-void DrawHistograms(std::map<std::string,TH1F*>& histoMap_1, std::map<std::string,TH1F*>& histoMap_2);
+void DrawHistograms(std::map<std::string,TH1F*>& histoMap_1, std::map<std::string,TH1F*>& histoMap_2, const std::vector<int>& masses);
 
 
 
@@ -93,23 +89,11 @@ int main(int argc, char** argv)
   
   
   // define histograms
-  masses[0] = 250;
-  masses[1] = 300;
-  masses[2] = 350;
-  masses[3] = 400;
-  masses[4] = 450;
-  masses[5] = 500;
-  masses[6] = 550;
-  masses[7] = 600;
+  std::vector<int> masses = GetMasses();
+  unsigned int nMasses = masses.size();
   
-  widths[0] = 4.04;
-  widths[1] = 8.43;
-  widths[2] = 15.2;
-  widths[3] = 29.2;
-  widths[4] = 47.0;
-  widths[5] = 68.0;
-  widths[6] = 93.2;
-  widths[7] = 123.;
+  xFitMin = new float[nMasses];
+  xFitMax = new float[nMasses];
   
   xFitMin[0] = 225.;
   xFitMin[1] = 265.;
@@ -129,12 +113,10 @@ int main(int argc, char** argv)
   xFitMax[6] = 625.;
   xFitMax[7] = 700.;
   
-  
-  
   std::map<std::string,TH1F*> histoMap_1;
   std::map<std::string,TH1F*> histoMap_2;
   
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     char labelName[50];
     sprintf(labelName,"M-%d",masses[iMass]);
@@ -214,7 +196,7 @@ int main(int argc, char** argv)
   
   
   
-  DrawHistograms(histoMap_1,histoMap_2);
+  DrawHistograms(histoMap_1,histoMap_2,masses);
   return 0;
 }
 
@@ -246,12 +228,13 @@ void FillHistograms(TTree* tree_1, TTree* tree_2,
 
 
 
-void DrawHistograms(std::map<std::string,TH1F*>& histoMap_1, std::map<std::string,TH1F*>& histoMap_2)
+void DrawHistograms(std::map<std::string,TH1F*>& histoMap_1, std::map<std::string,TH1F*>& histoMap_2, const std::vector<int>& masses)
 {
   int iMass = 0;
   for(std::map<std::string,TH1F*>::const_iterator mapIt = histoMap_1.begin(); mapIt != histoMap_1.end(); ++mapIt)
   {
     std::string label = mapIt -> first;
+    int mass = masses[iMass];
     
     // define canvas
     TCanvas* c = new TCanvas(("c_"+label).c_str());
@@ -288,8 +271,8 @@ void DrawHistograms(std::map<std::string,TH1F*>& histoMap_1, std::map<std::strin
     TF1* fitFunc_1 = new TF1(("fitFunc_1_"+label).c_str(),breitWigner_gaussian,xFitMin[iMass],xFitMax[iMass],5);
     
     fitFunc_1 -> SetParameter(0,histoMap_1[label]->GetMaximum());
-    fitFunc_1 -> FixParameter(1,masses[iMass]);
-    fitFunc_1 -> FixParameter(2,widths[iMass]);
+    fitFunc_1 -> FixParameter(1,mass);
+    fitFunc_1 -> FixParameter(2,GetHiggsWidth(mass));
     fitFunc_1 -> SetParameter(3,0.);
     fitFunc_1 -> SetParameter(4,20.);
     
@@ -303,8 +286,8 @@ void DrawHistograms(std::map<std::string,TH1F*>& histoMap_1, std::map<std::strin
     TF1* fitFunc_2 = new TF1(("fitFunc_2_"+label).c_str(),breitWigner_gaussian,xFitMin[iMass],xFitMax[iMass],5);
     
     fitFunc_2 -> SetParameter(0,histoMap_2[label]->GetMaximum());
-    fitFunc_2 -> FixParameter(1,masses[iMass]);
-    fitFunc_2 -> FixParameter(2,widths[iMass]);
+    fitFunc_2 -> FixParameter(1,mass);
+    fitFunc_2 -> FixParameter(2,GetHiggsWidth(mass));
     fitFunc_2 -> SetParameter(3,0.);
     fitFunc_2 -> SetParameter(4,20.);
     
@@ -318,7 +301,7 @@ void DrawHistograms(std::map<std::string,TH1F*>& histoMap_1, std::map<std::strin
     
     char latexBuffer[250];
     
-    sprintf(latexBuffer,"M = %d GeV/c^{2}   #Gamma = %.2e",masses[iMass],widths[iMass]);
+    sprintf(latexBuffer,"M = %d GeV/c^{2}   #Gamma = %.2e",masses[iMass],GetHiggsWidth(mass));
     TLatex* latex_bw = new TLatex(0.13,0.96,latexBuffer);
 
     latex_bw -> SetNDC();

@@ -13,13 +13,6 @@
 
 
 
-int nBins = 200;
-float xMin = 0.;
-float xMax = 1000.;
-float xWidth = (xMax-xMin)/nBins;
-
-
-
 
 
 
@@ -41,7 +34,6 @@ int main(int argc, char** argv)
   //[Input]
   std::string baseDir      = gConfigParser -> readStringOption("Input::baseDir");
   std::string jetAlgorithm = gConfigParser -> readStringOption("Input::jetAlgorithm");
-  std::string jetType      = gConfigParser -> readStringOption("Input::jetType");
   float lumi = gConfigParser -> readFloatOption("Input::lumi");
   
   std::string inputFileName = gConfigParser -> readStringOption("Input::inputFileName");
@@ -70,6 +62,13 @@ int main(int argc, char** argv)
   
   
   
+  float xMin = 0.;
+  float xMax = 1000.;
+  float xWidth = GetBinWidth();
+  int nBins = int((xMax-xMin)/xWidth);
+  
+  
+  
   // Define tree variables
   float mH;
   int totEvents;
@@ -88,17 +87,8 @@ int main(int argc, char** argv)
   
   
   // Define the output graph
-  int nMasses = 8;
-  
-  int* masses = new int[nMasses];
-  masses[0] = 250;
-  masses[1] = 300;
-  masses[2] = 350;
-  masses[3] = 400;
-  masses[4] = 450;
-  masses[5] = 500;
-  masses[6] = 550;
-  masses[7] = 600;
+  std::vector<int> masses = GetMasses();
+  unsigned int nMasses = masses.size();
   
   
   
@@ -111,18 +101,20 @@ int main(int argc, char** argv)
   std::map<int,TH1F*> h_ggS;
   std::map<int,TH1F*> h_qqS;
   
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
+    
+    // build histograms
     char histoName[50];
     
-    sprintf(histoName,"H%d",mass);
+    sprintf(histoName,"h_H%d",mass);
     h_S[mass] = new TH1F(histoName,"",nBins,xMin,xMax);
     
-    sprintf(histoName,"ggH%d",mass);
+    sprintf(histoName,"h_ggH%d",mass);
     h_ggS[mass] = new TH1F(histoName,"",nBins,xMin,xMax);
     
-    sprintf(histoName,"qqH%d",mass);
+    sprintf(histoName,"h_qqH%d",mass);
     h_qqS[mass] = new TH1F(histoName,"",nBins,xMin,xMax);
   }
   
@@ -172,16 +164,18 @@ int main(int argc, char** argv)
       
       int mass = int(int(mH)%1000);
       
-      h_S[mass] -> Fill(lepNuW_m_KF,weight);
-      if( mH < 1000 ) h_ggS[mass] -> Fill(lepNuW_m_KF,weight);
-      else            h_qqS[mass] -> Fill(lepNuW_m_KF,weight);
-      
+      // count events
       if( (lepNuW_m_KF >= GetLepNuWMMIN(mass)) && (lepNuW_m_KF < GetLepNuWMMAX(mass)) )
       {
         S[mass] += weight;
         if( mH < 1000 ) ggS[mass] += weight;
         else            qqS[mass] += weight;
       }
+      
+      // fill histograms
+      h_S[mass] -> Fill(lepNuW_m_KF,weight);
+      if( mH < 1000 ) h_ggS[mass] -> Fill(lepNuW_m_KF,weight);
+      else            h_qqS[mass] -> Fill(lepNuW_m_KF,weight);
     }
 
   inputFile -> Close(); 
@@ -192,7 +186,7 @@ int main(int argc, char** argv)
   
   // gluon-gluon fusion
   std::cout << ">>>>>> RESULTS FOR ggH <<<<<<" << std::endl;
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
@@ -203,7 +197,7 @@ int main(int argc, char** argv)
   
   // vector boson fusion
   std::cout << ">>>>>> RESULTS FOR qqH <<<<<<" << std::endl;
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
@@ -214,7 +208,7 @@ int main(int argc, char** argv)
   
   // gluon-gluon fusion + vector boson fusion
   std::cout << ">>>>>> RESULTS FOR ggH+qqH <<<<<<" << std::endl;
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     
@@ -228,7 +222,7 @@ int main(int argc, char** argv)
   // save histograms
   outFile -> cd();
   
-  for(int iMass = 0; iMass < nMasses; ++iMass)
+  for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
     

@@ -16,7 +16,8 @@ double PURescaleFactor(TH1F* distrPU_DATA, TH1F* distrPU_MC,
     int bin_DATA = distrPU_DATA -> FindBin(nPU_MC);
     int bin_MC   = distrPU_MC   -> FindBin(nPU_MC);
     
-    //std::cout << "   distrPU_DATA[" << std::setw(2) << bin_DATA << "] = " << std::fixed << std::setprecision(6) << std::setw(8) << distrPU_DATA -> GetBinContent(bin_DATA)
+    //std::cout << "   nPU_MC: " << std::setprecision(0) << std::setw(2) << nPU_MC 
+    //          << "   distrPU_DATA[" << std::setw(2) << bin_DATA << "] = " << std::fixed << std::setprecision(6) << std::setw(8) << distrPU_DATA -> GetBinContent(bin_DATA)
     //          << "   distrPU_MC["   << std::setw(2) << bin_MC << "] = "   << std::fixed << std::setprecision(6) << std::setw(8) << distrPU_MC   -> GetBinContent(bin_MC)
     //          << "   ratio: " << 1. * distrPU_DATA->GetBinContent(bin_DATA) / distrPU_MC->GetBinContent(bin_MC)
     //          << std::endl;
