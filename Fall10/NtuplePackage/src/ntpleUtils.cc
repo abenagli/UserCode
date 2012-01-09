@@ -197,7 +197,7 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
     return 1.;
   
   else if(nPU_MC > 34.)
-    return 1.;
+    return 0.;
   
   else
   {
@@ -242,43 +242,83 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
       distrPU_MC[34] = 5.80004E-06;
     }
     
-    if(MCFlag == 20113) // Fall11 - in-time
+    if(MCFlag == 20113) // Fall11
     {
-      distrPU_MC[0]  = 0.003388501;
-      distrPU_MC[1]  = 0.010357558;
-      distrPU_MC[2]  = 0.024724258;
-      distrPU_MC[3]  = 0.042348605;
-      distrPU_MC[4]  = 0.058279812;
-      distrPU_MC[5]  = 0.068851751;
-      distrPU_MC[6]  = 0.072914824;
-      distrPU_MC[7]  = 0.071579609;
-      distrPU_MC[8]  = 0.066811668;
-      distrPU_MC[9]  = 0.060672356;
-      distrPU_MC[10] = 0.054528356;
-      distrPU_MC[11] = 0.049193540;
-      distrPU_MC[12] = 0.044886042;
-      distrPU_MC[13] = 0.041341896;
-      distrPU_MC[14] = 0.038467900;
-      distrPU_MC[15] = 0.035871463;
-      distrPU_MC[16] = 0.033419520;
-      distrPU_MC[17] = 0.030915649;
-      distrPU_MC[18] = 0.028395374;
-      distrPU_MC[19] = 0.025798107;
-      distrPU_MC[20] = 0.023237445;
-      distrPU_MC[21] = 0.020602754;
-      distrPU_MC[22] = 0.018068800;
-      distrPU_MC[23] = 0.015559693;
-      distrPU_MC[24] = 0.013211063;
-      distrPU_MC[25] = 0.010964293;
-      distrPU_MC[26] = 0.008920993;
-      distrPU_MC[27] = 0.007080504;
-      distrPU_MC[28] = 0.005499239;
-      distrPU_MC[29] = 0.004187022;
-      distrPU_MC[30] = 0.003096474;
-      distrPU_MC[31] = 0.002237361;
-      distrPU_MC[32] = 0.001566428;
-      distrPU_MC[33] = 0.001074149;
-      distrPU_MC[34] = 0.000721755;
+      /*
+      // twiki - intime
+      distrPU_MC[0]  = 0.014583699;
+      distrPU_MC[1]  = 0.025682975;
+      distrPU_MC[2]  = 0.038460562;
+      distrPU_MC[3]  = 0.049414536;
+      distrPU_MC[4]  = 0.056931087;
+      distrPU_MC[5]  = 0.061182816;
+      distrPU_MC[6]  = 0.062534625;
+      distrPU_MC[7]  = 0.061476918;
+      distrPU_MC[8]  = 0.058677499;
+      distrPU_MC[9]  = 0.055449877;
+      distrPU_MC[10] = 0.051549051;
+      distrPU_MC[11] = 0.047621024;
+      distrPU_MC[12] = 0.043923799;
+      distrPU_MC[13] = 0.040569076;
+      distrPU_MC[14] = 0.037414654;
+      distrPU_MC[15] = 0.034227033;
+      distrPU_MC[16] = 0.031437714;
+      distrPU_MC[17] = 0.028825596;
+      distrPU_MC[18] = 0.026218978;
+      distrPU_MC[19] = 0.023727061;
+      distrPU_MC[20] = 0.021365645;
+      distrPU_MC[21] = 0.01918743;
+      distrPU_MC[22] = 0.016972815;
+      distrPU_MC[23] = 0.014920601;
+      distrPU_MC[24] = 0.013038989;
+      distrPU_MC[25] = 0.011293777;
+      distrPU_MC[26] = 0.009612465;
+      distrPU_MC[27] = 0.008193556;
+      distrPU_MC[28] = 0.006888047;
+      distrPU_MC[29] = 0.005715239;
+      distrPU_MC[30] = 0.004711232;
+      distrPU_MC[31] = 0.003869926;
+      distrPU_MC[32] = 0.003154521;
+      distrPU_MC[33] = 0.002547417;
+      distrPU_MC[34] = 0.002024714;
+      */
+      
+      // wjets
+      distrPU_MC[0]  = 0.008528684;
+      distrPU_MC[1]  = 0.019303381;
+      distrPU_MC[2]  = 0.031652782;
+      distrPU_MC[3]  = 0.043396104;
+      distrPU_MC[4]  = 0.052644081;
+      distrPU_MC[5]  = 0.058805779;
+      distrPU_MC[6]  = 0.061888184;
+      distrPU_MC[7]  = 0.062111977;
+      distrPU_MC[8]  = 0.060493879;
+      distrPU_MC[9]  = 0.057280354;
+      distrPU_MC[10] = 0.053492013;
+      distrPU_MC[11] = 0.049663045;
+      distrPU_MC[12] = 0.045949634;
+      distrPU_MC[13] = 0.042473182;
+      distrPU_MC[14] = 0.039085291;
+      distrPU_MC[15] = 0.036020033;
+      distrPU_MC[16] = 0.033270631;
+      distrPU_MC[17] = 0.030571645;
+      distrPU_MC[18] = 0.027872622;
+      distrPU_MC[19] = 0.025353206;
+      distrPU_MC[20] = 0.022884255;
+      distrPU_MC[21] = 0.020527728;
+      distrPU_MC[22] = 0.018277336;
+      distrPU_MC[23] = 0.016084203;
+      distrPU_MC[24] = 0.014050878;
+      distrPU_MC[25] = 0.012167806;
+      distrPU_MC[26] = 0.010399838;
+      distrPU_MC[27] = 0.008802013;
+      distrPU_MC[28] = 0.007376147;
+      distrPU_MC[29] = 0.006085729;
+      distrPU_MC[30] = 0.004994500;
+      distrPU_MC[31] = 0.004056721;
+      distrPU_MC[32] = 0.003254354;
+      distrPU_MC[33] = 0.002597702;
+      distrPU_MC[34] = 0.002046269;
     }
     
     
@@ -290,6 +330,8 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
     
     if(dataRunFlag == 20111)  // Run2011A
     {
+      /*
+      // mine
       distrPU_DATA[0]  = 0.005929510;
       distrPU_DATA[1]  = 0.025542751;
       distrPU_DATA[2]  = 0.059146766;
@@ -325,6 +367,44 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
       distrPU_DATA[32] = 0.000000002;
       distrPU_DATA[33] = 0.000000001;
       distrPU_DATA[34] = 0.000000000;
+      */
+      
+      // matt
+      distrPU_DATA[0]  = 0.00548268488655;
+      distrPU_DATA[1]  = 0.0221623012347;
+      distrPU_DATA[2]  = 0.0496891094541;
+      distrPU_DATA[3]  = 0.0812509216863;
+      distrPU_DATA[4]  = 0.108077184946;
+      distrPU_DATA[5]  = 0.123760426259;
+      distrPU_DATA[6]  = 0.126206245433;
+      distrPU_DATA[7]  = 0.117184065729;
+      distrPU_DATA[8]  = 0.100600998899;
+      distrPU_DATA[9]  = 0.0807709135897;
+      distrPU_DATA[10] = 0.0611758616346;
+      distrPU_DATA[11] = 0.0439921259819;
+      distrPU_DATA[12] = 0.0301786759644;
+      distrPU_DATA[13] = 0.0194251837551;
+      distrPU_DATA[14] = 0.0122283775737;
+      distrPU_DATA[15] = 0.00756679368734;
+      distrPU_DATA[16] = 0.00453053906389;
+      distrPU_DATA[17] = 0.0026254307415;
+      distrPU_DATA[18] = 0.00147069224801;
+      distrPU_DATA[19] = 0.00079626771087;
+      distrPU_DATA[20] = 0.000416930356137;
+      distrPU_DATA[21] = 0.000212005583528;
+      distrPU_DATA[22] = 0.000104839263429;
+      distrPU_DATA[23] = 5.00184750011e-05;
+      distrPU_DATA[24] = 2.32068721987e-05;
+      distrPU_DATA[25] = 1.03418434519e-05;
+      distrPU_DATA[26] = 4.60177033163e-06;
+      distrPU_DATA[27] = 1.9020062108e-06;
+      distrPU_DATA[28] = 7.77577472784e-07;
+      distrPU_DATA[29] = 3.37391685271e-07;
+      distrPU_DATA[30] = 1.34956674108e-07;
+      distrPU_DATA[31] = 6.74783370542e-08;
+      distrPU_DATA[32] = 2.77481012186e-08;
+      distrPU_DATA[33] = 5.67574797652e-09;
+      distrPU_DATA[34] = 2.52255465623e-09;
       
       distrPUUp_DATA[0]  = 0.005101118;
       distrPUUp_DATA[1]  = 0.019616973;
@@ -402,6 +482,8 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
     
     if(dataRunFlag == 20112)  // Run2011B
     {
+      /*
+      // mine
       distrPU_DATA[0]  = 0.000191236;
       distrPU_DATA[1]  = 0.001277422;
       distrPU_DATA[2]  = 0.004599973;
@@ -437,6 +519,44 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
       distrPU_DATA[32] = 0.000021758;
       distrPU_DATA[33] = 0.000011202;
       distrPU_DATA[34] = 0.000011131;
+      */
+      
+      // matt
+      distrPU_DATA[0]  = 0.000112737003406;
+      distrPU_DATA[1]  = 0.000777646125266;
+      distrPU_DATA[2]  = 0.00293953727088;
+      distrPU_DATA[3]  = 0.00779607746446;
+      distrPU_DATA[4]  = 0.0161886140039;
+      distrPU_DATA[5]  = 0.0280489939304;
+      distrPU_DATA[6]  = 0.0422732741973;
+      distrPU_DATA[7]  = 0.0570578977823;
+      distrPU_DATA[8]  = 0.0704498952494;
+      distrPU_DATA[9]  = 0.0808285880957;
+      distrPU_DATA[10] = 0.087175540055;
+      distrPU_DATA[11] = 0.0891353619476;
+      distrPU_DATA[12] = 0.0869369566986;
+      distrPU_DATA[13] = 0.0812446797496;
+      distrPU_DATA[14] = 0.07298581133;
+      distrPU_DATA[15] = 0.0631825589687;
+      distrPU_DATA[16] = 0.0528079996742;
+      distrPU_DATA[17] = 0.0426800503642;
+      distrPU_DATA[18] = 0.0334009356879;
+      distrPU_DATA[19] = 0.0253413520202;
+      distrPU_DATA[20] = 0.0186609176278;
+      distrPU_DATA[21] = 0.0133518691661;
+      distrPU_DATA[22] = 0.00929217896527;
+      distrPU_DATA[23] = 0.00629666691546;
+      distrPU_DATA[24] = 0.00415877084982;
+      distrPU_DATA[25] = 0.00267988512703;
+      distrPU_DATA[26] = 0.00168652054605;
+      distrPU_DATA[27] = 0.00103754971688;
+      distrPU_DATA[28] = 0.000624559819431;
+      distrPU_DATA[29] = 0.000368196397673;
+      distrPU_DATA[30] = 0.000212766035973;
+      distrPU_DATA[31] = 0.000120615027302;
+      distrPU_DATA[32] = 6.71298899774e-05;
+      distrPU_DATA[33] = 3.67081722824e-05;
+      distrPU_DATA[34] = 1.97348922108e-05;
       
       distrPUUp_DATA[0]  = 0.000175480;
       distrPUUp_DATA[1]  = 0.001090057;
@@ -514,6 +634,8 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
     
     if(dataRunFlag == 201112)  // Run2011A + Run2011B
     {
+      /*
+      // mine
       distrPU_DATA[0]  = 0.002859418;
       distrPU_DATA[1]  = 0.012560310;
       distrPU_DATA[2]  = 0.029963130;
@@ -549,6 +671,44 @@ double PURescaleFactor(const double& nPU_MC, const int& PUScale, const int& data
       distrPU_DATA[32] = 0.000011642;
       distrPU_DATA[33] = 0.000005994;
       distrPU_DATA[34] = 0.000005955;
+      */
+      
+      // matt
+      distrPU_DATA[0]  = 0.00203414674627;
+      distrPU_DATA[1]  = 0.0093989457795;
+      distrPU_DATA[2]  = 0.0234955075915;
+      distrPU_DATA[3]  = 0.0420865073886;
+      distrPU_DATA[4]  = 0.0606952653102;
+      distrPU_DATA[5]  = 0.0752888090933;
+      distrPU_DATA[6]  = 0.0839215023063;
+      distrPU_DATA[7]  = 0.0867348804906;
+      distrPU_DATA[8]  = 0.085047816952;
+      distrPU_DATA[9]  = 0.0804197580772;
+      distrPU_DATA[10] = 0.0741109810939;
+      distrPU_DATA[11] = 0.0669425322596;
+      distrPU_DATA[12] = 0.0593852931679;
+      distrPU_DATA[13] = 0.0517138171608;
+      distrPU_DATA[14] = 0.0441299860278;
+      distrPU_DATA[15] = 0.0368259963707;
+      distrPU_DATA[16] = 0.0299948235968;
+      distrPU_DATA[17] = 0.0238112095942;
+      distrPU_DATA[18] = 0.0184057946082;
+      distrPU_DATA[19] = 0.0138473260247;
+      distrPU_DATA[20] = 0.0101388028497;
+      distrPU_DATA[21] = 0.00722638449542;
+      distrPU_DATA[22] = 0.00501616832518;
+      distrPU_DATA[23] = 0.00339323049781;
+      distrPU_DATA[24] = 0.00223854969582;
+      distrPU_DATA[25] = 0.00144140292082;
+      distrPU_DATA[26] = 0.000906652403698;
+      distrPU_DATA[27] = 0.000557587401343;
+      distrPU_DATA[28] = 0.000335569614276;
+      distrPU_DATA[29] = 0.000197799663015;
+      distrPU_DATA[30] = 0.000114289785038;
+      distrPU_DATA[31] = 6.47858088544e-05;
+      distrPU_DATA[32] = 3.60559625478e-05;
+      distrPU_DATA[33] = 1.97157233488e-05;
+      distrPU_DATA[34] = 1.05993072984e-05;
       
       distrPUUp_DATA[0]  = 0.002568293;
       distrPUUp_DATA[1]  = 0.010394400;
