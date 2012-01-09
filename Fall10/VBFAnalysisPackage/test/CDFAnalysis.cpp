@@ -549,7 +549,7 @@ int main(int argc, char** argv)
       if( vars.lep_standalone != 1 ) isId = false;
       if( vars.lep_global     != 1 ) isId = false;
       
-      if( fabs(vars.lep_dxy_PV)             > muDxyMAX )                      isId = false;
+      if( fabs(vars.lep_dB)                 > muDxyMAX )                      isId = false;
       if( vars.lep_normalizedChi2           > muNormalizedChi2MAX )           isId = false;
       if( vars.lep_numberOfValidTrackerHits < muNumberOfValidTrackerHitsMIN ) isId = false;
       if( vars.lep_numberOfValidMuonHits    < muNumberOfValidMuonHitsMIN )    isId = false;
@@ -628,12 +628,12 @@ int main(int argc, char** argv)
     
     if( vars.lep_flavour == 11 )
     {
-      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > ele3DipMAX ) is3DIP = false;
+      if( fabs(vars.lep_dB/vars.lep_edB) > ele3DipMAX ) is3DIP = false;
     }
     
     if( vars.lep_flavour == 13 )
     {
-      if( fabs(vars.lep_dxy_PV/vars.lep_edxy_PV) > mu3DipMAX ) is3DIP = false;
+      if( fabs(vars.lep_dB/vars.lep_edB) > mu3DipMAX ) is3DIP = false;
     }    
     
     if( is3DIP == false ) continue;
