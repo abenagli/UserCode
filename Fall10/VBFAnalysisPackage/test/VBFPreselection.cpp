@@ -53,9 +53,8 @@ int main(int argc, char** argv)
   int TMVA4JetTraining    = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
   int doTnP               = gConfigParser -> readIntOption("Options::doTnP"); 
-  int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy"); 
-  
-  
+  int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy");
+    
   int nJetCntMIN    = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
   float lepJetDRMIN = gConfigParser -> readFloatOption("Cuts::lepJetDRMIN");
   float jetPtMIN    = gConfigParser -> readFloatOption("Cuts::jetPtMIN");
@@ -129,9 +128,10 @@ int main(int argc, char** argv)
   std::cout << ">>> VBFPreselection::Define histograms" << std::endl;
   int nStep = 12;
   
-  TH1F* nPU    = GetTotalHisto("PUDumper/nPU",   inputFileList.c_str());
-  TH1F* nPUit  = GetTotalHisto("PUDumper/nPUit", inputFileList.c_str());
-  TH1F* nPUoot = GetTotalHisto("PUDumper/nPUoot",inputFileList.c_str());
+  TH1F* nPUtrue      = GetTotalHisto("PUDumper/nPUtrue",     inputFileList.c_str());
+  TH1F* nPUit        = GetTotalHisto("PUDumper/nPUit",       inputFileList.c_str());
+  TH1F* nPUoot_early = GetTotalHisto("PUDumper/nPUoot_early",inputFileList.c_str());
+  TH1F* nPUoot_late  = GetTotalHisto("PUDumper/nPUoot_late", inputFileList.c_str());
   
   TH1F* events = new TH1F("events","events",nStep,0.,1.*nStep);
   std::map<int, int> stepEvents;
@@ -225,10 +225,11 @@ int main(int argc, char** argv)
     
     vars.eventWeight = 1.;
     
-    SetPUVariables(vars, reader, dataFlag);
-    SetHLTVariables(vars, reader);
-    if (doPDFstudy) SetPDFVariables(vars, reader);
-    SetPVVariables(vars, reader);
+    SetGenVariables(vars, reader, dataFlag, verbosity);
+    SetPUVariables(vars, reader, dataFlag, verbosity);
+    SetHLTVariables(vars, reader, verbosity);
+    if (doPDFstudy) SetPDFVariables(vars, reader, verbosity);
+    SetPVVariables(vars, reader, verbosity);
     
     //if( vars.eventId != 177044 ) continue;
     
@@ -348,7 +349,7 @@ int main(int argc, char** argv)
                      reader.GetFloat("electrons_hadIsoR03_depth2")->at(eleIt);
       float combIso = tkIso + emIso + hadIso;
       
-      float dxy = reader.GetFloat("electrons_dxy_BS")->at(eleIt);
+      float dxy = reader.GetFloat("electrons_dB")->at(eleIt);
       
       int isEB = reader.GetInt("electrons_isEB")->at(eleIt);
       float sigmaIetaIeta = reader.GetFloat("electrons_sigmaIetaIeta")->at(eleIt);
@@ -397,7 +398,7 @@ int main(int argc, char** argv)
           ( ( fabs(dist) > 0.02 ) || ( fabs(dcot) > 0.02 ) ) )
       {
         isTightElectron = true;
-        SetElectronVariables(vars, reader, eleIt);
+        SetElectronVariables(vars, reader, eleIt, verbosity);
         
         nLep += 1;
         nEle += 1;
@@ -453,9 +454,9 @@ int main(int argc, char** argv)
       int standalone = reader.GetInt("muons_standalone")->at(muIt);
       int global     = reader.GetInt("muons_global")->at(muIt);
       
-      float z                      = reader.GetFloat("muons_z")->at(muIt);
-      float dxy                    = reader.GetFloat("muons_dxy_BS")->at(muIt);
-      float normalizedChi2         = reader.GetFloat("muons_normalizedChi2")->at(muIt);
+      float z                        = reader.GetFloat("muons_z")->at(muIt);
+      float dxy                      = reader.GetFloat("muons_dB")->at(muIt);
+      float normalizedChi2           = reader.GetFloat("muons_normalizedChi2")->at(muIt);
       int numberOfMatches            = reader.GetInt("muons_numberOfMatches")->at(muIt);
       int numberOfValidTrackerHits   = reader.GetInt("muons_numberOfValidTrackerHits")->at(muIt);
       int numberOfValidMuonHits      = reader.GetInt("muons_numberOfValidMuonHits")->at(muIt);
@@ -498,7 +499,7 @@ int main(int argc, char** argv)
           ( 1 == 1 ) )
       {
         isTightMuon = true;
-        SetMuonVariables(vars, reader, muIt);
+        SetMuonVariables(vars, reader, muIt, verbosity);
         
         nLep += 1;
         nMu  += 1;
@@ -542,7 +543,7 @@ int main(int argc, char** argv)
     // select lepton
     vars.selectIt_lep = SelectLepton(vars.leptons, "maxPt", 20.);
     if(vars.selectIt_lep == -1) continue;
-    SetLeptonVariables(vars, reader);
+    SetLeptonVariables(vars, reader, verbosity);
     
     if( doTnP == 1 )
     {
@@ -551,7 +552,7 @@ int main(int argc, char** argv)
       
       vars.selectIt_lep2 = SelectLepton(vars.leptons, "maxPt", 20.,&blacklistIt_lep);
       if(vars.selectIt_lep2 == -1) continue;
-      SetLepton2Variables(vars, reader);
+      SetLepton2Variables(vars, reader, verbosity);
       if( ((vars.lep+vars.lep2).mass() < 50.) || ((vars.lep+vars.lep2).mass() > 130.) ) continue;
     }
     
@@ -650,10 +651,10 @@ int main(int argc, char** argv)
     
     //*****************
     // met and neutrino
-    SetMetVariables(vars, reader, jetType, JESScaleVariation, JECUncertainty);
+    SetMetVariables(vars, reader, jetType, JESScaleVariation, JECUncertainty, verbosity);
     
     //****************
-    SetBTagVariables(vars, reader, jetType, jetEtaCNT);
+    SetBTagVariables(vars, reader, jetType, jetEtaCNT, verbosity);
     
     
     //************
@@ -703,7 +704,7 @@ int main(int argc, char** argv)
         if( (fabs(jet.eta()) >= 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) + reader.GetInt("jets_neutralMultiplicity")->at(jetIt) <= 1) ) continue;
       }
       
-      SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD, JESScaleVariation, JECUncertainty);
+      SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD, JESScaleVariation, JECUncertainty, verbosity);
       
     } // loop on jets
     if( verbosity == 1)
@@ -789,7 +790,7 @@ int main(int argc, char** argv)
     if( vars.nJets_cnt < nJetCntMIN ) continue;
     
     if( vars.nJets_cnt > 0 )
-      SetLeadingJetVariables(vars, reader, jetEtaCNT);
+      SetLeadingJetVariables(vars, reader, jetEtaCNT, verbosity);
     
     
     // fIll event counters
@@ -853,9 +854,9 @@ int main(int argc, char** argv)
           vars.selectIt_W.at(0) = tempCombination.at(2);
           vars.selectIt_W.at(1) = tempCombination.at(3);
 	        
-          SetWJJVariables(vars, reader);
-          SetTagJJVariables(vars, reader);
-          SetHVariables(vars, reader);
+          SetWJJVariables(vars, reader, verbosity);
+          SetTagJJVariables(vars, reader, verbosity);
+          SetHVariables(vars, reader, verbosity);
           
           if(tempCombination == matchIt) vars.TMVA4Jet = 1;
           else                           vars.TMVA4Jet = 0;          
@@ -923,14 +924,12 @@ int main(int argc, char** argv)
       std::sort(vars.selectIt_W.begin(), vars.selectIt_W.end());
       std::sort(vars.selectIt_tag.begin(), vars.selectIt_tag.end());
       
-      SetWJJVariables(vars, reader);
-      SetTagJJVariables(vars, reader);
-      SetThirdJetVariables(vars, reader);
-      SetHVariables(vars, reader);
-      if(vars.mH > 0.) SetMCVariables(vars, reader);
-//        std::cout << "debug" << std::endl ; //DEBUG
+      SetWJJVariables(vars, reader, verbosity);
+      SetTagJJVariables(vars, reader, verbosity);
+      SetThirdJetVariables(vars, reader, verbosity);
+      SetHVariables(vars, reader, verbosity);
+      if(vars.mH > 0.) SetMCVariables(vars, reader, verbosity);
       if( (vars.mH > 0.) && (vars.mH < 1000.) ) vars.eventWeight = HiggsPtKFactors(vars.mc_H_pt,vars.mH);
-//        std::cout << "debug" << std::endl ; //DEBUG
       
       
       // fIll event counters
@@ -970,10 +969,13 @@ int main(int argc, char** argv)
     events -> GetXaxis() -> SetBinLabel(step, stepNames[step].c_str());
   }
   
-  nPU    -> Write();
-  nPUit  -> Write();
-  nPUoot -> Write();
+  nPUtrue      -> Write();
+  nPUit        -> Write();
+  nPUoot_early -> Write();
+  nPUoot_late  -> Write();
+  
   events -> Write();
+  
   outputRootFile.Close();
   
   
@@ -993,5 +995,5 @@ void SetStepNames(std::map<int, std::string>& stepNames, const std::string& step
   stepNames[step] = std::string(dummy)+" "+stepName;
   
   if(verbosity)
-    std::cout << ">>>>>>>>> " << stepNames[step] << std::endl;
+    std::cout << ">>>>>> " << stepNames[step] << std::endl;
 }
