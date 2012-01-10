@@ -226,8 +226,16 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     sprintf(xRangeMinChar,"%.10f",m_xRangeMin);
     char xRangeMaxChar[50];
     sprintf(xRangeMaxChar,"%.10f",m_xRangeMax);
-    TH1F* histoTemp = new TH1F((histoName+"Temp").c_str(),"",nBins,  m_xRangeMin,       m_xRangeMax);
-    TH1F* histo     = new TH1F(histoName.c_str(),         "",nBins+2,m_xRangeMin-m_xWidth,m_xRangeMax+m_xWidth);
+    TH1F* histoTemp = new TH1F((histoName+"Temp").c_str(),"",nBins,  m_xRangeMin,         m_xRangeMax);
+    
+    // to include the upper edge of the last bin
+    float* new_bins = new float[nBins+1];
+    for(int bin = 0; bin <= nBins; ++bin) new_bins[bin] = histoTemp->GetBinLowEdge(bin+1);
+    new_bins[nBins] = new_bins[nBins] + 0.001*m_xWidth;
+    TAxis* axis = histoTemp -> GetXaxis();
+    axis -> Set(nBins,new_bins);
+    
+    TH1F* histo = new TH1F(histoName.c_str(),"",nBins+2,m_xRangeMin-m_xWidth,m_xRangeMax+m_xWidth);
     histo -> Sumw2();
     
     for(unsigned int jj = 0; jj < variableNames.size(); ++jj)
@@ -244,6 +252,8 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
         cutExtended += " * ("+cut->at(jj)+")";
       
       tree -> Draw( (variableNames.at(jj)+" >>+ "+histoName+"Temp").c_str(), cutExtended.c_str(),"goff");
+      //std::cout << "nBins: " << nBins << "   min: " << m_xRangeMin << "   max: " <<m_xRangeMax << std::endl;
+      //std::cout << (variableNames.at(jj)+" >>+ "+histoName+"Temp").c_str() << "      " << cutExtended.c_str() << std::endl;
     }
     
     histo -> SetBinContent(1,histoTemp->GetBinContent(0));
