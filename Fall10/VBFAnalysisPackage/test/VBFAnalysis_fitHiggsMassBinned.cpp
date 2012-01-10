@@ -747,38 +747,16 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
   {
     //-------------------
     // double exponential
-    (*func) -> SetParameter(4,10.);
-    (*func) -> SetParameter(5,0.012);
-    (*func) -> SetParameter(6,5.);
-    (*func) -> SetParameter(7,0.005);
+    (*func) -> SetParameter(4,10.14);
+    (*func) -> SetParameter(5,0.015);
+    (*func) -> SetParameter(6,9.80);
+    (*func) -> SetParameter(7,0.011);
     
     (*func) -> SetParName(4,"N1");
     (*func) -> SetParName(5,"#lambda1");
     (*func) -> SetParName(6,"N2");
     (*func) -> SetParName(7,"#lambda2");
   }
-  
-  
-  
-  if( (fitMethod == "attenuatedExponential") || (fitMethod == "attenuatedExponentialNoHoles") )
-  {
-    //------------------------------
-    // attenuated exponential
-    
-    (*func) -> SetParameter(4,180.);
-    (*func) -> SetParameter(5,11.);
-    (*func) -> SetParameter(6,10.);
-    (*func) -> SetParameter(7,0.012);
-    
-    (*func) -> SetParLimits(4,150.,250.);
-    (*func) -> SetParLimits(5,0.,100.);
-    
-    (*func) -> SetParName(4,"#mu");
-    (*func) -> SetParName(5,"kT");
-    (*func) -> SetParName(6,"N1");
-    (*func) -> SetParName(7,"#lambda1");
-  }
-  
   
   
   if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
@@ -793,7 +771,7 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
     (*func) -> SetParameter(8,5.);
     (*func) -> SetParameter(9,0.005);
     
-    (*func) -> SetParLimits(4,150.,250.);
+    (*func) -> SetParLimits(4,50.,500.);
     (*func) -> SetParLimits(5,0.,100.);
     
     (*func) -> SetParName(4,"#mu");
