@@ -72,10 +72,9 @@ int main(int argc, char** argv)
   // Define tree variables
   float mH;
   int totEvents;
+  int PUtrue_n;
   float eventWeight;
   float crossSection;
-  int PUit_n;
-  int PUoot_n;
   float lepNuW_m_KF;
   
   
@@ -141,7 +140,7 @@ int main(int argc, char** argv)
     
     
     // get the mc pileup distribution
-    TH1F* distrPU_MC = (TH1F*)( inputFile->Get("nPUit") );
+    TH1F* distrPU_MC = (TH1F*)( inputFile->Get("nPUtrue") );
     distrPU_MC -> Scale(1./distrPU_MC->Integral());
     
     
@@ -149,10 +148,9 @@ int main(int argc, char** argv)
     // set tree branches
     tree -> SetBranchAddress("mH",           &mH);
     tree -> SetBranchAddress("eventWeight",  &eventWeight);
+    tree -> SetBranchAddress("PUtrue_n",     &PUtrue_n);
     tree -> SetBranchAddress("totEvents",    &totEvents);
     tree -> SetBranchAddress("crossSection", &crossSection);
-    tree -> SetBranchAddress("PUit_n",       &PUit_n);
-    tree -> SetBranchAddress("PUoot_n",      &PUoot_n);
     tree -> SetBranchAddress("lepNuW_m_KF",  &lepNuW_m_KF);
     
     
@@ -160,7 +158,7 @@ int main(int argc, char** argv)
     for(int entry = 0; entry < tree->GetEntries(); ++entry)
     {
       tree -> GetEntry(entry);
-      double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(distrPU_DATA,distrPU_MC,PUit_n,PUScale) * eventWeight;
+      double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(distrPU_DATA,distrPU_MC,PUtrue_n,PUScale) * eventWeight;
       
       int mass = int(int(mH)%1000);
       
