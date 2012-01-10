@@ -71,6 +71,22 @@ int ReadFile (map<string, TChain *> & output, string inputList, string treeName)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
+void saveShapes (map<string, vector<TH1F *> > shapes, TFile & f) 
+{
+  f.cd () ;
+  for (map<string, vector<TH1F *> >::iterator iShapes = shapes.begin () ;
+       iShapes != shapes.end () ;
+       ++iShapes)
+    {
+      for (int iHisto = 0 ; iHisto < iShapes->second.size () ; ++iHisto)
+        iShapes->second.at (iHisto)->Write () ;
+    }
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 int main (int argc, char** argv)
 {
   //Check if all nedeed arguments to parse are there
@@ -100,6 +116,9 @@ int main (int argc, char** argv)
   //PG the cuts
   TCut generalCut = "" ;
   generalCut = generalCut && "WJJ_m > 65  && WJJ_m < 95" ;
+  generalCut = generalCut && "WJJ_Deta < 1.5" ;
+  generalCut = generalCut && "fabs(lep_eta) < 1.5" ;
+
 //   TCut generalCut = "helicityLikelihood > 0.5" ;
 //  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
 //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
@@ -108,7 +127,9 @@ int main (int argc, char** argv)
   
   TString m4_VAR = "lepNuW_m_KF" ;
 
-  map<string, vector<TH1F *> > shapes ;
+  map<string, vector<TH1F *> > CT10_shapes ;
+  map<string, vector<TH1F *> > NNPDF_shapes ;
+  map<string, vector<TH1F *> > MSTW_shapes ;
 
   //PG loop over signal samples
   for (map<string, TChain *>::iterator iColl = collections.begin () ;
@@ -116,22 +137,56 @@ int main (int argc, char** argv)
        ++iColl)
     {
       vector<TH1F *> l_shapes ;
-      shapes[iColl->first] = l_shapes ;
-      //PG loop over weights
+      CT10_shapes[iColl->first] = l_shapes ;
+      NNPDF_shapes[iColl->first] = l_shapes ;
+      MSTW_shapes[iColl->first] = l_shapes ;
+
+      //PG loop over MSTW weights
+      for (int i = 0 ; i < 41 ; ++i)
+        {
+          stringstream name ;
+          name << iColl->first << "_MSTW_" << i ;
+          TH1F * dummy = new TH1F (name.str ().c_str (), name.str ().c_str (), nBins, m4_min, m4_max) ;
+          stringstream form ;
+          form << "(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight * PDF_weights_MSTW2008nlo68cl[" << i << "]" ;
+          TCut cut = Form (form.str ().c_str (), generalCut.GetTitle (), LUMI) ;
+
+          iColl->second->Draw (m4_VAR + TString (" >> ") + dummy->GetName (), cut) ;
+
+          MSTW_shapes[iColl->first].push_back (dummy) ;
+        } //PG loop over MSTW weights
+
+
+      //PG loop over NNPDF weights
+      for (int i = 0 ; i < 101 ; ++i)
+        {
+          stringstream name ;
+          name << iColl->first << "_NNPDF_" << i ;
+          TH1F * dummy = new TH1F (name.str ().c_str (), name.str ().c_str (), nBins, m4_min, m4_max) ;
+          stringstream form ;
+          form << "(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight * PDF_weights_NNPDF20[" << i << "]" ;
+          TCut cut = Form (form.str ().c_str (), generalCut.GetTitle (), LUMI) ;
+
+          iColl->second->Draw (m4_VAR + TString (" >> ") + dummy->GetName (), cut) ;
+
+          NNPDF_shapes[iColl->first].push_back (dummy) ;
+        } //PG loop over NNPDF weights
+
+
+      //PG loop over CT10 weights
       for (int i = 0 ; i < 53 ; ++i)
         { 
           stringstream name ;
-          name << iColl->first << "_" << i ;
+          name << iColl->first << "_CT10_" << i ;
           TH1F * dummy = new TH1F (name.str ().c_str (), name.str ().c_str (), nBins, m4_min, m4_max) ;
           stringstream form ; 
-          form << "(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight * PDF_weights[" << i << "]" ;
+          form << "(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight * PDF_weights_CT10[" << i << "]" ;
           TCut cut = Form (form.str ().c_str (), generalCut.GetTitle (), LUMI) ;    
 
           iColl->second->Draw (m4_VAR + TString (" >> ") + dummy->GetName (), cut) ;
           
-          
-          shapes[iColl->first].push_back (dummy) ;
-        } //PG loop over weights
+          CT10_shapes[iColl->first].push_back (dummy) ;
+        } //PG loop over CT10 weights
     } //PG loop over signal samples
 
   //PG saving the raw histograms
@@ -139,24 +194,20 @@ int main (int argc, char** argv)
 
   TFile * outputRootFile = new TFile ("testPDF_001_raw.root", "RECREATE") ;
   outputRootFile->cd () ;
-  for (map<string, vector<TH1F *> >::iterator iShapes = shapes.begin () ; 
-       iShapes != shapes.end () ;
-       ++iShapes)
-    {
-      for (int iHisto = 0 ; iHisto < iShapes->second.size () ; ++iHisto)
-        iShapes->second.at (iHisto)->Write () ;
-    }   
+  saveShapes (CT10_shapes, *outputRootFile) ;
+  saveShapes (NNPDF_shapes, *outputRootFile) ;
+  saveShapes (MSTW_shapes, *outputRootFile) ;
   outputRootFile->Close () ;
 
   //PG calculating the shapes
   //PG ----------------------
 
-  map<string, TH1F *> PDFUp_shapes ;
-  map<string, TH1F *> PDFDown_shapes ;
+  map<string, TH1F *> PDFUp_CT10_shapes ;
+  map<string, TH1F *> PDFDown_CT10_shapes ;
 
   //PG loop over samples
-  for (map<string, vector<TH1F *> >::iterator iShapes = shapes.begin () ; 
-       iShapes != shapes.end () ;
+  for (map<string, vector<TH1F *> >::iterator iShapes = CT10_shapes.begin () ; 
+       iShapes != CT10_shapes.end () ;
        ++iShapes)
     {
       cout << "------> calculating " << iShapes->first << endl ;
@@ -165,11 +216,11 @@ int main (int argc, char** argv)
       stringstream nameUp ;
       nameUp << iShapes->first << "_PDFUp" ;
       TH1F * dummyUp = new TH1F (nameUp.str ().c_str (), nameUp.str ().c_str (), nBins, m4_min, m4_max) ;
-      PDFUp_shapes[iShapes->first] = dummyUp ;
+      PDFUp_CT10_shapes[iShapes->first] = dummyUp ;
       stringstream nameDown ;
       nameDown << iShapes->first << "_PDFDown" ;
       TH1F * dummyDown = new TH1F (nameDown.str ().c_str (), nameDown.str ().c_str (), nBins, m4_min, m4_max) ;
-      PDFDown_shapes[iShapes->first] = dummyDown ;
+      PDFDown_CT10_shapes[iShapes->first] = dummyDown ;
 
       //PG loop over eigenvectors
       for (int iEigen = 0 ; iEigen < nEigen ; ++iEigen)
@@ -202,17 +253,17 @@ int main (int argc, char** argv)
   //PG renormalize up and down shapes to the central one
   //PG -------------------------------------------------
   
-  for (map<string,TH1F * >::iterator iShapes = PDFUp_shapes.begin () ; 
-       iShapes != PDFUp_shapes.end () ;
+  for (map<string,TH1F * >::iterator iShapes = PDFUp_CT10_shapes.begin () ; 
+       iShapes != PDFUp_CT10_shapes.end () ;
        ++iShapes) 
     {   
-      iShapes->second->Scale (shapes[iShapes->first].at (0)->Integral () / iShapes->second->Integral ()) ;
+      iShapes->second->Scale (CT10_shapes[iShapes->first].at (0)->Integral () / iShapes->second->Integral ()) ;
     }
-  for (map<string,TH1F * >::iterator iShapes = PDFDown_shapes.begin () ; 
-       iShapes != PDFDown_shapes.end () ;
+  for (map<string,TH1F * >::iterator iShapes = PDFDown_CT10_shapes.begin () ; 
+       iShapes != PDFDown_CT10_shapes.end () ;
        ++iShapes) 
     {   
-      iShapes->second->Scale (shapes[iShapes->first].at (0)->Integral () / iShapes->second->Integral ()) ;
+      iShapes->second->Scale (CT10_shapes[iShapes->first].at (0)->Integral () / iShapes->second->Integral ()) ;
     }
 
   //PG save up, down central shapes for inspection
@@ -221,16 +272,16 @@ int main (int argc, char** argv)
   outputRootFile = new TFile ("testPDF_001_insp.root", "RECREATE") ;
   outputRootFile->cd () ;
   
-  for (map<string,TH1F * >::iterator iShapes = PDFUp_shapes.begin () ; 
-       iShapes != PDFUp_shapes.end () ;
+  for (map<string,TH1F * >::iterator iShapes = PDFUp_CT10_shapes.begin () ; 
+       iShapes != PDFUp_CT10_shapes.end () ;
        ++iShapes) iShapes->second->Write () ;
 
-  for (map<string,TH1F * >::iterator iShapes = PDFDown_shapes.begin () ; 
-       iShapes != PDFDown_shapes.end () ;
+  for (map<string,TH1F * >::iterator iShapes = PDFDown_CT10_shapes.begin () ; 
+       iShapes != PDFDown_CT10_shapes.end () ;
        ++iShapes) iShapes->second->Write () ;
 
-  for (map<string, vector<TH1F *> >::iterator iShapes = shapes.begin () ; 
-       iShapes != shapes.end () ;
+  for (map<string, vector<TH1F *> >::iterator iShapes = CT10_shapes.begin () ; 
+       iShapes != CT10_shapes.end () ;
        ++iShapes) iShapes->second.at (0)->Write () ;
 
   outputRootFile->Close () ;
@@ -241,8 +292,8 @@ int main (int argc, char** argv)
   outputRootFile = new TFile ("countSignalEvents_PDFUp_PFlow.root", "RECREATE") ;
   outputRootFile->cd () ;
   
-  for (map<string,TH1F * >::iterator iShapes = PDFUp_shapes.begin () ; 
-       iShapes != PDFUp_shapes.end () ;
+  for (map<string,TH1F * >::iterator iShapes = PDFUp_CT10_shapes.begin () ; 
+       iShapes != PDFUp_CT10_shapes.end () ;
        ++iShapes) iShapes->second->Write (iShapes->first.c_str ()) ;
 
   outputRootFile->Close () ;
@@ -250,8 +301,8 @@ int main (int argc, char** argv)
   outputRootFile = new TFile ("countSignalEvents_PDFDown_PFlow.root", "RECREATE") ;
   outputRootFile->cd () ;
   
-  for (map<string,TH1F * >::iterator iShapes = PDFDown_shapes.begin () ; 
-       iShapes != PDFDown_shapes.end () ;
+  for (map<string,TH1F * >::iterator iShapes = PDFDown_CT10_shapes.begin () ; 
+       iShapes != PDFDown_CT10_shapes.end () ;
        ++iShapes) iShapes->second->Write (iShapes->first.c_str ()) ;
 
   outputRootFile->Close () ;
