@@ -198,7 +198,7 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "helicityLikelihood";
   histoName = "angles_helicityLikelihood";
-  stack -> SetXaxisRange(0., 1.);
+  stack -> SetXaxisRange(0., 2.);
   stack -> SetXaxisTitle("helicity LD");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
@@ -609,7 +609,7 @@ int main(int argc, char** argv)
   variableNames.at(0) = "(lep_tkIso+max(0.,lep_emIso)+lep_hadIso-rhoForIsolation*3.14159*0.3*0.3)/lep.pt()";
   histoName = "ele_combRelIso_PUCorr";
   cuts -> at(0) = "( lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.4);
+  stack -> SetXaxisRange(-0.2, 0.2);
   stack -> SetXaxisTitle("#Sigma (pt_{tracks}+max(0.,et_{ECAL})+et_{HCAL} - #rho#pi#DeltaR^{2} ) / pt_{muon}");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 80, PURescale, weightEvent, stackSig, cuts);
@@ -797,7 +797,7 @@ int main(int argc, char** argv)
   variableNames.at(0) = "(lep_tkIso+lep_emIso+lep_hadIso-rhoForIsolation*3.14159*0.3*0.3)/lep.pt()";
   histoName = "mu_combRelIso_PUCorr";
   cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 0.4);
+  stack -> SetXaxisRange(-0.2, 0.2);
   stack -> SetXaxisTitle("#Sigma (pt_{tracks}+et_{ECAL}+et_{HCAL}-#rho#pi#DeltaR^{2}) / pt_{muon}");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 80, PURescale, weightEvent, stackSig, cuts);

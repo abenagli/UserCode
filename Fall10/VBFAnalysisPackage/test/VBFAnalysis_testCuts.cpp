@@ -14,7 +14,7 @@
 
 
 
-int nBins = 320;
+int nBins = 160;
 float xMin = 0.;
 float xMax = 800.;
 float xWidth = (xMax-xMin)/nBins;
@@ -269,6 +269,31 @@ int main(int argc, char** argv)
   dummyCutValues.push_back("1.0,-1.0");
   
   dummyCutName = "lep_eta";
+  cutNames[dummyVarName] = dummyCutName;
+  cutValues[dummyVarName] = dummyCutValues;
+  cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig400HistoMap[dummyVarName]  = InitializeHistograms("sig400", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig450HistoMap[dummyVarName]  = InitializeHistograms("sig450", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig500HistoMap[dummyVarName]  = InitializeHistograms("sig500", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig550HistoMap[dummyVarName]  = InitializeHistograms("sig550", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  
+  //--------------------------
+  // cut on helicityLikelihood
+  dummyVarName = "helicityLikelihood";
+  dummyCutType = ">";
+  dummyCutValues.clear();
+  dummyCutValues.push_back("0.5");
+  dummyCutValues.push_back("0.6");
+  dummyCutValues.push_back("0.7");
+  
+  dummyCutName = "helicityLikelihood";
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
