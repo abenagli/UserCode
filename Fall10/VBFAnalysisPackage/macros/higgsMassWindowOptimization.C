@@ -8,7 +8,7 @@
 
 
 
-int nMasses = 8;
+int nMasses = 9;
 int* masses = new int[nMasses];
 float* widths = new float[nMasses];
 
@@ -20,26 +20,28 @@ double FindXMaximum(TGraph* graph);
 
 void higgsMassWindowOptimization()
 {
-  TFile* f = TFile::Open("higgsMassWindowOptimization_PFlow.root");
+  TFile* f = TFile::Open("/gwteraz/users/benaglia/data/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB/higgsMassWindowOptimization_PFlow.root");
   
   
-  masses[0] = 250;
-  masses[1] = 300;
-  masses[2] = 350;
-  masses[3] = 400;
-  masses[4] = 450;
-  masses[5] = 500;
-  masses[6] = 550;
-  masses[7] = 600;
+  masses[0] = 200;
+  masses[1] = 250;
+  masses[2] = 300;
+  masses[3] = 350;
+  masses[4] = 400;
+  masses[5] = 450;
+  masses[6] = 500;
+  masses[7] = 550;
+  masses[8] = 600;
   
-  widths[0] = 4.04;
-  widths[1] = 8.43;
-  widths[2] = 15.2;
-  widths[3] = 29.2;
-  widths[4] = 47.0;
-  widths[5] = 68.0;
-  widths[6] = 93.2;
-  widths[7] = 123.;
+  widths[0] = 1.43;
+  widths[1] = 4.04;
+  widths[2] = 8.43;
+  widths[3] = 15.2;
+  widths[4] = 29.2;
+  widths[5] = 47.0;
+  widths[6] = 68.0;
+  widths[7] = 93.2;
+  widths[8] = 123.;
   
   
   TGraph* g = new TGraph();
@@ -48,11 +50,11 @@ void higgsMassWindowOptimization()
   TGraph* g_KF = new TGraph();
   g_KF -> SetMarkerColor(kBlue);
   
-  TGraph2D* asymmG = new TGraph2D();
-  asymmG -> SetMarkerColor(kRed);
+  //TGraph2D* asymmG = new TGraph2D();
+  //asymmG -> SetMarkerColor(kRed);
   
-  TGraph2D* asymmG_KF = new TGraph2D();
-  asymmG_KF -> SetMarkerColor(kBlue);
+  //TGraph2D* asymmG_KF = new TGraph2D();
+  //asymmG_KF -> SetMarkerColor(kBlue);
       
   double bestHalfWindow = -1.;
   double bestHalfWindow_KF = -0.5;
@@ -80,6 +82,7 @@ void higgsMassWindowOptimization()
   
   
   
+  /*
   TCanvas* c2 = new TCanvas("asymmSignificances","asymmSignificances",800,700);
   c2 -> Divide(3,3);
   
@@ -92,7 +95,7 @@ void higgsMassWindowOptimization()
   
   c2 -> Print("asymmSignificances.pdf","pdf");
   //delete c2;
-  
+  */
   
   
   
@@ -101,7 +104,7 @@ void higgsMassWindowOptimization()
   c3 -> SetGridx();
   c3 -> SetGridy();
   
-  g -> SetMinimum(20.);
+  g -> SetMinimum(10.);
   g -> SetMaximum(100.);
   
   g -> GetXaxis() -> SetTitle("Higgs mass   (GeV/c^{2})");
@@ -196,7 +199,7 @@ void FitHiggsMassWindow(TFile* f, TCanvas* c, const int& iMass, const int& mass,
   
   g_KF -> GetXaxis() -> SetRangeUser(0.,x+1.5*x);
   g_KF -> SetMinimum(0.);
-  g_KF -> SetMaximum(2.);
+  g_KF -> SetMaximum(3.);
   g_KF -> Draw("AP");
   funz_KF -> Draw("same");
   
@@ -268,7 +271,7 @@ void FitAsymmHiggsMassWindow(TFile* f, TCanvas* c, const int& iMass, const int& 
   g -> GetYaxis() -> SetTitle("high window   (GeV/c^{2})");
   g -> GetZaxis() -> SetTitle("S / #sqrt{S+B}");
   g -> SetMinimum(0.4);
-  g -> SetMaximum(2.0);
+  g -> SetMaximum(3.0);
   
   /*
   double x = FindXMaximum(g);
@@ -318,7 +321,7 @@ void FitAsymmHiggsMassWindow(TFile* f, TCanvas* c, const int& iMass, const int& 
   
   //g_KF -> GetXaxis() -> SetRangeUser(0.,x+1.5*x);
   //g_KF -> SetMinimum(0.);
-  //g_KF -> SetMaximum(2.);
+  //g_KF -> SetMaximum(3.);
   //g_KF -> Draw("AP");
   //funz_KF -> Draw("same");
   
