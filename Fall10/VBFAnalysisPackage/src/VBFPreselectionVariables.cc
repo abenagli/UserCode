@@ -60,9 +60,9 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   
   // PDF variables
-  vars.m_reducedTree -> Branch("PDF_weights_CT10",            "std::vector<float>",            &vars.p_PDF_weights_CT10);
-  vars.m_reducedTree -> Branch("PDF_weights_MSTW2008nlo68cl", "std::vector<float>", &vars.p_PDF_weights_MSTW2008nlo68cl);
-  vars.m_reducedTree -> Branch("PDF_weights_NNPDF20",         "std::vector<float>",         &vars.p_PDF_weights_NNPDF20);
+//  vars.m_reducedTree -> Branch("PDF_weights_CT10",            "std::vector<float>",            &vars.p_PDF_weights_CT10);
+//  vars.m_reducedTree -> Branch("PDF_weights_MSTW2008nlo68cl", "std::vector<float>", &vars.p_PDF_weights_MSTW2008nlo68cl);
+//  vars.m_reducedTree -> Branch("PDF_weights_NNPDF20",         "std::vector<float>",         &vars.p_PDF_weights_NNPDF20);
   
   
   // PV variables
@@ -1487,7 +1487,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
       if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
       {
         thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet1_hltMatchPt = jet.pt();
+        vars.jet1_hltMatchPt = jet_hlt.pt();
       }
     }
   }
@@ -1508,7 +1508,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
       if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
       {
         thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet2_hltMatchPt = jet.pt();
+        vars.jet2_hltMatchPt = jet_hlt.pt();
       }
     }
   }
@@ -1529,7 +1529,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
       if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
       {
         thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet3_hltMatchPt = jet.pt();
+        vars.jet3_hltMatchPt = jet_hlt.pt();
       }
     }
   }
@@ -1550,7 +1550,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
       if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
       {
         thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet4_hltMatchPt = jet.pt();
+        vars.jet4_hltMatchPt = jet_hlt.pt();
       }
     }
   }
@@ -1571,7 +1571,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
       if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
       {
         thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet5_hltMatchPt = jet.pt();
+        vars.jet5_hltMatchPt = jet_hlt.pt();
       }
     }
   }
@@ -1592,7 +1592,7 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
       if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
       {
         thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet6_hltMatchPt = jet.pt();
+        vars.jet6_hltMatchPt = jet_hlt.pt();
       }
     }
   }
@@ -1873,7 +1873,6 @@ void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
   vars.mc_lep_eta = vars.mc_lep.eta();
   vars.mc_lep_phi = vars.mc_lep.phi();
   
-  
   // neutrino
   vars.mc_nu = reader.Get4V("mcF2_fromV1")->at(0);
   vars.p_mc_nu = &vars.mc_nu;
@@ -1883,7 +1882,6 @@ void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
   vars.mc_nu_pt  = vars.mc_nu.pt();
   vars.mc_nu_eta = vars.mc_nu.eta();
   vars.mc_nu_phi = vars.mc_nu.phi();
-  
   
   if( abs(vars.mc_lep_flavour%2 == 0) )
   {
@@ -1907,11 +1905,9 @@ void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
     vars.mc_nu_phi = vars.mc_nu.phi();  
   }
   
-  
   vars.mc_lepNu_pt = (vars.mc_lep+vars.mc_nu).pt();
   vars.mc_lepNu_mt = sqrt( vars.mc_lep.mass() * vars.mc_lep.mass() + 2. * vars.mc_lep.pt() * vars.mc_nu.pt() * ( 1 - cos(deltaPhi(vars.mc_lep.phi(), vars.mc_nu.phi()) ) ) );
   vars.mc_lepNu_Dphi = deltaPhi(vars.mc_lep_phi,vars.mc_nu_phi);
-  
   
   // WJets
   vars.mc_WJ1 = reader.Get4V("mcF1_fromV2")->at(0);
@@ -1954,7 +1950,6 @@ void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
   vars.mc_WJJ_pt = (vars.mc_WJ1+vars.mc_WJ2).pt();
   vars.mc_WJJ_m = (vars.mc_WJ1+vars.mc_WJ2).mass();
   
-  
   // W
   vars.mc_W1 = reader.Get4V("mcV1")->at(0);
   vars.p_mc_W1 = &vars.mc_W1;
@@ -1970,7 +1965,6 @@ void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
   vars.mc_W1_m = vars.mc_W1.mass();
   vars.mc_W2_m = vars.mc_W2.mass();
   
-  
   // Higgs
   vars.mc_H = reader.Get4V("mc_H")->at(0);
   vars.p_mc_H = &vars.mc_H;
@@ -1979,7 +1973,6 @@ void SetMCVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
   vars.mc_H_eta = vars.mc_H.eta();
   vars.mc_H_phi = vars.mc_H.phi();
   vars.mc_H_m = vars.mc_H.mass();
-  
   
   
   // get matchings
