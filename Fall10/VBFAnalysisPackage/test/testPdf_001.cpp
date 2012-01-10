@@ -117,7 +117,7 @@ int main (int argc, char** argv)
   TCut generalCut = "" ;
   generalCut = generalCut && "WJJ_m > 65  && WJJ_m < 95" ;
   generalCut = generalCut && "WJJ_Deta < 1.5" ;
-  generalCut = generalCut && "fabs(lep_eta) < 1.5" ;
+  generalCut = generalCut && "abs(lep_eta) < 1.5" ;
 
 //   TCut generalCut = "helicityLikelihood > 0.5" ;
 //  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
@@ -136,11 +136,13 @@ int main (int argc, char** argv)
        iColl != collections.end () ; 
        ++iColl)
     {
+      cout << "reading " << iColl->first << endl ;
       vector<TH1F *> l_shapes ;
       CT10_shapes[iColl->first] = l_shapes ;
       NNPDF_shapes[iColl->first] = l_shapes ;
       MSTW_shapes[iColl->first] = l_shapes ;
 
+      cout << "   beginning MSTW" << endl ;
       //PG loop over MSTW weights
       for (int i = 0 ; i < 41 ; ++i)
         {
@@ -156,7 +158,7 @@ int main (int argc, char** argv)
           MSTW_shapes[iColl->first].push_back (dummy) ;
         } //PG loop over MSTW weights
 
-
+      cout << "   beginning NNPDF" << endl ;
       //PG loop over NNPDF weights
       for (int i = 0 ; i < 101 ; ++i)
         {
@@ -172,7 +174,7 @@ int main (int argc, char** argv)
           NNPDF_shapes[iColl->first].push_back (dummy) ;
         } //PG loop over NNPDF weights
 
-
+      cout << "   beginning CT10" << endl ;
       //PG loop over CT10 weights
       for (int i = 0 ; i < 53 ; ++i)
         { 
