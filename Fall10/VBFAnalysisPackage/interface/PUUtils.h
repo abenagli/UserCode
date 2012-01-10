@@ -12,7 +12,6 @@
 
 
 /** get the PU scale factor  */
-double PURescaleFactor(TH1F* distrPU_DATA, TH1F* distrPU_MC,
-                       const double& nPU_MC, const int& PUScale);
+double PURescaleFactor(TH1F* distrPU_DATA, TH1F* distrPU_MC, const double& nPU_MC);
 
 #endif

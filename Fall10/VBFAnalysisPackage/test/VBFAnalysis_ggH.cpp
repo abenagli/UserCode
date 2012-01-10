@@ -555,7 +555,7 @@ int main(int argc, char** argv)
     GetLNuJJAngles(vars.lepNuW_cphi,vars.lepNuZ_cphi,vars.lep_ctheta,vars.WJ1_ctheta,vars.lepNu_ctheta,
                    vars.lep,vars.nu,vars.WJ1,vars.WJ2);
     
-    vars.PUWeight = PURescaleFactor(distrPU_DATA,distrPU_MC,vars.PUtrue_n,0);
+    vars.PUWeight = PURescaleFactor(distrPU_DATA,distrPU_MC,vars.PUtrue_n);
     
     
     

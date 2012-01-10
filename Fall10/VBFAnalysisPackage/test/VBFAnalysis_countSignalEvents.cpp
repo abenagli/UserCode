@@ -81,7 +81,10 @@ int main(int argc, char** argv)
   
   // get the data pileup distribution
   TFile* inFile_pileup = TFile::Open(pileupFileName.c_str(),"READ");
-  TH1F* distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileup") );
+  TH1F* distrPU_DATA;
+  if     ( PUScale ==  1 ) distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileupUp") );
+  else if( PUScale == -1 ) distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileupDown") );
+  else                     distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileup") );
   
   
   
@@ -158,7 +161,7 @@ int main(int argc, char** argv)
     for(int entry = 0; entry < tree->GetEntries(); ++entry)
     {
       tree -> GetEntry(entry);
-      double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(distrPU_DATA,distrPU_MC,PUtrue_n,PUScale) * eventWeight;
+      double weight = lumi * 1000 * 1. / totEvents * crossSection * PURescaleFactor(distrPU_DATA,distrPU_MC,PUtrue_n) * eventWeight;
       
       int mass = int(int(mH)%1000);
       
