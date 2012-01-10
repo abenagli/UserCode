@@ -199,18 +199,20 @@ int main (int argc, char** argv)
   saveShapes (MSTW_shapes, *outputRootFile) ;
   outputRootFile->Close () ;
 
-  //PG calculating the shapes
-  //PG ----------------------
+  //PG calculating the CT10 shapes and errors
+  //PG --------------------------------------
 
   map<string, TH1F *> PDFUp_CT10_shapes ;
   map<string, TH1F *> PDFDown_CT10_shapes ;
+
+  map<string, pair<double, double> > CT10_band ;
 
   //PG loop over samples
   for (map<string, vector<TH1F *> >::iterator iShapes = CT10_shapes.begin () ; 
        iShapes != CT10_shapes.end () ;
        ++iShapes)
     {
-      cout << "------> calculating " << iShapes->first << endl ;
+      cout << "------> calculating CT10 " << iShapes->first << endl ;
       int nEigen = iShapes->second.size () / 2 ;
 
       stringstream nameUp ;
@@ -222,10 +224,25 @@ int main (int argc, char** argv)
       TH1F * dummyDown = new TH1F (nameDown.str ().c_str (), nameDown.str ().c_str (), nBins, m4_min, m4_max) ;
       PDFDown_CT10_shapes[iShapes->first] = dummyDown ;
 
+      double errUp = 0. ;
+      double errDown = 0. ;
+
+      double intCentre = iShapes->second.at (0)->Integral () ;
+
       //PG loop over eigenvectors
       for (int iEigen = 0 ; iEigen < nEigen ; ++iEigen)
         {
           cout << "-----------> eigenvalue: " << iEigen << endl ;
+          double intPlus = iShapes->second.at (2*iEigen + 1)->Integral () ;
+          double intMinus = iShapes->second.at (2*iEigen + 2)->Integral () ;
+          //PG ctrl chi e' piu' alto
+          double unc_p = max (intPlus - intCentre, intMinus - intCentre) ; 
+          unc_p = max (unc_p, 0.) ;
+          double unc_m = max (intCentre - intPlus, intCentre - intMinus) ; 
+          unc_m = max (unc_m, 0.) ;
+          errUp += unc_p * unc_p ;
+          errDown += unc_m * unc_m ;
+
           //PG loop over histo bins
           for (int iBin = 1 ; iBin <= iShapes->second.at (0)->GetNbinsX () ; ++iBin)
             {
@@ -243,12 +260,118 @@ int main (int argc, char** argv)
             } //PG loop over histo bins
         } //PG loop over eigenvectors
 
+      CT10_band[iShapes->first] = pair<double, double> (intCentre + sqrt (errUp), intCentre - sqrt (errDown)) ;
       for (int iBin = 1 ; iBin <= iShapes->second.at (0)->GetNbinsX () ; ++iBin)
         {
           dummyUp->SetBinContent (iBin, iShapes->second.at (0)->GetBinContent (iBin) + sqrt (dummyUp->GetBinContent (iBin))) ;
           dummyDown->SetBinContent (iBin, iShapes->second.at (0)->GetBinContent (iBin) - sqrt (dummyDown->GetBinContent (iBin))) ;
         }
     } //PG loop over samples
+
+
+  //PG calculating the NNPDF shapes and errors
+  //PG ---------------------------------------
+
+  map<string, pair<double, double> > NNPDF_band ;
+
+  //PG loop over samples
+  for (map<string, vector<TH1F *> >::iterator iShapes = NNPDF_shapes.begin () ; 
+       iShapes != NNPDF_shapes.end () ;
+       ++iShapes)
+    {
+      cout << "------> calculating NNPDF " << iShapes->first << endl ;
+      int nEigen = iShapes->second.size () / 2 ;
+
+      double errUp = 0. ;
+      double errDown = 0. ;
+
+      double intCentre = iShapes->second.at (0)->Integral () ;
+      //PG loop over eigenvectors
+      for (int iEigen = 0 ; iEigen < nEigen ; ++iEigen)
+        {
+          cout << "-----------> eigenvalue: " << iEigen << endl ;
+          double intPlus = iShapes->second.at (2*iEigen + 1)->Integral () ;
+          double intMinus = iShapes->second.at (2*iEigen + 2)->Integral () ;
+          //PG ctrl chi e' piu' alto
+          double unc_p = intPlus - intCentre ; 
+          double unc_m = intCentre - intMinus ; 
+          errUp += unc_p * unc_p ;
+          errDown += unc_m * unc_m ;
+        } //PG loop over eigenvectors
+      errUp /= (double) (nEigen - 1) ;
+      errDown /= (double) (nEigen - 1) ;
+      NNPDF_band[iShapes->first] = pair<double, double> (intCentre + sqrt (errUp), intCentre - sqrt (errDown)) ;
+    } //PG loop over samples
+
+
+  //PG calculating the MSTW shapes and errors
+  //PG ---------------------------------------
+
+  map<string, pair<double, double> > MSTW_band ;
+
+  //PG loop over samples
+  for (map<string, vector<TH1F *> >::iterator iShapes = MSTW_shapes.begin () ; 
+       iShapes != MSTW_shapes.end () ;
+       ++iShapes)
+    {
+      cout << "------> calculating MSTW " << iShapes->first << endl ;
+      int nEigen = iShapes->second.size () / 2 ;
+
+      double errUp = 0. ;
+      double errDown = 0. ;
+
+      double intCentre = iShapes->second.at (0)->Integral () ;
+      //PG loop over eigenvectors
+      for (int iEigen = 0 ; iEigen < nEigen ; ++iEigen)
+        {
+          cout << "-----------> eigenvalue: " << iEigen << endl ;
+          double intPlus = iShapes->second.at (2*iEigen + 1)->Integral () ;
+          double intMinus = iShapes->second.at (2*iEigen + 2)->Integral () ;
+          //PG ctrl chi e' piu' alto
+          double unc_p = max (intPlus - intCentre, intMinus - intCentre) ; 
+          unc_p = max (unc_p, 0.) ;
+          double unc_m = max (intCentre - intPlus, intCentre - intMinus) ; 
+          unc_m = max (unc_m, 0.) ;
+          errUp += unc_p * unc_p ;
+          errDown += unc_m * unc_m ;
+        } //PG loop over eigenvectors
+      MSTW_band[iShapes->first] = pair<double, double> (intCentre + sqrt (errUp), intCentre - sqrt (errDown)) ;
+    } //PG loop over samples
+
+  //PG printout errors and global envelope
+  //PG -------------------------------------------------
+
+  //PG loop over samples
+  for (map<string, pair<double, double> >::iterator iMap = CT10_band.begin () ; 
+       iMap != CT10_band.end () ; ++iMap)
+    {
+      cout << iMap->first ;
+      
+      //PG the minimum of the envelope
+      double mini = (iMap->second).first ;
+      mini = min (mini, NNPDF_band[iMap->first].first) ;
+      mini = min (mini, MSTW_band[iMap->first].first) ;
+    
+      cout << " | " << mini ;
+    
+      //PG the maximum of the envelope
+      double maxi = (iMap->second).second ;
+      maxi = max (maxi, NNPDF_band[iMap->first].second) ;
+      maxi = max (maxi, MSTW_band[iMap->first].second) ;
+
+      cout << " | " << maxi ;
+
+      //PG the relative half width of the envelope
+      cout <<  " e : " << (maxi-mini) / (maxi+mini) ;
+
+      //PG the three bands
+      cout << " @CT10 " << CT10_band[iMap->first].first << " - " << CT10_band[iMap->first].second ;
+      cout << " @NNPDF " << NNPDF_band[iMap->first].first << " - " << NNPDF_band[iMap->first].second ;
+      cout << " @MSTW " << MSTW_band[iMap->first].first << " - " << MSTW_band[iMap->first].second ;
+          
+      cout << endl ;    
+    } //PG loop over samples
+
 
   //PG renormalize up and down shapes to the central one
   //PG -------------------------------------------------
