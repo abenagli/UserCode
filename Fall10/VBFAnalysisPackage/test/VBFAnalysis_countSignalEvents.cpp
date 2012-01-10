@@ -85,7 +85,7 @@ int main(int argc, char** argv)
   if     ( PUScale ==  1 ) distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileupUp") );
   else if( PUScale == -1 ) distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileupDown") );
   else                     distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileup") );
-  
+  distrPU_DATA -> Scale(1./distrPU_DATA->Integral());
   
   
   // Define the output graph
