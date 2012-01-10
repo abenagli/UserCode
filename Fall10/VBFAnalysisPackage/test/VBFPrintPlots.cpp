@@ -198,7 +198,7 @@ int main(int argc, char** argv)
   
   variableNames.at(0) = "helicityLikelihood";
   histoName = "angles_helicityLikelihood";
-  stack -> SetXaxisRange(0., 2.);
+  stack -> SetXaxisRange(0., 1.);
   stack -> SetXaxisTitle("helicity LD");
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
