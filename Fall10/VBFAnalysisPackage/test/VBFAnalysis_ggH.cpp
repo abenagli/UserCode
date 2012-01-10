@@ -225,8 +225,8 @@ int main(int argc, char** argv)
   
   for(int step = 1; step <= nStep; ++step)
   {
-    if( (step < firstSTEP) && (step != 6) ) continue;
-    //if( step < firstSTEP ) continue;
+    //if( (step < firstSTEP) && (step != 6) ) continue;
+    if( step < firstSTEP ) continue;
     
     char treeName[50];
     sprintf(treeName, "ntu_%d", step);
@@ -939,8 +939,8 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step == 6 ) cloneTrees[step] -> Fill();
-    //if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+    //if( step == 6 ) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
     
     
     
@@ -1200,16 +1200,16 @@ int main(int argc, char** argv)
     
     
     // qg likelihood
-    if( vars.WJ1.pt() > 0. )
-      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
-    if( vars.WJ2.pt() > 0. )
-      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
-    if( vars.WJ2.pt() > vars.WJ1.pt() )
-    {
-      float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
-      vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
-      vars.WJ1_QGLikelihood = QGLikelihoodDummy;
-    }
+    //if( vars.WJ1.pt() > 0. )
+    //  vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    //if( vars.WJ2.pt() > 0. )
+    //  vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    //if( vars.WJ2.pt() > vars.WJ1.pt() )
+    //{
+    //  float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
+    //  vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
+    //  vars.WJ1_QGLikelihood = QGLikelihoodDummy;
+    //}
     
     
     // helicity likelihood
@@ -1224,9 +1224,13 @@ int main(int argc, char** argv)
     helicitylikeli -> setMeasurables(hangles);
     double sProb = helicitylikeli -> getSignalProbability();
     double bProb = helicitylikeli -> getBkgdProbability();
-    vars.helicityLikelihood = sProb/(sProb+bProb);  
+    if( (sProb >= 0.) && (sProb <= 1.) &&
+        (bProb >= 0.) && (bProb <= 1.) )
+      vars.helicityLikelihood = sProb/(sProb+bProb);  
+    else
+      vars.helicityLikelihood = -1.;
     
-    
+        
     // helicity bdt
     if( applyMVA == 1 ) vars.mva = MVAReader -> EvaluateMVA("kBDT_H250");
     
@@ -1383,8 +1387,8 @@ int main(int argc, char** argv)
   
   for(step = 1; step <= nStep; ++step)
   {
-    if( (step < firstSTEP) && (step != 6) ) continue;
-    //if( step < firstSTEP ) continue;
+    //if( (step < firstSTEP) && (step != 6) ) continue;
+    if( step < firstSTEP ) continue;
     cloneTrees[step] -> AutoSave();
   } 
   
