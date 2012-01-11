@@ -49,7 +49,7 @@ double fitFunc(double* x, double* par)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-int macro () 
+int macro_test_injection () 
 {
   TFile * f = new TFile ("testBkg_017_S350_2011AB.root") ;
   TH1F * m4_sideband_DATA = (TH1F *) f->Get ("m4_sideband_DATA") ;
