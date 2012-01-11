@@ -107,6 +107,9 @@ int macro_017 (int mass)
   bool closure = false;
   bool final   = true;
 
+  //PG type of fit
+  bool attenuated = false ;
+
   inputFile += mass ;
   inputFile += "_2011AB.root" ;
   cout << inputFile << endl ;
@@ -491,11 +494,16 @@ int macro_017 (int mass)
   
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-//   TF1 * numFitFunc = new TF1 ("numFitFunc", doubleExponential, 0., 1000., 4);
-//   setDoubleExpPars (numFitFunc);            
-  TF1 * numFitFunc = new TF1 ("numFitFunc", attenuatedDoubleExponential, 0., 1000., 6);
-  setAttenuatedDoubleExpPars (numFitFunc);        
-  
+  TF1 * numFitFunc ;
+  if (!attenuated)
+    {
+      numFitFunc = new TF1 ("numFitFunc", doubleExponential, 0., 1000., 4);
+      setDoubleExpPars (numFitFunc);            
+    } else
+    {
+      numFitFunc = new TF1 ("numFitFunc", attenuatedDoubleExponential, 0., 1000., 6);
+      setAttenuatedDoubleExpPars (numFitFunc);        
+    }
   TFitResultPtr fitResultPtr = signalRegionMC->Fit (numFitFunc, "L", "", startFit, endFit) ;
   int fitStatus = (int)(fitResultPtr) ;
   int loops = 0 ; 
@@ -529,11 +537,16 @@ int macro_017 (int mass)
   c1->Print ("signal_log.png", "png") ;
   c1->SetLogy (0) ;
 
-  
-//   TF1 * denFitFunc = new TF1 ("denFitFunc", doubleExponential, 0., 1000., 4);
-//   setDoubleExpPars (denFitFunc);                
-  TF1 * denFitFunc = new TF1 ("denFitFunc", attenuatedDoubleExponential, 0., 1000., 6);
-  setAttenuatedDoubleExpPars (denFitFunc);        
+  TF1 * denFitFunc ;
+  if (!attenuated)
+    {  
+      denFitFunc = new TF1 ("denFitFunc", doubleExponential, 0., 1000., 4);
+      setDoubleExpPars (denFitFunc);                
+    } else
+    {
+      denFitFunc = new TF1 ("denFitFunc", attenuatedDoubleExponential, 0., 1000., 6);
+      setAttenuatedDoubleExpPars (denFitFunc);        
+    }
   
   fitResultPtr = sidebaRegionMC->Fit (denFitFunc, "L", "", startFit, endFit) ;
   fitStatus = (int)(fitResultPtr) ;
@@ -689,11 +702,17 @@ int macro_017 (int mass)
     //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----   
     //FC fit the sideband shape
     TH1F * sideband_bkg = sidebaRegion->Clone ("sideband_bkg") ;
-  
-//     TF1 * bkgFitFunc = new TF1 ("bkgFitFunc", doubleExponential, 0., 1000., 4);
-//     setDoubleExpPars (bkgFitFunc);               
-    TF1 * bkgFitFunc = new TF1 ("bkgFitFunc", attenuatedDoubleExponential, 0., 1000., 6);
-    setAttenuatedDoubleExpPars (bkgFitFunc);        
+
+    TF1 * bkgFitFunc ;
+    if (!attenuated)
+      {  
+        bkgFitFunc = new TF1 ("bkgFitFunc", doubleExponential, 0., 1000., 4);
+        setDoubleExpPars (bkgFitFunc);               
+      } else
+      {
+        bkgFitFunc = new TF1 ("bkgFitFunc", attenuatedDoubleExponential, 0., 1000., 6);
+        setAttenuatedDoubleExpPars (bkgFitFunc);        
+      }
     
     TFitResultPtr fitResultPtr2 = sideband_bkg->Fit (bkgFitFunc, "L", "", startFit, endFit) ;
     fitStatus = (int)(fitResultPtr2) ;
@@ -776,11 +795,16 @@ int macro_017 (int mass)
   if(fitbkg)
   {
     //LS fit the background
-    TF1 * bkgFitFunc = new TF1 ("bkgFitFunc", doubleExponential, 0., 1000., 4);
-    setDoubleExpPars (bkgFitFunc);
-//     TF1 * bkgFitFunc = new TF1 ("bkgFitFunc", attenuatedDoubleExponential, 0., 1000., 6);
-//     setAttenuatedDoubleExpPars (bkgFitFunc);    
-    
+    TF1 * bkgFitFunc ;
+    if (!attenuated)
+      {
+        bkgFitFunc = new TF1 ("bkgFitFunc", doubleExponential, 0., 1000., 4);
+        setDoubleExpPars (bkgFitFunc);
+      } else
+      {   
+        bkgFitFunc = new TF1 ("bkgFitFunc", attenuatedDoubleExponential, 0., 1000., 6);
+        setAttenuatedDoubleExpPars (bkgFitFunc);    
+      }
   
     TFitResultPtr fitResultPtr3 = extrapolated_bkg->Fit (bkgFitFunc, "L", "", startFit, endFit) ;
     fitStatus = (int)(fitResultPtr3) ;
