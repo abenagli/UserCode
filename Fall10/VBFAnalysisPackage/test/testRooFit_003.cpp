@@ -155,7 +155,8 @@ int main (int argc, char** argv)
         {
           iColl->second->GetEntry (i) ;
           m = vars.lepNuW_m_KF ;
-          double weight = 1./vars.totEvents * vars.crossSection *  LUMI * PURescaleFactor ((vars.PUit_n + vars.PUoot_n)/3.) ; 
+          //double weight = 1./vars.totEvents * vars.crossSection *  LUMI * PURescaleFactor ((vars.PUit_n + vars.PUoot_n)/3.) ; 
+          double weight = 1 ;
           rds->add (RooArgSet (m), weight) ;            
         }
 

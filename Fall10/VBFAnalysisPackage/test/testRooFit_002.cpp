@@ -171,7 +171,8 @@ int main (int argc, char** argv)
           iColl->second->GetEntry (i) ;
           WJJ_m = vars.WJJ_m ;   
           lepNuW_m_KF = vars.lepNuW_m_KF ;
-          double weight = 1./vars.totEvents * vars.crossSection *  LUMI * PURescaleFactor ((vars.PUit_n + vars.PUoot_n)/3.) ; 
+          //double weight = 1./vars.totEvents * vars.crossSection *  LUMI * PURescaleFactor ((vars.PUit_n + vars.PUoot_n)/3.) ; 
+          double weight = 1. ;
           rds->add (RooArgSet (WJJ_m, lepNuW_m_KF), weight) ;            
         }
       simulation_DS.push_back (rds) ;
