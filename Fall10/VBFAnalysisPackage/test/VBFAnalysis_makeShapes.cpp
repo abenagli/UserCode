@@ -2,6 +2,7 @@
 #include "ntpleUtils.h"
 #include "HiggsMassWindows.h"
 #include "HiggsCrossSectionSyst.h"
+#include "Functions.h"
 
 #include <iostream>
 #include <iomanip>
@@ -10,11 +11,13 @@
 #include "TH1F.h"
 #include "TF1.h"
 
+#include "RooMsgService.h"
 #include "RooRealVar.h"
 #include "RooDataHist.h"
 #include "RooHistPdf.h"
 #include "RooGenericPdf.h"
 #include "RooWorkspace.h"
+#include "RooGaussian.h"
 
 
 
@@ -22,6 +25,10 @@
 
 int main(int argc, char** argv)
 {
+  RooMsgService::instance().deleteStream(0);
+  RooMsgService::instance().deleteStream(1);
+  
+  
   //Check if all nedeed arguments to parse are there
   if(argc != 2)
   {
@@ -44,6 +51,9 @@ int main(int argc, char** argv)
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
   
+  //[Options]
+  float sigStrength = gConfigParser -> readFloatOption("Options::sigStrength");
+  
   
   
   std::vector<int> masses = GetMasses();
@@ -52,6 +62,8 @@ int main(int argc, char** argv)
   for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
   {
     int mass = masses[iMass];
+    char massChar[50];
+    sprintf(massChar,"%d",mass);
     std::cout << ">>> mass: " << mass << std::endl;
     float lepNuWMMIN = GetLepNuWMMIN(mass);
     float lepNuWMMAX = GetLepNuWMMAX(mass);    
@@ -62,7 +74,7 @@ int main(int argc, char** argv)
     if( (analysisMethod == "fit") || (analysisMethod == "fitNoHoles") )
       ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << fitMethod << "_" << mass << ".root";
     else
-      ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << mass << ".root";
+      ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << fitMethod << "_" << mass << ".root";
     TFile* outFile = new TFile((ss.str()).c_str(),"RECREATE");
     
     
@@ -91,28 +103,15 @@ int main(int argc, char** argv)
     double n_bkg;
     double nWindow_bkg;
     double nWindow_bkg_err;
-        
+    
     TH1F* histo;
-    TH1F* ggH;
-    TH1F* qqH;
-    RooDataHist* dh_ggH;
-    RooDataHist* dh_qqH;
-    RooHistPdf* pdf_ggH;
-    RooHistPdf* pdf_qqH;
-    std::map<std::string,TH1F*> ggH_syst;
-    std::map<std::string,TH1F*> qqH_syst;
-    std::map<std::string,RooDataHist*> dh_ggH_syst;
-    std::map<std::string,RooDataHist*> dh_qqH_syst;
-    std::map<std::string,RooHistPdf*> pdf_ggH_syst;
-    std::map<std::string,RooHistPdf*> pdf_qqH_syst;
-    double n_ggH;
-    double n_qqH;
-    double nWindow_ggH;
-    double nWindow_qqH;
-    std::map<std::string,double> n_ggH_syst;
-    std::map<std::string,double> n_qqH_syst;
-    std::map<std::string,double> nWindow_ggH_syst;
-    std::map<std::string,double> nWindow_qqH_syst;
+    TH1F* histo_toFit;
+    std::map<std::string,TH1F*> H;
+    std::map<std::string,TH1F*> H_fit;
+    std::map<std::string,RooDataHist*> dh_H;
+    std::map<std::string,RooHistPdf*> pdf_H;
+    std::map<std::string,double> n_H;
+    std::map<std::string,double> nWindow_H;
     
     RooWorkspace* workspace;
     RooRealVar* x;
@@ -124,10 +123,8 @@ int main(int argc, char** argv)
     RooGenericPdf* pdf_bkg;
     RooDataHist* dh_data_obs; 
     
-    std::stringstream histoName_gg;
-    histoName_gg << "h_ggH" << mass;
-    std::stringstream histoName_qq;
-    histoName_qq << "h_qqH" << mass;
+    
+    
     
     
     
@@ -135,28 +132,33 @@ int main(int argc, char** argv)
     // data & bkgshapes
     
     fileName.str(std::string());
-    if( (analysisMethod == "fit") || (analysisMethod == "fitNoHoles") )
+    if( (analysisMethod == "fit") || (analysisMethod == "fitNoHoles") ||
+	(analysisMethod == "fake") || (analysisMethod == "fakeNoHoles") )
       fileName << baseDir << "/fitHiggsMassBinned_" << fitMethod << "_PFlow_H" << mass << ".root";
     if( analysisMethod == "sidebands" )
-      fileName << baseDir << "/output_015.root";
+      fileName << baseDir << "/output_017.root";
     inFile = TFile::Open(fileName.str().c_str(),"READ");
-    std::cout << ">>> opened file " << fileName.str() << std::endl; 
+    //std::cout << ">>> opened file " << fileName.str() << std::endl; 
     
     inFile -> cd();
     
     
     if( analysisMethod == "fit" )
     {
-      data = (TH1F*)( inFile->Get("data/h_lepNuW_m") );
+      data = (TH1F*)( inFile->Get("data/h_data_lepNuW_m") );
       hint = (TH1F*)( inFile->Get("data/hint") );
       
       xWidth = data -> GetBinWidth(1);
-      if( (fitMethod == "doubleExponential") || (fitMethod == "attenuatedDoubleExponential") )
+      if( (fitMethod == "doubleExponential") ||
+          (fitMethod == "attenuatedExponential") ||
+          (fitMethod == "attenuatedDoubleExponential") )
       {
         xMin = GetLepNuWMMIN(mass);
         xMax = GetLepNuWMMAX(mass);
       }
-      if( (fitMethod == "doubleExponentialNoHoles") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+      if( (fitMethod == "doubleExponentialNoHoles") ||
+          (fitMethod == "attenuatedExponentialNoHoles") ||
+          (fitMethod == "attenuatedDoubleExponentialNoHoles") )
       {
         xMin = GetXFitMIN1(mass,fitMethod);
         xMax = GetXFitMAX2(mass,fitMethod);
@@ -168,9 +170,12 @@ int main(int argc, char** argv)
       binMaxWindow = nBins;
     }
     
-    if( analysisMethod == "fitNoHoles" ) 
+    if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") ) 
     {
-      data = (TH1F*)( inFile->Get("data/h_lepNuW_m") );
+      if( analysisMethod == "fitNoHoles" )
+        data = (TH1F*)( inFile->Get("data/h_data_lepNuW_m") );
+      if( analysisMethod == "fakeNoHoles" )
+        data = (TH1F*)( inFile->Get("fake/h_fake_lepNuW_m") );
       
       xWidth = data -> GetBinWidth(1);
       xMin = GetXFitMIN1(mass,fitMethod);
@@ -189,9 +194,9 @@ int main(int argc, char** argv)
       
       if( fitMethod == "doubleExponential" )
       {
-        N  = new RooRealVar("N", "N", 0.007,0.,1.0);
+        N  = new RooRealVar("N", "N", 0.711,0.,10.0);
         L1 = new RooRealVar("L1","L1",0.015,0.,0.1);
-        L2 = new RooRealVar("L2","L2",0.005,0.,0.1);
+        L2 = new RooRealVar("L2","L2",0.011,0.,0.1);
         pdf_bkg = new RooGenericPdf("bkg","","(exp(-1*@2*@0) + @1*exp(-1*@3*@0))",RooArgSet(*x,*N,*L1,*L2));
         
         workspace -> import(*N);
@@ -199,13 +204,25 @@ int main(int argc, char** argv)
         workspace -> import(*L2);
         workspace -> import(*pdf_bkg);
       }
+      if( fitMethod == "attenuatedExponential" )
+      {
+        mu = new RooRealVar("mu","mu",130.,0.,500.); 
+        kT = new RooRealVar("kT","kT",20.,0.,100.); 
+        L1 = new RooRealVar("L1","L1",0.012,0.,0.1);
+        pdf_bkg = new RooGenericPdf("bkg","","1./(exp(-1.*(@0-@1)/@2)+1.) * exp(-1*@3*@0)",RooArgSet(*x,*mu,*kT,*L1));
+        
+        workspace -> import(*mu);
+        workspace -> import(*kT);
+        workspace -> import(*L1);
+        workspace -> import(*pdf_bkg);
+      }
       if( fitMethod == "attenuatedDoubleExponential" )
       {
-        mu = new RooRealVar("mu","mu",160.,0.,500.); 
-        kT = new RooRealVar("kT","kT", 20.,0.,100.); 
-        N  = new RooRealVar("N", "N", 0.007,0.,1.0);
-        L1 = new RooRealVar("L1","L1",0.015,0.,0.1);
-        L2 = new RooRealVar("L2","L2",0.005,0.,0.1);
+        mu = new RooRealVar("mu","mu",190.,190.,190.); 
+        kT = new RooRealVar("kT","kT", 55., 55.,55.); 
+        N  = new RooRealVar("N", "N", 0.059,0.,1.0);
+        L1 = new RooRealVar("L1","L1",0.023,0.,0.1);
+        L2 = new RooRealVar("L2","L2",0.011,0.,0.1);
         pdf_bkg = new RooGenericPdf("bkg","","1./(exp(-1.*(@0-@1)/@2)+1.) * (exp(-1*@4*@0) + @3*exp(-1*@5*@0))",RooArgSet(*x,*mu,*kT,*N,*L1,*L2));
         
         workspace -> import(*mu);
@@ -223,8 +240,8 @@ int main(int argc, char** argv)
       hint = (TH1F*)(inFile->Get("extrapolated_bkg"));
       
       xWidth = data -> GetBinWidth(1);
-      xMin = GetXFitMIN1(mass);
-      xMax = GetXFitMAX2(mass);
+      xMin = GetXFitMIN1(mass,fitMethod);
+      xMax = GetXFitMAX2(mass,fitMethod);
       nBins = int( (xMax - xMin)/xWidth );
       binMin = 1;
       binMax = nBins;
@@ -289,7 +306,7 @@ int main(int argc, char** argv)
     }    
     
     
-    if( analysisMethod == "fitNoHoles" )
+    if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
     {
       // data
       data_obs = new TH1F("data_obs_dummy","",nBins,xMin,xMax);
@@ -319,239 +336,107 @@ int main(int argc, char** argv)
     //--------------
     // signal shapes
     
-    fileName.str(std::string());
-    fileName << baseDir << "/countSignalEvents_PFlow.root";
-    inFile = TFile::Open(fileName.str().c_str(),"READ");
-    std::cout << ">>> opened file " << fileName.str() << std::endl; 
-    
-    
-    // gg Higgs
-    inFile -> cd();
-    histo = (TH1F*)(inFile->Get(histoName_gg.str().c_str()));
-    outFile -> cd();
-    
-    if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-      ggH = new TH1F("ggH","",nBins,xMin,xMax);
-    if( analysisMethod == "fitNoHoles" )
-      ggH = new TH1F("ggH_dummy","",nBins,xMin,xMax);
-    
-    for(int bin = 1; bin <= histo->GetNbinsX(); ++bin)
-    {
-      float binCenter  = histo -> GetBinCenter(bin);
-      float binContent = histo -> GetBinContent(bin);
-      if( (binCenter >= xMin) && (binCenter < xMax) )
-      {
-        ggH -> Fill(binCenter,binContent);
-      }
-    }
-    
-    if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-      ggH -> Write();
-    if( analysisMethod == "fitNoHoles" )
-    {
-      dh_ggH = new RooDataHist("dh_ggH","",RooArgList(*x),ggH);
-      pdf_ggH = new RooHistPdf("ggH","",RooArgList(*x),*dh_ggH,2);
-      workspace -> import(*pdf_ggH);
-    }
-    
-    n_ggH = ggH -> Integral(binMin,binMax);
-    nWindow_ggH = ggH -> Integral(binMinWindow,binMaxWindow);
-    
-    
-    // qq Higgs    
-    inFile -> cd();
-    histo = (TH1F*)(inFile->Get(histoName_qq.str().c_str()));
-    outFile -> cd();
-    if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-      qqH = new TH1F("qqH","",nBins,xMin,xMax);
-    if( analysisMethod == "fitNoHoles" )
-      qqH = new TH1F("qqH_dummy","",nBins,xMin,xMax);
-    
-    for(int bin = 1; bin <= histo->GetNbinsX(); ++bin)
-    {
-      float binCenter  = histo -> GetBinCenter(bin);
-      float binContent = histo -> GetBinContent(bin);
-      if( (binCenter >= xMin) && (binCenter < xMax) )
-      {
-        qqH -> Fill(binCenter,binContent);
-      }
-    }
-
-    if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-      qqH -> Write();
-    if( analysisMethod == "fitNoHoles" )
-    {
-      dh_qqH = new RooDataHist("dh_qqH","",RooArgList(*x),qqH);
-      pdf_qqH = new RooHistPdf("qqH","",RooArgList(*x),*dh_qqH,2);
-      workspace -> import(*pdf_qqH);
-    }    
-    
-    n_qqH = qqH -> Integral(binMin,binMax);
-    nWindow_qqH = qqH -> Integral(binMinWindow,binMaxWindow);
-    
-    
-    
-    
-    
-    
-    //-------------------------
-    // systematic signal shapes
-    
     std::vector<std::string> labels;
-    labels.push_back("PU");
-    labels.push_back("JES");
+    labels.push_back("ggH");
+    labels.push_back("qqH");
+    std::vector<std::string> labels_syst;
+    labels_syst.push_back("JESUp");
+    labels_syst.push_back("JESDown");
+    labels_syst.push_back("PUUp");
+    labels_syst.push_back("PUDown");
+    
     std::vector<std::string> labels2;
     labels2.push_back("PU     ");
     labels2.push_back("JES    ");
-    
-    for(unsigned int labelIt = 0; labelIt < labels.size(); ++labelIt)
-    {
-      std::string label = labels.at(labelIt)+"Up";
-      
-      fileName.str(std::string());
-      fileName << baseDir << "/countSignalEvents_" + label + "_PFlow.root";
-      inFile = TFile::Open(fileName.str().c_str(),"READ");
-      std::cout << ">>> opened file " << fileName.str() << std::endl;
-      
-      
-      // gg Higgs
-      inFile -> cd();
-      histo = (TH1F*)(inFile->Get(histoName_gg.str().c_str()));
-      outFile -> cd();
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-        ggH_syst[label] = new TH1F(("ggH_"+label).c_str(),"",nBins,xMin,xMax);
-      if( analysisMethod == "fitNoHoles" )
-        ggH_syst[label] = new TH1F(("ggH_"+label+"_dummy").c_str(),"",nBins,xMin,xMax);
-      
-      for(int bin = 1; bin <= histo->GetNbinsX(); ++bin)
-      {
-        float binCenter  = histo -> GetBinCenter(bin);
-        float binContent = histo -> GetBinContent(bin);
-        if( (binCenter >= xMin) && (binCenter < xMax) )
-        {
-          ggH_syst[label] -> Fill(binCenter,binContent);
-        }
-      }
-      
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-        ggH_syst[label] -> Write();
-      if( analysisMethod == "fitNoHoles" )
-      {
-        dh_ggH_syst[label] = new RooDataHist(("dh_ggH_"+label).c_str(),"",RooArgList(*x),ggH_syst[label]);
-        pdf_ggH_syst[label] = new RooHistPdf(("ggH_"+label).c_str(),"",RooArgList(*x),*dh_ggH_syst[label],2);
-        workspace -> import(*pdf_ggH_syst[label]);
-      }
 
-      n_ggH_syst[label] = ggH_syst[label] -> Integral(binMin,binMax);
-      nWindow_ggH_syst[label] = ggH_syst[label] -> Integral(binMinWindow,binMaxWindow);
-      
-      
-      // qq Higgs
-      inFile -> cd();
-      histo = (TH1F*)(inFile->Get(histoName_qq.str().c_str()));
-      outFile -> cd();
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-        qqH_syst[label] = new TH1F(("qqH_"+label).c_str(),"",nBins,xMin,xMax);
-      if( analysisMethod == "fitNoHoles" )
-        qqH_syst[label] = new TH1F(("qqH_"+label+"_dummy").c_str(),"",nBins,xMin,xMax);
-            
-      for(int bin = 1; bin <= histo->GetNbinsX(); ++bin)
-      {
-        float binCenter  = histo -> GetBinCenter(bin);
-        float binContent = histo -> GetBinContent(bin);
-        if( (binCenter >= xMin) && (binCenter < xMax) )
-        {
-          qqH_syst[label] -> Fill(binCenter,binContent);
-        }
-      }
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )      
-        qqH_syst[label] -> Write();
-      
-      if( analysisMethod == "fitNoHoles" )
-      {
-        dh_qqH_syst[label] = new RooDataHist(("dh_qqH_"+label).c_str(),"",RooArgList(*x),qqH_syst[label]);
-        pdf_qqH_syst[label] = new RooHistPdf(("qqH_"+label).c_str(),"",RooArgList(*x),*dh_qqH_syst[label],2);
-        workspace -> import(*pdf_qqH_syst[label]);
-      }
-      
-      n_qqH_syst[label] = qqH_syst[label] -> Integral(binMin,binMax);
-      nWindow_qqH_syst[label] = qqH_syst[label] -> Integral(binMinWindow,binMaxWindow);
-      
-      
-      
-      
-      
-      
-      label = labels.at(labelIt)+"Down";
+    for(unsigned int labelIt = 0; labelIt < 2 + 2*labels_syst.size(); ++labelIt)
+    {
+      std::string label;
+      if(labelIt < 2) label = labels.at(labelIt);
+      else            label = labels.at(labelIt%2) + "_" + labels_syst.at((labelIt-2)/2);
       
       fileName.str(std::string());
-      fileName << baseDir << "/countSignalEvents_" + label + "_PFlow.root";
+      if(labelIt < 2) fileName << baseDir << "/countSignalEvents_PFlow.root";
+      else            fileName << baseDir << "/countSignalEvents_" + labels_syst.at((labelIt-2)/2) + "_PFlow.root";
       inFile = TFile::Open(fileName.str().c_str(),"READ");
-      std::cout << ">>> opened file " << fileName.str() << std::endl;
+      //std::cout << ">>> opened file " << fileName.str() << std::endl; 
+      std::cout << ">>>>>> label: " << label << std::endl;
       
       
-      // gg Higgs
-      inFile -> cd();
-      histo = (TH1F*)(inFile->Get(histoName_gg.str().c_str()));
+      if( labelIt%2 == 0 ) histo = (TH1F*)( inFile->Get(("h_ggH"+std::string(massChar)).c_str()) );
+      if( labelIt%2 == 1 ) histo = (TH1F*)( inFile->Get(("h_qqH"+std::string(massChar)).c_str()) );
+      
       outFile -> cd();
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-        ggH_syst[label] = new TH1F(("ggH_"+label).c_str(),"",nBins,xMin,xMax);
-      if( analysisMethod == "fitNoHoles" )      
-        ggH_syst[label] = new TH1F(("ggH_"+label+"_dummy").c_str(),"",nBins,xMin,xMax);
+      histo_toFit = (TH1F*)( histo->Clone((label+"_toFit").c_str()) );
+      histo_toFit -> Reset();
+      H[label] = new TH1F((label+"_dummy").c_str(),"",nBins,xMin,xMax);
       
       for(int bin = 1; bin <= histo->GetNbinsX(); ++bin)
       {
         float binCenter  = histo -> GetBinCenter(bin);
         float binContent = histo -> GetBinContent(bin);
-        if( (binCenter >= xMin) && (binCenter < xMax) )
+        float binError   = histo -> GetBinError(bin);
+        if( binContent/histo->Integral() > 0.0005 )
         {
-          ggH_syst[label] -> Fill(binCenter,binContent);
+          int localBin = histo_toFit -> Fill(binCenter,sigStrength*binContent);
+          histo_toFit -> SetBinError(localBin,binError);
         }
       }
       
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-        ggH_syst[label] -> Write();
-      if( analysisMethod == "fitNoHoles" )
-      {
-        dh_ggH_syst[label] = new RooDataHist(("dh_ggH_"+label).c_str(),"",RooArgList(*x),ggH_syst[label]);
-        pdf_ggH_syst[label] = new RooHistPdf(("ggH_"+label).c_str(),"",RooArgList(*x),*dh_ggH_syst[label],2);
-        workspace -> import(*pdf_ggH_syst[label]);
-      }
-      
-      n_ggH_syst[label] = ggH_syst[label] -> Integral(binMin,binMax);
-      nWindow_ggH_syst[label] = ggH_syst[label] -> Integral(binMinWindow,binMaxWindow);
-          
-      
-      // qq Higgs
-      inFile -> cd();
-      histo = (TH1F*)(inFile->Get(histoName_qq.str().c_str()));
-      outFile -> cd();
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-        qqH_syst[label] = new TH1F(("qqH_"+label).c_str(),"",nBins,xMin,xMax);
-      if( analysisMethod == "fitNoHoles" )
-        qqH_syst[label] = new TH1F(("qqH_"+label+"_dummy").c_str(),"",nBins,xMin,xMax);
-            
       for(int bin = 1; bin <= histo->GetNbinsX(); ++bin)
       {
         float binCenter  = histo -> GetBinCenter(bin);
         float binContent = histo -> GetBinContent(bin);
-        if( (binCenter >= xMin) && (binCenter < xMax) )
+        float binError   = histo -> GetBinError(bin);
+        if( (binCenter >= xMin) && (binCenter < xMax) && (binContent/histo->Integral() > 0.0005) )
         {
-          qqH_syst[label] -> Fill(binCenter,binContent);
+          int localBin = H[label] -> Fill(binCenter,sigStrength*binContent);
+          H[label] -> SetBinError(localBin,binError);
         }
       }
       
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )      
-        qqH_syst[label] -> Write();
-      if( analysisMethod == "fitNoHoles" )
+      n_H[label]       = H[label] -> Integral(binMin,binMax);
+      nWindow_H[label] = H[label] -> Integral(binMinWindow,binMaxWindow);      
+      
+      
+      
+      TF1* fitFunc;
+      FitHiggsMass(&fitFunc,"fitFunc",xMin,xMax,histo_toFit,mass,"crystalBallLowHigh");
+      histo_toFit -> Write();
+      
+      
+      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
+        H_fit[label] = (TH1F*)( H[label]->Clone(label.c_str()) );
+      if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
+        H_fit[label] = (TH1F*)( H[label]->Clone((label+"_fit").c_str()) );
+      H_fit[label] -> Reset();
+      H_fit[label] -> FillRandom(fitFunc->GetName(),1000000);
+      H_fit[label] -> Scale(n_H[label]/H_fit[label]->Integral());
+      
+      
+      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
       {
-        dh_qqH_syst[label] = new RooDataHist(("dh_qqH_"+label).c_str(),"",RooArgList(*x),qqH_syst[label]);
-        pdf_qqH_syst[label] = new RooHistPdf(("qqH_"+label).c_str(),"",RooArgList(*x),*dh_qqH_syst[label],2);
-        workspace -> import(*pdf_qqH_syst[label]);
+        H_fit[label] -> Write();      
+      }
+      if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
+      {
+        dh_H[label] = new RooDataHist(("dh_"+label).c_str(),"",RooArgList(*x),H_fit[label]);
+        pdf_H[label] = new RooHistPdf(label.c_str(),"",RooArgList(*x),*dh_H[label],2);
+        workspace -> import(*pdf_H[label]);
       }
       
-      n_qqH_syst[label] = qqH_syst[label] -> Integral(binMin,binMax);
-      nWindow_qqH_syst[label] = qqH_syst[label] -> Integral(binMinWindow,binMaxWindow);
+      //float effMean = mass + fitFunc->GetParameter(3);
+      //float effSigma = sqrt(GetHiggsWidth(mass)*GetHiggsWidth(mass) + fitFunc->GetParameter(4)*fitFunc->GetParameter(4));
+      //RooRealVar* mean    = new RooRealVar("mean","mean",effMean,effMean,effMean);
+      //RooRealVar* sigma = new RooRealVar("sigma","sigma",effSigma,effSigma,effSigma);
+      //RooGaussian* gaussian = new RooGaussian("ggH","",*x,*mean,*sigma);
+      //
+      //workspace -> import(*mean);
+      //workspace -> import(*sigma);
+      //workspace -> import(*gaussian);
+      
+      delete fitFunc;
+      inFile -> Close();
     }
     
     
@@ -559,7 +444,7 @@ int main(int argc, char** argv)
     
     
     
-    if( analysisMethod == "fitNoHoles" )
+    if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
     {
       outFile -> cd();
       workspace -> Write();
@@ -579,7 +464,7 @@ int main(int argc, char** argv)
       if( analysisMethod == "fit" )
         ss2 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "bincounting" << "." << mass << ".txt";
       else
-        ss2 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << "bincounting" << "." << mass << ".txt";
+        ss2 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "bincounting" << "." << mass << ".txt";
       std::ofstream datacard_bc(ss2.str().c_str(),std::ios::out);
       
       datacard_bc << std::fixed;
@@ -588,7 +473,7 @@ int main(int argc, char** argv)
       datacard_bc << std::endl;
       datacard_bc << "imax 1   # number of channels" << std::endl;
       datacard_bc << "jmax 2   # number of processes - 1" << std::endl;
-      datacard_bc << "kmax " << 4 + labels.size() << "   # number of nuisance parameters (sources of systematic uncertainties)" << std::endl;
+      datacard_bc << "kmax " << 4 + labels2.size() << "   # number of nuisance parameters (sources of systematic uncertainties)" << std::endl;
       datacard_bc << std::endl;
       datacard_bc << "bin           " << std::setprecision(0) << std::setw(5) << 1 << std::endl;
       datacard_bc << "observation   " << std::setprecision(0) << std::setw(5) << nWindow_data_obs << std::endl;
@@ -597,8 +482,8 @@ int main(int argc, char** argv)
       datacard_bc << "process               ggH        qqH        bkg" << std::endl;
       datacard_bc << "process                -1         -2          1" << std::endl;
       datacard_bc << "rate             " << std::setprecision(2)
-                  << std::setw(8) << nWindow_ggH << "   "
-                  << std::setw(8) << nWindow_qqH << "   "
+                  << std::setw(8) << nWindow_H["ggH"] << "   "
+                  << std::setw(8) << nWindow_H["qqH"] << "   "
                   << std::setw(8) << nWindow_bkg
                   << std::endl;
       datacard_bc << std::endl;
@@ -609,19 +494,19 @@ int main(int argc, char** argv)
                   << std::setprecision(3) << std::setw(8) << 1.+0.5*(HiggsCrossSectionSyst(mass,"gg","up")+HiggsCrossSectionSyst(mass,"gg","down")) << "   "
                   << std::setprecision(3) << std::setw(8) << 1.+0.5*(HiggsCrossSectionSyst(mass,"qq","up")+HiggsCrossSectionSyst(mass,"qq","down")) << "   "
                   << "       -" << std::endl;
-      for(unsigned int labelIt = 0; labelIt < labels.size(); ++labelIt)
+      for(unsigned int labelIt = 0; labelIt < labels2.size(); ++labelIt)
       {
-        std::string label = labels.at(labelIt);
-        double ggH_errUp   = fabs(nWindow_ggH_syst[label+"Up"]  - nWindow_ggH);
-        double ggH_errDown = fabs(nWindow_ggH_syst[label+"Down"]- nWindow_ggH);
+        double ggH_errUp   = fabs(nWindow_H["ggH_"+labels_syst.at(2*labelIt)]   - nWindow_H["ggH"]);
+        double qqH_errUp   = fabs(nWindow_H["qqH_"+labels_syst.at(2*labelIt)]   - nWindow_H["qqH"]);
+        double ggH_errDown = fabs(nWindow_H["ggH_"+labels_syst.at(2*labelIt+1)] - nWindow_H["ggH"]);
+        double qqH_errDown = fabs(nWindow_H["qqH_"+labels_syst.at(2*labelIt+1)] - nWindow_H["qqH"]);
+        
         double ggH_errAve  = 0.5*(ggH_errUp + ggH_errDown);
-        double qqH_errUp   = fabs(nWindow_qqH_syst[label+"Up"]  - nWindow_qqH);
-        double qqH_errDown = fabs(nWindow_qqH_syst[label+"Down"]- nWindow_qqH);
         double qqH_errAve  = 0.5*(qqH_errUp + qqH_errDown);
         
         datacard_bc << labels2.at(labelIt) << "    lnN   "
-                    << std::setprecision(3) << std::setw(8) << 1. + ggH_errAve/nWindow_ggH << "   "
-                    << std::setprecision(3) << std::setw(8) << 1. + qqH_errAve/nWindow_qqH << "   "
+                    << std::setprecision(3) << std::setw(8) << 1. + ggH_errAve/nWindow_H["ggH"] << "   "
+                    << std::setprecision(3) << std::setw(8) << 1. + qqH_errAve/nWindow_H["qqH"] << "   "
                    << "       -" << std::endl;
       } 
       
@@ -631,7 +516,7 @@ int main(int argc, char** argv)
       if( analysisMethod == "fit" )
         ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "shapeanalysis" << "." << mass << ".txt";
       else
-        ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << "shapeanalysis" << "." << mass << ".txt";
+        ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "shapeanalysis" << "." << mass << ".txt";
       std::ofstream datacard_sa(ss3.str().c_str(),std::ios::out);
       
       datacard_sa << std::fixed;
@@ -653,8 +538,8 @@ int main(int argc, char** argv)
       datacard_sa << "process               ggH        qqH        bkg" << std::endl;
       datacard_sa << "process                -1         -2          1" << std::endl;
       datacard_sa << "rate             " << std::setprecision(2)
-                  << std::setw(8) << n_ggH << "   "
-                  << std::setw(8) << n_qqH << "   "
+                  << std::setw(8) << n_H["ggH"] << "   "
+                  << std::setw(8) << n_H["qqH"] << "   "
                   << std::setw(8) << n_bkg
                   << std::endl;
       datacard_sa << std::endl;
@@ -674,7 +559,7 @@ int main(int argc, char** argv)
     } 
     
     
-    if( analysisMethod == "fitNoHoles" )
+    if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
     {
       std::stringstream ss3;
       ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_"<< "shapeanalysis" << "." << mass << ".txt";
@@ -699,8 +584,8 @@ int main(int argc, char** argv)
       datacard_sa << "process               ggH        qqH        bkg" << std::endl;
       datacard_sa << "process                -1         -2          1" << std::endl;
       datacard_sa << "rate             " << std::setprecision(2)
-                  << std::setw(8) << n_ggH << "   "
-                  << std::setw(8) << n_qqH << "   "
+                  << std::setw(8) << n_H["ggH"] << "   "
+                  << std::setw(8) << n_H["qqH"] << "   "
                   << std::setw(8) << n_data_obs
                   << std::endl;
       datacard_sa << std::endl;
@@ -711,26 +596,32 @@ int main(int argc, char** argv)
                   << std::setprecision(3) << std::setw(8) << 1.+0.5*(HiggsCrossSectionSyst(mass,"gg","up")+HiggsCrossSectionSyst(mass,"gg","down")) << "   "
                   << std::setprecision(3) << std::setw(8) << 1.+0.5*(HiggsCrossSectionSyst(mass,"qq","up")+HiggsCrossSectionSyst(mass,"qq","down")) << "   "
                   << "       -" << std::endl;
-      for(unsigned int labelIt = 0; labelIt < labels.size(); ++labelIt)
-      {
-        std::string label = labels.at(labelIt);
-        
-        datacard_sa << labels2.at(labelIt) << "  shape          1          1          - " << std::endl;
-      }
+      //for(unsigned int labelIt = 0; labelIt < labels.size(); ++labelIt)
+      //{
+      //  std::string label = labels.at(labelIt);
+      //  
+      //  datacard_sa << labels2.at(labelIt) << "  shape          1          1          - " << std::endl;
+      //}
       datacard_sa << std::endl;
       if( fitMethod == "doubleExponential" )
       {
-        datacard_sa << "N    param    0.007     1.   [0.,1.]"   << std::endl; 
+        datacard_sa << "N    param    0.711     1.   [0.,10.]"   << std::endl; 
         datacard_sa << "L1   param    0.015     1.   [0.,0.1]"  << std::endl; 
-        datacard_sa << "L2   param    0.005     1.   [0.,0.1]"  << std::endl; 
+        datacard_sa << "L2   param    0.011     1.   [0.,0.1]"  << std::endl; 
+      }
+      if( fitMethod == "attenuatedExponential" )
+      {
+        datacard_sa << "mu   param     130.   100.   [0.,500.]" << std::endl; 
+        datacard_sa << "kT   param      20.   100.   [0.,100.]" << std::endl; 
+        datacard_sa << "L1   param    0.012     1.   [0.,0.1]"  << std::endl; 
       }
       if( fitMethod == "attenuatedDoubleExponential" )
       {
-        datacard_sa << "mu   param     160.   100.   [0.,500.]" << std::endl; 
-        datacard_sa << "kT   param      20.   100.   [0.,100.]" << std::endl; 
-        datacard_sa << "N    param    0.007     1.   [0.,1.]"   << std::endl; 
-        datacard_sa << "L1   param    0.015     1.   [0.,0.1]"  << std::endl; 
-        datacard_sa << "L2   param    0.005     1.   [0.,0.1]"  << std::endl; 
+        //datacard_sa << "mu   param     190.     0.   [190.,190.]" << std::endl; 
+        //datacard_sa << "kT   param      55.     0.   [55.,55.]" << std::endl; 
+        datacard_sa << "N    param    0.059     1.   [0.,1.]"   << std::endl; 
+        datacard_sa << "L1   param    0.023     1.   [0.,0.1]"  << std::endl; 
+        datacard_sa << "L2   param    0.011     1.   [0.,0.1]"  << std::endl; 
       }
     }
     
