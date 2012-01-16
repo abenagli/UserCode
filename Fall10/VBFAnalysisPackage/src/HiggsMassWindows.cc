@@ -4,7 +4,7 @@
 
 float GetBinWidth()
 {
-  return 2.5;
+  return 5.;
 }
 
 
@@ -43,6 +43,142 @@ float GetHiggsWidth(const float& mH)
   else if( mH == 550. ) return 93.2;
   else if( mH == 600. ) return 123.;
   else return -1.;
+}
+
+float GetHiggsMassFitMIN(const float& mH)
+{
+  if     ( mH == 200. ) return 180.;
+  if     ( mH == 250. ) return 225.;
+  else if( mH == 300. ) return 265.;
+  else if( mH == 350. ) return 305.;
+  else if( mH == 400. ) return 345.;
+  else if( mH == 450. ) return 365.;
+  else if( mH == 500. ) return 395.;
+  else if( mH == 550. ) return 455.;
+  else if( mH == 600. ) return 475.;
+  else return -1.;
+}
+
+float GetHiggsMassFitMAX(const float& mH)
+{
+  if     ( mH == 200. ) return 220.;
+  if     ( mH == 250. ) return 285.;
+  if     ( mH == 300. ) return 345.;
+  else if( mH == 350. ) return 395.;
+  else if( mH == 400. ) return 455.;
+  else if( mH == 450. ) return 525.;
+  else if( mH == 500. ) return 565.;
+  else if( mH == 550. ) return 625.;
+  else if( mH == 600. ) return 700.;
+  else return -1.;
+}
+
+
+
+
+void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin, const float& xMax,
+                  TH1F* h, const float& mH, const std::string& fitMethod)
+{
+  TVirtualFitter::SetDefaultFitter("Minuit2");
+  double width = GetHiggsWidth(mH);
+  
+  /*
+  TH1F* h = (TH1F*)( h_temp->Clone("h") );
+  h -> Reset(); 
+  for(int bin = 1; bin <= h->GetNbinsX(); ++bin)
+  {
+    float binContent = h_temp -> GetBinContent(bin);
+    float binError   = h_temp -> GetBinError(bin);
+    
+    if( binContent/h_temp->Integral() > 0.001 )
+    {
+      h -> SetBinContent(bin,binContent);
+      h -> SetBinError(bin,binError);
+    }
+  }
+  */
+  
+  
+  //--------------------------
+  // 1st pre-fit with gaussian
+  
+  TF1* preFitFunc = new TF1("preFitFunc","gaus",mH-100,mH+100);
+  
+  preFitFunc -> SetParameter(0,h->GetMaximum());
+  preFitFunc -> SetParameter(1,mH);
+  preFitFunc -> SetParameter(2,width);
+  
+  preFitFunc -> SetNpx(10000);
+  preFitFunc -> SetLineColor(kBlue);
+  preFitFunc -> SetLineWidth(2);
+  
+  h -> Fit("preFitFunc","NRQ+");
+  
+  double preN     = preFitFunc -> GetParameter(0);
+  double preMu    = preFitFunc -> GetParameter(1);
+  double preSigma = preFitFunc -> GetParameter(2);
+  
+  
+  
+  //--------------------------
+  // 2nd pre-fit with gaussian
+  
+  TF1* preFitFunc2 = new TF1("preFitFunc2","gaus",preMu-0.5*preSigma,preMu+0.5*preSigma);
+  
+  preFitFunc2 -> SetParameter(0,preN);
+  preFitFunc2 -> SetParameter(1,preMu);
+  preFitFunc2 -> SetParameter(2,preSigma);
+  
+  preFitFunc2 -> SetNpx(10000);
+  preFitFunc2 -> SetLineColor(kBlue);
+  preFitFunc2 -> SetLineWidth(2);
+  
+  h -> Fit("preFitFunc2","NRQ+");
+  
+  double preN2     = preFitFunc2 -> GetParameter(0);
+  double preMu2    = preFitFunc2 -> GetParameter(1);
+  double preSigma2 = preFitFunc2 -> GetParameter(2);
+  
+  
+  
+  if( fitMethod == "crystalBallLowHigh" )
+  {
+    //-----------------------------
+    // fit with double crystal-ball
+        
+    (*fitFunc) = new TF1(funcName.c_str(),crystalBallLowHigh,0.,1000.,7);
+    
+    (*fitFunc) -> SetParLimits(3,0.,10.);
+    (*fitFunc) -> SetParLimits(4,0.,200.);
+    (*fitFunc) -> SetParLimits(5,0.,10.);
+    (*fitFunc) -> SetParLimits(6,0.,200.);
+    
+    (*fitFunc) -> SetParameter(0,preN2);
+    (*fitFunc) -> FixParameter(1,preMu2);
+    (*fitFunc) -> SetParameter(2,preSigma2);
+    (*fitFunc) -> SetParameter(3,0.8);
+    (*fitFunc) -> SetParameter(4,10.);
+    (*fitFunc) -> SetParameter(5,0.8);
+    (*fitFunc) -> SetParameter(6,10.);
+    
+    (*fitFunc) -> SetNpx(10000);
+    (*fitFunc) -> SetLineColor(kRed);
+    (*fitFunc) -> SetLineWidth(2);
+    
+    int counter = 0;
+    int fitStatus = -1;
+    while( counter < 5 )
+    {
+      TFitResultPtr fitResultPtr = h -> Fit(funcName.c_str(),"QR+","",0.,1000.);
+      fitStatus = (int)(fitResultPtr);
+      if( fitStatus == 0 ) break;
+      ++counter;
+    }
+  }
+  
+  
+  delete preFitFunc;
+  delete preFitFunc2;
 }
 
 
@@ -99,17 +235,18 @@ float GetXFitMIN1(const float& mH, const std::string& fitMethod)
     else return 1.;
   }
   
-  else if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+  else if( (fitMethod == "attenuatedExponential") || (fitMethod == "attenuatedExponentialNoHoles") ||
+           (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
   {
-    if     ( mH == 200. ) return 170.;
-    if     ( mH == 250. ) return 170.;
-    else if( mH == 300. ) return 170.;
-    else if( mH == 350. ) return 170.;
-    else if( mH == 400. ) return 170.;
-    else if( mH == 450. ) return 170.;
-    else if( mH == 500. ) return 170.;
-    else if( mH == 550. ) return 170.;
-    else if( mH == 600. ) return 170.;
+    if     ( mH == 200. ) return 175.;
+    if     ( mH == 250. ) return 175.;
+    else if( mH == 300. ) return 175.;
+    else if( mH == 350. ) return 175.;
+    else if( mH == 400. ) return 175.;
+    else if( mH == 450. ) return 175.;
+    else if( mH == 500. ) return 175.;
+    else if( mH == 550. ) return 175.;
+    else if( mH == 600. ) return 175.;
     else return 1.;
   }
   
@@ -118,7 +255,9 @@ float GetXFitMIN1(const float& mH, const std::string& fitMethod)
 
 float GetXFitMAX1(const float& mH, const std::string& fitMethod)
 {
-  if( (fitMethod == "doubleExponentialNoHoles") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+  if( (fitMethod == "doubleExponentialNoHoles") ||
+      (fitMethod == "attenuatedExponentialNoHoles") ||
+      (fitMethod == "attenuatedDoubleExponentialNoHoles") )
   {
     return -1.;
   }
@@ -145,7 +284,9 @@ float GetXFitMAX1(const float& mH, const std::string& fitMethod)
 
 float GetXFitMIN2(const float& mH, const std::string& fitMethod)
 {
-  if( (fitMethod == "doubleExponentialNoHoles") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+  if( (fitMethod == "doubleExponentialNoHoles") ||
+      (fitMethod == "attenuatedExponentialNoHoles") ||
+      (fitMethod == "attenuatedDoubleExponentialNoHoles") )
   {
     return -1.;
   }

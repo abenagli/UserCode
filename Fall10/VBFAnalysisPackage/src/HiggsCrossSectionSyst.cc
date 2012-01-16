@@ -6,6 +6,9 @@ double HiggsCrossSectionSyst(const float& mH, const std::string& productionMode,
 {
   if( productionMode == "gg" )
   {
+    if     ( (mH == 200) && (updown == "up") )   return 0.172;
+    else if( (mH == 200) && (updown == "down") ) return 0.152;
+    
     if     ( (mH == 250) && (updown == "up") )   return 0.165;
     else if( (mH == 250) && (updown == "down") ) return 0.156;
     
@@ -35,6 +38,9 @@ double HiggsCrossSectionSyst(const float& mH, const std::string& productionMode,
   
   else if( productionMode == "qq" )
   {
+    if     ( (mH == 200) && (updown == "up") )   return 0.034;
+    else if( (mH == 200) && (updown == "down") ) return 0.023;
+    
     if     ( (mH == 250) && (updown == "up") )   return 0.040;
     else if( (mH == 250) && (updown == "down") ) return 0.026;
     
