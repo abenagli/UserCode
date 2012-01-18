@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 
   if ( HLTperiod == -2 ) {
     refHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v5");
-    testHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v5");
+    testHLTPathNames.push_back("HLT_Ele30_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_PFMHT25_v1");
   }
 
   if ( HLTperiod == -1 ) {
