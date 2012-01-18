@@ -76,6 +76,39 @@ int main(int argc, char** argv)
   std::vector<std::string> refHLTPathNames;
   std::vector<std::string> testHLTPathNames;
 
+  if ( HLTperiod == -2 ) {
+    refHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v5");
+    testHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v5");
+  }
+
+  if ( HLTperiod == -1 ) {
+    refHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_v1");
+    testHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  }
+
+  if ( HLTperiod == 1 ) {
+    refHLTPathNames.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_v3");
+    refHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_v1");
+    refHLTPathNames.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_v2");
+    refHLTPathNames.push_back("HLT_Ele17_CaloIdVT_TrkIdT_CentralJet30_CentralJet25_v4");
+    refHLTPathNames.push_back("HLT_Ele17_CaloIdVT_TrkIdT_CentralJet30_CentralJet25_v1");
+    testHLTPathNames.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+    testHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    testHLTPathNames.push_back("HLT_Ele22_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    testHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4");
+    testHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  }
+
+  if ( HLTperiod == 2 ) {
+    refHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_v1");
+    testHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+  }
+
+  if ( HLTperiod == 3 ) {
+    refHLTPathNames.push_back("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v5");
+    testHLTPathNames.push_back("HLT_Ele30_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_PFMHT25_v1");
+  }
+
   if ( HLTperiod == 4 ) {
     refHLTPathNames.push_back("HLT_Ele27_WP80_DiCentralPFJet25_v4");
     refHLTPathNames.push_back("HLT_Ele27_WP80_DiCentralPFJet25_v5");
@@ -134,3 +167,4 @@ int main(int argc, char** argv)
   h_eff -> Write();
     
 }
+
