@@ -64,6 +64,7 @@ int main(int argc, char** argv)
   int verbosity = gConfigParser -> readIntOption("Options::verbosity"); 
   int trainMVA = gConfigParser -> readIntOption("Options::trainMVA"); 
   int applyMVA = gConfigParser -> readIntOption("Options::applyMVA"); 
+  int ttSelection = gConfigParser -> readIntOption("Options::ttSelection"); 
   
   int HLTCUT = gConfigParser -> readIntOption("Cuts::HLTCUT");
   
@@ -308,7 +309,7 @@ int main(int argc, char** argv)
   
   if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
   {
-    // 0-th - Run2011B
+    // 2-th - Run2011B
     HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+337.50);
     dummyHLTRunRanges.first = 175832; dummyHLTRunRanges.second = 176309; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
@@ -316,7 +317,7 @@ int main(int argc, char** argv)
     HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
     ++HLTLumiIt;
     
-    // 1-th - Run2011B
+    // 3-th - Run2011B
     HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+1359.20);
     dummyHLTRunRanges.first = 176461; dummyHLTRunRanges.second = 178380; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
@@ -324,7 +325,7 @@ int main(int argc, char** argv)
     HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
     ++HLTLumiIt;
     
-    // 2-th - Run2011B
+    // 4-th - Run2011B
     HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+815.5);
     dummyHLTRunRanges.first = 178420; dummyHLTRunRanges.second = 180252; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
@@ -368,7 +369,7 @@ int main(int argc, char** argv)
   
   if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
   { 
-    // 0-th - Run2011B
+    // 2-th - Run2011B
     HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+2512.20);
     dummyHLTRunRanges.first = 175832; dummyHLTRunRanges.second = 180252; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
@@ -410,7 +411,7 @@ int main(int argc, char** argv)
     // 3-th - Run2011B
     HLTLabels_e.push_back("2011B-1");
     dummyHLTPathNames.clear();
-    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    dummyHLTPathNames.push_back("HLT_Ele30_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_PFMHT25_v1");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
     
     // 4-th - Run2011B
@@ -441,7 +442,7 @@ int main(int argc, char** argv)
   
   if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
   {
-    // 0-th - Run2011B
+    // 2-th - Run2011B
     HLTLabels_mu.push_back("2011B-0");
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
@@ -618,16 +619,16 @@ int main(int argc, char** argv)
     bool pathFound = false;
     skipEvent = true;
 
-    //if( verbosity == 1)
-    //{
-    //  for(unsigned int HLTIt = 0; HLTIt < (*HLT_Names).size(); ++HLTIt)
-    //  {
-    //    std::cout << "HLT_Bit: "       << std::setw(3)  << HLTIt
-    //              << "   HLT_Name: "   << std::setw(50) << (*HLT_Names).at(HLTIt)
-    //              << "   HLT_Accept: " << std::setw(2)  <<(*HLT_Accept).at(HLTIt)
-    //              << std::endl;    
-    //  }
-    //}
+    if( verbosity == 1)
+    {
+      for(unsigned int HLTIt = 0; HLTIt < (*HLT_Names).size(); ++HLTIt)
+      {
+        std::cout << "HLT_Bit: "       << std::setw(3)  << HLTIt
+                  << "   HLT_Name: "   << std::setw(50) << (*HLT_Names).at(HLTIt)
+                  << "   HLT_Accept: " << std::setw(2)  <<(*HLT_Accept).at(HLTIt)
+                  << std::endl;    
+      }
+    }
     
     
     unsigned int HLTPeriod = -1;
@@ -1024,22 +1025,20 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "b-tag veto", step, verbosity);
     
     
+    // Higgs selection
     bool isBTagged = false;
-    bool isAntiBTagged = true;
+    if( vars.nBTag_TCHEM_pt30  > 0 ) isBTagged = true;
+    
+    if( (trainMVA == 0) && (ttSelection == 0) && (vars.nJets_cnt_pt30 > 2) && (isBTagged == true) ) continue;
     
     
-    // standard b-tag veto
-    if( vars.nBTag_TCHEM_pt30 > 0 ) isBTagged = true;
-    if( (trainMVA == 0) && (vars.nJets_cnt_pt30 > 2) && (isBTagged == true) ) continue;
-    //if( ( (trainMVA == 0) && (isBTagged == true) ) continue;
+    // top selection
+    bool isTopTagged = false;
+    if( vars.nBTag_TCHEM_pt30 == 2 ) isTopTagged = true;
     
-    
-    // b-tag selection
-    //if( vars.nBTag_TCHEM_pt30 == 1 ) isBTagged = true;
-    //if( ( (trainMVA == 0) && (isBTagged == false) ) continue;
-    //
-    //if( vars.WJ1_bTag > 3.30 ) continue;
-    //if( vars.WJ2_bTag > 3.30 ) continue;
+    if( (trainMVA == 0) && (ttSelection == 1) && (std::max(vars.WJ1_bTag,vars.WJ2_bTag) > 3.30) ) continue;
+    if( (trainMVA == 0) && (ttSelection == 1) && (std::min(vars.WJ1_bTag,vars.WJ2_bTag) > 3.30) ) continue;
+    if( (trainMVA == 0) && (ttSelection == 1) && (isTopTagged == false) ) continue;
     
     
     // fill distributions
