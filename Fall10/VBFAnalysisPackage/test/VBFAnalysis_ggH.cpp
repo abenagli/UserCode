@@ -1063,7 +1063,8 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "jet veto", step, verbosity);
     
     
-    if( vars.nJets_cnt_pt30 > 3 ) continue;
+    if( (ttSelection == 0) && (vars.nJets_cnt_pt30 > 3) ) continue;
+    if( (ttSelection == 1) && (vars.nJets_cnt_pt30 < 4) ) continue;
     
     
     // Fill distributions
