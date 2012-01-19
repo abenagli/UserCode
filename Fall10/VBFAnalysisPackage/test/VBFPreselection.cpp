@@ -52,6 +52,7 @@ int main(int argc, char** argv)
   float crossSection      = gConfigParser -> readFloatOption("Options::crossSection");
   int TMVA4JetTraining    = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
+  int ttSelection         = gConfigParser -> readIntOption("Options::ttSelection"); 
   int doTnP               = gConfigParser -> readIntOption("Options::doTnP"); 
   int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy");
     
@@ -891,7 +892,10 @@ int main(int argc, char** argv)
     {
       if( vars.nJets < 4 )
       {
-        SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999.);
+        if( ttSelection == 0 )
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999.);
+        else
+          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999., 0, &(vars.jets_bTag));
         
         std::vector<int> blacklistIt_W;
         blacklistIt_W.push_back(vars.selectIt_W.at(0));
@@ -908,11 +912,18 @@ int main(int argc, char** argv)
           std::vector<int> blacklistIt_tag;
           blacklistIt_tag.push_back(vars.selectIt_tag.at(0));
           blacklistIt_tag.push_back(vars.selectIt_tag.at(1));
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5., 9999., &blacklistIt_tag);
+
+          if( ttSelection == 0 )
+            SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999.);
+          else
+            SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999., 0, &(vars.jets_bTag));
         }
         else
         {
-          SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 9, 9999.);
+          if( ttSelection == 0 )
+            SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999.);
+          else
+            SelectWJets(vars.selectIt_W, vars.jets, WSelectionMETHOD, jetPtMIN, jetEtaCNT, 5, 9999., 0, &(vars.jets_bTag));
           
           std::vector<int> blacklistIt_W;
           blacklistIt_W.push_back(vars.selectIt_W.at(0));
