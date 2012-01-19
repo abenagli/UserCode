@@ -1533,7 +1533,8 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
                    const double& etaMAX,
                    const double& DetaMAX,
                    const double& mjjMAX,
-                   const std::vector<int>* blacklist)
+                   const std::vector<int>* blacklist,
+                   const std::vector<float>* bTags)
 {
   // initialize vector with result
   it.clear();
@@ -1558,6 +1559,8 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
   {
     if(jets.at(i).pt() < ptMin) continue;
     if(fabs(jets.at(i).eta()) > etaMAX) continue;
+    if(bTags)
+      if(bTags->at(i) > 3.30) continue;
     
     bool skipJet1 = false;
     if(blacklist)
@@ -1572,7 +1575,9 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
     {
       if(jets.at(j).pt() < ptMin) continue;
       if(fabs(jets.at(j).eta()) > etaMAX) continue;      
-
+      if(bTags)
+        if(bTags->at(j) > 3.30) continue;
+      
       bool skipJet2 = false;
       if(blacklist)
         for(unsigned int kk = 0; kk < blacklist -> size(); ++kk)
