@@ -28,6 +28,7 @@ int main(int argc, char** argv)
   std::string inputFileList  = gConfigParser -> readStringOption("Input::inputFileList");
   std::string inputTree  = gConfigParser -> readStringOption("Input::inputTree");
   std::string dataEra    = gConfigParser -> readStringOption("Input::dataEra");
+  std::string outputFolder  = gConfigParser -> readStringOption("Input::outputFolder");
 
   int runMin = gConfigParser -> readIntOption("Options::runMin");
   int runMax = gConfigParser -> readIntOption("Options::runMax");
@@ -47,7 +48,7 @@ int main(int argc, char** argv)
   TH1F* h_den = new TH1F("h_den","h_den",nBins,metPtMin,metPtMax);
   TH1F* h_eff = new TH1F("h_eff","h_eff",nBins,metPtMin,metPtMax);
   
-  std::string outfileName = dataEra + "_" + inputTree + "_MetTurnOn.root";
+  std::string outfileName = outputFolder + "/" + dataEra + "_" + inputTree + "_MetTurnOn.root";
   TFile* outfile = new TFile(outfileName.c_str(),"RECREATE");
   
   
