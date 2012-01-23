@@ -1534,7 +1534,7 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
                    const double& DetaMAX,
                    const double& mjjMAX,
                    const std::vector<int>* blacklist,
-                   const std::vector<float>* bTags)
+                   std::vector<float>* bTags)
 {
   // initialize vector with result
   it.clear();

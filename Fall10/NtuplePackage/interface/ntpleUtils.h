@@ -209,7 +209,7 @@ double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& je
                    const double& DetaMAX,
                    const double& mjjMAX,                     
                    const std::vector<int>* blacklist = 0,
-                   const std::vector<float>* bTags = 0);
+                   std::vector<float>* bTags = 0);
 
 /** select 4 jets */
 double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
