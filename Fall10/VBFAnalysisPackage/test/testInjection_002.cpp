@@ -1,3 +1,7 @@
+/*
+testInjection_002.exe ../../backgroundFitting/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_EGMu_Run2011AB/shapes_fitNoHoles_attenuatedDoubleExponential_400.root 50 10
+*/
+
 
 #include "TH1.h"
 #include "TH2.h"
@@ -44,6 +48,16 @@ double fixMe (RooRealVar & var)
 
 int main (int argc, char ** argv)
 {
+  if (argc < 2) 
+    {
+      cerr << "usage: " << argv[0] << " filename [toys] [NsmXS]\n" ;
+      exit (1) ;
+    }
+  int nToys = 1000 ;
+  if (argc>=2) nToys = atoi (argv[2]) ;
+  double nSMXS = 1. ;
+  if (argc>=3) nSMXS = atof (argv[3]) ;
+
 //  TFile *_file0 = TFile::Open("shapes_fitNoHoles_doubleExponential_350.root") ;
   TFile *_file0 = TFile::Open(argv[1]) ;
   RooWorkspace * w = (RooWorkspace *) _file0->Get ("workspace")               ;
@@ -67,10 +81,10 @@ int main (int argc, char ** argv)
   double initVal_kT = kT->getVal () ;
   double initVal_mu = mu->getVal () ;
 
-  double sigStartingNum = 1. ;
+  double sigStartingNum = nSMXS ;
   sigStartingNum *= exp->sumEntries () ;
 
-  RooRealVar nSig ("nSig", "nSig", sigStartingNum, -3. * sigStartingNum, 3 * sigStartingNum) ;
+  RooRealVar nSig ("nSig", "nSig", sigStartingNum, -4. * sigStartingNum, 4 * sigStartingNum) ;
   double numInit = d->sumEntries () ;
   RooRealVar nBkg ("nBkg", "nBkg", numInit, 0.5 * numInit, 2 * numInit) ;
   w->import (nSig) ;
@@ -141,11 +155,14 @@ int main (int argc, char ** argv)
   RooGenericPdf init_pdf_bkg ("init_pdf_bkg","","1./(exp(-1.*(@0-@1)/@2)+1.) * (exp(-1*@4*@0) + @3*exp(-1*@5*@0))",
                               RooArgSet(*x,init_mu,init_kT,init_N,init_L1,init_L2));
   init_pdf_bkg.fitTo (*d) ;
+
+  RooPlot * bkgFrame = x->frame () ;
+  d->plotOn (bkgFrame) ;
+  init_pdf_bkg.plotOn (bkgFrame) ;
+
   
   TH1F result ("result", "result", 100, -5, 5) ;
   
-  int nToys = 1000 ;
-
   //PG loop on toys
   for (int iToy = 0 ; iToy < nToys ; ++iToy)
     {
@@ -165,7 +182,7 @@ int main (int argc, char ** argv)
       kT->setVal (initVal_kT) ;
       mu->setVal (initVal_mu) ;
 
-      RooFitResult * sbRes = sb.fitTo (injected, Extended (kTRUE), Save (), Strategy (2), Minos (1)) ;
+      RooFitResult * sbRes = sb.fitTo (injected, Extended (kTRUE), Save (), Strategy (2), Minos (1), PrintLevel (-10)) ;
 
       double obtained = nSig.getVal () ;
       
@@ -181,6 +198,8 @@ int main (int argc, char ** argv)
 
   TFile out ("bias.root", "recreate") ;
   out.cd () ;
+  gausFrame->Write ("signalModel") ;
+  bkgFrame->Write ("backgroundModel") ;
   result.Write () ;
   out.Close () ;
 

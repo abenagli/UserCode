@@ -94,12 +94,19 @@ int main (int argc, char ** argv)
 
   cerr << "SKIRT DEFINED" << endl ;
 
-//  RooFitResult * rgws_res = rgws->fitTo (*exp, Save ()) ;
+  RooFitResult * rgws_res = rgws->fitTo (*exp, Save ()) ;
+  RooPlot * gausFrame = x->frame () ;
+  exp->plotOn (gausFrame) ;
+  rgws->plotOn (gausFrame) ;
+  TCanvas c1 ;
+  gausFrame->Draw () ;
+  c1.Print ("signalModel.pdf", "pdf") ;
+  
 
   //PG build injected dataset
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  double sigStartingNum = 10. ;
+  double sigStartingNum = 1. ;
   sigStartingNum *= exp->sumEntries () ;
 
   //PG inject a Higgs boson
@@ -117,6 +124,8 @@ int main (int argc, char ** argv)
   //PG fix the parameters of the turn-on
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
+  kT->setVal (55) ;
+  mu->setVal (190) ;
   fixMe (*kT) ;
   fixMe (*mu) ;
 
@@ -130,7 +139,7 @@ int main (int argc, char ** argv)
   fixMe (rgws_alphaR) ;
 
 //  RooRealVar nSig ("nSig", "nSig", sigStartingNum, 0.5 * sigStartingNum, 2 * sigStartingNum) ;
-  RooRealVar nSig ("nSig", "nSig", sigStartingNum, 0., 2 * sigStartingNum) ;
+  RooRealVar nSig ("nSig", "nSig", sigStartingNum, 0., 4 * sigStartingNum) ;
   double numInit = d->sumEntries () ;
   RooRealVar nBkg ("nBkg", "nBkg", numInit, 0.5 * numInit, 2 * numInit) ;
   w->import (nSig) ;
@@ -151,13 +160,15 @@ int main (int argc, char ** argv)
   sb.plotOn (xframe, VisualizeError (*sbRes, 1), FillColor (kOrange), FillStyle (3001)) ;
   sb.plotOn (xframe, LineColor (kRed)) ;
   sb.paramOn (xframe) ;
-  TCanvas c1 ;
 //  c1.SetLogy () ;
   xframe->Draw () ;
   c1.Print ("fitted.pdf", "pdf") ;
   c1.SaveAs ("fitted.root") ;
   
   cout << "INJECTED : " << sigStartingNum << endl ;
-  cout << "MEASURED : " << nSig.getVal () << endl ;
+  cout << "MEASURED : " << nSig.getVal () 
+       << " + " << nSig.getAsymErrorHi()
+       << " - " << nSig.getAsymErrorLo() 
+  << endl ;
 }
 

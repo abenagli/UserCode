@@ -1,5 +1,5 @@
 /*
-testBkg_004.exe cfg/2011-10-11-listaFile.txt  
+testBkg_004.exe cfg/2011-12-06-listaFile.txt 500 
 
 
 */

@@ -1,5 +1,5 @@
 /*
-testBkg_004.exe cfg/2011-10-11-listaFile.txt  
+testBkg_017.exe cfg/2011-10-11-listaFile.txt  
 
 Optimized cuts on WJJ_m for signal/sideband regions
 
@@ -89,7 +89,7 @@ int main (int argc, char** argv)
   cout << "samples " << inputFileList << endl ;
 
   map<string, TChain *> collections ;
-  string treeName = "ntu_14" ;
+  string treeName = "ntu_14" ; //PG all the preselections + deta_jj
   ReadFile (collections, inputFileList, treeName) ;
   
   TH1::SetDefaultSumw2 (kTRUE) ;
@@ -124,12 +124,14 @@ int main (int argc, char** argv)
 
   //PG the cuts
   TCut generalCut = "" ;
+//  generalCut = generalCut && "(helicityLikelihood > 0.5)" ; //PG helicity likelihood di HZZ
 //  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
 //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
 //   generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
 //   generalCut = generalCut && "lep_flavour == 11" ; //PG only electrons
   
   std::string outputRootFullFileName = "testBkg_017_S" + mass + "_2011AB.root" ;
+//  std::string outputRootFullFileName = "testBkg_017_S" + mass + "_LI_2011AB.root" ;  //PG helicity likelihood di HZZ
 //   std::string outputRootFullFileName = "testBkg_004_mu_S" + mass + "_2011AB.root" ;
 //   std::string outputRootFullFileName = "testBkg_004_el_S" + mass + "_2011AB.root" ;
   
@@ -260,6 +262,8 @@ int main (int argc, char** argv)
         
           continue ;
         }  
+
+      cout << "   defining histos" << endl ;
       
       TH1F * h_m4_lower = m4_lower.addSample (iColl->first.c_str ()) ;
       TH1F * h_m4_lower_c = m4_lower_c.addSample (iColl->first.c_str ()) ;
@@ -271,23 +275,29 @@ int main (int argc, char** argv)
       TH1F * h_m4_EvenHigher = m4_EvenHigher.addSample (iColl->first.c_str ()) ;
       TH1F * h_m4_sideband = m4_sideband.addSample (iColl->first.c_str ()) ;
 
+      cout << "   getting chain" << endl ;
+
       TChain * chain = iColl->second ;
       VBFAnalysisVariables vars ;
-      SetVBFPreselectionTreeBranches (vars, chain) ;
+//      SetVBFPreselectionTreeBranches (vars, chain) ;
 
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower->GetName (), cutLowerExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_c->GetName (), cutLower_cExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_a->GetName (), cutLower_aExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_signal->GetName (), cutSignalExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper->GetName (), cutUpperExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_c->GetName (), cutUpper_cExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_a->GetName (), cutUpper_aExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_EvenHigher->GetName (), cutEvenHigherExtended) ;
-      iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_sideband->GetName (), cutSidebandExtended) ;
+      cout << "   filling histos" << endl ;
+
+      int IND = 0 ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower->GetName (), cutLowerExtended) ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_c->GetName (), cutLower_cExtended) ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_lower_a->GetName (), cutLower_aExtended) ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_signal->GetName (), cutSignalExtended) ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper->GetName (), cutUpperExtended) ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_c->GetName (), cutUpper_cExtended) ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_upper_a->GetName (), cutUpper_aExtended) ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_EvenHigher->GetName (), cutEvenHigherExtended) ;
+      cout << "      index " << IND++ << endl ; iColl->second->Draw (m4_VAR + TString (" >> ") + h_m4_sideband->GetName (), cutSidebandExtended) ;
       
       ++index ;   
     } //PG loop over samples
 
+  cout << "   filling DONE" << endl ;
 
   //PG get the Wjets histograms from collections
   TH1F * m4_upper_c_Wjet = m4_upper_c.findHisto ("m4_upper_c_Wjet") ;
