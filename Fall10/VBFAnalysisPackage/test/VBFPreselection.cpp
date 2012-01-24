@@ -349,7 +349,8 @@ int main(int argc, char** argv)
       float hadIso = reader.GetFloat("electrons_hadIsoR03_depth1")->at(eleIt) + 
                      reader.GetFloat("electrons_hadIsoR03_depth2")->at(eleIt);
       float combIso = tkIso + emIso + hadIso;
-      
+
+      float z   = reader.GetFloat("electrons_z")->at(eleIt);      
       float dxy = reader.GetFloat("electrons_dB")->at(eleIt);
       
       int isEB = reader.GetInt("electrons_isEB")->at(eleIt);
@@ -384,6 +385,7 @@ int main(int argc, char** argv)
       if( ( pt > 20.)  &&
           ( fabs(eta) < 2.5 ) &&
           ( (fabs(etaSC) < 1.4442) || (fabs(etaSC) > 1.5660) ) &&
+          ( fabs(z-vars.PV_z) < 0.2 ) && 
           ( fabs(dxy) < 0.02 ) &&
           ( tkIso/pt < 0.1 ) &&   // standard
           //( tkIso/pt < 0.5 ) &&    // loose for QCD studies
@@ -487,7 +489,7 @@ int main(int argc, char** argv)
           ( fabs(eta) < 2.1 ) &&
 	  ( tkIso/pt < 0.05 ) &&   // standard
 	  //( tkIso/pt < 0.50 ) &&   // loose for QCD studies
-          ( fabs(z-vars.PV_z) < 1. ) && 
+          ( fabs(z-vars.PV_z) < 0.2 ) && 
           ( fabs(dxy) < 0.02 ) &&
           ( tracker == 1 ) &&
           //( standalone == 1 ) &&
