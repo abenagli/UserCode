@@ -28,6 +28,7 @@ int main(int argc, char** argv)
   std::string inputFileList  = gConfigParser -> readStringOption("Input::inputFileList");
   std::string inputTree  = gConfigParser -> readStringOption("Input::inputTree");
   std::string dataEra    = gConfigParser -> readStringOption("Input::dataEra");
+  std::string outputFolder  = gConfigParser -> readStringOption("Input::outputFolder");
 
   int runMin = gConfigParser -> readIntOption("Options::runMin");
   int runMax = gConfigParser -> readIntOption("Options::runMax");
@@ -60,7 +61,7 @@ int main(int argc, char** argv)
   
   }
   
-  std::string outfileName = dataEra + "_" + inputTree + "_JetTurnOn.root";
+  std::string outfileName = outputFolder + "/" + dataEra + "_" + inputTree + "_JetTurnOn.root";
   TFile* outfile = new TFile(outfileName.c_str(),"RECREATE");
   
   // initialize variables
