@@ -79,7 +79,7 @@ void makePFMetSyst(){
       }
     }
 
-    std::cout << "erorre syst relativo per il segnale a " << s_iMass << " GeV/c^2 = " << error/integral * 100. << std::endl;
+    std::cout << "errore syst relativo per il segnale a " << s_iMass << " GeV/c^2 = " << error/integral * 100. << std::endl;
     massIndex++;
   }
 
