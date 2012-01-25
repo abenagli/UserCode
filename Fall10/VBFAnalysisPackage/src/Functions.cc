@@ -123,6 +123,50 @@ double superGausCumCauda(double* x, double* par)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
+/*** gaussian + exponential tail smoothly joined ***/
+double doubleSuperGausCumCauda(double* x, double* par)
+{
+  //[0] = N
+  //[1] = mean
+  //[2] = sigma
+  //[3] = alpha right
+  //[4] = alpha left
+  
+  // variable
+  double xx = x[0];
+  // parameters
+  double mean = par[1];
+  double sigma = par[2];
+  double alphaR = par[3];
+  double alphaL = par[4];
+  //std::cout << "mean: " << mean << "   sigma: " << sigma << "   alpha: " << alpha << std::endl;
+  
+  if( xx > (mean+alphaR*sigma) )
+  {
+    double N = par[0] * exp( 0.5*alphaR*alphaR + alphaR/sigma*mean );
+    double K = alphaR/sigma;
+    
+    return N * exp(-1.*K*xx);
+  }
+  
+  else if( xx > (mean-alphaL*sigma) )
+  {
+    return par[0] * exp(-1.*(xx-mean)*(xx-mean)/(2.*sigma*sigma));
+  }
+  
+  else
+  {
+    double N = par[0] * exp( 0.5*alphaL*alphaL - alphaL/sigma*mean );
+    double K = alphaL/sigma;
+    
+    return N * exp(1.*K*xx);
+  }
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 /*** parabola + double exponential tail smoothly joined ***/
 double superParabolaCumDoubleCauda(double* x, double* par)
 {
@@ -543,9 +587,18 @@ double attenuatedDoubleExponentialCumLeadingEdge(double* x, double* par)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-double attenuatedCB(double* x, double* par)
+double attenuatedCrystallBallHigh(double* x, double* par)
 {
-  return crystalBallHigh (x, par) * antiFermi (x, &par[5]) ;
+  return antiFermi(x,par) * crystalBallHigh(x,&par[2]);
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+double attenuatedCrystalBallLowHigh(double* x, double* par)
+{
+  return antiFermi(x,par) * crystalBallLowHigh(x,&par[2]);
 }
 
 

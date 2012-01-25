@@ -29,6 +29,9 @@ double antiFermi(double* x, double* par);
 /*** gaussian + exponential tail smoothly joined ***/
 double superGausCumCauda(double* x, double* par);
 
+/*** gaussian + exponential tail smoothly joined ***/
+double doubleSuperGausCumCauda(double* x, double* par);
+
 /*** parabola + double exponential tail smoothly joined ***/
 double superParabolaCumDoubleCauda(double* x, double* par);
 
@@ -79,7 +82,9 @@ double attenuatedDoubleExponential(double* x, double* par);
 
 double attenuatedDoubleExponentialCumLeadingEdge(double* x, double* par);
 
-double attenuatedCB(double* x, double* par);
+double attenuatedCrystalBallHigh(double* x, double* par);
+
+double attenuatedCrystalBallLowHigh(double* x, double* par);
 
 double antiFermiWithScale (double* x, double* par);
 
