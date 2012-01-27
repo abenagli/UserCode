@@ -105,58 +105,82 @@
   }
   
   // Now make the histograms for the analysis corrections
-  TH1F* h_correction_PFMET[5];
+  TH1F* metEffHlt[5];
+  TH1F* metEffHltUp[5];
+  TH1F* metEffHltDown[5];
   // Run11A - May10th
-  h_correction_PFMET[0] = (TH1F*) h_num_red[0] -> Clone("h_correction_PFMET_0");
-  for ( int iBin = 1; iBin <= h_correction_PFMET[0] -> GetXaxis() -> GetNbins(); iBin++ ) {
-    h_correction_PFMET[0] -> SetBinContent(iBin, 1.);
-    h_correction_PFMET[0] -> SetBinError(iBin, 0.);
+  metEffHlt[0] = (TH1F*) h_num_red[0] -> Clone("metEffHltZero");
+  metEffHltUp[0] = (TH1F*) h_num_red[0] -> Clone("metEffHltZeroUp");
+  metEffHltDown[0] = (TH1F*) h_num_red[0] -> Clone("metEffHltZeroDown");
+  for ( int iBin = 1; iBin <= metEffHlt[0] -> GetXaxis() -> GetNbins(); iBin++ ) {
+    metEffHlt[0] -> SetBinContent(iBin, 1.);
+    metEffHlt[0] -> SetBinError(iBin, 0.);
+    metEffHltUp[0] -> SetBinContent(iBin, 1.);
+    metEffHltDown[0] -> SetBinContent(iBin, 1.);
   }
   // Run11A - v4-aug5-v6
-  h_correction_PFMET[1] = (TH1F*) h_num_red[1] -> Clone("h_correction_PFMET_1");
-  for ( int iBin = 1; iBin <= h_correction_PFMET[1] -> GetXaxis() -> GetNbins(); iBin++ ) {
-    float thisPFmet =  h_correction_PFMET[1] -> GetBinCenter(iBin);
+  metEffHlt[1] = (TH1F*) h_num_red[1] -> Clone("metEffHltOne");
+  metEffHltUp[1] = (TH1F*) h_num_red[1] -> Clone("metEffHltOneUp");
+  metEffHltDown[1] = (TH1F*) h_num_red[1] -> Clone("metEffHltOneDown");
+  for ( int iBin = 1; iBin <= metEffHlt[1] -> GetXaxis() -> GetNbins(); iBin++ ) {
+    float thisPFmet =  metEffHlt[1] -> GetBinCenter(iBin);
     float thisCorrection  = erfit[1] -> Eval(thisPFmet)/erfit[4] -> Eval(thisPFmet);
     float thisError = thisCorrection * sqrt(
      h_erfit[1]->GetBinError(iBin)**2/erfit[1] -> Eval(thisPFmet)**2
     +h_erfit[4]->GetBinError(iBin)**2/erfit[4] -> Eval(thisPFmet)**2);
-    h_correction_PFMET[1] -> SetBinContent(iBin, thisCorrection);
-    h_correction_PFMET[1] -> SetBinError(iBin, thisError);
+    metEffHlt[1] -> SetBinContent(iBin, thisCorrection);
+    metEffHlt[1] -> SetBinError(iBin, thisError);
+    metEffHltUp[1] -> SetBinContent(iBin, 1.);
+    metEffHltDown[1] -> SetBinContent(iBin, 1.);
   }
   // Run11B - normal
-  h_correction_PFMET[2] = (TH1F*) h_num_red[2] -> Clone("h_correction_PFMET_2");
-  for ( int iBin = 1; iBin <= h_correction_PFMET[2] -> GetXaxis() -> GetNbins(); iBin++ ) {
-    float thisPFmet =  h_correction_PFMET[2] -> GetBinCenter(iBin);
+  metEffHlt[2] = (TH1F*) h_num_red[2] -> Clone("metEffHltTwo");
+  metEffHltUp[2] = (TH1F*) h_num_red[2] -> Clone("metEffHltTwoUp");
+  metEffHltDown[2] = (TH1F*) h_num_red[2] -> Clone("metEffHltTwoDown");
+  for ( int iBin = 1; iBin <= metEffHlt[2] -> GetXaxis() -> GetNbins(); iBin++ ) {
+    float thisPFmet =  metEffHlt[2] -> GetBinCenter(iBin);
     float thisCorrection  = erfit[2] -> Eval(thisPFmet)/erfit[4] -> Eval(thisPFmet);
     float thisError = thisCorrection * sqrt(
      h_erfit[2]->GetBinError(iBin)**2/erfit[2] -> Eval(thisPFmet)**2
     +h_erfit[4]->GetBinError(iBin)**2/erfit[4] -> Eval(thisPFmet)**2);
-    h_correction_PFMET[2] -> SetBinContent(iBin, thisCorrection);
-    h_correction_PFMET[2] -> SetBinError(iBin, thisError);
+    metEffHlt[2] -> SetBinContent(iBin, thisCorrection);
+    metEffHlt[2] -> SetBinError(iBin, thisError);
+    metEffHltUp[2] -> SetBinContent(iBin, thisCorrection + thisError);
+    metEffHltDown[2] -> SetBinContent(iBin, thisCorrection - thisError);
   }
   // Run11B - backup
-  h_correction_PFMET[3] = (TH1F*) h_num_red[3] -> Clone("h_correction_PFMET_3");
-  for ( int iBin = 1; iBin <= h_correction_PFMET[3] -> GetXaxis() -> GetNbins(); iBin++ ) {
-    float thisPFmet =  h_correction_PFMET[3] -> GetBinCenter(iBin);
+  metEffHlt[3] = (TH1F*) h_num_red[3] -> Clone("metEffHltThree");
+  metEffHltUp[3] = (TH1F*) h_num_red[3] -> Clone("metEffHltThreeUp");
+  metEffHltDown[3] = (TH1F*) h_num_red[3] -> Clone("metEffHltThreeDown");
+  for ( int iBin = 1; iBin <= metEffHlt[3] -> GetXaxis() -> GetNbins(); iBin++ ) {
+    float thisPFmet =  metEffHlt[3] -> GetBinCenter(iBin);
     float thisCorrection  = erfit[3] -> Eval(thisPFmet)/erfit[5] -> Eval(thisPFmet);
     float thisError = thisCorrection * sqrt(
      h_erfit[3]->GetBinError(iBin)**2/erfit[3] -> Eval(thisPFmet)**2
     +h_erfit[5]->GetBinError(iBin)**2/erfit[5] -> Eval(thisPFmet)**2);
-    h_correction_PFMET[3] -> SetBinContent(iBin, thisCorrection);
-    h_correction_PFMET[3] -> SetBinError(iBin, thisError);
+    metEffHlt[3] -> SetBinContent(iBin, thisCorrection);
+    metEffHlt[3] -> SetBinError(iBin, thisError);
+    metEffHltUp[3] -> SetBinContent(iBin, thisCorrection + thisError);
+    metEffHltDown[3] -> SetBinContent(iBin, thisCorrection - thisError);
   }
   // Run11B - PF
-  h_correction_PFMET[4] = (TH1F*) h_num_red[4] -> Clone("h_correction_PFMET_4");
-  for ( int iBin = 1; iBin <= h_correction_PFMET[4] -> GetXaxis() -> GetNbins(); iBin++ ) {
-    float thisPFmet =  h_correction_PFMET[4] -> GetBinCenter(iBin);
+  metEffHlt[4] = (TH1F*) h_num_red[4] -> Clone("metEffHltFour");
+  metEffHltUp[4] = (TH1F*) h_num_red[4] -> Clone("metEffHltFourUp");
+  metEffHltDown[4] = (TH1F*) h_num_red[4] -> Clone("metEffHltFourDown");
+  for ( int iBin = 1; iBin <= metEffHlt[4] -> GetXaxis() -> GetNbins(); iBin++ ) {
+    float thisPFmet =  metEffHlt[4] -> GetBinCenter(iBin);
     float thisCorrection  = erfit[4] -> Eval(thisPFmet);
     float thisError = h_erfit[4]->GetBinError(iBin);
-    h_correction_PFMET[4] -> SetBinContent(iBin, thisCorrection);
-    h_correction_PFMET[4] -> SetBinError(iBin, thisError);
+    metEffHlt[4] -> SetBinContent(iBin, thisCorrection);
+    metEffHlt[4] -> SetBinError(iBin, thisError);
+    metEffHltUp[4] -> SetBinContent(iBin, thisCorrection + thisError);
+    metEffHltDown[4] -> SetBinContent(iBin, thisCorrection - thisError);
   }
   
   const int nCorrections = 5;
   TFile* outfile = new TFile ("../data/PFMETto/PFMETto_corrections.root","RECREATE");
-  for ( int i = 0; i < nCorrections; i++ ) h_correction_PFMET[i] -> Write();
+  for ( int i = 0; i < nCorrections; i++ ) metEffHlt[i] -> Write();
+  for ( int i = 0; i < nCorrections; i++ ) metEffHltUp[i] -> Write();
+  for ( int i = 0; i < nCorrections; i++ ) metEffHltDown[i] -> Write();
 
 }
