@@ -1684,7 +1684,7 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader, const int
 {
   if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetHVariables" << std::endl;
   
-  vars.lepNu_nSolutions = GetNeutrino(vars.nu1,vars.nu2,vars.lep,vars.met,vars.WJ1,vars.WJ2);
+  vars.lepNu_nSolutions = GetNeutrino(vars.nu1,vars.nu2,vars.lep,vars.met);
   vars.p_nu1 = &(vars.nu1);
   vars.p_nu2 = &(vars.nu2);
   

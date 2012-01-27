@@ -475,6 +475,11 @@ int main(int argc, char** argv)
   }
   
   
+  // met phi correction
+  //TFile* inFile_correction_met_phi = TFile::Open("/gwteraz/users/benaglia/data/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB/computeMetPhiCorrection.root");
+  //TF1* f_correction_met_phi = (TF1*)( inFile_correction_met_phi->Get("f_corr") );
+  
+  
   
   
   
@@ -497,16 +502,16 @@ int main(int argc, char** argv)
   stepNames[2]  = "2) preselection";
   stepNames[3]  = "3) HLT";
   stepNames[4]  = "4) lepton ID+iso";
-  stepNames[5]  = "5) lepton pt/eta";
+  stepNames[5]  = "5) lepton pt";
   stepNames[6]  = "6) lepton mt";
   stepNames[7]  = "7) met";
   stepNames[8]  = "8) W-jets pt";
   stepNames[9]  = "9) b-tag veto";
   stepNames[10] = "10) jet veto";
-  stepNames[11] = "11) lep-met angles";
-  stepNames[12] = "12) WJ1-WJ2 angles";
-  stepNames[13] = "13) W pt";
-  stepNames[14] = "14) kinematic fit";
+  stepNames[11] = "11) lepton eta";
+  stepNames[12] = "12) lep-met angles";
+  stepNames[13] = "13) WJ1-WJ2 angles";
+  stepNames[14] = "14) W pt";
   stepNames[15] = "15) W mass";
   stepNames[16] = "16) helicity likelihood";
   stepNames[17] = "17) helicity BDT";
@@ -890,17 +895,15 @@ int main(int argc, char** argv)
     
     
     
-    //***********************
-    // STEP 5 - lepton pt/eta
+    //*******************
+    // STEP 5 - lepton pt
     step += 1;
-    //SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
+    //SetStepNames(stepNames, "lepton pt", step, verbosity);
      
     if( (vars.lep_flavour == 11) && (vars.lep.pt() < elePtMIN) ) continue;
     if( (vars.lep_flavour == 11) && (vars.lep.pt() > elePtMAX) ) continue;
     if( (vars.lep_flavour == 13) && (vars.lep.pt() < muPtMIN) ) continue;
     if( (vars.lep_flavour == 13) && (vars.lep.pt() > muPtMAX) ) continue;
-    if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
-    if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
     
     if( vars.lep_flavour == 11 )    
     {
@@ -1034,7 +1037,7 @@ int main(int argc, char** argv)
     
     // top selection
     bool isTopTagged = false;
-    if( vars.nBTag_TCHEM_pt30 == 2 ) isTopTagged = true;
+    if( vars.nBTag_TCHEM_pt20 >= 2 ) isTopTagged = true;
     
     if( (trainMVA == 0) && (ttSelection == 1) && (std::max(vars.WJ1_bTag,vars.WJ2_bTag) > 3.30) ) continue;
     if( (trainMVA == 0) && (ttSelection == 1) && (std::min(vars.WJ1_bTag,vars.WJ2_bTag) > 3.30) ) continue;
@@ -1064,9 +1067,56 @@ int main(int argc, char** argv)
     
     
     if( (ttSelection == 0) && (vars.nJets_cnt_pt30 > 3) ) continue;
-    if( (ttSelection == 1) && (vars.nJets_cnt_pt30 < 4) ) continue;
+    if( (ttSelection == 1) && (vars.nJets_cnt_pt20 < 4) ) continue;
     
     
+    // kinematic fit
+    DoKinematicFit(vars,0.1,"MIB");
+    
+    
+    // qg likelihood
+    //if( vars.WJ1.pt() > 0. )
+    //  vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    //if( vars.WJ2.pt() > 0. )
+    //  vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    //if( vars.WJ2.pt() > vars.WJ1.pt() )
+    //{
+    //  float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
+    //  vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
+    //  vars.WJ1_QGLikelihood = QGLikelihoodDummy;
+    //}
+    
+    
+    // helicity likelihood
+    TLorentzVector lep_tlv(vars.lep_KF.Px(),vars.lep_KF.Py(),vars.lep_KF.Pz(),vars.lep_KF.E());
+    TLorentzVector nu_tlv ( vars.nu_KF.Px(), vars.nu_KF.Py(), vars.nu_KF.Pz(), vars.nu_KF.E());
+    TLorentzVector WJ1_tlv(vars.WJ1_KF.Px(),vars.WJ1_KF.Py(),vars.WJ1_KF.Pz(),vars.WJ1_KF.E());
+    TLorentzVector WJ2_tlv(vars.WJ2_KF.Px(),vars.WJ2_KF.Py(),vars.WJ2_KF.Pz(),vars.WJ2_KF.E());
+        
+    HelicityLikelihoodDiscriminant::HelicityAngles hangles;
+    if( vars.lep_charge < 0 ) hangles = helicitylikeli -> computeHelicityAngles(lep_tlv,nu_tlv,WJ1_tlv,WJ2_tlv);
+    else                      hangles = helicitylikeli -> computeHelicityAngles(nu_tlv,lep_tlv,WJ1_tlv,WJ2_tlv);
+    helicitylikeli -> setMeasurables(hangles);
+    double sProb = helicitylikeli -> getSignalProbability();
+    double bProb = helicitylikeli -> getBkgdProbability();
+    if( (sProb >= 0.) && (sProb <= 1.) &&
+        (bProb >= 0.) && (bProb <= 1.) )
+      vars.helicityLikelihood = sProb/(sProb+bProb);  
+    else
+      vars.helicityLikelihood = -1.;
+    
+        
+    // helicity bdt
+    if( applyMVA == 1 ) vars.mva = MVAReader -> EvaluateMVA("kBDT_H250");
+    
+    
+    //// met phi correction
+    //if( vars.dataFlag == 0 )
+    //{
+    //  vars.eventWeight *= f_correction_met_phi->Eval(vars.met_phi);
+    //}
+    
+      
     // Fill distributions
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
@@ -1082,8 +1132,32 @@ int main(int argc, char** argv)
     
     
     
+    //*********************
+    // STEP 11 - lepton eta
+    step += 1;
+    //SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
+    
+    if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
+    if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
+    
+    
+    // fill distributions    
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
     //****************************************
-    // STEP 11 - Initial cuts - lep-met angles
+    // STEP 12 - Initial cuts - lep-met angles
     step += 1;
     //SetStepNames(stepNames, "lep-met angles", step, verbosity);
     
@@ -1108,7 +1182,7 @@ int main(int argc, char** argv)
     
     
     //****************************************
-    // STEP 12 - Initial cuts - WJ1-WJ2 angles
+    // STEP 13 - Initial cuts - WJ1-WJ2 angles
     step += 1;
     //SetStepNames(stepNames, "WJ1-WJ2 angle cuts", step, verbosity);
     
@@ -1165,74 +1239,13 @@ int main(int argc, char** argv)
     
     
     //*******************************
-    // STEP 13 - Initial cuts - W pt
+    // STEP 14 - Initial cuts - W pt
     step += 1;
     //SetStepNames(stepNames, "W pt", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.WJ1+vars.WJ2).Pt() < WPtMIN) ) continue;
     if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.lep+vars.met).Pt() < WPtMIN) ) continue;
-    
-    
-    // fill distributions
-    stepEvents[step] += 1;
-    stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
-    //***************************************
-    // STEP 14 - Initial cuts - Kinematic Fit
-    step += 1;
-    //SetStepNames(stepNames, "Kinematic Fit", step, verbosity);
-    
-    
-    // kinematic fit
-    DoKinematicFit(vars,0.1,"MIB");
-    
-    
-    // qg likelihood
-    //if( vars.WJ1.pt() > 0. )
-    //  vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
-    //if( vars.WJ2.pt() > 0. )
-    //  vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
-    //if( vars.WJ2.pt() > vars.WJ1.pt() )
-    //{
-    //  float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
-    //  vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
-    //  vars.WJ1_QGLikelihood = QGLikelihoodDummy;
-    //}
-    
-    
-    // helicity likelihood
-    TLorentzVector lep_tlv(vars.lep_KF.Px(),vars.lep_KF.Py(),vars.lep_KF.Pz(),vars.lep_KF.E());
-    TLorentzVector nu_tlv ( vars.nu_KF.Px(), vars.nu_KF.Py(), vars.nu_KF.Pz(), vars.nu_KF.E());
-    TLorentzVector WJ1_tlv(vars.WJ1_KF.Px(),vars.WJ1_KF.Py(),vars.WJ1_KF.Pz(),vars.WJ1_KF.E());
-    TLorentzVector WJ2_tlv(vars.WJ2_KF.Px(),vars.WJ2_KF.Py(),vars.WJ2_KF.Pz(),vars.WJ2_KF.E());
-        
-    HelicityLikelihoodDiscriminant::HelicityAngles hangles;
-    if( vars.lep_charge < 0 ) hangles = helicitylikeli -> computeHelicityAngles(lep_tlv,nu_tlv,WJ1_tlv,WJ2_tlv);
-    else                      hangles = helicitylikeli -> computeHelicityAngles(nu_tlv,lep_tlv,WJ1_tlv,WJ2_tlv);
-    helicitylikeli -> setMeasurables(hangles);
-    double sProb = helicitylikeli -> getSignalProbability();
-    double bProb = helicitylikeli -> getBkgdProbability();
-    if( (sProb >= 0.) && (sProb <= 1.) &&
-        (bProb >= 0.) && (bProb <= 1.) )
-      vars.helicityLikelihood = sProb/(sProb+bProb);  
-    else
-      vars.helicityLikelihood = -1.;
-    
-        
-    // helicity bdt
-    if( applyMVA == 1 ) vars.mva = MVAReader -> EvaluateMVA("kBDT_H250");
     
     
     // fill distributions
@@ -1339,7 +1352,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    //if( step >= firstSTEP) cloneTrees[step] -> Fill();
     
     
     

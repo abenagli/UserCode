@@ -379,6 +379,12 @@ void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
   vars.p_WJ2_KF2 = new ROOT::Math::XYZTVector;
   reducedTree -> Branch("WJ2_KF2", "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ2_KF2);
   
+  reducedTree -> Branch("lepNu_nSolutions_KF",  &vars.lepNu_nSolutions_KF,   "lepNu_nSolutions_KF/F");
+  
+  reducedTree -> Branch("lepNu_m_KF",  &vars.lepNu_m_KF,   "lepNu_m_KF/F");
+  reducedTree -> Branch("lepNu_m_KF1", &vars.lepNu_m_KF1, "lepNu_m_KF1/F");
+  reducedTree -> Branch("lepNu_m_KF2", &vars.lepNu_m_KF2, "lepNu_m_KF2/F");
+  
   reducedTree -> Branch("lepNuW_m_KF",  &vars.lepNuW_m_KF,   "lepNuW_m_KF/F");
   reducedTree -> Branch("lepNuW_m_KF1", &vars.lepNuW_m_KF1, "lepNuW_m_KF1/F");
   reducedTree -> Branch("lepNuW_m_KF2", &vars.lepNuW_m_KF2, "lepNuW_m_KF2/F");

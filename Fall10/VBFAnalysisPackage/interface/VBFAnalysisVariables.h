@@ -299,7 +299,11 @@ struct VBFAnalysisVariables
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNu_m;
+  float lepNu_m_KF;
+  float lepNu_m_KF1;
+  float lepNu_m_KF2;
   int lepNu_nSolutions;
+  int lepNu_nSolutions_KF;
   float lepNuW_m;
   float lepNuW_m1;
   float lepNuW_m2;
