@@ -13,9 +13,7 @@
 int GetNeutrino(ROOT::Math::XYZTVector& nu1,
                 ROOT::Math::XYZTVector& nu2,
 		const ROOT::Math::XYZTVector& lep,
-		const ROOT::Math::XYZTVector& met,
-		const ROOT::Math::XYZTVector& WJ1,
-		const ROOT::Math::XYZTVector& WJ2);
+		const ROOT::Math::XYZTVector& met);
 
 
 /** get lnujj angles  */

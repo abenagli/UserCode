@@ -3,6 +3,7 @@
 
 #include "treeReader.h"
 #include "ntpleUtils.h"
+#include "analysisUtils.h"
 #include "VBFAnalysisVariables.h"
 #include "TKinFitterUtils.h"
 
