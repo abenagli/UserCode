@@ -46,7 +46,7 @@ CPPFLAGS  = -Wall -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAG
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)
-SONAME	 =  libVBF.so
+SONAME	 =  libAnalysisPackage.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
 GLIBS    =  $(ROOTGLIBS) -lGenVector -lFoam -lMinuit -lRooFitCore -lRooFit -lMLP -lXMLIO -lTMVA -lTreePlayer $(NTUPLEPACKAGELIBS) $(KINFITTERPACKAGELIBS)
@@ -65,7 +65,7 @@ CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS) $(NT
 CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
-SONAME	 =  libVBF.dylib
+SONAME	 =  libAnalysisPackage.dylib
 SOFLAGS  =
 endif
 #################################################
@@ -83,7 +83,7 @@ CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS) $(NT
 CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS) $(KINFITTERPACKAGEFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
-SONAME	 =  libVBF.dylib
+SONAME	 =  libAnalysisPackage.dylib
 SOFLAGS  =
 endif
 #################################################
@@ -118,11 +118,11 @@ test:
 
 
 $(OBJ)%$(ObjSuf): %$(SrcSuf) $(HDRS)
-	$(CXX) -c $(CXXFLAGS) -o $(OBJ)$@ $< 
+	$(CXX) -c $(CXXFLAGS) -o $@ $< 
 
 
 $(OBJ)mydict.o: $(OBJ)mydict.cc $(OBJ)mydict.h
-	$(CXX) -c $(CXXFLAGS) -o $(OBJ)$@ $<
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 
 $(OBJ)mydict.cc: $(DICTHDRS)
@@ -134,7 +134,7 @@ $(LIB)$(SONAME): $(OBJS) $(OBJ)mydict.o
 	$(LD) $(LDFLAGS) $(OBJS) $(OBJ)mydict.o $(SOFLAGS) -o $(LIB)$(SONAME)
 
 $(BIN)%$(BinSuf): $(PRG)%$(PrgSuf) $(HDRS) $(LIB)$(SONAME)
-	$(CPP) $(CPPFLAGS) -L$(LIB) $(GLIBS) -lVBF  -o $@ $<
+	$(CPP) $(CPPFLAGS) $(GLIBS) -L$(LIB) -lAnalysisPackage  -o $@ $<
 
 
 clean:

@@ -93,7 +93,7 @@ int main(int argc, char** argv)
   //[Cuts]
   float lepNuWMMIN = GetLepNuWMMIN(higgsMass);
   float lepNuWMMAX = GetLepNuWMMAX(higgsMass);
-  float xFitMIN = GetXFitMIN1(higgsMass,analysisMethod);
+  float xFitMIN = GetXFitMIN1(higgsMass,analysisMethod,step);
   float xFitMAX = GetXFitMAX2(higgsMass,analysisMethod);
   
   int nBins = 200;

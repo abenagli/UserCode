@@ -223,7 +223,7 @@ void FillHistograms(TTree* tree,
   // define common cut and weight
   std::string commonCut = "(1 == 1) * ((WJJ_m >= 65.) && (WJJ_m < 95.))";
   char lumiChar[50]; sprintf(lumiChar,"%f",lumi);
-  std::string weight = "( 1000 * " + std::string(lumiChar) + " * 1. / totEvents * crossSection * PURescaleFactor(PUit_n) )";
+  std::string weight = "( 1000 * " + std::string(lumiChar) + " * 1. / totEvents * crossSection * eventWeight * PUWeight )";
   
     
   std::string histoName = (h_lepNuW_m[label]) -> GetName();

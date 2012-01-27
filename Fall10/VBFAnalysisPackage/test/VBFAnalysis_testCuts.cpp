@@ -292,6 +292,7 @@ int main(int argc, char** argv)
   dummyCutValues.push_back("0.5");
   dummyCutValues.push_back("0.6");
   dummyCutValues.push_back("0.7");
+  dummyCutValues.push_back("0.8");
   
   dummyCutName = "helicityLikelihood";
   cutNames[dummyVarName] = dummyCutName;
@@ -760,6 +761,9 @@ void DrawSignificance(std::map<int,std::map<std::string,std::vector<TH1F*> > >& 
       
       if( (binCenter >= GetLepNuWMMIN(mass)) && (binMin == -1) ) binMin = bin;
       if( (binCenter >= GetLepNuWMMIN(mass)) && (binCenter < GetLepNuWMMAX(mass)) ) binMax = bin;
+      
+      binMin = 1;
+      binMax = nBins;
     }
     
     

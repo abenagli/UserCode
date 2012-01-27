@@ -157,6 +157,12 @@ int main(int argc, char** argv)
   
   
   
+  
+  
+  
+  
+  
+  
   //---------------------------------------------  
   // Angles
   //---------------------------------------------
@@ -254,12 +260,12 @@ int main(int argc, char** argv)
   stack -> SetUnit("");
   stack -> Draw(variableNames, histoName, method, lumi, step, 35, PURescale, weightEvent, stackSig);
     
-  //variableNames.at(0) = "PV_d0";  
-  //histoName    = "PV_d0";
-  //stack -> SetXaxisRange(0., 0.5);
-  //stack -> SetXaxisTitle("d0(PV)");
-  //stack -> SetUnit("cm");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 250, PURescale, weightEvent, stackSig);
+  variableNames.at(0) = "PV_d0";  
+  histoName    = "PV_d0";
+  stack -> SetXaxisRange(0., 0.5);
+  stack -> SetXaxisTitle("d0(PV)");
+  stack -> SetUnit("cm");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 250, PURescale, weightEvent, stackSig);
   
   variableNames.at(0) = "PV_z";
   histoName    = "PV_z";
@@ -383,6 +389,13 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("met");
   stack -> SetUnit("GeV");
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
+  
+  variableNames.at(0) = "met.phi()";  
+  histoName = "met_phi";
+  stack -> SetXaxisRange(-3.14159, 3.14159);
+  stack -> SetXaxisTitle("#phi(met)");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
   
   variableNames.at(0) = "lepMet_pt";
   histoName = "lepMet_pt";
@@ -627,6 +640,14 @@ int main(int argc, char** argv)
   stack -> SetUnit("GeV");
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
   
+  variableNames.at(0) = "met.phi()";  
+  histoName = "ele_met_phi";
+  cuts -> at(0) = "( lep_flavour == 11 )";
+  stack -> SetXaxisRange(-3.14159, 3.14159);
+  stack -> SetXaxisTitle("#phi(met)");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  
   variableNames.at(0) = "lepMet_mt";
   histoName = "ele_lepMet_mt";
   cuts -> at(0) = "( lep_flavour == 11 )";
@@ -815,6 +836,14 @@ int main(int argc, char** argv)
   stack -> SetUnit("GeV");
   stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
   
+  variableNames.at(0) = "met.phi()";  
+  histoName = "mu_met_phi";
+  cuts -> at(0) = "( lep_flavour == 13 )";
+  stack -> SetXaxisRange(-3.14159, 3.14159);
+  stack -> SetXaxisTitle("#phi(met)");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  
   variableNames.at(0) = "lepMet_mt";
   histoName = "mu_lepMet_mt";
   cuts -> at(0) = "( lep_flavour == 13 )";
@@ -961,18 +990,36 @@ int main(int argc, char** argv)
   stack -> Draw(variableNames, histoName, method, lumi, step, 10, PURescale, weightEvent, stackSig);
   
   variableNames.at(0) = "max(WJ1_bTag,WJ2_bTag)";
-  histoName = "WJets_bTag1";
+  histoName = "WJets_bTag1_2j";
+  cuts -> at(0) = "nJets_cnt_pt30 == 2";
   stack -> SetXaxisRange(-5., 10.);
   stack -> SetXaxisTitle("1^{st} bTag");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "min(WJ1_bTag,WJ2_bTag)";
-  histoName = "WJets_bTag2";
+  histoName = "WJets_bTag2_2j";
+  cuts -> at(0) = "nJets_cnt_pt30 == 2";
   stack -> SetXaxisRange(-5., 10.);
   stack -> SetXaxisTitle("2^{nd} bTag2");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);  
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);  
+  
+  variableNames.at(0) = "max(WJ1_bTag,WJ2_bTag)";
+  histoName = "WJets_bTag1_3j";
+  cuts -> at(0) = "nJets_cnt_pt30 == 3";
+  stack -> SetXaxisRange(-5., 10.);
+  stack -> SetXaxisTitle("1^{st} bTag");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
+  
+  variableNames.at(0) = "min(WJ1_bTag,WJ2_bTag)";
+  histoName = "WJets_bTag2_3j";
+  cuts -> at(0) = "nJets_cnt_pt30 == 3";
+  stack -> SetXaxisRange(-5., 10.);
+  stack -> SetXaxisTitle("2^{nd} bTag2");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);  
   
   
   
