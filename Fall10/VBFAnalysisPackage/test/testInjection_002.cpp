@@ -1,5 +1,15 @@
 /*
-testInjection_002.exe ../../backgroundFitting/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_EGMu_Run2011AB/shapes_fitNoHoles_attenuatedDoubleExponential_400.root 50 10
+
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_200_emu.root 425 2000 1 bias_200 >& log_200.txt ; \
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_250_emu.root 433 2000 1 bias_250 >& log_250.txt ; \
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_300_emu.root 420 2000 1 bias_300 >& log_300.txt ; \
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_350_emu.root 450 2000 1 bias_350 >& log_350.txt ; \
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_400_emu.root 371 2000 1 bias_400 >& log_400.txt ; \
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_450_emu.root 250 2000 1 bias_450 >& log_450.txt ; \
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_500_emu.root 161 2000 1 bias_500 >& log_500.txt ; \
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_550_emu.root 103 2000 1 bias_550 >& log_550.txt ; \
+testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_600_emu.root  65 2000 1 bias_600 >& log_600.txt ; 
+
 */
 
 
@@ -34,7 +44,7 @@ testInjection_002.exe ../../backgroundFitting/VBFAnalysis_PFlow_allH_PT30_maxSum
 #include "RooChi2Var.h"
 #endif 
 
-#include "SUperCrystalBall.h"
+#include "RooSuperCrystalBall.h"
 #include "RooGaussWithSkirt.h"
 
 using namespace RooFit ;
@@ -53,12 +63,18 @@ int main (int argc, char ** argv)
       cerr << "usage: " << argv[0] << " filename [toys] [NsmXS]\n" ;
       exit (1) ;
     }
-  int nToys = 1000 ;
-  if (argc>=2) nToys = atoi (argv[2]) ;
-  double nSMXS = 1. ;
-  if (argc>=3) nSMXS = atof (argv[3]) ;
 
-//  TFile *_file0 = TFile::Open("shapes_fitNoHoles_doubleExponential_350.root") ;
+  int expnum = 100 ;
+  if (argc>=3) expnum = atoi (argv[2]) ;
+  int nToys = 1000 ;
+  if (argc>=4) nToys = atoi (argv[3]) ;
+  double nSMXS = 1. ;
+  if (argc>=5) nSMXS = atof (argv[4]) ;
+  string baseName = "bias" ;
+  if (argc>=6) baseName = argv[5] ;
+
+  expnum *= nSMXS ;
+
   TFile *_file0 = TFile::Open(argv[1]) ;
   RooWorkspace * w = (RooWorkspace *) _file0->Get ("workspace")               ;
   RooDataHist * d = (RooDataHist *) w->data ("data_obs")                      ;
@@ -73,7 +89,7 @@ int main (int argc, char ** argv)
   RooGenericPdf * sing_alone = (RooGenericPdf *) sig->clone ("sig_alone") ;
   RooGenericPdf * bkg_alone = (RooGenericPdf *) bkg->clone ("bkg_alone") ;
   RooGenericPdf * bkg_forGaus = (RooGenericPdf *) bkg->clone ("bkg_forGaus") ;
-  RooDataHist * exp = (RooDataHist *) w->data ("dh_ggH")                      ;
+//  RooDataHist * exp = (RooDataHist *) w->data ("dh_ggH")                      ;
 
   double initVal_L1 = L1->getVal () ;
   double initVal_L2 = L2->getVal () ;
@@ -81,10 +97,10 @@ int main (int argc, char ** argv)
   double initVal_kT = kT->getVal () ;
   double initVal_mu = mu->getVal () ;
 
-  double sigStartingNum = nSMXS ;
-  sigStartingNum *= exp->sumEntries () ;
+//  double sigStartingNum = nSMXS ;
+//  sigStartingNum *= exp->sumEntries () ;
 
-  RooRealVar nSig ("nSig", "nSig", sigStartingNum, -4. * sigStartingNum, 4 * sigStartingNum) ;
+  RooRealVar nSig ("nSig", "nSig", expnum, -4. * expnum, 4 * expnum) ;
   double numInit = d->sumEntries () ;
   RooRealVar nBkg ("nBkg", "nBkg", numInit, 0.5 * numInit, 2 * numInit) ;
   w->import (nSig) ;
@@ -93,46 +109,45 @@ int main (int argc, char ** argv)
   //PG prepare the signal function for the fit
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-  //PG preliminary fit to initiate parameters
-  RooRealVar gm ("gm", "gm", 0., 1000.) ; 
-  RooRealVar gs ("gs", "gs", 0., 100.); 
-  RooGaussian peak ("peak", "peak", *x, gm, gs) ;
-
-  peak.fitTo (*exp) ;
-  x->setRange ("R1", gm.getVal () - gs.getVal () , gm.getVal () + gs.getVal ()) ;    
-  peak.fitTo (*exp, Range ("R1"), PrintLevel (-10)) ;
-  x->setRange ("R2", gm.getVal () - gs.getVal () , gm.getVal () + gs.getVal ()) ;    
-  peak.fitTo (*exp, Range ("R2"), PrintLevel (-10)) ;
-
-  double gmean = gm.getVal () ;
-  double gsigma = gs.getVal () ;
-
-  //PG gaus with exponential tails
-  RooRealVar rgws_norma  ("rgws_norma",  "rgws_norma",  exp->sumEntries ()) ;
-  RooRealVar rgws_mean   ("rgws_mean",   "rgws_mean",   gmean, 0.5 * gmean, 1.5 * gmean) ;
-  RooRealVar rgws_sigma  ("rgws_sigma",  "rgws_sigma",  gsigma, 0.5 * gsigma, 2 * gsigma) ;
-  RooRealVar rgws_alphaL ("rgws_alphaL", "rgws_alphaL", 1, 0, 10) ;
-  RooRealVar rgws_alphaR ("rgws_alphaR", "rgws_alphaR", 1, 0, 10) ;
-
-  RooGaussWithSkirt * rgws = new RooGaussWithSkirt ("rgws", "rgws",
-                                *x, rgws_norma, rgws_mean, rgws_sigma, rgws_alphaL, rgws_alphaR) ;
-
-  fixMe (rgws_norma ) ;
-  fixMe (rgws_mean  ) ;
-  fixMe (rgws_sigma ) ;
-  fixMe (rgws_alphaL) ;
-  fixMe (rgws_alphaR) ;
-
-  RooFitResult * rgws_res = rgws->fitTo (*exp, Save ()) ;
+//  //PG preliminary fit to initiate parameters
+//  RooRealVar gm ("gm", "gm", 0., 1000.) ; 
+//  RooRealVar gs ("gs", "gs", 0., 100.); 
+//  RooGaussian peak ("peak", "peak", *x, gm, gs) ;
+//
+//  peak.fitTo (*exp) ;
+//  x->setRange ("R1", gm.getVal () - gs.getVal () , gm.getVal () + gs.getVal ()) ;    
+//  peak.fitTo (*exp, Range ("R1"), PrintLevel (-10)) ;
+//  x->setRange ("R2", gm.getVal () - gs.getVal () , gm.getVal () + gs.getVal ()) ;    
+//  peak.fitTo (*exp, Range ("R2"), PrintLevel (-10)) ;
+//
+//  double gmean = gm.getVal () ;
+//  double gsigma = gs.getVal () ;
+//
+//  //PG gaus with exponential tails
+//  RooRealVar rgws_norma  ("rgws_norma",  "rgws_norma",  exp->sumEntries ()) ;
+//  RooRealVar rgws_mean   ("rgws_mean",   "rgws_mean",   gmean, 0.5 * gmean, 1.5 * gmean) ;
+//  RooRealVar rgws_sigma  ("rgws_sigma",  "rgws_sigma",  gsigma, 0.5 * gsigma, 2 * gsigma) ;
+//  RooRealVar rgws_alphaL ("rgws_alphaL", "rgws_alphaL", 1, 0, 10) ;
+//  RooRealVar rgws_alphaR ("rgws_alphaR", "rgws_alphaR", 1, 0, 10) ;
+//
+//  RooGaussWithSkirt * rgws = new RooGaussWithSkirt ("rgws", "rgws",
+//                                *x, rgws_norma, rgws_mean, rgws_sigma, rgws_alphaL, rgws_alphaR) ;
+//
+//  fixMe (rgws_norma ) ;
+//  fixMe (rgws_mean  ) ;
+//  fixMe (rgws_sigma ) ;
+//  fixMe (rgws_alphaL) ;
+//  fixMe (rgws_alphaR) ;
+//
+//  RooFitResult * rgws_res = rgws->fitTo (*exp, Save ()) ;
   RooPlot * gausFrame = x->frame () ;
-  exp->plotOn (gausFrame) ;
-  rgws->plotOn (gausFrame) ;
-  TCanvas c1 ;
-  gausFrame->Draw () ;
-  c1.Print ("signalModel.pdf", "pdf") ;
+  sig->plotOn (gausFrame) ;
+//  TCanvas c1 ;
+//  gausFrame->Draw () ;
+//  c1.Print ("signalModel.pdf", "pdf") ;
 
   //PG signal plus background
-  RooAddPdf sb ("sb","bkg+ggH", RooArgList (*rgws, *bkg), RooArgList (nSig, nBkg)) ;
+  RooAddPdf sb ("sb","bkg+ggH", RooArgList (*sig, *bkg), RooArgList (nSig, nBkg)) ;
   
   //PG fix the parameters of the turn-on
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -142,7 +157,7 @@ int main (int argc, char ** argv)
   fixMe (*kT) ;
   fixMe (*mu) ;
 
-  //PG fit the bkg only to data
+  //PG fit the bkg only to data to get the model for toys
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   //PG variables
@@ -162,6 +177,12 @@ int main (int argc, char ** argv)
 
   
   TH1F result ("result", "result", 100, -5, 5) ;
+  result.GetXaxis ()->SetTitle ("(N_{exp} - N_{fit}) / N_{exp}") ;
+  TH1F fitStatus ("fitStatus", "fitStatus", 20, -10, 10) ;
+  fitStatus.GetXaxis ()->SetTitle ("fit status") ;
+  TH2F result_vs_fitStatus ("result_vs_fitStatus", "result_vs_fitStatus", 100, -5, 5, 20, -10, 10) ;
+  result_vs_fitStatus.GetXaxis ()->SetTitle ("(N_{exp} - N_{fit}) / N_{exp}") ;
+  result_vs_fitStatus.GetYaxis ()->SetTitle ("fit status") ;
   
   //PG loop on toys
   for (int iToy = 0 ; iToy < nToys ; ++iToy)
@@ -170,11 +191,11 @@ int main (int argc, char ** argv)
       RooDataSet * background = init_pdf_bkg.generate (*x, d->sumEntries ()) ;
       RooDataHist injected ("h_back", "h_back", *x, *background) ; 
       //PG generate signal
-      RooDataSet * signal     = rgws->generate (*x, sigStartingNum) ;
+      RooDataSet * signal     = sig->generate (*x, expnum) ;
       injected.add (*signal, "1==1", 1.) ;
 
       //PG prepare the fitting function initial params
-      nSig.setVal (sigStartingNum) ;
+      nSig.setVal (expnum) ;
       nBkg.setVal (numInit) ;
       L1->setVal (initVal_L1) ;
       L2->setVal (initVal_L2) ;
@@ -182,27 +203,41 @@ int main (int argc, char ** argv)
       kT->setVal (initVal_kT) ;
       mu->setVal (initVal_mu) ;
 
+//      RooFitResult * sbRes = sb.fitTo (injected, Extended (kTRUE), Save (), Strategy (2), Minos (1)) ;
       RooFitResult * sbRes = sb.fitTo (injected, Extended (kTRUE), Save (), Strategy (2), Minos (1), PrintLevel (-10)) ;
-
+      cout << "PIETRO fit " << iToy << " status " << sbRes->status () << endl ;
+      
       double obtained = nSig.getVal () ;
       
-      result.Fill ((sigStartingNum - obtained) / sigStartingNum) ;
+      result.Fill ((expnum - obtained) / expnum) ;
+      fitStatus.Fill (sbRes->status ()) ;
+      result_vs_fitStatus.Fill ((expnum - obtained) / expnum, sbRes->status ()) ;
       
       delete background ;
       delete signal ;
+      delete sbRes ;
     } //PG loop on toys
 
+  TCanvas c1 ;
   c1.cd () ;
   result.Draw () ;
-  c1.Print ("bias.pdf", "pdf") ;
+  string name = baseName + ".pdf" ;
+  c1.Print (name.c_str (), "pdf") ;
 
-  TFile out ("bias.root", "recreate") ;
+  name = baseName + ".root" ;
+  TFile out (name.c_str (), "recreate") ;
   out.cd () ;
   gausFrame->Write ("signalModel") ;
   bkgFrame->Write ("backgroundModel") ;
   result.Write () ;
+  fitStatus.Write () ;
+  result_vs_fitStatus.Write () ;
   out.Close () ;
 
   return 0 ;
 }
 
+/*
+- i parametri costanti sono trattati come tali da roofit
+
+*/
