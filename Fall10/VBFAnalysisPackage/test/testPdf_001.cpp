@@ -78,7 +78,7 @@ void saveShapes (map<string, vector<TH1F *> > shapes, TFile & f)
        iShapes != shapes.end () ;
        ++iShapes)
     {
-      for (int iHisto = 0 ; iHisto < iShapes->second.size () ; ++iHisto)
+      for (unsigned int iHisto = 0 ; iHisto < iShapes->second.size () ; ++iHisto)
         iShapes->second.at (iHisto)->Write () ;
     }
 }
@@ -208,6 +208,7 @@ int main (int argc, char** argv)
   map<string, TH1F *> PDFDown_CT10_shapes ;
 
   map<string, pair<double, double> > CT10_band ;
+  map<string, pair<double, double> > CT10_relBand ;
 
   //PG loop over samples
   for (map<string, vector<TH1F *> >::iterator iShapes = CT10_shapes.begin () ; 
@@ -263,6 +264,7 @@ int main (int argc, char** argv)
         } //PG loop over eigenvectors
 
       CT10_band[iShapes->first] = pair<double, double> (intCentre + sqrt (errUp), intCentre - sqrt (errDown)) ;
+      CT10_relBand[iShapes->first] = pair<double, double> (sqrt (errUp) / intCentre, sqrt (errDown) / intCentre) ;
       for (int iBin = 1 ; iBin <= iShapes->second.at (0)->GetNbinsX () ; ++iBin)
         {
           dummyUp->SetBinContent (iBin, iShapes->second.at (0)->GetBinContent (iBin) + sqrt (dummyUp->GetBinContent (iBin))) ;
@@ -275,6 +277,7 @@ int main (int argc, char** argv)
   //PG ---------------------------------------
 
   map<string, pair<double, double> > NNPDF_band ;
+  map<string, pair<double, double> > NNPDF_relBand ;
 
   //PG loop over samples
   for (map<string, vector<TH1F *> >::iterator iShapes = NNPDF_shapes.begin () ; 
@@ -303,6 +306,7 @@ int main (int argc, char** argv)
       errUp /= (double) (nEigen - 1) ;
       errDown /= (double) (nEigen - 1) ;
       NNPDF_band[iShapes->first] = pair<double, double> (intCentre + sqrt (errUp), intCentre - sqrt (errDown)) ;
+      NNPDF_band[iShapes->first] = pair<double, double> (sqrt (errUp) / intCentre, sqrt (errDown) / intCentre) ;
     } //PG loop over samples
 
 
@@ -310,6 +314,7 @@ int main (int argc, char** argv)
   //PG ---------------------------------------
 
   map<string, pair<double, double> > MSTW_band ;
+  map<string, pair<double, double> > MSTW_relBand ;
 
   //PG loop over samples
   for (map<string, vector<TH1F *> >::iterator iShapes = MSTW_shapes.begin () ; 
@@ -338,6 +343,7 @@ int main (int argc, char** argv)
           errDown += unc_m * unc_m ;
         } //PG loop over eigenvectors
       MSTW_band[iShapes->first] = pair<double, double> (intCentre + sqrt (errUp), intCentre - sqrt (errDown)) ;
+      MSTW_band[iShapes->first] = pair<double, double> (sqrt (errUp) / intCentre, sqrt (errDown) / intCentre) ;
     } //PG loop over samples
 
   //PG printout errors and global envelope
@@ -350,14 +356,14 @@ int main (int argc, char** argv)
       cout << iMap->first ;
       
       //PG the minimum of the envelope
-      double mini = (iMap->second).first ;
+      double mini = (iMap->second).second ;
       mini = std::min (mini, NNPDF_band[iMap->first].second) ;
       mini = std::min (mini, MSTW_band[iMap->first].second) ;
     
       cout << " | " << mini ;
     
       //PG the maximum of the envelope
-      double maxi = (iMap->second).second ;
+      double maxi = (iMap->second).first ;
       maxi = std::max (maxi, NNPDF_band[iMap->first].first) ;
       maxi = std::max (maxi, MSTW_band[iMap->first].first) ;
 
@@ -373,6 +379,30 @@ int main (int argc, char** argv)
           
       cout << endl ;    
     } //PG loop over samples
+
+  //PG printout the relative errors envelope
+  //PG -------------------------------------------------
+
+  cout << "\nRELATIVE BAND ONLY\n\n" ;
+
+  for (map<string, pair<double, double> >::iterator iMap = CT10_relBand.begin () ; 
+       iMap != CT10_relBand.end () ; ++iMap)
+    {
+      cout << iMap->first ;
+      //PG the minimum of the envelope
+      double mini = (iMap->second).second ;
+      mini = std::min (mini, NNPDF_band[iMap->first].second) ;
+      mini = std::min (mini, MSTW_band[iMap->first].second) ;
+    
+      cout << " | " << mini ;
+    
+      //PG the maximum of the envelope
+      double maxi = (iMap->second).first ;
+      maxi = std::max (maxi, NNPDF_band[iMap->first].first) ;
+      maxi = std::max (maxi, MSTW_band[iMap->first].first) ;
+
+      cout << " | " << maxi ;
+    }  
 
 
   //PG renormalize up and down shapes to the central one
