@@ -112,108 +112,108 @@
   }
 
   // Now make the histograms for the analysis corrections
-  TH2F* jetEffHlt[5];
-  TH2F* jetEffHltUp[5];
-  TH2F* jetEffHltDown[5];
+  TH2F* jetEffHLT[5];
+  TH2F* jetEffHLTUp[5];
+  TH2F* jetEffHLTDown[5];
   int theBins  = h_num_red[0] -> GetXaxis() -> GetNbins();
   float theMin = h_num_red[0] -> GetXaxis() -> GetXmin();
   float theMax = h_num_red[0] -> GetXaxis() -> GetXmax();
   Double_t etaBoundaries[5] = {-2.4, -1., 0, 1., 2.4};
   // Run11A - May10th
-  jetEffHlt[0] = new TH2F("jetEffHltZero","jetEffHltZero",
+  jetEffHLT[0] = new TH2F("jetEffHLT0","jetEffHLT0",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltUp[0] = new TH2F("jetEffHltZeroUp","jetEffHltZeroUp",
+  jetEffHLTUp[0] = new TH2F("jetEffHLT0Up","jetEffHLT0Up",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltDown[0] = new TH2F("jetEffHltZeroDown","jetEffHltZeroDown",
+  jetEffHLTDown[0] = new TH2F("jetEffHLT0Down","jetEffHLT0Down",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  for ( int iBinX = 1; iBinX <= jetEffHlt[0] -> GetNbinsX(); iBinX++ ) {
-    for ( int iBinY = 1; iBinY <= jetEffHlt[0] -> GetNbinsY(); iBinY++ ) {
-      jetEffHlt[0] -> SetBinContent(iBinX, iBinY, 1.);
-      jetEffHlt[0] -> SetBinError(iBin, iBinY, 0.);
+  for ( int iBinX = 1; iBinX <= jetEffHLT[0] -> GetNbinsX(); iBinX++ ) {
+    for ( int iBinY = 1; iBinY <= jetEffHLT[0] -> GetNbinsY(); iBinY++ ) {
+      jetEffHLT[0] -> SetBinContent(iBinX, iBinY, 1.);
+      jetEffHLT[0] -> SetBinError(iBin, iBinY, 0.);
     }
   }
   // Run11A - v4-aug5-v6
-  jetEffHlt[1] = new TH2F("jetEffHltOne","jetEffHltOne",
+  jetEffHLT[1] = new TH2F("jetEffHLT1","jetEffHLT1",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltUp[1] = new TH2F("jetEffHltOneUp","jetEffHltOneUp",
+  jetEffHLTUp[1] = new TH2F("jetEffHLT1Up","jetEffHLT1Up",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltDown[1] = new TH2F("jetEffHltOneDown","jetEffHltOneDown",
+  jetEffHLTDown[1] = new TH2F("jetEffHLT1Down","jetEffHLT1Down",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  for ( int iBinX = 1; iBinX <= jetEffHlt[1] -> GetNbinsX(); iBinX++ ) {
-    for ( int iBinY = 1; iBinY <= jetEffHlt[1] -> GetNbinsY(); iBinY++ ) {
-      jetEffHlt[1] -> SetBinContent(iBinX, iBinY, 1.);
-      jetEffHlt[1] -> SetBinError(iBin, iBinY, 0.);
-      jetEffHltUp[1] -> SetBinContent(iBinX, iBinY, 1.);
-      jetEffHltDown[1] -> SetBinContent(iBinX, iBinY, 1.);
+  for ( int iBinX = 1; iBinX <= jetEffHLT[1] -> GetNbinsX(); iBinX++ ) {
+    for ( int iBinY = 1; iBinY <= jetEffHLT[1] -> GetNbinsY(); iBinY++ ) {
+      jetEffHLT[1] -> SetBinContent(iBinX, iBinY, 1.);
+      jetEffHLT[1] -> SetBinError(iBin, iBinY, 0.);
+      jetEffHLTUp[1] -> SetBinContent(iBinX, iBinY, 1.);
+      jetEffHLTDown[1] -> SetBinContent(iBinX, iBinY, 1.);
     }
   }
   // Run11B - normal
-  jetEffHlt[2] = new TH2F("jetEffHltTwo","jetEffHltTwo",
+  jetEffHLT[2] = new TH2F("jetEffHLT2","jetEffHLT2",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltUp[2] = new TH2F("jetEffHltTwoUp","jetEffHltTwoUp",
+  jetEffHLTUp[2] = new TH2F("jetEffHLT2Up","jetEffHLT2Up",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltDown[2] = new TH2F("jetEffHltTwoDown","jetEffHltTwoDown",
+  jetEffHLTDown[2] = new TH2F("jetEffHLT2Down","jetEffHLT2Down",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  for ( int iBinX = 1; iBinX <= jetEffHlt[2] -> GetNbinsX(); iBinX++ ) {
-    for ( int iBinY = 1; iBinY <= jetEffHlt[2] -> GetNbinsY(); iBinY++ ) {
-      jetEffHlt[2] -> SetBinContent(iBinX, iBinY, 1.);
-      jetEffHlt[2] -> SetBinError(iBin, iBinY, 0.);
-      jetEffHltUp[2] -> SetBinContent(iBinX, iBinY, 1.);
-      jetEffHltDown[2] -> SetBinContent(iBinX, iBinY, 1.);
+  for ( int iBinX = 1; iBinX <= jetEffHLT[2] -> GetNbinsX(); iBinX++ ) {
+    for ( int iBinY = 1; iBinY <= jetEffHLT[2] -> GetNbinsY(); iBinY++ ) {
+      jetEffHLT[2] -> SetBinContent(iBinX, iBinY, 1.);
+      jetEffHLT[2] -> SetBinError(iBin, iBinY, 0.);
+      jetEffHLTUp[2] -> SetBinContent(iBinX, iBinY, 1.);
+      jetEffHLTDown[2] -> SetBinContent(iBinX, iBinY, 1.);
     }
   }
   // Run11B - backup
-  jetEffHlt[3] = new TH2F("jetEffHltThree","jetEffHltThree",
+  jetEffHLT[3] = new TH2F("jetEffHLT3","jetEffHLT3",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltUp[3] = new TH2F("jetEffHltThreeUp","jetEffHltThreeUp",
+  jetEffHLTUp[3] = new TH2F("jetEffHLT3Up","jetEffHLT3Up",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltDown[3] = new TH2F("jetEffHltThreeDown","jetEffHltThreeDown",
+  jetEffHLTDown[3] = new TH2F("jetEffHLT3Down","jetEffHLT3Down",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  for ( int iBinX = 1; iBinX <= jetEffHlt[3] -> GetNbinsX(); iBinX++ ) {
-    for ( int iBinY = 1; iBinY <= jetEffHlt[3] -> GetNbinsY(); iBinY++ ) {
-      jetEffHlt[3] -> SetBinContent(iBinX, iBinY, 1.);
-      jetEffHlt[3] -> SetBinError(iBin, iBinY, 0.);
-      jetEffHltUp[3] -> SetBinContent(iBinX, iBinY, 1.);
-      jetEffHltUp[3] -> SetBinContent(iBinX, iBinY, 1.);
+  for ( int iBinX = 1; iBinX <= jetEffHLT[3] -> GetNbinsX(); iBinX++ ) {
+    for ( int iBinY = 1; iBinY <= jetEffHLT[3] -> GetNbinsY(); iBinY++ ) {
+      jetEffHLT[3] -> SetBinContent(iBinX, iBinY, 1.);
+      jetEffHLT[3] -> SetBinError(iBin, iBinY, 0.);
+      jetEffHLTUp[3] -> SetBinContent(iBinX, iBinY, 1.);
+      jetEffHLTUp[3] -> SetBinContent(iBinX, iBinY, 1.);
     }
   }
   // Run11B - PF
-  jetEffHlt[4] = new TH2F("jetEffHltFour","jetEffHltFour",
+  jetEffHLT[4] = new TH2F("jetEffHLT4","jetEffHLT4",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltUp[4] = new TH2F("jetEffHltFourUp","jetEffHltFourUp",
+  jetEffHLTUp[4] = new TH2F("jetEffHLT4Up","jetEffHLT4Up",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  jetEffHltDown[4] = new TH2F("jetEffHltFourDown","jetEffHltFourDown",
+  jetEffHLTDown[4] = new TH2F("jetEffHLT4Down","jetEffHLT4Down",
   theBins, theMin, theMax,
   nEtaBins, etaBoundaries);
-  for ( int iBinY = 1; iBinY <= jetEffHlt[4] -> GetNbinsY(); iBinY++ ) {
-    for ( int iBinX = 1; iBinX <= jetEffHlt[4] -> GetNbinsX(); iBinX++ ) {
-      float thisPt =  jetEffHlt[4] -> GetXaxis() -> GetBinCenter(iBinX);
+  for ( int iBinY = 1; iBinY <= jetEffHLT[4] -> GetNbinsY(); iBinY++ ) {
+    for ( int iBinX = 1; iBinX <= jetEffHLT[4] -> GetNbinsX(); iBinX++ ) {
+      float thisPt =  jetEffHLT[4] -> GetXaxis() -> GetBinCenter(iBinX);
       float thisCorrection  = erfit[iBinY-1] -> Eval(thisPt);
       float thisError = h_erfit[iBinY-1]->GetBinError(iBinX);
-      jetEffHlt[4] -> SetBinContent(iBinX, iBinY, thisCorrection);
-      jetEffHlt[4] -> SetBinError(iBin, iBinY, thisError);
-      jetEffHltUp[4] -> SetBinContent(iBinX, iBinY, thisCorrection + thisError);
-      jetEffHltDown[4] -> SetBinContent(iBinX, iBinY, thisCorrection - thisError);
+      jetEffHLT[4] -> SetBinContent(iBinX, iBinY, thisCorrection);
+      jetEffHLT[4] -> SetBinError(iBin, iBinY, thisError);
+      jetEffHLTUp[4] -> SetBinContent(iBinX, iBinY, thisCorrection + thisError);
+      jetEffHLTDown[4] -> SetBinContent(iBinX, iBinY, thisCorrection - thisError);
     }
   }
   
   const int nCorrections = 5;
   TFile* outfile = new TFile ("../data/PFJETto/PFJETto_corrections.root","RECREATE");
-  for ( int i = 0; i < nCorrections; i++ ) jetEffHlt[i] -> Write();
-  for ( int i = 0; i < nCorrections; i++ ) jetEffHltUp[i] -> Write();
-  for ( int i = 0; i < nCorrections; i++ ) jetEffHltDown[i] -> Write();
+  for ( int i = 0; i < nCorrections; i++ ) jetEffHLT[i] -> Write();
+  for ( int i = 0; i < nCorrections; i++ ) jetEffHLTUp[i] -> Write();
+  for ( int i = 0; i < nCorrections; i++ ) jetEffHLTDown[i] -> Write();
 }
