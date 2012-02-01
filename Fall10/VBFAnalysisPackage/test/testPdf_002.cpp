@@ -103,7 +103,7 @@ int main (int argc, char** argv)
   cout << "samples " << inputFileList << endl ;
 
   map<string, TChain *> collections ;
-  string treeName = "ntu_14" ;
+  string treeName = "ntu" ;
   ReadFile (collections, inputFileList, treeName) ;
   
   TH1::SetDefaultSumw2 (kTRUE) ;
@@ -114,10 +114,10 @@ int main (int argc, char** argv)
   double m4_max = 1000. ;
 
   //PG the cuts
-  TCut generalCut = "" ;
-  generalCut = generalCut && "WJJ_m > 65  && WJJ_m < 95" ;
-  generalCut = generalCut && "WJJ_Deta < 1.5" ;
-  generalCut = generalCut && "abs(lep_eta) < 1.5" ;
+  TCut generalCut = "1==1" ;
+//  generalCut = generalCut && "WJJ_m > 65  && WJJ_m < 95" ;
+//  generalCut = generalCut && "WJJ_Deta < 1.5" ;
+//  generalCut = generalCut && "abs(lep_eta) < 1.5" ;
 
 //   TCut generalCut = "helicityLikelihood > 0.5" ;
 //  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
@@ -194,7 +194,7 @@ int main (int argc, char** argv)
   //PG saving the raw histograms
   //PG -------------------------
 
-  TFile * outputRootFile = new TFile ("testPDF_001_raw.root", "RECREATE") ;
+  TFile * outputRootFile = new TFile ("testPDF_002_raw.root", "RECREATE") ;
   outputRootFile->cd () ;
   saveShapes (CT10_shapes, *outputRootFile) ;
   saveShapes (NNPDF_shapes, *outputRootFile) ;
@@ -435,7 +435,7 @@ int main (int argc, char** argv)
   //PG save up, down central shapes for inspection
   //PG -------------------------------------------
   
-  outputRootFile = new TFile ("testPDF_001_insp.root", "RECREATE") ;
+  outputRootFile = new TFile ("testPDF_002_insp.root", "RECREATE") ;
   outputRootFile->cd () ;
   
   for (map<string,TH1F * >::iterator iShapes = PDFUp_CT10_shapes.begin () ; 
@@ -455,7 +455,7 @@ int main (int argc, char** argv)
   //PG save in the format for the analysis
   //PG -----------------------------------
   
-  outputRootFile = new TFile ("countSignalEvents_PDFUp_PFlow.root", "RECREATE") ;
+  outputRootFile = new TFile ("countSignalEvents_002_PDFUp_PFlow.root", "RECREATE") ;
   outputRootFile->cd () ;
   
   for (map<string,TH1F * >::iterator iShapes = PDFUp_CT10_shapes.begin () ; 
@@ -464,7 +464,7 @@ int main (int argc, char** argv)
 
   outputRootFile->Close () ;
 
-  outputRootFile = new TFile ("countSignalEvents_PDFDown_PFlow.root", "RECREATE") ;
+  outputRootFile = new TFile ("countSignalEvents_002_PDFDown_PFlow.root", "RECREATE") ;
   outputRootFile->cd () ;
   
   for (map<string,TH1F * >::iterator iShapes = PDFDown_CT10_shapes.begin () ; 
