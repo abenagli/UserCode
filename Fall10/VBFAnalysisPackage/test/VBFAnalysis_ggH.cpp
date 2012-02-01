@@ -7,6 +7,7 @@
 #include "HelicityLikelihoodDiscriminant.h"
 #include "QGLikelihoodCalculator.h"
 #include "VBFKinematicFit.h"
+#include "EfficiencyCorrector.h"
 
 #include <iomanip>
 
@@ -51,6 +52,10 @@ int main(int argc, char** argv)
   std::string jsonFileName   = gConfigParser -> readStringOption("Input::jsonFileName");
   std::string pileupFileName = gConfigParser -> readStringOption("Input::pileupFileName");
   std::string MVAWeightsFile = gConfigParser -> readStringOption("Input::MVAWeightsFile");
+  std::string eleEffFileName = gConfigParser -> readStringOption("Input::eleEffFileName");
+  std::string muEffFileName  = gConfigParser -> readStringOption("Input::muEffFileName");
+  std::string jetEffFileName = gConfigParser -> readStringOption("Input::jetEffFileName");
+  std::string metEffFileName = gConfigParser -> readStringOption("Input::metEffFileName");
   
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
@@ -67,6 +72,7 @@ int main(int argc, char** argv)
   int ttSelection = gConfigParser -> readIntOption("Options::ttSelection"); 
   
   int HLTCUT = gConfigParser -> readIntOption("Cuts::HLTCUT");
+  int EffCorrection = gConfigParser -> readIntOption("Cuts::EffCorrection");
   
   float elePtMIN = gConfigParser -> readFloatOption("Cuts::elePtMIN");
   float elePtMAX = gConfigParser -> readFloatOption("Cuts::elePtMAX");
@@ -124,6 +130,7 @@ int main(int argc, char** argv)
   float WJJDphiMAX = gConfigParser -> readFloatOption("Cuts::WJJDphiMAX");
   
   float WPtMIN = gConfigParser -> readFloatOption("Cuts::WPtMIN");
+  float WJPtMIN = gConfigParser -> readFloatOption("Cuts::WJPtMIN");
   
   float lepMetWDphiMIN = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMIN");
   float lepMetWDphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMAX");
@@ -169,7 +176,10 @@ int main(int argc, char** argv)
   
   TH1F* distrPU_DATA = (TH1F*)( inFile_pileup->Get("pileup") );
   distrPU_DATA -> Scale(1./distrPU_DATA->Integral());
-    
+  
+  // get the efficiency correction histos
+  EfficiencyCorrector* theEffCorrector;
+  if ( EffCorrection > 0 ) theEffCorrector = new EfficiencyCorrector(eleEffFileName, muEffFileName, metEffFileName, jetEffFileName);
   
   // define map with events
   std::map<std::pair<int,std::pair<int,int> >,int> eventsMap;  
@@ -417,7 +427,8 @@ int main(int argc, char** argv)
     // 4-th - Run2011B
     HLTLabels_e.push_back("2011B-2");
     dummyHLTPathNames.clear();
-    dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v2");
+    else dummyHLTPathNames.push_back("HLT_dummy");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
   }
   
@@ -657,6 +668,10 @@ int main(int argc, char** argv)
       if( vars.lep_flavour == 11 ) HLTPathNames = HLTPathNames_e_DATA.at(HLTPeriod);
       if( vars.lep_flavour == 13 ) HLTPathNames = HLTPathNames_mu_DATA.at(HLTPeriod);
       
+      // set the periods for eff corrections
+      if( vars.dataFlag == 0 && EffCorrection > 0 && vars.lep_flavour == 11 ) theEffCorrector -> setPeriodEle(HLTPeriod);
+      if( vars.dataFlag == 0 && EffCorrection > 0 && vars.lep_flavour == 13 ) theEffCorrector -> setPeriodMu(HLTPeriod);
+      
       for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
       {
         if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound,verbosity) == true )
@@ -683,6 +698,10 @@ int main(int argc, char** argv)
       
       if( vars.lep_flavour == 11 ) HLTPathNames = HLTPathNames_e_MC.at(HLTPeriod);
       if( vars.lep_flavour == 13 ) HLTPathNames = HLTPathNames_mu_MC.at(HLTPeriod);
+
+      // set the periods for eff corrections
+      if( vars.dataFlag == 0 && EffCorrection > 0 && vars.lep_flavour == 11 ) theEffCorrector -> setPeriodEle(HLTPeriod);
+      if( vars.dataFlag == 0 && EffCorrection > 0 && vars.lep_flavour == 13 ) theEffCorrector -> setPeriodMu(HLTPeriod);
       
       for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt)
       {
@@ -985,7 +1004,7 @@ int main(int argc, char** argv)
     //SetStepNames(stepNames, "W-jet pt", step, verbosity);
     
     
-    if( (vars.WJ1.pt() <= 30.) || (vars.WJ2.pt() <= 30.) ) continue;
+    if( (vars.WJ1.pt() <= WJPtMIN) || (vars.WJ2.pt() <= WJPtMIN) ) continue;
     if( std::max(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMaxPtMIN ) continue;
     if( std::min(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMinPtMIN ) continue;
     
@@ -1069,6 +1088,30 @@ int main(int argc, char** argv)
     if( (ttSelection == 0) && (vars.nJets_cnt_pt30 > 3) ) continue;
     if( (ttSelection == 1) && (vars.nJets_cnt_pt20 < 4) ) continue;
     
+    // hlt weight
+    if ( vars.dataFlag == 0 ) {
+      std::string lepEffMode = "RIH";
+      if ( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
+      if ( EffCorrection > 0 && vars.lep_flavour == 13 ) vars.leptonWeight = theEffCorrector -> getMuEff  ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
+      if ( EffCorrection > 0 ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
+
+      std::vector<float> jets_pt;
+      if ( vars.p_jet1->pt() > 15 && fabs(vars.p_jet1->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet1->pt());
+      if ( vars.p_jet2->pt() > 15 && fabs(vars.p_jet2->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet2->pt());
+      if ( vars.p_jet3->pt() > 15 && fabs(vars.p_jet3->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet3->pt());
+      if ( vars.p_jet4->pt() > 15 && fabs(vars.p_jet4->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet4->pt());
+      if ( vars.p_jet5->pt() > 15 && fabs(vars.p_jet5->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet5->pt());
+      if ( vars.p_jet6->pt() > 15 && fabs(vars.p_jet6->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet6->pt());
+      std::vector<float> jets_eta;
+      if ( vars.p_jet1->pt() > 15 && fabs(vars.p_jet1->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet1->eta());
+      if ( vars.p_jet2->pt() > 15 && fabs(vars.p_jet2->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet2->eta());
+      if ( vars.p_jet3->pt() > 15 && fabs(vars.p_jet3->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet3->eta());
+      if ( vars.p_jet4->pt() > 15 && fabs(vars.p_jet4->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet4->eta());
+      if ( vars.p_jet5->pt() > 15 && fabs(vars.p_jet5->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet5->eta());
+      if ( vars.p_jet6->pt() > 15 && fabs(vars.p_jet6->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet6->eta());
+      if( EffCorrection > 0 ) vars.jetWeight = theEffCorrector -> getJetEff ( jets_pt, jets_eta );
+      vars.eventWeight *= vars.leptonWeight*vars.metWeight*vars.jetWeight;
+    }
     
     // kinematic fit
     DoKinematicFit(vars,0.1,"MIB");
@@ -1450,6 +1493,10 @@ bool AcceptHLTPath(const std::vector<std::string>& HLT_Names,
                    const bool& verbosity)
 {
   bool acceptEvent = false;
+  if ( HLTPathName == "HLT_dummy" ) {
+    pathFound = true;
+    return true;
+  }
   
   for(unsigned int HLTIt = 0; HLTIt < HLT_Names.size(); ++HLTIt)
   {

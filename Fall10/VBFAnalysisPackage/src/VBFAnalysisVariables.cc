@@ -20,7 +20,6 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   reducedTree -> SetBranchAddress("eventWeight", &vars.eventWeight);
   
-  
   // MVA variables
   reducedTree -> SetBranchAddress("mva", &vars.mva);  
   
@@ -339,7 +338,10 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
 void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
 {
   reducedTree -> Branch("PUWeight", &vars.PUWeight);
-  
+  reducedTree -> Branch("leptonWeight", &vars.leptonWeight);
+  reducedTree -> Branch("metWeight", &vars.metWeight);
+  reducedTree -> Branch("jetWeight", &vars.jetWeight);
+
   reducedTree -> Branch("lepNuW_cphi",  &vars.lepNuW_cphi,   "lepNuW_cphi/F");
   reducedTree -> Branch("lepNuZ_cphi",  &vars.lepNuZ_cphi,   "lepNuZ_cphi/F");
   reducedTree -> Branch("lep_ctheta",   &vars.lep_ctheta,     "lep_ctheta/F");
@@ -407,6 +409,10 @@ void AddVBFAnalysisTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTree)
 void InitializeVBFAnalysisTree(VBFAnalysisVariables& vars)
 {
   vars.PUWeight = 1;
+
+  vars.leptonWeight = 1;
+  vars.metWeight = 1;
+  vars.jetWeight = 1;
   
   vars.lepNuW_cphi = -1.;
   vars.lepNuZ_cphi = -1.;

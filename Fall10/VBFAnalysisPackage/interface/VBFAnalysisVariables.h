@@ -36,7 +36,9 @@ struct VBFAnalysisVariables
   float eventWeight;
   float PUWeight;
   
-  
+  float leptonWeight;
+  float metWeight;
+  float jetWeight;
   
   // mva value
   float mva;
