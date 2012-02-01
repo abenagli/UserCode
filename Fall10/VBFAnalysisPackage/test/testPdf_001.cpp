@@ -396,15 +396,15 @@ int main (int argc, char** argv)
       cout << iMap->first ;
       //PG the minimum of the envelope
       double mini = (iMap->second).second ;
-      mini = std::min (mini, NNPDF_band[iMap->first].second) ;
-      mini = std::min (mini, MSTW_band[iMap->first].second) ;
+      mini = std::min (mini, NNPDF_relBand[iMap->first].second) ;
+      mini = std::min (mini, MSTW_relBand[iMap->first].second) ;
     
       cout << " | " << mini ;
     
       //PG the maximum of the envelope
       double maxi = (iMap->second).first ;
-      maxi = std::max (maxi, NNPDF_band[iMap->first].first) ;
-      maxi = std::max (maxi, MSTW_band[iMap->first].first) ;
+      maxi = std::max (maxi, NNPDF_relBand[iMap->first].first) ;
+      maxi = std::max (maxi, MSTW_relBand[iMap->first].first) ;
 
       cout << " | " << maxi ;
 
