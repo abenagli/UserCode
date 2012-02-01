@@ -166,7 +166,7 @@ int main (int argc, char** argv)
           name << iColl->first << "_NNPDF_" << i ;
           TH1F * dummy = new TH1F (name.str ().c_str (), name.str ().c_str (), nBins, m4_min, m4_max) ;
           stringstream form ;
-          form << "(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight * PDF_weights_NNPDF20[" << i << "]" ;
+          form << "(%s) * 1./totEvents * crossSection * %f * eventWeight * PDF_weights_NNPDF20[" << i << "]" ;
           TCut cut = Form (form.str ().c_str (), generalCut.GetTitle (), LUMI) ;
 
           iColl->second->Draw (m4_VAR + TString (" >> ") + dummy->GetName (), cut) ;
@@ -182,7 +182,7 @@ int main (int argc, char** argv)
           name << iColl->first << "_CT10_" << i ;
           TH1F * dummy = new TH1F (name.str ().c_str (), name.str ().c_str (), nBins, m4_min, m4_max) ;
           stringstream form ; 
-          form << "(%s) * 1./totEvents * crossSection * %f * PUWeight * eventWeight * PDF_weights_CT10[" << i << "]" ;
+          form << "(%s) * 1./totEvents * crossSection * %f * eventWeight * PDF_weights_CT10[" << i << "]" ;
           TCut cut = Form (form.str ().c_str (), generalCut.GetTitle (), LUMI) ;    
 
           iColl->second->Draw (m4_VAR + TString (" >> ") + dummy->GetName (), cut) ;
