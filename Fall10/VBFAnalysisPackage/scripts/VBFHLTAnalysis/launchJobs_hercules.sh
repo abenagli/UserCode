@@ -8,6 +8,13 @@ then
     exit
 fi
 
+#Fix the input file lists
+
+INPUTNTUPLE="/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT15_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_NoHLT/"
+cat listaFile_MC.txt  | sed -e s\%INPUTNTUPLE\%$INPUTNTUPLE\%g  > pippo.txt ; mv pippo.txt listaFile_MC.txt
+cat listaFile_11A.txt | sed -e s\%INPUTNTUPLE\%$INPUTNTUPLE\%g  > pippo.txt ; mv pippo.txt listaFile_11A.txt
+cat listaFile_11B.txt | sed -e s\%INPUTNTUPLE\%$INPUTNTUPLE\%g  > pippo.txt ; mv pippo.txt listaFile_11B.txt
+
 #Set up all folders and inputs
 
 QUEUE="longcms"
@@ -16,7 +23,7 @@ TEMPLATE=$1
 
 EXE="measurePFMetTurnOn.exe"
 
-HOME="/gwpool/users/ldimatt/scratch0/PHD_MiBi/Fall11_ForDataVsMC_NewNT/VBFAnalysisPackage/"
+HOME="/gwpool/users/ldimatt/scratch0/PHD_MiBi/Fall11_ForDataVsMC_V1/VBFAnalysisPackage/"
 THISFOLDER="${HOME}scripts/VBFHLTAnalysis/"
 
 INPUTS=(scripts/VBFHLTAnalysis/listaFile_MC.txt
