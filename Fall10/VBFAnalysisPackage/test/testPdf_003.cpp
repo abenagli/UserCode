@@ -71,6 +71,34 @@ int ReadFile (map<string, TChain *> & output, string inputList, string treeName)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
+double getMinNonZero (TH1F * histo)
+{
+  for (int i = 1 ; i <= histo->GetNbinsX () ; ++i)
+    {
+      if (histo->GetBinContent (i) > 0)
+        return histo->GetBinCenter (i) ;
+    }
+  return -1. ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+double getMaxNonZero (TH1F * histo)
+{
+  for (int i = histo->GetNbinsX () ; i > 0  ; --i)
+    {
+      if (histo->GetBinContent (i) > 0)
+        return histo->GetBinCenter (i) ;
+    }
+  return -1. ;
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 void saveShapes (map<string, vector<TH1F *> > shapes, TFile & f) 
 {
   f.cd () ;
@@ -112,16 +140,17 @@ int main (int argc, char** argv)
   TFile f_tot ("testPDF_002_raw.root") ;
   TFile f_sel ("testPDF_001_raw.root") ;
 
-  TH1F eff_CT10 ("eff_CT10", "eff_CT10", 1000, 0, 1) ;
-  TH1F eff_MSTW ("eff_MSTW", "eff_MSTW", 1000, 0, 1) ;
-  TH1F eff_NNPDF ("eff_NNPDF", "eff_NNPDF", 1000, 0, 1) ;
-  
+  vector<TH1F *> results ;
  
   //PG loop over signal samples
   for (map<string, TChain *>::iterator iColl = collections.begin () ;
        iColl != collections.end () ; 
        ++iColl)
     {
+      TH1F * eff_CT10  = new TH1F ("eff_CT10", "eff_CT10", 10000, 0, 1) ;
+      TH1F * eff_MSTW  = new TH1F ("eff_MSTW", "eff_MSTW", 10000, 0, 1) ;
+      TH1F * eff_NNPDF = new TH1F  ("eff_NNPDF", "eff_NNPDF", 10000, 0, 1) ;
+
       //PG loop over MSTW weights
       for (int i = 0 ; i < 41 ; ++i)
         {
@@ -133,7 +162,7 @@ int main (int argc, char** argv)
           num->SetName (name_sel.str ().c_str ()) ;          
           TH1F * den = (TH1F *) f_tot.Get (name.str ().c_str ()) ;
           double eff = num->Integral () / den->Integral () ;
-          eff_MSTW.Fill (eff) ;
+          eff_MSTW->Fill (eff) ;
         } //PG loop over MSTW weights
 
       //PG loop over NNPDF weights
@@ -147,7 +176,7 @@ int main (int argc, char** argv)
           num->SetName (name_sel.str ().c_str ()) ;          
           TH1F * den = (TH1F *) f_tot.Get (name.str ().c_str ()) ;
           double eff = num->Integral () / den->Integral () ;
-          eff_NNPDF.Fill (eff) ;
+          eff_NNPDF->Fill (eff) ;
         } //PG loop over NNPDF weights
 
       //PG loop over CT10 weights
@@ -161,20 +190,39 @@ int main (int argc, char** argv)
           num->SetName (name_sel.str ().c_str ()) ;          
           TH1F * den = (TH1F *) f_tot.Get (name.str ().c_str ()) ;
           double eff = num->Integral () / den->Integral () ;
-          eff_CT10.Fill (eff) ;
+          eff_CT10->Fill (eff) ;
         } //PG loop over CT10 weights
+
+      //PG cloning
+
+      TH1F * eff_int = (TH1F *) eff_CT10->Clone ("eff_int") ;
+      eff_int->Add (eff_NNPDF) ;
+      eff_int->Add (eff_MSTW) ;
+
+      stringstream name ;
+      name << iColl->first << "_effs" ;
+      eff_int->SetName (name.str ().c_str ()) ;
+      results.push_back (eff_int) ;
+
+      delete eff_CT10  ;
+      delete eff_MSTW  ;
+      delete eff_NNPDF ;
+
+
     } //PG loop over signal samples
 
-  TH1F * eff_int = (TH1F *) eff_CT10.Clone ("eff_int") ;
-  eff_int->Add (&eff_NNPDF) ;
-  eff_int->Add (&eff_MSTW) ;
 
   TFile output ("testPdf_003.root", "recreate") ;
   output.cd () ;
-  eff_int->Write () ;
-  eff_CT10 .Write () ;
-  eff_MSTW .Write () ;
-  eff_NNPDF.Write () ;
+  cout << "sample : minEff - maxEff : halfWidth\n" ;
+  for (int i = 0 ; i < results.size () ; ++i)
+    {
+      cout << results.at (i)->GetName () << " : " 
+           << getMinNonZero (results.at (i)) << " - " << getMaxNonZero (results.at (i))
+           << " : " << (getMaxNonZero (results.at (i)) - getMinNonZero (results.at (i))) / (getMaxNonZero (results.at (i)) + getMinNonZero (results.at (i))) 
+           << endl ;
+      results.at (i)->Write () ;
+    }
   output.Close () ;
 
   return 0 ;
