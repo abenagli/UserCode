@@ -402,6 +402,12 @@ int main (int argc, char** argv)
       maxi = std::max (maxi, MSTW_band[iMap->first].first) ;
 
       cout << " | " << maxi ;
+
+      cout << " | " << (mini + maxi) / (maxi - mini + 2) << endl ;
+      /* 
+      la semilarghezza dello scarto, relativa:
+      [(N + Nf+) - (N - Nf-)] / [(N + Nf+) + (N - Nf-)] = (f+ + f-) / (f+ - f- + 2)
+      */
     }  
 
 
