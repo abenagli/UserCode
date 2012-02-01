@@ -306,7 +306,7 @@ int main (int argc, char** argv)
       errUp /= (double) (nEigen - 1) ;
       errDown /= (double) (nEigen - 1) ;
       NNPDF_band[iShapes->first] = pair<double, double> (intCentre + sqrt (errUp), intCentre - sqrt (errDown)) ;
-      NNPDF_band[iShapes->first] = pair<double, double> (sqrt (errUp) / intCentre, sqrt (errDown) / intCentre) ;
+      NNPDF_relBand[iShapes->first] = pair<double, double> (sqrt (errUp) / intCentre, sqrt (errDown) / intCentre) ;
     } //PG loop over samples
 
 
@@ -343,12 +343,14 @@ int main (int argc, char** argv)
           errDown += unc_m * unc_m ;
         } //PG loop over eigenvectors
       MSTW_band[iShapes->first] = pair<double, double> (intCentre + sqrt (errUp), intCentre - sqrt (errDown)) ;
-      MSTW_band[iShapes->first] = pair<double, double> (sqrt (errUp) / intCentre, sqrt (errDown) / intCentre) ;
+      MSTW_relBand[iShapes->first] = pair<double, double> (sqrt (errUp) / intCentre, sqrt (errDown) / intCentre) ;
     } //PG loop over samples
 
   //PG printout errors and global envelope
   //PG -------------------------------------------------
 
+  cout << " mini | maxi | rel half width | min CT10 - max CT10 | min NNPDF - max NNPDF | min MSTW = max MSTW \n" ;
+  cout << "---------------------------------------------------------------------\n" ;
   //PG loop over samples
   for (map<string, pair<double, double> >::iterator iMap = CT10_band.begin () ; 
        iMap != CT10_band.end () ; ++iMap)
@@ -384,6 +386,9 @@ int main (int argc, char** argv)
   //PG -------------------------------------------------
 
   cout << "\nRELATIVE BAND ONLY\n\n" ;
+
+  cout << " mini | maxi | rel half width \n" ;
+  cout << "------------------------------\n" ;
 
   for (map<string, pair<double, double> >::iterator iMap = CT10_relBand.begin () ; 
        iMap != CT10_relBand.end () ; ++iMap)
