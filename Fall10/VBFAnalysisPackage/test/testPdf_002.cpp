@@ -125,7 +125,7 @@ int main (int argc, char** argv)
 //   generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
 //   generalCut = generalCut && "lep_flavour == 11" ; //PG only electrons
   
-  TString m4_VAR = "lepNuW_m_KF" ;
+  TString m4_VAR = "lep_pt" ;
 
   map<string, vector<TH1F *> > CT10_shapes ;
   map<string, vector<TH1F *> > NNPDF_shapes ;
