@@ -15,7 +15,9 @@
   TH1F *h_den_red[nEtaBins];
   
   gStyle->SetStatX(0.9);
-  gStyle->SetStatY(0.6);
+  gStyle->SetStatY(0.5);
+  gStyle->SetStatFontSize(15);
+  gStyle->SetStatFont(4);
 
   TFile* thisFile = new TFile(inFolder+fileIn.at(0)+".root","READ");
   
@@ -58,7 +60,7 @@
     TurnOn -> SetTitle(TurnOnTitle);
     TurnOn -> SetName("TurnOn");
     TurnOn -> Draw("AP");
-    c1 -> SaveAs("jet_erfit_"+s_iTO+".gif","gif");
+    c1 -> SaveAs("jet_erfit_"+s_iTO+".pdf","pdf");
     
 //    erfit[iTO] -> Write();
 
@@ -69,7 +71,13 @@
   TF1 *erfit_support[nEtaBins];
   TGraphAsymmErrors* g_TurnOn[nEtaBins];
   TH1F *h_erfit[nEtaBins];
-    
+  
+  std::vector<TString> latexNames;  
+  latexNames.push_back("-2.4 < #eta < -1.5");
+  latexNames.push_back("-1.5 < #eta < 0");
+  latexNames.push_back("0 < #eta < 1.5");
+  latexNames.push_back("1.5 < #eta < 2.4");
+
   for ( unsigned int iTO = 0; iTO < nEtaBins; iTO++ ) {
   
     TString s_iTO = "";
@@ -99,7 +107,7 @@
     h_erfit[iTO]->SetFillColor(kRed);
     h_erfit[iTO]->SetFillStyle(3003);
     h_erfit[iTO]->Draw("same,e3");
-    c1 -> SaveAs("jet_erfit_"+s_iTO+".gif","gif");
+    c1 -> SaveAs("jet_erfit_"+s_iTO+".pdf","pdf");
 
   }
 
