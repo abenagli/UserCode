@@ -1,0 +1,3 @@
+INPUTNTUPLE/ElectronHad_abenagli-SQWaT_PAT_42X_2011A-PromptReco-v4_v3/VBFAnalysis_PFlow.root
+INPUTNTUPLE/ElectronHad_abenagli-SQWaT_PAT_42X_2011A-05Aug2011_v3/VBFAnalysis_PFlow.root
+INPUTNTUPLE/ElectronHad_abenagli-SQWaT_PAT_42X_2011A-PromptReco-v6_v3/VBFAnalysis_PFlow.root
