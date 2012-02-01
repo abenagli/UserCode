@@ -22,7 +22,9 @@
   TH1F *h_den_red[6];
   
   gStyle->SetStatX(0.9);
-  gStyle->SetStatY(0.6);
+  gStyle->SetStatY(0.5);
+  gStyle->SetStatFontSize(15);
+  gStyle->SetStatFont(4);
   
   for ( unsigned int iFile = 0; iFile < fileIn.size(); iFile++ ) {
   
@@ -62,7 +64,7 @@
     TurnOn -> SetTitle(TurnOnTitle);
     TurnOn -> SetName("TurnOn");
     TurnOn -> Draw("AP");
-//    c1 -> SaveAs(fileIn.at(iFile)+".gif","gif");
+//    c1 -> SaveAs(fileIn.at(iFile)+".pdf","pdf");
 
   }
 
@@ -95,12 +97,12 @@
     g_TurnOn[iFile] -> SetTitle(TurnOnTitle);
     g_TurnOn[iFile] -> SetName("TurnOn");
     g_TurnOn[iFile] -> Draw("AP");
-    c1 -> SaveAs(fileIn.at(iFile)+".gif","gif");
+    c1 -> SaveAs(fileIn.at(iFile)+".pdf","pdf");
     h_erfit[iFile]->SetMarkerStyle(0);
     h_erfit[iFile]->SetFillColor(kRed);
     h_erfit[iFile]->SetFillStyle(3003);
     h_erfit[iFile]->Draw("same,e3");
-    c1 -> SaveAs(fileIn.at(iFile)+".gif","gif");
+    c1 -> SaveAs(fileIn.at(iFile)+".pdf","pdf");
 
   }
   
@@ -124,14 +126,14 @@
   metEffHltDown[1] = (TH1F*) h_num_red[1] -> Clone("metEffHltOneDown");
   for ( int iBin = 1; iBin <= metEffHlt[1] -> GetXaxis() -> GetNbins(); iBin++ ) {
     float thisPFmet =  metEffHlt[1] -> GetBinCenter(iBin);
-    float thisCorrection  = erfit[1] -> Eval(thisPFmet)/erfit[4] -> Eval(thisPFmet);
+    float thisCorrection  = erfit[0] -> Eval(thisPFmet)/erfit[4] -> Eval(thisPFmet);
     float thisError = thisCorrection * sqrt(
-     h_erfit[1]->GetBinError(iBin)**2/erfit[1] -> Eval(thisPFmet)**2
+     h_erfit[0]->GetBinError(iBin)**2/erfit[0] -> Eval(thisPFmet)**2
     +h_erfit[4]->GetBinError(iBin)**2/erfit[4] -> Eval(thisPFmet)**2);
     metEffHlt[1] -> SetBinContent(iBin, thisCorrection);
     metEffHlt[1] -> SetBinError(iBin, thisError);
-    metEffHltUp[1] -> SetBinContent(iBin, 1.);
-    metEffHltDown[1] -> SetBinContent(iBin, 1.);
+    metEffHltUp[1] -> SetBinContent(iBin, thisCorrection + thisError);
+    metEffHltDown[1] -> SetBinContent(iBin, thisCorrection - thisError);
   }
   // Run11B - normal
   metEffHlt[2] = (TH1F*) h_num_red[2] -> Clone("metEffHltTwo");
@@ -139,9 +141,9 @@
   metEffHltDown[2] = (TH1F*) h_num_red[2] -> Clone("metEffHltTwoDown");
   for ( int iBin = 1; iBin <= metEffHlt[2] -> GetXaxis() -> GetNbins(); iBin++ ) {
     float thisPFmet =  metEffHlt[2] -> GetBinCenter(iBin);
-    float thisCorrection  = erfit[2] -> Eval(thisPFmet)/erfit[4] -> Eval(thisPFmet);
+    float thisCorrection  = erfit[1] -> Eval(thisPFmet)/erfit[4] -> Eval(thisPFmet);
     float thisError = thisCorrection * sqrt(
-     h_erfit[2]->GetBinError(iBin)**2/erfit[2] -> Eval(thisPFmet)**2
+     h_erfit[1]->GetBinError(iBin)**2/erfit[1] -> Eval(thisPFmet)**2
     +h_erfit[4]->GetBinError(iBin)**2/erfit[4] -> Eval(thisPFmet)**2);
     metEffHlt[2] -> SetBinContent(iBin, thisCorrection);
     metEffHlt[2] -> SetBinError(iBin, thisError);
@@ -154,9 +156,9 @@
   metEffHltDown[3] = (TH1F*) h_num_red[3] -> Clone("metEffHltThreeDown");
   for ( int iBin = 1; iBin <= metEffHlt[3] -> GetXaxis() -> GetNbins(); iBin++ ) {
     float thisPFmet =  metEffHlt[3] -> GetBinCenter(iBin);
-    float thisCorrection  = erfit[3] -> Eval(thisPFmet)/erfit[5] -> Eval(thisPFmet);
+    float thisCorrection  = erfit[2] -> Eval(thisPFmet)/erfit[5] -> Eval(thisPFmet);
     float thisError = thisCorrection * sqrt(
-     h_erfit[3]->GetBinError(iBin)**2/erfit[3] -> Eval(thisPFmet)**2
+     h_erfit[2]->GetBinError(iBin)**2/erfit[2] -> Eval(thisPFmet)**2
     +h_erfit[5]->GetBinError(iBin)**2/erfit[5] -> Eval(thisPFmet)**2);
     metEffHlt[3] -> SetBinContent(iBin, thisCorrection);
     metEffHlt[3] -> SetBinError(iBin, thisError);
@@ -169,8 +171,8 @@
   metEffHltDown[4] = (TH1F*) h_num_red[4] -> Clone("metEffHltFourDown");
   for ( int iBin = 1; iBin <= metEffHlt[4] -> GetXaxis() -> GetNbins(); iBin++ ) {
     float thisPFmet =  metEffHlt[4] -> GetBinCenter(iBin);
-    float thisCorrection  = erfit[4] -> Eval(thisPFmet);
-    float thisError = h_erfit[4]->GetBinError(iBin);
+    float thisCorrection  = erfit[3] -> Eval(thisPFmet);
+    float thisError = h_erfit[3]->GetBinError(iBin);
     metEffHlt[4] -> SetBinContent(iBin, thisCorrection);
     metEffHlt[4] -> SetBinError(iBin, thisError);
     metEffHltUp[4] -> SetBinContent(iBin, thisCorrection + thisError);
