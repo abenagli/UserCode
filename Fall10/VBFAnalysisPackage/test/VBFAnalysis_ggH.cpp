@@ -1093,7 +1093,7 @@ int main(int argc, char** argv)
       std::string lepEffMode = "RIH";
       if ( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 13 ) vars.leptonWeight = theEffCorrector -> getMuEff  ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
-      if ( EffCorrection > 0 ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
+      if ( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
 
       std::vector<float> jets_pt;
       if ( vars.p_jet1->pt() > 15 && fabs(vars.p_jet1->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet1->pt());
@@ -1109,7 +1109,7 @@ int main(int argc, char** argv)
       if ( vars.p_jet4->pt() > 15 && fabs(vars.p_jet4->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet4->eta());
       if ( vars.p_jet5->pt() > 15 && fabs(vars.p_jet5->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet5->eta());
       if ( vars.p_jet6->pt() > 15 && fabs(vars.p_jet6->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet6->eta());
-      if( EffCorrection > 0 ) vars.jetWeight = theEffCorrector -> getJetEff ( jets_pt, jets_eta );
+      if( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.jetWeight = theEffCorrector -> getJetEff ( jets_pt, jets_eta );
       vars.eventWeight *= vars.leptonWeight*vars.metWeight*vars.jetWeight;
     }
     
