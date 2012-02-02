@@ -15,11 +15,11 @@ void makePFMetSyst(){
   lumiPeriods.push_back(816);
   
   std::vector<TString> histoNames;
-  histoNames.push_back("metEffHltZero");
-  histoNames.push_back("metEffHltOne");
-  histoNames.push_back("metEffHltTwo");
-  histoNames.push_back("metEffHltThree");
-  histoNames.push_back("metEffHltFour");
+  histoNames.push_back("metEffHLT0");
+  histoNames.push_back("metEffHLT1");
+  histoNames.push_back("metEffHLT1");
+  histoNames.push_back("metEffHLT3");
+  histoNames.push_back("metEffHLT4");
   
   const int n_periods = 5;
   
@@ -32,7 +32,7 @@ void makePFMetSyst(){
     h_corr[iFile] = (TH1F*) inFileCorr -> Get(histoNames[iFile]);
   }
   
-  TString inFileSigName_1 = "/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_WPt20/";
+  TString inFileSigName_1 = "/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB/";
   TString inFileSigName_2 = "_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/VBFAnalysis_PFlow.root";
   std::vector<TString> vs_HiggsType;
   vs_HiggsType.push_back("GluGluToHToWWToLNuQQ_M-");
