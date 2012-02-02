@@ -94,6 +94,10 @@ while(<SAMPLESListFile>)
   #print($command."\n");
   system($command);
   
+  $command = "cp /gwteraz/users/benaglia/data/*.root ".$sampleDir;
+  #print($command."\n");
+  system($command);
+  
   
   
   
@@ -110,6 +114,7 @@ while(<SAMPLESListFile>)
   #print("selectionsCfgFile = ".$selectionsCfgFile."\n");
   system("cat ".$SELECTIONSCfgTemplate."   | sed -e s%INPUTFILELIST%".$inputFileList.
                                        "%g | sed -e s%BASEDIR%".$BASEDir.
+                                       "%g | sed -e s%SAMPLEDIR%".$sampleDir.
                                        "%g | sed -e s%OUTPUTSAVEPATH%".$sampleDir.
                                        "%g | sed -e s%JETALGORITHM%".$JETAlgorithm.
                                        "%g | sed -e s%JETTYPE%".$JETType.
