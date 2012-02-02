@@ -63,7 +63,7 @@
     TurnOn -> SetMarkerStyle(20);
     TurnOn -> SetTitle(TurnOnTitle);
     TurnOn -> SetName("TurnOn");
-    TurnOn -> Draw("AP");
+    //TurnOn -> Draw("AP");
 //    c1 -> SaveAs(fileIn.at(iFile)+".pdf","pdf");
 
   }
@@ -101,7 +101,7 @@
     h_erfit[iFile]->SetMarkerStyle(0);
     h_erfit[iFile]->SetFillColor(kRed);
     h_erfit[iFile]->SetFillStyle(3003);
-    h_erfit[iFile]->Draw("same,e3");
+    //h_erfit[iFile]->Draw("same,e3");
     c1 -> SaveAs(fileIn.at(iFile)+".pdf","pdf");
 
   }
@@ -184,5 +184,22 @@
   for ( int i = 0; i < nCorrections; i++ ) metEffHLT[i] -> Write();
   for ( int i = 0; i < nCorrections; i++ ) metEffHLTUp[i] -> Write();
   for ( int i = 0; i < nCorrections; i++ ) metEffHLTDown[i] -> Write();
+
+  gStyle->SetOptStat(0);
+
+  TCanvas* can = new TCanvas("can");  
+  // Draw the scale factors
+  for ( int i = 0; i < nCorrections; i++ ) {
+  
+    metEffHLT[i] -> SetMinimum(0.95);  
+    metEffHLT[i] -> SetMaximum(1.05);  
+    metEffHLT[i] -> GetXaxis() -> SetRangeUser(30,100);  
+    metEffHLT[i] -> GetXaxis() -> SetTitle("PFMet (GeV)");  
+    metEffHLT[i] -> GetYaxis() -> SetTitle("data/MC");  
+    metEffHLT[i] -> Draw();
+    TString name = metEffHLT[i]->GetName();
+    can -> Print(name + ".pdf","pdf");
+  }
+
 
 }
