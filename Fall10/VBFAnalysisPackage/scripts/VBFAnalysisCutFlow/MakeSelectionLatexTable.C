@@ -9,20 +9,25 @@ void MakeSelectionLatexTable(){
   TH1F* theEventsHistos[nSample];
   TH1F* theData;
     
-//  string leptonType = "Mu";
-  string leptonType = "EG";
-//  string leptonType = "EGMu";
-  string InputPath = "/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/" + leptonType + "/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_" +  leptonType + "_Run2011AB_WPt30/";
+//  string leptonType = "mu";
+  TString leptonType = "ele";
+  TString histoName = "events_PURescaled_" + leptonType;
+  string InputPath = "/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_WithEffCorr/";
 
   vector<string> DATAFolders;
-  DATAFolders.push_back("ElectronHad_abenagli-SQWaT_PAT_42X_2011A-05Aug2011_v3/");
+  DATAFolders.push_back("data_Run2011A-May10ReReco-v1/");
+  DATAFolders.push_back("data_Run2011A-PromptReco-v4/");
+  DATAFolders.push_back("data_Run2011A-05Aug2011-v1/");
+  DATAFolders.push_back("data_Run2011A-PromptReco-v6/");
+  DATAFolders.push_back("data_Run2011B-PromptReco-v1/");
+/*  DATAFolders.push_back("ElectronHad_abenagli-SQWaT_PAT_42X_2011A-05Aug2011_v3/");
   DATAFolders.push_back("ElectronHad_abenagli-SQWaT_PAT_42X_2011A-PromptReco-v4_v3/");
   DATAFolders.push_back("ElectronHad_abenagli-SQWaT_PAT_42X_2011A-PromptReco-v6_v3/");
   DATAFolders.push_back("ElectronHad_abenagli-SQWaT_PAT_42X_2011B-PromptReco-v1_v3/");
   DATAFolders.push_back("SingleMu_abenagli-SQWaT_PAT_42X_2011A_May10ReReco-v1_v3/");
   DATAFolders.push_back("SingleMu_abenagli-SQWaT_PAT_42X_2011A-PromptReco-v4_v3/");
   DATAFolders.push_back("SingleMu_abenagli-SQWaT_PAT_42X_2011A-PromptReco-v6_v3/");
-  DATAFolders.push_back("SingleMu_abenagli-SQWaT_PAT_42X_2011B-PromptReco-v1_v3/");
+  DATAFolders.push_back("SingleMu_abenagli-SQWaT_PAT_42X_2011B-PromptReco-v1_v3/");*/
 
   vector<string> QCDFolders;
   QCDFolders.push_back("QCD_Pt-20_MuEnrichedPt-15_TuneZ2_7TeV-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
@@ -76,6 +81,7 @@ void MakeSelectionLatexTable(){
   theSteps.push_back(11);
   theSteps.push_back(12);
   theSteps.push_back(13);
+  theSteps.push_back(14);
   theSteps.push_back(15);
   theSteps.push_back(16);
     
@@ -99,11 +105,10 @@ void MakeSelectionLatexTable(){
    
     string thisFile = InputPath + DATAFolders[iDATA] + fileName;
     TFile* myFile = new TFile (thisFile.c_str(),"READ");
-
-    TH1F* theTempHisto = (TH1F*) myFile -> Get("events"); 
+    TH1F* theTempHisto = (TH1F*) myFile -> Get(histoName); 
            
     if (iDATA == 0) { 
-      theData = (TH1F*) myFile -> Get("events");
+      theData = (TH1F*) myFile -> Get(histoName);
     }
     else theData -> Add(theTempHisto);
         
@@ -111,8 +116,9 @@ void MakeSelectionLatexTable(){
 
 
   // Set up everything to do the weighting
-  float crossSection; 
-  float lumi = 4700;
+  float crossSection;
+  int lep_flavour; 
+  float lumi = 4680;
 
   
   // Add up with the right weight the QCD samples
@@ -123,15 +129,16 @@ void MakeSelectionLatexTable(){
 
     TTree* myTree = (TTree*) myFile -> Get("ntu_15");  
     myTree -> SetBranchAddress("crossSection", &crossSection);
+    myTree -> SetBranchAddress("lep_flavour", &lep_flavour);
     myTree -> GetEntry(0);
 
-    TH1F* theTempHisto = (TH1F*) myFile -> Get("events_PURescaled"); 
+    TH1F* theTempHisto = (TH1F*) myFile -> Get(histoName); 
     float totEvents = theTempHisto -> GetBinContent(1);
     
     float weight = crossSection * lumi / totEvents;
        
     if (iQCD == 0) { 
-      theEventsHistos[8] = (TH1F*) myFile -> Get("events_PURescaled");
+      theEventsHistos[8] = (TH1F*) myFile -> Get(histoName);
       theEventsHistos[8] -> Scale(weight);
     }
     else theEventsHistos[8] -> Add(theTempHisto, weight);
@@ -146,15 +153,16 @@ void MakeSelectionLatexTable(){
 
     TTree* myTree = (TTree*) myFile -> Get("ntu_15");  
     myTree -> SetBranchAddress("crossSection", &crossSection);
+    myTree -> SetBranchAddress("lep_flavour", &lep_flavour);
     myTree -> GetEntry(0);
 
-    TH1F* theTempHisto = (TH1F*) myFile -> Get("events_PURescaled"); 
+    TH1F* theTempHisto = (TH1F*) myFile -> Get(histoName); 
     float totEvents = theTempHisto -> GetBinContent(1);
     
     float weight = crossSection * lumi / totEvents;
        
     if (iVV == 0) { 
-      theEventsHistos[3] = (TH1F*) myFile -> Get("events_PURescaled");
+      theEventsHistos[3] = (TH1F*) myFile -> Get(histoName);
       theEventsHistos[3] -> Scale(weight);
     }
     else theEventsHistos[3] -> Add(theTempHisto, weight);
@@ -169,15 +177,16 @@ void MakeSelectionLatexTable(){
 
     TTree* myTree = (TTree*) myFile -> Get("ntu_15");  
     myTree -> SetBranchAddress("crossSection", &crossSection);
+    myTree -> SetBranchAddress("lep_flavour", &lep_flavour);
     myTree -> GetEntry(0);
 
-    TH1F* theTempHisto = (TH1F*) myFile -> Get("events_PURescaled"); 
+    TH1F* theTempHisto = (TH1F*) myFile -> Get(histoName); 
     float totEvents = theTempHisto -> GetBinContent(1);
     
     float weight = crossSection * lumi / totEvents;
        
     if (iT == 0) { 
-      theEventsHistos[7] = (TH1F*) myFile -> Get("events_PURescaled");
+      theEventsHistos[7] = (TH1F*) myFile -> Get(histoName);
       theEventsHistos[7] -> Scale(weight);
     }
     else theEventsHistos[7] -> Add(theTempHisto, weight);
@@ -192,15 +201,16 @@ void MakeSelectionLatexTable(){
     
     TTree* myTree = (TTree*) myFile -> Get("ntu_15");  
     myTree -> SetBranchAddress("crossSection", &crossSection);
+    myTree -> SetBranchAddress("lep_flavour", &lep_flavour);
     myTree -> GetEntry(0);
     
-    TH1F* theTempHisto = (TH1F*) myFile -> Get("events_PURescaled"); 
+    TH1F* theTempHisto = (TH1F*) myFile -> Get(histoName); 
     float totEvents = theTempHisto -> GetBinContent(1);
     
     float weight = crossSection * lumi / totEvents;
     
     if (iHiggs == 0) { 
-      theEventsHistos[0] = (TH1F*) myFile -> Get("events_PURescaled");
+      theEventsHistos[0] = (TH1F*) myFile -> Get(histoName);
       theEventsHistos[0] -> Scale(weight);
     }
     else theEventsHistos[0] -> Add(theTempHisto, weight);
@@ -214,15 +224,16 @@ void MakeSelectionLatexTable(){
     
     TTree* myTree = (TTree*) myFile -> Get("ntu_15");  
     myTree -> SetBranchAddress("crossSection", &crossSection);
+    myTree -> SetBranchAddress("lep_flavour", &lep_flavour);
     myTree -> GetEntry(0);
     
-    TH1F* theTempHisto = (TH1F*) myFile -> Get("events_PURescaled"); 
+    TH1F* theTempHisto = (TH1F*) myFile -> Get(histoName); 
     float totEvents = theTempHisto -> GetBinContent(1);
     
     float weight = crossSection * lumi / totEvents;
     
     if (iHiggs == 0) { 
-      theEventsHistos[1] = (TH1F*) myFile -> Get("events_PURescaled");
+      theEventsHistos[1] = (TH1F*) myFile -> Get(histoName);
       theEventsHistos[1] -> Scale(weight);
     }
     else theEventsHistos[1] -> Add(theTempHisto, weight);
@@ -236,15 +247,16 @@ void MakeSelectionLatexTable(){
     
     TTree* myTree = (TTree*) myFile -> Get("ntu_15");  
     myTree -> SetBranchAddress("crossSection", &crossSection);
+    myTree -> SetBranchAddress("lep_flavour", &lep_flavour);
     myTree -> GetEntry(0);
     
-    TH1F* theTempHisto = (TH1F*) myFile -> Get("events_PURescaled"); 
+    TH1F* theTempHisto = (TH1F*) myFile -> Get(histoName); 
     float totEvents = theTempHisto -> GetBinContent(1);
     
     float weight = crossSection * lumi / totEvents;
     
     if (iHiggs == 0) { 
-      theEventsHistos[2] = (TH1F*) myFile -> Get("events_PURescaled");
+      theEventsHistos[2] = (TH1F*) myFile -> Get(histoName);
       theEventsHistos[2] -> Scale(weight);
     }
     else theEventsHistos[2] -> Add(theTempHisto, weight);
@@ -255,8 +267,9 @@ void MakeSelectionLatexTable(){
   TFile* myFileW = new TFile ((InputPath + WJetsFolder + fileName).c_str(),"READ");
   TTree* myTreeW = (TTree*) myFileW -> Get("ntu_15");  
   myTreeW -> SetBranchAddress("crossSection", &crossSection);
+  myTreeW -> SetBranchAddress("lep_flavour", &lep_flavour);
   myTreeW -> GetEntry(0);
-  theEventsHistos[4] = (TH1F*) myFileW -> Get("events_PURescaled");
+  theEventsHistos[4] = (TH1F*) myFileW -> Get(histoName);
   float totEvents = theEventsHistos[4] -> GetBinContent(1);
   float weight = crossSection * lumi / totEvents;
   theEventsHistos[4] -> Scale(weight);
@@ -265,8 +278,9 @@ void MakeSelectionLatexTable(){
   TFile* myFileZ = new TFile ((InputPath + ZJetsFolder + fileName).c_str(),"READ");
   TTree* myTreeZ = (TTree*) myFileZ -> Get("ntu_15");  
   myTreeZ -> SetBranchAddress("crossSection", &crossSection);
+  myTreeZ -> SetBranchAddress("lep_flavour", &lep_flavour);
   myTreeZ -> GetEntry(0);
-  theEventsHistos[5] = (TH1F*) myFileZ -> Get("events_PURescaled");
+  theEventsHistos[5] = (TH1F*) myFileZ -> Get(histoName);
   totEvents = theEventsHistos[5] -> GetBinContent(1);
   weight = crossSection * lumi / totEvents;
   theEventsHistos[5] -> Scale(weight);
@@ -274,8 +288,9 @@ void MakeSelectionLatexTable(){
   TFile* myFileTT = new TFile ((InputPath + TTJetsFolder + fileName).c_str(),"READ");
   TTree* myTreeTT = (TTree*) myFileTT -> Get("ntu_15");  
   myTreeTT -> SetBranchAddress("crossSection", &crossSection);
+  myTreeTT -> SetBranchAddress("lep_flavour", &lep_flavour);
   myTreeTT -> GetEntry(0);
-  theEventsHistos[6] = (TH1F*) myFileTT -> Get("events_PURescaled");
+  theEventsHistos[6] = (TH1F*) myFileTT -> Get(histoName);
   totEvents = theEventsHistos[6] -> GetBinContent(1);
   weight = crossSection * lumi / totEvents;
   theEventsHistos[6] -> Scale(weight);
