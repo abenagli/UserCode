@@ -63,8 +63,8 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white
   s/\s+$//;               # no trailing white
   
-  ($mH) = split(" ");
-  
+  ($mH,$mHcutMin,$mHcutMax) = split(" ") ;
+
   print("Higgs mass = ".$mH."\n");
   $sampleDir = $OUTPUTSaveDir.$sample."/";
   
@@ -72,6 +72,8 @@ while(<SAMPLESListFile>)
   $selectionsCfgFile = "./selections_".$mH.".cfg";
   system("cat ".$SELECTIONSCfgTemplate."   | sed -e s%HIGGSMASS%".$mH.
                                        "%g | sed -e s%OUTDIR%".$OUTDir.
+                                       "%g | sed -e s%HMASSMIN%".$mHcutMin.
+                                       "%g | sed -e s%HMASSMAX%".$mHcutMax.
                                        "%g > ".$selectionsCfgFile);
                                          
   $sampleJobFile = "./job_".$mH.".sh";

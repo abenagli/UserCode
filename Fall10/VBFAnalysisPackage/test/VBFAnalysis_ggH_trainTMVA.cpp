@@ -64,7 +64,10 @@ int main(int argc, char** argv)
   
   //[Options]
   int step   = gConfigParser -> readIntOption("Options::step");
-  float lumi = gConfigParser -> readIntOption("Options::lumi");
+  float lumi = gConfigParser -> readFloatOption("Options::lumi");
+  int massDependentCUTS   = gConfigParser -> readIntOption("Options::massDependentCUTS");
+  float lepNuWMMIN = gConfigParser -> readFloatOption("Options::lepNuWMMIN");
+  float lepNuWMMAX = gConfigParser -> readFloatOption("Options::lepNuWMMAX");
   
   
   
@@ -136,22 +139,31 @@ int main(int argc, char** argv)
   
   
   // Define variables
-  factory -> AddVariable("lepNuW_cphi", 'F');
-  factory -> AddVariable("lepNuZ_cphi", 'F');
+//  factory -> AddVariable("lepNuW_cphi", 'F');
+//  factory -> AddVariable("lepNuZ_cphi", 'F');
   factory -> AddVariable("lep_ctheta",  'F');
   factory -> AddVariable("WJ1_ctheta",  'F');
-  factory -> AddVariable("lepNu_ctheta",'F');
-//   factory -> AddVariable("lepNuW_m_KF", 'F');
-
+  factory -> AddVariable("abs(lepNu_ctheta)",'F');
+//  factory -> AddVariable("abs(WJ1_eta)",  'F');
+//  factory -> AddVariable("abs(WJ2_eta)",  'F');
+  factory -> AddVariable("abs(WJJ_eta)",  'F');
+  factory -> AddVariable("abs(lep_eta)",  'F');
+  factory -> AddVariable("lepMet_Dphi",  'F');
+  factory -> AddVariable("WJJ_Dphi",  'F');
   
-  factory -> PrepareTrainingAndTestTree("","SplitMode=Random");
+  TCut mycut;
+  if ( massDependentCUTS == 1 ) mycut = Form("(WJJ_m > 65 && WJJ_m < 95) * (lepNuW_m_KF > %f && lepNuW_m_KF < %f )", lepNuWMMIN, lepNuWMMAX);
+  else mycut = "(WJJ_m > 65 && WJJ_m < 95)";
+
+  factory -> PrepareTrainingAndTestTree(mycut, mycut ,"SplitMode=Random");
   
   
   
   std::cout << "******************************************************" << std::endl;
   std::cout << "BookMethod" << std::endl;
   std::cout << "******************************************************" << std::endl;
-  //factory -> BookMethod(TMVA::Types::kCuts, "kCuts");
+  factory -> BookMethod(TMVA::Types::kCuts, "kCuts", "!H:!V:FitMethod=MC:EffSel:SampleSize=200000:VarProp=FSmart");
+  //factory -> BookMethod(TMVA::Types::kCuts, "kCutsGA", "FitMethod=GA");
   //factory -> BookMethod(TMVA::Types::kLikelihood, "kLikelihood_H"+higgsMass);
   //factory -> BookMethod(TMVA::Types::kPDERS, "kPDERS");
   //factory -> BookMethod(TMVA::Types::kKNN, "kKNN_H"+higgsMass);
@@ -162,7 +174,7 @@ int main(int argc, char** argv)
   //factory -> BookMethod(TMVA::Types::kMLP, "kMLP");
   //factory -> BookMethod(TMVA::Types::kSVM, "kSVM");
 //   factory -> BookMethod( TMVA::Types::kBDT, "kBDT_H"+higgsMass,"!H:!V:VarTransform=G,N:NTrees=100:nEventsMin=10");
-  factory -> BookMethod( TMVA::Types::kBDT, "kBDT_H"+higgsMass,"!H:!V");
+//  factory -> BookMethod( TMVA::Types::kBDT, "kBDT_H"+higgsMass,"!H:!V");
   
 //   factory -> OptimizeAllMethods();
   
