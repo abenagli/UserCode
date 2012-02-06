@@ -159,6 +159,7 @@ class drawTStack
   std::vector<std::pair<std::string, std::string> > m_jetAlgorithm;
   
   std::map<std::string, double> m_crossSection;
+  std::map<std::string, double> m_scaleFactor;
   std::map<std::string, int> m_color;
   std::map<std::string, int> m_linestyle;
   std::map<std::string, int> m_fillstyle;
@@ -166,6 +167,7 @@ class drawTStack
   std::map<std::string, int> m_dataFlag;
   
   std::map<std::string, double> m_crossSection_summed;
+  std::map<std::string, double> m_scaleFactor_summed;
   std::map<std::string, int> m_color_summed;
   std::map<std::string, int> m_linestyle_summed;
   std::map<std::string, int> m_fillstyle_summed;

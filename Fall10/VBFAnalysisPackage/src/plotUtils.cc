@@ -29,6 +29,14 @@ drawTStack::drawTStack(const std::string& inputDir,
  m_baseRootFileName(baseRootFileName),
  m_outputDir(outputDir),
  m_imgFormat(imgFormat),
+ m_globalHisto(NULL),
+ m_bkgGlobalHisto(NULL),
+ m_sigGlobalHisto(NULL),
+ m_dataGlobalHisto(NULL),
+ m_stack(NULL),
+ m_bkgStack(NULL),
+ m_sigStack(NULL),
+ m_legend(NULL),
  m_generalCut("(1 == 1)"),
  m_xAxisRange(false),
  m_xRangeMin(0.),
@@ -43,7 +51,7 @@ drawTStack::drawTStack(const std::string& inputDir,
  m_unit(""),
  m_drawLegend(true),
  m_xLowLegend(0.76),
- m_yLowLegend(0.78),
+ m_yLowLegend(0.60),
  m_xHighLegend(0.99),
  m_yHighLegend(0.99),
  c1(NULL),
@@ -109,6 +117,7 @@ drawTStack::drawTStack(const std::string& inputDir,
     std::pair<std::string, std::string> dummyPair(sample, sumName);
     m_list.push_back(dummyPair);
     m_crossSection[sample] = crossSection*scaleFactor;
+    m_scaleFactor[sample] = scaleFactor;
     m_color[sample] = color;
     m_linestyle[sample] = linestyle;
     m_fillstyle[sample] = fillstyle;
@@ -118,6 +127,17 @@ drawTStack::drawTStack(const std::string& inputDir,
     std::pair<std::string, std::string> dummyPair2(sample, jetAlgorithm);
     m_jetAlgorithm.push_back(dummyPair2);
   }
+  
+  
+  for(std::vector<std::pair<std::string, std::string> >::const_iterator vecIt = m_list.begin();
+      vecIt != m_list.end(); ++vecIt)
+  {
+    m_histo_summed[vecIt->second] = NULL;
+    m_bkgHisto_summed[vecIt->second] = NULL;
+    m_sigHisto_summed[vecIt->second] = NULL;
+    m_dataHisto_summed[vecIt->second] = NULL;
+  }
+  
   
   listFile.close();
   //std::cout << ">>>plotUtils::drawTStack::Read " << m_list.size() << " samples" << std::endl;
@@ -142,30 +162,35 @@ void drawTStack::Initialize()
   //std::cout << "\n>>>plotUtils::Initialize " << std::endl;
   
   
-  // Initialize::clear vector with root files
-   m_rootFiles.clear();
-  
-  
   // Initialize::initialize summed vectors
   for(std::vector<std::pair<std::string, std::string> >::const_iterator vecIt = m_list.begin();
       vecIt != m_list.end(); ++vecIt)
   {
     m_crossSection_summed[vecIt->second] += m_crossSection[vecIt->first];
+    m_scaleFactor_summed[vecIt->second]   = m_scaleFactor[vecIt->first];
     m_color_summed[vecIt->second]         = m_color[vecIt->first];
     m_linestyle_summed[vecIt->second]     = m_linestyle[vecIt->first];
     m_fillstyle_summed[vecIt->second]     = m_fillstyle[vecIt->first];
     m_mH_summed[vecIt->second]            = m_mH[vecIt->first];
     m_dataFlag_summed[vecIt->second]      = m_dataFlag[vecIt->first];
+    
+    if(  m_histo_summed[vecIt->second] != NULL ) delete  m_histo_summed[vecIt->second];
+    if(  m_bkgHisto_summed[vecIt->second] != NULL ) delete  m_bkgHisto_summed[vecIt->second];
+    if(  m_sigHisto_summed[vecIt->second] != NULL ) delete  m_sigHisto_summed[vecIt->second];
+    if(  m_dataHisto_summed[vecIt->second] != NULL ) delete  m_dataHisto_summed[vecIt->second];
+    
     m_histo_summed[vecIt->second] = NULL;
-    if( (m_dataFlag_summed[vecIt->second] != 1) && (m_mH_summed[vecIt->second] <= 0) )
-      m_bkgHisto_summed[vecIt->second] = NULL;
-    if( (m_dataFlag_summed[vecIt->second] != 1) && (m_mH_summed[vecIt->second] > 0) )
-      m_sigHisto_summed[vecIt->second] = NULL;
-    if( (m_dataFlag_summed[vecIt->second] == 1) && (m_mH_summed[vecIt->second] <= 0) )
-      m_dataHisto_summed[vecIt->second] = NULL;
+    m_bkgHisto_summed[vecIt->second] = NULL;
+    m_sigHisto_summed[vecIt->second] = NULL;
+    m_dataHisto_summed[vecIt->second] = NULL;
   }
   
   // Initialize::initialize global histograms
+  if( m_globalHisto != NULL ) delete m_globalHisto; 
+  if( m_bkgGlobalHisto != NULL ) delete m_bkgGlobalHisto; 
+  if( m_sigGlobalHisto != NULL ) delete m_sigGlobalHisto; 
+  if( m_dataGlobalHisto != NULL ) delete m_dataGlobalHisto; 
+  
   m_globalHisto = NULL;
   m_bkgGlobalHisto = NULL;
   m_sigGlobalHisto = NULL;
@@ -174,6 +199,11 @@ void drawTStack::Initialize()
   m_bkgGlobalIntegral = 0.;
   m_dataGlobalIntegral = 0.;
   
+  
+  
+  // Initialize::clear vector with root files
+  CloseRootFiles();
+   m_rootFiles.clear();
 }
 
 
@@ -226,7 +256,7 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     sprintf(xRangeMinChar,"%.10f",m_xRangeMin);
     char xRangeMaxChar[50];
     sprintf(xRangeMaxChar,"%.10f",m_xRangeMax);
-    TH1F* histoTemp = new TH1F((histoName+"Temp").c_str(),"",nBins,  m_xRangeMin,         m_xRangeMax);
+    TH1F* histoTemp = new TH1F((histoName+"Temp").c_str(),"",nBins,  m_xRangeMin, m_xRangeMax);
     
     // to include the upper edge of the last bin
     float* new_bins = new float[nBins+1];
@@ -324,6 +354,9 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     
     
     ++i;
+    delete histoTemp;
+    delete histo;
+    delete new_bins;
   } // MakeHistogram::end loop over all the samples
   
   
@@ -332,16 +365,22 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
   
   
   //MakeHistogram::make stacks
+  if( m_stack != NULL ) delete m_stack;
+  if( m_bkgStack != NULL ) delete m_bkgStack;
+  if( m_sigStack != NULL ) delete m_sigStack;
+  
   m_stack = new THStack("stack","stack");
   m_bkgStack = new THStack("bkgStack","bkgStack");
   m_sigStack = new THStack("sigStack","sigStack");
   
   //MakeHistogram::make legend    
+  if( m_legend != NULL ) delete m_legend;
+  
   m_legend = new TLegend(m_xLowLegend, m_yLowLegend, m_xHighLegend, m_yHighLegend);
   m_legend -> SetFillColor(kWhite);
   m_legend -> SetFillStyle(4000);  
   m_legend -> SetTextFont(42);  
-  m_legend -> SetTextSize(0.025);
+  m_legend -> SetTextSize(0.04);
   
   
   
@@ -415,10 +454,13 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     {
       if( m_dataFlag_summed[mapIt->first] != 1 )
       {
-        if( stackSig == false )
-          histo_summed -> Scale(m_dataGlobalIntegral/m_bkgGlobalIntegral);
-        else
+        if( stackSig == true )
           histo_summed -> Scale(m_dataGlobalIntegral/(m_bkgGlobalIntegral+m_sigGlobalIntegral));
+        else
+        {
+	  if( m_mH_summed[mapIt->first] <= 0 )
+            histo_summed -> Scale(m_dataGlobalIntegral/m_bkgGlobalIntegral);
+        }
       }
     }
     if( mode == "sameAreaNoStack" )
@@ -548,21 +590,36 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     
     
     //MakeHistogram::add summed histograms to the legend    
+    std::string sampleName      = mapIt->first;
+    std::string sampleNameClean = "";
+    std::string::const_iterator strIt = sampleName.begin();
+    int strCounter = 0;
+    while( strIt != sampleName.end() )
+    {
+      if( (strCounter > 1) && ((*strIt) != '_') )
+        sampleNameClean += *strIt;
+      if( (strCounter > 1) && ((*strIt) == '_') )
+        sampleNameClean += " ";
+      
+      ++strIt;
+      ++strCounter;
+    }
+    
     if( (m_dataFlag_summed[mapIt->first] != 1) )
     {
       if( mode == "eventsScaled" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "F");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "F");
       if( mode == "sameAreaNoStack" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "L");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "L");
       if( mode == "sameAreaStack" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "F");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "F");
       if( mode == "integralStack" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "F");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "F");
       if( mode == "integralNoStack" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "L");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "L");
     }
     else
-      m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "P");
+      m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "P");
     
     
   } // loop over summed samples
@@ -710,10 +767,10 @@ void drawTStack::FindMinimumMaximum(const std::string& mode)
   
   
   // FindMinimumMaximum::loop over summed samples to get global maximum
-  if( (m_globalHisto != NULL) && ( (mode == "eventsScaled") || (mode == "sameAreaStack") || (mode == "integralStack") || (mode == "eventsScaledStack") ) )
+  if( (m_bkgGlobalHisto != NULL) && ( (mode == "eventsScaled") || (mode == "integralStack") || (mode == "eventsScaledStack") ) )
   {
-    if( MyGetMaximum(m_globalHisto, 1.E15, binMin, binMax) > m_globalMaximum )
-      m_globalMaximum = MyGetMaximum(m_globalHisto, 1.E15, binMin, binMax);
+    if( MyGetMaximum(m_bkgGlobalHisto, 1.E15, binMin, binMax) > m_globalMaximum )
+      m_globalMaximum = MyGetMaximum(m_bkgGlobalHisto, 1.E15, binMin, binMax);
   }
   
   if( (m_dataGlobalHisto != NULL) && ( (mode == "eventsScaled") || (mode == "sameAreaStack") || (mode == "integralStack") || (mode == "eventsScaledStack") ) )
@@ -764,8 +821,6 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
   Draw(c1,histoName,mode,stackSig,false,lumi);
   Draw(c2,histoName,mode,stackSig,true,lumi);
   
-  CloseRootFiles();
-
   m_xAxisRange = false;
   m_xAxisTitle = false;
   m_yAxisRange = false;
@@ -792,6 +847,12 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   p1 -> Draw();
   p2 -> Draw();
   
+  TGraph* ratioGraph1s = NULL;
+  TGraph* ratioGraph2s = NULL;
+  TH1F* ratioHisto = NULL;
+  TF1* line = NULL;
+  TLatex* latex = NULL;
+  
   
   // eventsScaled or sameAreaStack modes
   if( (mode == "eventsScaled") || (mode == "sameAreaStack") )
@@ -817,9 +878,9 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
     {
       p2 -> cd();
       
-      TGraph* ratioGraph1s = new TGraph();
-      TGraph* ratioGraph2s = new TGraph();
-      TH1F* ratioHisto = DrawTStackDataMCRatio(m_bkgStack,m_dataGlobalHisto,ratioGraph1s,ratioGraph2s);
+      ratioGraph1s = new TGraph();
+      ratioGraph2s = new TGraph();
+      ratioHisto = DrawTStackDataMCRatio(m_bkgStack,m_dataGlobalHisto,ratioGraph1s,ratioGraph2s);
       ratioHisto -> GetYaxis() -> SetRangeUser(0.7, 1.3);
       ratioHisto -> GetXaxis() -> SetLabelSize(0.09);
       ratioHisto -> GetYaxis() -> SetLabelSize(0.09);
@@ -837,7 +898,7 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
       ratioGraph1s -> Draw("F,same");
       ratioHisto -> Draw("P,same");
         
-      TF1* line = new TF1("line", "1.", -1000000., 1000000.);
+      line = new TF1("line", "1.", -1000000., 1000000.);
       line -> SetLineWidth(2);
       line -> SetLineColor(kRed);
       line -> Draw("same");
@@ -923,17 +984,17 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
     if( mode == "sameAreaNoStack" )
       sprintf(lumiBuffer, "CMS Preliminary 2011   -   histograms normalized to unit area");
     if( mode == "sameAreaStack" )
-      sprintf(lumiBuffer, "CMS Preliminary 2011   -   #sqrt{s}=7 TeV   L=%.2f fb^{-1}   MC norm. to data",lumi);
+      sprintf(lumiBuffer, "CMS Preliminary 2011   -   #sqrt{s}=7 TeV   L=%.2f fb^{-1}",lumi);
     if( mode == "integralStack" )
       sprintf(lumiBuffer, "CMS Preliminary 2011   -   integral distributions");
     if( mode == "integralNoStack" )
       sprintf(lumiBuffer, "CMS Preliminary 2011   -   integral distributions");
     
-    TLatex *latex = new TLatex(0.13, 0.96, lumiBuffer);
+    latex = new TLatex(0.13, 0.96, lumiBuffer);
     
     latex->SetNDC();
     latex->SetTextFont(42);
-    latex->SetTextSize(0.03);
+    latex->SetTextSize(0.04);
     latex->Draw("same");
   }
   
@@ -952,7 +1013,15 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   else
     c->Print((m_outputDir+"log_"+histoName+"."+m_imgFormat).c_str(), m_imgFormat.c_str());
   
+  delete p1;
+  delete p2;
   delete c;
+
+  if( ratioGraph1s != NULL ) delete ratioGraph1s;
+  if( ratioGraph2s != NULL ) delete ratioGraph2s;
+  if( ratioHisto != NULL ) delete ratioHisto;
+  if( line != NULL ) delete line;
+  if( latex != NULL ) delete latex;
 }
 
 
@@ -1029,16 +1098,23 @@ void drawTStack::DrawEvents(const std::string& mode,
   
   
   // DrawEvents::make stacks
+  if( m_stack != NULL ) delete m_stack;
+  if( m_bkgStack != NULL ) delete m_bkgStack;
+  if( m_sigStack != NULL ) delete m_sigStack;
+  
   m_stack = new THStack("stack","stack");
   m_bkgStack = new THStack("bkgStack","bkgStack");
   m_sigStack = new THStack("sigStack","sigStack");
   
- // DrawEvents::make legend
+  
+  // DrawEvents::make legend
+  if( m_legend != NULL ) delete m_legend;
+  
   m_legend = new TLegend(m_xLowLegend, m_yLowLegend, m_xHighLegend, m_yHighLegend);
   m_legend -> SetFillColor(kWhite);
   m_legend -> SetFillStyle(4000);
   m_legend -> SetTextFont(42);
-  m_legend -> SetTextSize(0.025);
+  m_legend -> SetTextSize(0.04);
   
   // DrawEvents::make outfiles
   std::ofstream* outFile = new std::ofstream((m_outputDir+mode+".txt").c_str(), std::ios::out);
@@ -1232,23 +1308,38 @@ void drawTStack::DrawEvents(const std::string& mode,
     
     
     // DrawEvents::add summed histograms to the legend
+    std::string sampleName      = mapIt->first;
+    std::string sampleNameClean = "";
+    std::string::const_iterator strIt = sampleName.begin();
+    int strCounter = 0;
+    while( strIt != sampleName.end() )
+    {
+      if( (strCounter >1) && ((*strIt) != '_') )
+        sampleNameClean += *strIt;
+      if( (strCounter >1) && ((*strIt) == '_') )
+        sampleNameClean += " ";
+      
+      ++strIt;
+      ++strCounter;
+    }
+    
     if( (m_dataFlag_summed[mapIt->first] != 1) )
     {
       if( mode == "events" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "L");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "L");
       if( mode == "eventsScaled" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "L");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "L");
       if( mode == "eventsScaledStack" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "F");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "F");
       if( mode == "efficiencies" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "L");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "L");
       if( mode == "efficienciesRelative" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "L");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "L");
       if( mode == "significance" )
-        m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "L");
+        m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "L");
     }
     else
-      m_legend -> AddEntry(histo_summed, (mapIt->first).c_str(), "P");    
+      m_legend -> AddEntry(histo_summed, sampleNameClean.c_str(), "P");    
     
     
     
@@ -1269,7 +1360,7 @@ void drawTStack::DrawEvents(const std::string& mode,
     {
       binLabels[bin] = histo_summed->GetXaxis()->GetBinLabel(bin);
       if( (m_mH_summed[mapIt->first] > 0.) && (m_dataFlag_summed[mapIt->first] != 1) )
-        nEventsScaled_sig[bin] += histo_summed->GetBinContent(bin);
+        nEventsScaled_sig[bin] += histo_summed->GetBinContent(bin)/m_scaleFactor_summed[mapIt->first];
       else if( (m_mH_summed[mapIt->first] <= 0.) && (m_dataFlag_summed[mapIt->first] != 1) )
         nEventsScaled_bkg[bin] += histo_summed->GetBinContent(bin);
     }
@@ -1314,6 +1405,12 @@ void drawTStack::DrawEvents(const std::string& mode,
   p1 -> Draw();
   p2 -> Draw();
   
+  TGraph* ratioGraph1s = NULL;
+  TGraph* ratioGraph2s = NULL;
+  TH1F* ratioHisto = NULL;
+  TF1* line = NULL;
+  TLatex* latex = NULL;
+  
   
   // eventsScaledStack mode
   if( mode == "eventsScaledStack" )
@@ -1339,9 +1436,9 @@ void drawTStack::DrawEvents(const std::string& mode,
     {
       p2 -> cd();
       
-      TGraph* ratioGraph1s = new TGraph();
-      TGraph* ratioGraph2s = new TGraph();
-      TH1F* ratioHisto = DrawTStackDataMCRatio(m_bkgStack,m_dataGlobalHisto,ratioGraph1s,ratioGraph2s);
+      ratioGraph1s = new TGraph();
+      ratioGraph2s = new TGraph();
+      ratioHisto = DrawTStackDataMCRatio(m_bkgStack,m_dataGlobalHisto,ratioGraph1s,ratioGraph2s);
       ratioHisto -> GetYaxis() -> SetRangeUser(0.7, 1.3);
       ratioHisto -> GetXaxis() -> SetLabelSize(0.09);
       ratioHisto -> GetYaxis() -> SetLabelSize(0.09);
@@ -1359,7 +1456,7 @@ void drawTStack::DrawEvents(const std::string& mode,
       ratioGraph1s -> Draw("F,same");
       ratioHisto -> Draw("P,same");
         
-      TF1* line = new TF1("line", "1.", -1000000., 1000000.);
+      line = new TF1("line", "1.", -1000000., 1000000.);
       line -> SetLineWidth(2);
       line -> SetLineColor(kRed);
       line -> Draw("same");
@@ -1438,11 +1535,11 @@ void drawTStack::DrawEvents(const std::string& mode,
     if( mode == "significance" )
       sprintf(lumiBuffer, "CMS Preliminary 2011   -   significance");
     
-    TLatex *latex = new TLatex(0.13, 0.96, lumiBuffer);
+    latex = new TLatex(0.13, 0.96, lumiBuffer);
     
     latex->SetNDC();
     latex->SetTextFont(42);
-    latex->SetTextSize(0.03);
+    latex->SetTextSize(0.04);
     latex->Draw("same");
   }
   
@@ -1454,7 +1551,15 @@ void drawTStack::DrawEvents(const std::string& mode,
   }
   c1->Print((m_outputDir+mode+"."+m_imgFormat).c_str(), m_imgFormat.c_str());
   
+  delete p1;
+  delete p2;
   delete c1;
+
+  if( ratioGraph1s != NULL ) delete ratioGraph1s;
+  if( ratioGraph2s != NULL ) delete ratioGraph2s;
+  if( ratioHisto != NULL ) delete ratioHisto;
+  if( line != NULL ) delete line;
+  if( latex != NULL ) delete latex;  
   
   
   
@@ -1512,6 +1617,7 @@ void drawTStack::DrawEvents(const std::string& mode,
       c1->Print( (m_outputDir+"significance."+m_imgFormat).c_str(), m_imgFormat.c_str());
       
       delete c1;    
+      delete significance;
     }
   }
   
@@ -1561,9 +1667,7 @@ void drawTStack::DrawEvents(const std::string& mode,
   //delete stepHisto;
   //delete outRootFile;
   
-  // close root files
-  CloseRootFiles();
-  
+  delete stepHisto;
 }
 
 
