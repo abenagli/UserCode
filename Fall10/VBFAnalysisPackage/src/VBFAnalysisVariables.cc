@@ -220,6 +220,8 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("WJJ_Dphi", &vars.WJJ_Dphi);
   reducedTree -> SetBranchAddress("WJJ_DR",   &vars.WJJ_DR);
   reducedTree -> SetBranchAddress("WJJ_pt",   &vars.WJJ_pt);
+  reducedTree -> SetBranchAddress("WJJ_eta",  &vars.WJJ_eta);
+  reducedTree -> SetBranchAddress("WJJ_phi",  &vars.WJJ_phi);
   reducedTree -> SetBranchAddress("WJJ_m",    &vars.WJJ_m);
   reducedTree -> SetBranchAddress("WJJ_zepp", &vars.WJJ_zepp);
   
@@ -230,11 +232,13 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   
   // Higgs variables
   reducedTree -> SetBranchAddress("lepMetW_pt",       &vars.lepMetW_pt);
+  reducedTree -> SetBranchAddress("lepMetW_phi",      &vars.lepMetW_phi);
   reducedTree -> SetBranchAddress("lepMetW_mt",       &vars.lepMetW_mt);
   reducedTree -> SetBranchAddress("lepMetW_Dphi",     &vars.lepMetW_Dphi);
   reducedTree -> SetBranchAddress("lepNu_m",          &vars.lepNu_m);
   reducedTree -> SetBranchAddress("lepNu_nSolutions", &vars.lepNu_nSolutions);
   reducedTree -> SetBranchAddress("lepW_pt",          &vars.lepW_pt);
+  reducedTree -> SetBranchAddress("lepNuW_eta",       &vars.lepNuW_eta);
   reducedTree -> SetBranchAddress("lepNuW_m",         &vars.lepNuW_m);
   reducedTree -> SetBranchAddress("lepNuW_m1",        &vars.lepNuW_m1);
   reducedTree -> SetBranchAddress("lepNuW_m2",        &vars.lepNuW_m2);

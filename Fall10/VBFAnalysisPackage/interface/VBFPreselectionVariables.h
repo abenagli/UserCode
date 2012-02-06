@@ -403,6 +403,8 @@ struct VBFPreselectionVariables
   float WJJ_Dphi;
   float WJJ_DR;
   float WJJ_pt;
+  float WJJ_eta;
+  float WJJ_phi;
   float WJJ_m;
   float WJJ_zepp;
   
@@ -420,11 +422,13 @@ struct VBFPreselectionVariables
   ROOT::Math::XYZTVector lepNuW2;
   
   float lepMetW_pt;
+  float lepMetW_phi;
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNu_m;
   int lepNu_nSolutions;
   float lepW_pt;
+  float lepNuW_eta;
   float lepNuW_m;
   float lepNuW_m1;
   float lepNuW_m2;

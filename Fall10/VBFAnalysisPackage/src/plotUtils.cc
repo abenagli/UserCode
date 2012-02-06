@@ -748,6 +748,7 @@ void drawTStack::FindMinimumMaximum(const std::string& mode)
   int binMin = -1;
   int binMax = -1;
   
+  
   // FindMinimumMaximum::loop over summed samples to get single minimum and maximum
   for(std::map<std::string, double>::const_iterator mapIt = m_crossSection_summed.begin(); mapIt != m_crossSection_summed.end(); ++mapIt)
   {    
@@ -767,7 +768,7 @@ void drawTStack::FindMinimumMaximum(const std::string& mode)
   
   
   // FindMinimumMaximum::loop over summed samples to get global maximum
-  if( (m_bkgGlobalHisto != NULL) && ( (mode == "eventsScaled") || (mode == "integralStack") || (mode == "eventsScaledStack") ) )
+  if( (m_bkgGlobalHisto != NULL) && ( (mode == "eventsScaled") || (mode == "sameAreaStack") || (mode == "integralStack") || (mode == "eventsScaledStack") ) )
   {
     if( MyGetMaximum(m_bkgGlobalHisto, 1.E15, binMin, binMax) > m_globalMaximum )
       m_globalMaximum = MyGetMaximum(m_bkgGlobalHisto, 1.E15, binMin, binMax);
@@ -958,11 +959,13 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   {
     m_bkgStack -> SetMinimum(0.);
     m_bkgStack -> SetMaximum(m_globalMaximum+0.1*m_globalMaximum);
+    m_bkgStack -> GetYaxis() -> SetRangeUser(0.,m_globalMaximum+0.1*m_globalMaximum);
   }
   else
   {
     m_bkgStack -> SetMinimum(pow(10.,log10(m_globalMinimum) - 0.1));
     m_bkgStack -> SetMaximum(pow(10.,log10(m_globalMaximum) + 0.1));
+    m_bkgStack -> GetYaxis() -> SetRangeUser(pow(10.,log10(m_globalMinimum) - 0.1),pow(10.,log10(m_globalMinimum) + 0.1));
   }
   
   if(m_yAxisRange)

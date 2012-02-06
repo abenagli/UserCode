@@ -280,6 +280,8 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("WJJ_Dphi",   &vars.WJJ_Dphi,     "WJJ_Dphi/F");
   vars.m_reducedTree -> Branch("WJJ_DR",     &vars.WJJ_DR,         "WJJ_DR/F");
   vars.m_reducedTree -> Branch("WJJ_pt",     &vars.WJJ_pt,         "WJJ_pt/F");
+  vars.m_reducedTree -> Branch("WJJ_eta",    &vars.WJJ_eta,       "WJJ_eta/F");
+  vars.m_reducedTree -> Branch("WJJ_phi",    &vars.WJJ_phi,       "WJJ_phi/F");
   vars.m_reducedTree -> Branch("WJJ_m",      &vars.WJJ_m,           "WJJ_m/F");
   vars.m_reducedTree -> Branch("WJJ_zepp",   &vars.WJJ_zepp,     "WJJ_zepp/F");
 
@@ -290,11 +292,13 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   // Higgs variables
   vars.m_reducedTree -> Branch("lepMetW_pt",       &vars.lepMetW_pt,             "lepMetW_pt/F");
+  vars.m_reducedTree -> Branch("lepMetW_phi",      &vars.lepMetW_phi,           "lepMetW_phi/F");
   vars.m_reducedTree -> Branch("lepMetW_mt",       &vars.lepMetW_mt,             "lepMetW_mt/F");
   vars.m_reducedTree -> Branch("lepMetW_Dphi",     &vars.lepMetW_Dphi,         "lepMetW_Dphi/F");
   vars.m_reducedTree -> Branch("lepNu_m",          &vars.lepNu_m,                   "lepNu_m/F");
   vars.m_reducedTree -> Branch("lepNu_nSolutions", &vars.lepNu_nSolutions, "lepNu_nSolutions/I");
   vars.m_reducedTree -> Branch("lepW_pt",          &vars.lepW_pt,                   "lepW_pt/F");
+  vars.m_reducedTree -> Branch("lepNuW_eta",       &vars.lepNuW_eta,             "lepNuW_eta/F");
   vars.m_reducedTree -> Branch("lepNuW_m",         &vars.lepNuW_m,                 "lepNuW_m/F");
   vars.m_reducedTree -> Branch("lepNuW_m1",        &vars.lepNuW_m1,               "lepNuW_m1/F");
   vars.m_reducedTree -> Branch("lepNuW_m2",        &vars.lepNuW_m2,               "lepNuW_m2/F");
@@ -737,6 +741,8 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.WJJ_Dphi = -99.;
   vars.WJJ_DR = -99.;
   vars.WJJ_pt = -99.;
+  vars.WJJ_eta = -99.;
+  vars.WJJ_phi = -99.;
   vars.WJJ_m = -99.;
   vars.WJJ_zepp = -99.;
   
@@ -754,11 +760,13 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lepNuW2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   
   vars.lepMetW_pt = -1.;
+  vars.lepMetW_phi = -1.;
   vars.lepMetW_mt = -1.;
   vars.lepMetW_Dphi = -1.;
   vars.lepNu_m = -1.;
   vars.lepNu_nSolutions = -1;
   vars.lepW_pt = -1.;
+  vars.lepNuW_eta = -1.;
   vars.lepNuW_m = -1.;
   vars.lepNuW_m1 = -1.;
   vars.lepNuW_m2 = -1.;
@@ -1664,6 +1672,8 @@ void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
   vars.WJJ_Dphi = deltaPhi(vars.WJ1.phi(),vars.WJ2.phi());
   vars.WJJ_DR = deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi());
   vars.WJJ_pt = (vars.WJ1+vars.WJ2).pt();
+  vars.WJJ_eta = (vars.WJ1+vars.WJ2).eta();
+  vars.WJJ_phi = (vars.WJ1+vars.WJ2).phi();
   vars.WJJ_m = (vars.WJ1+vars.WJ2).mass();
   
   vars.lepWJJ_ptOrdered.push_back( vars.lep.pt() );
@@ -1700,11 +1710,13 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader, const int
   vars.lepNuW = vars.lepW + vars.nu;
   vars.lepNuW1 = vars.lepW + vars.nu1;
   vars.lepNuW2 = vars.lepW + vars.nu2;
+  vars.lepNuW_eta = vars.lepNuW.eta();
   vars.lepNuW_m = vars.lepNuW.mass();
   vars.lepNuW_m1 = vars.lepNuW1.mass();
   vars.lepNuW_m2 = vars.lepNuW2.mass();
   
   vars.lepMetW_pt = (vars.lep + vars.met + vars.WJJ).pt();
+  vars.lepMetW_phi = (vars.lep + vars.met + vars.WJJ).phi();
   vars.lepMetW_mt = sqrt( vars.lepW.mass()*vars.lepW.mass() + 2. * vars.lepW.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lepW.phi(), vars.met.phi()) ) ) );
   vars.lepMetW_Dphi = deltaPhi(vars.lepMet.phi(), vars.WJJ.phi());
   

@@ -285,6 +285,8 @@ struct VBFAnalysisVariables
   float WJJ_Dphi;
   float WJJ_DR;
   float WJJ_pt;
+  float WJJ_eta;
+  float WJJ_phi;
   float WJJ_m;
   float WJJ_zepp;
   
@@ -298,6 +300,7 @@ struct VBFAnalysisVariables
   float lepW_pt;
   
   float lepMetW_pt;
+  float lepMetW_phi;
   float lepMetW_mt;
   float lepMetW_Dphi;
   float lepNu_m;
@@ -306,6 +309,7 @@ struct VBFAnalysisVariables
   float lepNu_m_KF2;
   int lepNu_nSolutions;
   int lepNu_nSolutions_KF;
+  float lepNuW_eta;
   float lepNuW_m;
   float lepNuW_m1;
   float lepNuW_m2;
