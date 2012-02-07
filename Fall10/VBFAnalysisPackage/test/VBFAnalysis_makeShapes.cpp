@@ -305,7 +305,7 @@ int main(int argc, char** argv)
     // data
     if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
       data_obs = new TH1F("data_obs","",nBins,xMin,xMax);
-    if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )    
+    if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
       data_obs = new TH1F("data_obs_dummy","",nBins,xMin,xMax);
     data_obs -> Sumw2();
     
