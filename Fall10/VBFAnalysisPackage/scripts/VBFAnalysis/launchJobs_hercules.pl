@@ -138,7 +138,7 @@ while(<SAMPLESListFile>)
   $command = "cd ".$sampleDir;
   print SAMPLEJOBFILE $command."\n";
   
-  $command = "cp /gwteraz/users/benaglia/data/*.root ".$sampleDir;
+  $command = "cp /gwteraz/users/benaglia/data/EfficiencyCorrections/*.root ".$sampleDir;
   print SAMPLEJOBFILE $command."\n";
     
   $command = $EXEName." ./selections.cfg >> ".$sampleDir."/out.txt";
