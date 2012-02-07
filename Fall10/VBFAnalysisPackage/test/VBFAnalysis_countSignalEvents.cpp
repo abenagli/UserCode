@@ -70,6 +70,9 @@ int main(int argc, char** argv)
   int step = gConfigParser -> readIntOption("Options::step");
   char stepChar[50];
   sprintf(stepChar,"%d",step);
+  
+  std::string additionalCuts = gConfigParser -> readStringOption("Options::additionalCuts");
+  
   int PUScale = gConfigParser -> readIntOption("Options::PUScale");
   std::string pileupFileName = gConfigParser -> readStringOption("Options::pileupFileName");
   
@@ -81,7 +84,11 @@ int main(int argc, char** argv)
   
   
   // Define the output file
-  outputRootFilePath += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
+  if( additionalCuts == "" )
+    outputRootFilePath += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
+  else
+    outputRootFilePath += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "_" + additionalCuts + "/";
+  
   std::string outputRootFullFileName;
   if( outputRootFileLabel == "none" )
     outputRootFullFileName = outputRootFilePath + outputRootFileName + ".root";

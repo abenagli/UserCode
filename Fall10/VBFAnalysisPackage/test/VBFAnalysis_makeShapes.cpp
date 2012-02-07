@@ -23,6 +23,14 @@
 
 
 
+float GetXFitMIN1(const float& mH, const int& step = -1);
+float GetXFitMAX2(const float& mH);
+
+void GetTurnOnParameters(float& mu, float& kT, const float& mH, const int& step = -1);
+
+
+
+
 
 
 int main(int argc, char** argv)
@@ -62,12 +70,17 @@ int main(int argc, char** argv)
   char stepChar[50];
   sprintf(stepChar,"%d",step);  
   
+  std::string additionalCuts = gConfigParser -> readStringOption("Options::additionalCuts");
+  
   std::string flavour = gConfigParser -> readStringOption("Options::flavour");
   
   float sigStrength = gConfigParser -> readFloatOption("Options::sigStrength");
   
   
-  inputDir += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
+  if( additionalCuts == "" )
+    inputDir += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
+  else
+    inputDir += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "_" + additionalCuts + "/";
   outputRootFilePath += "/combine_signal/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
 
 
@@ -186,8 +199,8 @@ int main(int argc, char** argv)
       histoName << "H" << mass << "/h_dataFit" << mass << "_" << flavour << "_" << fitMethod;      
       hint = (TH1F*)( inFile->Get(histoName.str().c_str()) );
       
-      xMin = GetXFitMIN1(mass,fitMethod,step);
-      xMax = GetXFitMAX2(mass,fitMethod);
+      xMin = GetLepNuWMMIN(mass);
+      xMax = GetLepNuWMMAX(mass);
     }
     
     
@@ -202,8 +215,8 @@ int main(int argc, char** argv)
       histoName << "H" << mass << "/h_data" << mass << "_" << flavour;
       data = (TH1F*)( inFile->Get(histoName.str().c_str()) );
       
-      xMin = GetXFitMIN1(mass,fitMethod,step);
-      xMax = GetXFitMAX2(mass,fitMethod);
+      xMin = GetXFitMIN1(mass,step);
+      xMax = GetXFitMAX2(mass);
       
       
       workspace = new RooWorkspace("workspace");
@@ -213,6 +226,11 @@ int main(int argc, char** argv)
       workspace -> import(*x);
       
       
+      float tempMu = -1.; 
+      float tempKT = -1.;
+      GetTurnOnParameters(tempMu,tempKT,mass,step);
+      
+       
       if( fitMethod == "exponential" )
       {
         L1 = new RooRealVar("L1","",0.012,0.,0.1);
@@ -224,8 +242,8 @@ int main(int argc, char** argv)
       
       if( fitMethod == "attenuatedExponential" )
       {
-        mu = new RooRealVar("mu","",130.,0.,500.); 
-        kT = new RooRealVar("kT","",20.,0.,100.); 
+        mu = new RooRealVar("mu","",tempMu,tempMu,tempMu);
+        kT = new RooRealVar("kT","",tempKT,tempKT,tempKT);
         L1 = new RooRealVar("L1","",0.012,0.,0.1);
         pdf_bkg = new RooGenericPdf("bkg","","1./(exp(-1.*(@0-@1)/@2)+1.) * exp(-1*@3*@0)",RooArgSet(*x,*mu,*kT,*L1));
         
@@ -250,8 +268,8 @@ int main(int argc, char** argv)
       
       if( fitMethod == "attenuatedDoubleExponential" )
       {
-        mu = new RooRealVar("mu","",190.,190.,190.); 
-        kT = new RooRealVar("kT","", 55., 55.,55.); 
+        mu = new RooRealVar("mu","",tempMu,tempMu,tempMu);
+        kT = new RooRealVar("kT","",tempKT,tempKT,tempKT);
         N  = new RooRealVar("N", "", 0.059,0.,1.0);
         L1 = new RooRealVar("L1","",0.023,0.,0.1);
         L2 = new RooRealVar("L2","",0.011,0.,0.1);
@@ -275,8 +293,8 @@ int main(int argc, char** argv)
       data = (TH1F*)(inFile->Get("signalRegion"));    
       hint = (TH1F*)(inFile->Get("extrapolated_bkg"));
       
-      xMin = GetXFitMIN1(mass,fitMethod,step);
-      xMax = GetXFitMAX2(mass,fitMethod);
+      xMin = GetXFitMIN1(mass,step);
+      xMax = GetXFitMAX2(mass);
     }
     
     
@@ -719,8 +737,6 @@ int main(int argc, char** argv)
       }
       if( fitMethod == "attenuatedExponential" )
       {
-        datacard_sa << "mu   param     130.   100.   [0.,500.]" << std::endl; 
-        datacard_sa << "kT   param      20.   100.   [0.,100.]" << std::endl; 
         datacard_sa << "L1   param    0.012     1.   [0.,0.1]"  << std::endl; 
       }
       if( fitMethod == "doubleExponential" )
@@ -744,4 +760,84 @@ int main(int argc, char** argv)
   
   
   return 1;
+}
+
+
+
+
+
+
+float GetXFitMIN1(const float& mH, const int& step)
+{
+  if( step <= 13 )
+  {
+    if     ( mH == 200. ) return 180.;
+    if     ( mH == 250. ) return 180.;
+    else if( mH == 300. ) return 180.;
+    else if( mH == 350. ) return 180.;
+    else if( mH == 400. ) return 180.;
+    else if( mH == 450. ) return 180.;
+    else if( mH == 500. ) return 180.;
+    else if( mH == 550. ) return 180.;
+    else if( mH == 600. ) return 180.;
+    else return 1.;
+  }
+  
+  else if( step > 13 )
+  {
+    if     ( mH == 200. ) return 200.;
+    if     ( mH == 250. ) return 200.;
+    else if( mH == 300. ) return 200.;
+    else if( mH == 350. ) return 200.;
+    else if( mH == 400. ) return 200.;
+    else if( mH == 450. ) return 200.;
+    else if( mH == 500. ) return 200.;
+    else if( mH == 550. ) return 200.;
+    else if( mH == 600. ) return 200.;
+    else return 1.;
+  }
+  
+  else return -1.;
+}
+
+float GetXFitMAX2(const float& mH)
+{
+  if     ( mH == 200. ) return 800.;
+  else if( mH == 250. ) return 800.;
+  else if( mH == 300. ) return 800.;
+  else if( mH == 350. ) return 800.;
+  else if( mH == 400. ) return 800.;
+  else if( mH == 450. ) return 800.;
+  else if( mH == 500. ) return 800.;
+  else if( mH == 550. ) return 800.;
+  else if( mH == 600. ) return 800.;
+  else return -1.;
+}
+
+void  GetTurnOnParameters(float& mu, float& kT, const float& mH, const int& step)
+{
+  if( step <= 13 )
+  {
+    if     ( mH == 200. ) { mu = 180.; kT = 50; }
+    else if( mH == 250. ) { mu = 180.; kT = 50; }
+    else if( mH == 300. ) { mu = 180.; kT = 50; }
+    else if( mH == 350. ) { mu = 180.; kT = 50; }
+    else if( mH == 400. ) { mu = 180.; kT = 50; }
+    else if( mH == 450. ) { mu = 180.; kT = 50; }
+    else if( mH == 500. ) { mu = 180.; kT = 50; }
+    else if( mH == 550. ) { mu = 180.; kT = 50; }
+    else if( mH == 600. ) { mu = 180.; kT = 50; }
+  }
+  else if( step > 13 )
+  {
+    if     ( mH == 200. ) { mu = 180.; kT = 50; }
+    else if( mH == 250. ) { mu = 180.; kT = 50; }
+    else if( mH == 300. ) { mu = 180.; kT = 50; }
+    else if( mH == 350. ) { mu = 180.; kT = 50; }
+    else if( mH == 400. ) { mu = 180.; kT = 50; }
+    else if( mH == 450. ) { mu = 180.; kT = 50; }
+    else if( mH == 500. ) { mu = 180.; kT = 50; }
+    else if( mH == 550. ) { mu = 180.; kT = 50; }
+    else if( mH == 600. ) { mu = 180.; kT = 50; }
+  }
 }
