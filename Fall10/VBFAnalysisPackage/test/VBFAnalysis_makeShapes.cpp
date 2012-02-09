@@ -106,7 +106,10 @@ int main(int argc, char** argv)
     
     // define outfile
     std::stringstream ss;
-    ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root";
+    if( analysisMethod != "sidebands" )
+      ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root";
+    else
+      ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << mass << "_" << flavour << ".root";
     TFile* outFile = new TFile((ss.str()).c_str(),"RECREATE");
     
     
@@ -574,7 +577,10 @@ int main(int argc, char** argv)
     if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
     {
       std::stringstream ss2;
-      ss2 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "bincounting" << "_" << mass << "_" << flavour << ".txt";
+      if( analysisMethod != "sidebands" )
+        ss2 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "bincounting" << "_" << mass << "_" << flavour << ".txt";
+      else
+      ss2 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << "bincounting" << "_" << mass << "_" << flavour << ".txt";
       std::ofstream datacard_bc(ss2.str().c_str(),std::ios::out);
       
       datacard_bc << std::fixed;
@@ -623,7 +629,10 @@ int main(int argc, char** argv)
       
       
       std::stringstream ss3;
-      ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "shapeanalysis" << "_" << mass << "_" << flavour << ".txt";
+      if( analysisMethod != "sidebands" )
+        ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "shapeanalysis" << "_" << mass << "_" << flavour << ".txt";
+      else
+        ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << "shapeanalysis" << "_" << mass << "_" << flavour << ".txt";
       std::ofstream datacard_sa(ss3.str().c_str(),std::ios::out);
       
       datacard_sa << std::fixed;
@@ -634,12 +643,24 @@ int main(int argc, char** argv)
       datacard_sa << "jmax 2   # number of processes - 1" << std::endl;
       datacard_sa << "kmax " << 4 + labels.size() << "   # number of nuisance parameters (sources of systematic uncertainties)" << std::endl;
       datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-      datacard_sa << "shapes *          " << std::setw(7) << flavour+"_23j   "
-		  << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root   "
-                  << "$PROCESS $PROCESS_$SYSTEMATIC" << std::endl;
-      datacard_sa << "shapes data_obs   " << std::setw(7) << flavour+"_23j   "
-		  << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root   "
-                  << "data_obs" << std::endl;
+      if( analysisMethod != "sidebands" )
+      {
+        datacard_sa << "shapes *          " << std::setw(7) << flavour+"_23j   "
+                    << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root   "
+                    << "$PROCESS $PROCESS_$SYSTEMATIC" << std::endl;
+        datacard_sa << "shapes data_obs   " << std::setw(7) << flavour+"_23j   "
+                    << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root   "
+                    << "data_obs" << std::endl;
+      }
+      else
+      {
+        datacard_sa << "shapes *          " << std::setw(7) << flavour+"_23j   "
+                    << "shapes_" << analysisMethod << "_" << mass << "_" << flavour << ".root   "
+                    << "$PROCESS $PROCESS_$SYSTEMATIC" << std::endl;
+        datacard_sa << "shapes data_obs   " << std::setw(7) << flavour+"_23j   "
+                    << "shapes_" << analysisMethod << "_" << mass << "_" << flavour << ".root   "
+                    << "data_obs" << std::endl;
+      }
       datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
       datacard_sa << "bin           " << std::setw(7) << flavour+"_23j" << std::endl;
       datacard_sa << "observation   " << std::setprecision(0) << std::setw(7) << n_data_obs << std::endl;    
