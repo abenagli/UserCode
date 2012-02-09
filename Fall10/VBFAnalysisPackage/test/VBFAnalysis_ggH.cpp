@@ -130,7 +130,7 @@ int main(int argc, char** argv)
   
   float WPtMIN = gConfigParser -> readFloatOption("Cuts::WPtMIN");
   float WJPtMIN = gConfigParser -> readFloatOption("Cuts::WJPtMIN");
-  float WJEtaMAX = gConfigParser -> readFloatOption("Cuts::WJEtaMAX");
+  float WJJEtaMAX = gConfigParser -> readFloatOption("Cuts::WJJEtaMAX");
   
   float lepMetWDphiMIN = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMIN");
   float lepMetWDphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMAX");
@@ -1160,16 +1160,9 @@ int main(int argc, char** argv)
     else
       vars.helicityLikelihood = -1.;
     
-        
+    
     // helicity bdt
     if( applyMVA == 1 ) vars.mva = MVAReader -> EvaluateMVA("kBDT_H250");
-    
-    
-    //// met phi correction
-    //if( vars.dataFlag == 0 )
-    //{
-    //  vars.eventWeight *= f_correction_met_phi->Eval(vars.met_phi);
-    //}
     
       
     // Fill distributions
@@ -1195,12 +1188,10 @@ int main(int argc, char** argv)
     
     if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
     if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
-    if( fabs(vars.WJ1_eta) > WJEtaMAX ) continue;
-    if( fabs(vars.WJ2_eta) > WJEtaMAX ) continue;
-    if( fabs(vars.WJJ_eta) > WJEtaMAX ) continue;
+    if( fabs(vars.WJJ_eta) > WJJEtaMAX ) continue;
     
     
-    // fill distributions    
+    // fill distributions
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
