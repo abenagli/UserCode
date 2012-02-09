@@ -275,8 +275,8 @@ int main(int argc, char** argv)
         
         
         // mass-dependent cuts
-        if( lepMet_Dphi > GetCut_lepMet_Dphi(mass) ) continue;
-        if( WJJ_Dphi > GetCut_WJJ_Dphi(mass) ) continue;
+        //if( lepMet_Dphi > GetCut_lepMet_Dphi(mass) ) continue;
+        //if( WJJ_Dphi > GetCut_WJJ_Dphi(mass) ) continue;
         
         
         // ggH
@@ -329,8 +329,8 @@ int main(int argc, char** argv)
           
           
           // mass-dependent cuts
-          if( lepMet_Dphi > GetCut_lepMet_Dphi(mass) ) continue;
-          if( WJJ_Dphi > GetCut_WJJ_Dphi(mass) ) continue;
+          //if( lepMet_Dphi > GetCut_lepMet_Dphi(mass) ) continue;
+          //if( WJJ_Dphi > GetCut_WJJ_Dphi(mass) ) continue;
           
           for(unsigned int flavourIt = 0; flavourIt < nFlavours; ++flavourIt)
           {
