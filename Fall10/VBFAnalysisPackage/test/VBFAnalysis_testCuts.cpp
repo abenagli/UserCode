@@ -135,6 +135,31 @@ int main(int argc, char** argv)
   
   
   //----------------
+  // cut on lepMet_Dphi
+  dummyVarName = "lepMet_Dphi";
+  dummyCutType = "<";
+  dummyCutValues.clear();
+  dummyCutValues.push_back("2.5");
+  dummyCutValues.push_back("2.0");
+  dummyCutValues.push_back("1.5");
+  
+  dummyCutName = "lepMet_Dphi";
+  cutNames[dummyVarName] = dummyCutName;
+  cutValues[dummyVarName] = dummyCutValues;
+  cutTypes[dummyVarName] = dummyCutType;
+  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig400HistoMap[dummyVarName]  = InitializeHistograms("sig400", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig450HistoMap[dummyVarName]  = InitializeHistograms("sig450", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig500HistoMap[dummyVarName]  = InitializeHistograms("sig500", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig550HistoMap[dummyVarName]  = InitializeHistograms("sig550", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
+  
+  //----------------
   // cut on WJJ_Dphi
   dummyVarName = "WJJ_Dphi";
   dummyCutType = "<";
@@ -283,17 +308,20 @@ int main(int argc, char** argv)
   sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-   
-  //----------------
-  // cut on WJ1_eta
-  dummyVarName = "WJ1_eta";
-  dummyCutType = "<,>";
-  dummyCutValues.clear();
-  dummyCutValues.push_back("2.0,-2.0");
-  dummyCutValues.push_back("1.5,-1.5");
-  dummyCutValues.push_back("1.0,-1.0");
   
-  dummyCutName = "WJ1_eta";
+  //-------------
+  // cut on WJJ_m
+  dummyVarName = "WJJ_m";
+  dummyCutType = ">,<";
+  dummyCutValues.clear();
+  dummyCutValues.push_back("60.0,95.0");
+  dummyCutValues.push_back("60.0,100.0");
+  dummyCutValues.push_back("65.0,95.0");
+  dummyCutValues.push_back("65.0,100.0");
+  dummyCutValues.push_back("70.0,95.0");
+  dummyCutValues.push_back("70.0,100.0");
+  
+  dummyCutName = "WJJ_m";
   cutNames[dummyVarName] = dummyCutName;
   cutValues[dummyVarName] = dummyCutValues;
   cutTypes[dummyVarName] = dummyCutType;
@@ -309,6 +337,7 @@ int main(int argc, char** argv)
   bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   
+    
   //--------------------------
   // cut on helicityLikelihood
   dummyVarName = "helicityLikelihood";
@@ -334,64 +363,6 @@ int main(int argc, char** argv)
   sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
   bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  
-  
-  
-  /*
-  //----------------
-  // cut WJJ_m
-  dummyVarName = "WJJ_m";
-  dummyCutType = ">,<";
-  dummyCutValues.clear();
-  dummyCutValues.push_back("70.,90.");
-  dummyCutValues.push_back("65.,95.");
-  dummyCutValues.push_back("60.,100.");
-  dummyCutValues.push_back("55.,110.");
-  
-  dummyCutName = "WJJ_m";
-  cutNames[dummyVarName] = dummyCutName;
-  cutValues[dummyVarName] = dummyCutValues;
-  cutTypes[dummyVarName] = dummyCutType;
-  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig400HistoMap[dummyVarName]  = InitializeHistograms("sig400", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig450HistoMap[dummyVarName]  = InitializeHistograms("sig450", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig500HistoMap[dummyVarName]  = InitializeHistograms("sig500", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig550HistoMap[dummyVarName]  = InitializeHistograms("sig550", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  */
-  
-  
-  
-  /*
-  //-------------
-  // cut on nJets
-  dummyVarName = " ";
-  dummyCutType = " ";
-  dummyCutValues.clear();
-  dummyCutValues.push_back("nJets_cnt_pt30 < 4");
-  dummyCutValues.push_back("nJets_pt30 < 4");
-  
-  dummyCutName = "nJets";
-  cutNames[dummyVarName] = dummyCutName;
-  cutValues[dummyVarName] = dummyCutValues;
-  cutTypes[dummyVarName] = dummyCutType;
-  sig200HistoMap[dummyVarName]  = InitializeHistograms("sig200", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig250HistoMap[dummyVarName]  = InitializeHistograms("sig250", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig300HistoMap[dummyVarName]  = InitializeHistograms("sig300", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig350HistoMap[dummyVarName]  = InitializeHistograms("sig350", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig400HistoMap[dummyVarName]  = InitializeHistograms("sig400", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig450HistoMap[dummyVarName]  = InitializeHistograms("sig450", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig500HistoMap[dummyVarName]  = InitializeHistograms("sig500", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig550HistoMap[dummyVarName]  = InitializeHistograms("sig550", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  sig600HistoMap[dummyVarName]  = InitializeHistograms("sig600", dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  bkgHistoMap[dummyVarName]     = InitializeHistograms("bkg",    dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  bkgNormHistoMap[dummyVarName] = InitializeHistograms("bkgNorm",dummyCutName,dummyVarName,dummyCutValues,dummyCutType);
-  */
   
   
   
@@ -560,7 +531,7 @@ std::vector<TH1F*> InitializeHistograms(const std::string& prefix,
     histos[iCut+1] -> GetYaxis() -> SetTitle("events");
     
     histos[iCut+1] -> SetMarkerStyle(1);
-    histos[iCut+1] -> SetLineColor(51+6*iCut);
+    histos[iCut+1] -> SetLineColor(51+5*iCut);
   }
   
   
@@ -762,8 +733,8 @@ void DrawSignificance(std::map<int,std::map<std::string,std::vector<TH1F*> > >& 
     g_significance.push_back( new TGraph() );
     g_significance.at(iCut+1) -> SetMarkerStyle(20);
     g_significance.at(iCut+1) -> SetMarkerSize(0.7);
-    g_significance.at(iCut+1) -> SetMarkerColor(51+6*iCut);
-    g_significance.at(iCut+1) -> SetLineColor(51+6*iCut);
+    g_significance.at(iCut+1) -> SetMarkerColor(51+5*iCut);
+    g_significance.at(iCut+1) -> SetLineColor(51+5*iCut);
     
     legend -> AddEntry(g_significance.at(iCut+1),cut.c_str(),"PL");
   }
