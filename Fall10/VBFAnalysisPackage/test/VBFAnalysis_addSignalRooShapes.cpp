@@ -24,7 +24,7 @@
 #include "RooGenericPdf.h"
 #include "RooGaussian.h"
 #include "RooWorkspace.h"
-#include "SuperCrystalBall.h"
+#include "RooAttenuatedCrystalBallLowHigh.h"
 #include "RooGaussWithSkirt.h"
 #include "RooFitResult.h"
 #include "RooAbsPdf.h"
@@ -144,6 +144,8 @@ void fitSCB (RooDataHist & datasetHist, RooAbsPdf * scb, RooRealVar & x, RooArgL
 
   //PG gaus with exponential tails
   RooRealVar scb_norma  ("scb_norma",  "scb_norma",  datasetHist.sumEntries ()) ;
+  RooRealVar scb_mu     ("scb_mu",     "scb_mu",     gmean, 0.5 * gmean, 1.5 * gmean) ;
+  RooRealVar scb_kT     ("scb_kT",     "scb_kT",     gmean, 0.5 * gmean, 1.5 * gmean) ;
   RooRealVar scb_mean   ("scb_mean",   "scb_mean",   gmean, 0.5 * gmean, 1.5 * gmean) ;
   RooRealVar scb_sigma  ("scb_sigma",  "scb_sigma",  gsigma, 0.5 * gsigma, 2 * gsigma) ;
   RooRealVar scb_alpha  ("scb_alpha",  "scb_alpha",  1, 0, 10) ;
@@ -151,11 +153,13 @@ void fitSCB (RooDataHist & datasetHist, RooAbsPdf * scb, RooRealVar & x, RooArgL
   RooRealVar scb_alpha2 ("scb_alpha2", "scb_alpha2", 1, 0, 10) ;
   RooRealVar scb_n2     ("scb_n2",     "scb_n2",     50, 0, 200) ;
 
-  scb = new SuperCrystalBall ("scb", "scb",
-                              x, scb_norma, scb_mean, scb_sigma, scb_alpha, scb_n, scb_alpha2, scb_n2) ;
+  scb = new RooAttenuatedCrystalBallLowHigh ("scb", "scb",
+					     x, scb_mu, scb_kT, scb_mean, scb_sigma, scb_alpha, scb_n, scb_alpha2, scb_n2) ;
   RooFitResult * scb_res = scb->fitTo (datasetHist, Save (), PrintLevel (-10)) ;   
 
   params.add (scb_norma ) ;
+  params.add (scb_mu    ) ;
+  params.add (scb_kT    ) ;
   params.add (scb_mean  ) ;
   params.add (scb_sigma ) ;
   params.add (scb_alpha ) ;
