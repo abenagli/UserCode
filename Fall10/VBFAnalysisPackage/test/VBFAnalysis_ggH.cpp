@@ -1510,3 +1510,37 @@ int main(int argc, char** argv)
   
   return 0;
 }
+
+
+
+
+
+
+bool AcceptHLTPath(const std::vector<std::string>& HLT_Names, 
+		   const std::vector<float>& HLT_Accept, 
+		   const std::string& HLTPathName, 
+		   bool& pathFound, 
+		   const bool& verbosity) 
+{ 
+  bool acceptEvent = false; 
+  if ( HLTPathName == "HLT_dummy" )
+  { 
+    pathFound = true; 
+    return true; 
+  } 
+  
+  for(unsigned int HLTIt = 0; HLTIt < HLT_Names.size(); ++HLTIt) 
+  { 
+    if( HLT_Names.at(HLTIt) == HLTPathName ) 
+    { 
+      pathFound = true; 
+      if( HLT_Accept.at(HLTIt) == 1 ) 
+      { 
+        acceptEvent = true; 
+        if( verbosity ) std::cout << ">>> AcceptHLTPath::path " << HLTPathName << " has fired" << std::endl; 
+      } 
+    } 
+  } 
+  
+  return acceptEvent; 
+}
