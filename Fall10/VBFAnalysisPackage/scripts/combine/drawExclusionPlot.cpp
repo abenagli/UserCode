@@ -31,6 +31,7 @@ int main(int argc, char** argv)
   std::string folder(argv[1]);
   std::string name(argv[2]);
   
+  std::cout << "./drawExclusionPlot " << folder << " " << name << std::endl;
   
   double mass[200];
   double b_vals_exclusion_median_data[200];
@@ -113,6 +114,10 @@ int main(int argc, char** argv)
   }
   
   int n_points = numMass;
+  for(int i = 0; i < n_points; ++i)
+  {
+    std::cout << ">>> mass: " << mass[i] << "   obs: " << b_vals_exclusion_median_data[i] << std::endl;
+  }
   
   
   
@@ -160,15 +165,14 @@ int main(int argc, char** argv)
   
   
   
-  TCanvas *cExclusion = new TCanvas("cExclusion","",1000,750);
-  cExclusion->SetGridx();
-  cExclusion->SetGridy();
-  cExclusion->SetLogy();
+  TCanvas *c1 = new TCanvas("c1","",1000,750);
+  c1->SetGridx();
+  c1->SetGridy();
   
   m_exclusion_b_band_graph_2sigma->GetYaxis()->SetTitle("r = #sigma_{95%CL} / #sigma_{SM}");
   m_exclusion_b_band_graph_2sigma->GetXaxis()->SetTitle("Higgs mass (GeV/c^{2})");
-  m_exclusion_b_band_graph_2sigma->SetMinimum(0.2);
-  m_exclusion_b_band_graph_2sigma->SetMaximum(20.);
+  m_exclusion_b_band_graph_2sigma->SetMinimum(0.);
+  m_exclusion_b_band_graph_2sigma->SetMaximum(5.);
   m_exclusion_b_band_graph_2sigma->SetTitle("");
   m_exclusion_b_band_graph_2sigma->Draw("A3");
   
@@ -183,8 +187,33 @@ int main(int argc, char** argv)
   f->SetLineWidth(2);
   f->Draw("same");
   
-  cExclusion->Print((name+".pdf").c_str(),"pdf");
+  c1->Print(("lin_"+name+".pdf").c_str(),"pdf");
   
+  
+  
+  TCanvas *c2 = new TCanvas("c2","",1000,750);
+  c2->SetGridx();
+  c2->SetGridy();
+  c2->SetLogy();
+  
+  m_exclusion_b_band_graph_2sigma->GetYaxis()->SetTitle("r = #sigma_{95%CL} / #sigma_{SM}");
+  m_exclusion_b_band_graph_2sigma->GetXaxis()->SetTitle("Higgs mass (GeV/c^{2})");
+  m_exclusion_b_band_graph_2sigma->SetMinimum(0.1);
+  m_exclusion_b_band_graph_2sigma->SetMaximum(10.);
+  m_exclusion_b_band_graph_2sigma->SetTitle("");
+  m_exclusion_b_band_graph_2sigma->Draw("A3");
+  
+  m_exclusion_b_band_graph_1sigma->Draw("3,same");
+
+  m_exclusion_b_line_graph->Draw("L,same");
+  m_exclusion_b_line_graph_obs->Draw("PL,same");
+  m_exclusion_legend->Draw("same");
+  
+  f->SetLineColor(kRed+1);
+  f->SetLineWidth(2);
+  f->Draw("same");
+  
+  c2->Print(("log_"+name+".pdf").c_str(),"pdf");
   
   
   return 0;

@@ -17,6 +17,9 @@
 
 void RegularizeHistogram(TH1F* h);
 
+float GetCut_lepMet_Dphi(const float& mH);
+float GetCut_WJJ_Dphi(const float& mH);
+
 
 
 
@@ -84,7 +87,7 @@ int main(int argc, char** argv)
   
   
   // Define the output file
-  if( additionalCuts == "" )
+  if( additionalCuts == "none" )
     outputRootFilePath += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
   else
     outputRootFilePath += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "_" + additionalCuts + "/";
@@ -186,6 +189,10 @@ int main(int argc, char** argv)
   float crossSection;
   float WJJ_m;
   float lepNuW_m_KF;
+  float lepMet_Dphi;
+  float WJJ_Dphi;
+  float WJ1_ctheta;
+  float lepNu_ctheta;
   int lep_flavour;
   
   
@@ -232,6 +239,10 @@ int main(int argc, char** argv)
     tree -> SetBranchAddress("totEvents",      &totEvents);
     tree -> SetBranchAddress("crossSection",   &crossSection);
     tree -> SetBranchAddress("WJJ_m",          &WJJ_m);
+    tree -> SetBranchAddress("lepMet_Dphi",    &lepMet_Dphi);
+    tree -> SetBranchAddress("WJJ_Dphi",       &WJJ_Dphi);
+    tree -> SetBranchAddress("WJ1_ctheta",     &WJ1_ctheta);
+    tree -> SetBranchAddress("lepNu_ctheta",   &lepNu_ctheta);
     tree -> SetBranchAddress("lepNuW_m_KF",    &lepNuW_m_KF);
     tree -> SetBranchAddress("lep_flavour",    &lep_flavour);
     
@@ -247,8 +258,10 @@ int main(int argc, char** argv)
       
       
       
-      // cuts
+      // non mass-dependent cuts
       if( (WJJ_m < 65.) || (WJJ_m >= 100.) ) continue;
+      //if( WJ1_ctheta > 0.6 ) continue;
+      //if( fabs(lepNu_ctheta) > 0.65 ) continue;
       
       
       
@@ -259,6 +272,11 @@ int main(int argc, char** argv)
       {
         // count events
         int mass = int(int(mH)%1000);
+        
+        
+        // mass-dependent cuts
+        if( lepMet_Dphi > GetCut_lepMet_Dphi(mass) ) continue;
+        if( WJJ_Dphi > GetCut_WJJ_Dphi(mass) ) continue;
         
         
         // ggH
@@ -308,6 +326,11 @@ int main(int argc, char** argv)
         for(unsigned int iMass = 0; iMass < nMasses; ++iMass)
         {
           int mass = masses.at(iMass);
+          
+          
+          // mass-dependent cuts
+          if( lepMet_Dphi > GetCut_lepMet_Dphi(mass) ) continue;
+          if( WJJ_Dphi > GetCut_WJJ_Dphi(mass) ) continue;
           
           for(unsigned int flavourIt = 0; flavourIt < nFlavours; ++flavourIt)
           {
@@ -417,4 +440,36 @@ void RegularizeHistogram(TH1F* h)
   }
   
   return;
+}
+
+
+
+
+
+float GetCut_lepMet_Dphi(const float& mH)
+{
+  if     ( mH == 200. ) return 2.5;
+  else if( mH == 250. ) return 2.5;
+  else if( mH == 300. ) return 2.5;
+  else if( mH == 350. ) return 2.5;
+  else if( mH == 400. ) return 2.;
+  else if( mH == 450. ) return 2.;
+  else if( mH == 500. ) return 2.;
+  else if( mH == 550. ) return 1.5;
+  else if( mH == 600. ) return 1.5;
+  else return -1;
+}
+
+float GetCut_WJJ_Dphi(const float& mH)
+{
+  if     ( mH == 200. ) return 2.;
+  else if( mH == 250. ) return 2.;
+  else if( mH == 300. ) return 2.;
+  else if( mH == 350. ) return 2.;
+  else if( mH == 400. ) return 1.5;
+  else if( mH == 450. ) return 1.5;
+  else if( mH == 500. ) return 1.5;
+  else if( mH == 550. ) return 1.5;
+  else if( mH == 600. ) return 1.5;
+  else return -1;
 }

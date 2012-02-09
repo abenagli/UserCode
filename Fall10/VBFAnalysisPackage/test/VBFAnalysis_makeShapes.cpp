@@ -23,10 +23,12 @@
 
 
 
-float GetXFitMIN1(const float& mH, const int& step = -1);
+float GetXFitMIN1(const float& mH, const int& step = -1, const std::string& additionalCuts = "none");
 float GetXFitMAX2(const float& mH);
 
-void GetTurnOnParameters(float& mu, float& kT, const float& mH, const int& step = -1);
+void GetTurnOnParameters(float& mu, float& kT, const float& mH, const int& step = -1, const std::string& additionalCuts = "none");
+
+void GetAttenuateDoubleExponentialParameters(float& L1, float& L2, float& N, const float& mH, const int& step, const std::string& additionalCuts);
 
 
 
@@ -77,12 +79,16 @@ int main(int argc, char** argv)
   float sigStrength = gConfigParser -> readFloatOption("Options::sigStrength");
   
   
-  if( additionalCuts == "" )
+  if( additionalCuts == "none" )
+  {  
     inputDir += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
+    outputRootFilePath += "/combine_signal/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
+  }
   else
+  {
     inputDir += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "_" + additionalCuts + "/";
-  outputRootFilePath += "/combine_signal/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
-
+    outputRootFilePath += "/combine_signal/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "_" + additionalCuts + "/";
+  }
 
   
   
@@ -96,9 +102,7 @@ int main(int argc, char** argv)
     sprintf(massChar,"%d",mass);
     std::string massString(massChar);
     std::cout << "\n>>> mass: " << massString << std::endl;
-    float lepNuWMMIN = GetLepNuWMMIN(mass);
-    float lepNuWMMAX = GetLepNuWMMAX(mass);
-        
+    
     
     // define outfile
     std::stringstream ss;
@@ -145,6 +149,10 @@ int main(int argc, char** argv)
     RooRealVar* N;
     RooRealVar* L1;
     RooRealVar* L2;
+    
+    float tempL1 = -1.;
+    float tempL2 = -1.;
+    float tempN  = -1.;
     
     RooDataHist* dh_data_obs;
     
@@ -215,7 +223,7 @@ int main(int argc, char** argv)
       histoName << "H" << mass << "/h_data" << mass << "_" << flavour;
       data = (TH1F*)( inFile->Get(histoName.str().c_str()) );
       
-      xMin = GetXFitMIN1(mass,step);
+      xMin = GetXFitMIN1(mass,step,additionalCuts);
       xMax = GetXFitMAX2(mass);
       
       
@@ -228,9 +236,10 @@ int main(int argc, char** argv)
       
       float tempMu = -1.; 
       float tempKT = -1.;
-      GetTurnOnParameters(tempMu,tempKT,mass,step);
+      GetTurnOnParameters(tempMu,tempKT,mass,step,additionalCuts);
       
-       
+      GetAttenuateDoubleExponentialParameters(tempL1,tempL2,tempN,mass,step,additionalCuts);
+      
       if( fitMethod == "exponential" )
       {
         L1 = new RooRealVar("L1","",0.012,0.,0.1);
@@ -270,9 +279,9 @@ int main(int argc, char** argv)
       {
         mu = new RooRealVar("mu","",tempMu,tempMu,tempMu);
         kT = new RooRealVar("kT","",tempKT,tempKT,tempKT);
-        N  = new RooRealVar("N", "", 0.059,0.,1.0);
-        L1 = new RooRealVar("L1","",0.023,0.,0.1);
-        L2 = new RooRealVar("L2","",0.011,0.,0.1);
+        N  = new RooRealVar("N", "",tempN,0.,1000000.0);
+        L1 = new RooRealVar("L1","",tempL1,0.,0.1);
+        L2 = new RooRealVar("L2","",tempL2,0.,0.1);
         pdf_bkg = new RooGenericPdf("bkg","","1./(exp(-1.*(@0-@1)/@2)+1.) * (exp(-1*@4*@0) + @3*exp(-1*@5*@0))",RooArgSet(*x,*mu,*kT,*N,*L1,*L2));
         
         workspace -> import(*mu);
@@ -293,7 +302,7 @@ int main(int argc, char** argv)
       data = (TH1F*)(inFile->Get("signalRegion"));    
       hint = (TH1F*)(inFile->Get("extrapolated_bkg"));
       
-      xMin = GetXFitMIN1(mass,step);
+      xMin = GetXFitMIN1(mass,step,additionalCuts);
       xMax = GetXFitMAX2(mass);
     }
     
@@ -747,9 +756,9 @@ int main(int argc, char** argv)
       }
       if( fitMethod == "attenuatedDoubleExponential" )
       {
-        datacard_sa << "N    param    0.059     1.   [0.,1.]"   << std::endl; 
-        datacard_sa << "L1   param    0.023     1.   [0.,0.1]"  << std::endl; 
-        datacard_sa << "L2   param    0.011     1.   [0.,0.1]"  << std::endl; 
+        datacard_sa << "N    param    " << std::setprecision(6) << tempN  << "     1.   [0.,1000000.]" << std::endl; 
+        datacard_sa << "L1   param    " << tempL1 << "     1.   [0.,0.1]"    << std::endl; 
+        datacard_sa << "L2   param    " << tempL2 << "     1.   [0.,0.1]"    << std::endl; 
       }
     }
     
@@ -767,9 +776,9 @@ int main(int argc, char** argv)
 
 
 
-float GetXFitMIN1(const float& mH, const int& step)
+float GetXFitMIN1(const float& mH, const int& step, const std::string& additionalCuts)
 {
-  if( step <= 13 )
+  if( (step <= 13) && (additionalCuts == "none") )
   {
     if     ( mH == 200. ) return 180.;
     if     ( mH == 250. ) return 180.;
@@ -783,7 +792,21 @@ float GetXFitMIN1(const float& mH, const int& step)
     else return 1.;
   }
   
-  else if( step > 13 )
+  if( (step <= 13) && (additionalCuts == "Dphi") )
+  {
+    if     ( mH == 200. ) return 200.;
+    if     ( mH == 250. ) return 200.;
+    else if( mH == 300. ) return 200.;
+    else if( mH == 350. ) return 200.;
+    else if( mH == 400. ) return 220.;
+    else if( mH == 450. ) return 220.;
+    else if( mH == 500. ) return 220.;
+    else if( mH == 550. ) return 240.;
+    else if( mH == 600. ) return 240.;
+    else return 1.;
+  }
+  
+  else if( (step > 13) && (additionalCuts == "none") )
   {
     if     ( mH == 200. ) return 200.;
     if     ( mH == 250. ) return 200.;
@@ -797,8 +820,24 @@ float GetXFitMIN1(const float& mH, const int& step)
     else return 1.;
   }
   
+  else if( (step > 13) && (additionalCuts == "Dphi") )
+  {
+    if     ( mH == 200. ) return 200.;
+    if     ( mH == 250. ) return 200.;
+    else if( mH == 300. ) return 200.;
+    else if( mH == 350. ) return 200.;
+    else if( mH == 400. ) return 220.;
+    else if( mH == 450. ) return 220.;
+    else if( mH == 500. ) return 220.;
+    else if( mH == 550. ) return 240.;
+    else if( mH == 600. ) return 240.;
+    else return 1.;
+  }
+  
   else return -1.;
 }
+
+
 
 float GetXFitMAX2(const float& mH)
 {
@@ -814,30 +853,117 @@ float GetXFitMAX2(const float& mH)
   else return -1.;
 }
 
-void  GetTurnOnParameters(float& mu, float& kT, const float& mH, const int& step)
+
+
+void GetTurnOnParameters(float& mu, float& kT, const float& mH, const int& step, const std::string& additionalCuts)
 {
-  if( step <= 13 )
+  if( (step <= 13) && (additionalCuts == "none") )
   {
-    if     ( mH == 200. ) { mu = 180.; kT = 50; }
-    else if( mH == 250. ) { mu = 180.; kT = 50; }
-    else if( mH == 300. ) { mu = 180.; kT = 50; }
-    else if( mH == 350. ) { mu = 180.; kT = 50; }
-    else if( mH == 400. ) { mu = 180.; kT = 50; }
-    else if( mH == 450. ) { mu = 180.; kT = 50; }
-    else if( mH == 500. ) { mu = 180.; kT = 50; }
-    else if( mH == 550. ) { mu = 180.; kT = 50; }
-    else if( mH == 600. ) { mu = 180.; kT = 50; }
+    if     ( mH == 200. ) { mu = 290.; kT = 39; }
+    else if( mH == 250. ) { mu = 290.; kT = 39; }
+    else if( mH == 300. ) { mu = 290.; kT = 39; }
+    else if( mH == 350. ) { mu = 290.; kT = 39; }
+    else if( mH == 400. ) { mu = 290.; kT = 39; }
+    else if( mH == 450. ) { mu = 290.; kT = 39; }
+    else if( mH == 500. ) { mu = 290.; kT = 39; }
+    else if( mH == 550. ) { mu = 290.; kT = 39; }
+    else if( mH == 600. ) { mu = 290.; kT = 39; }
   }
-  else if( step > 13 )
+  
+  if( (step <= 13) && (additionalCuts == "Dphi") )
   {
-    if     ( mH == 200. ) { mu = 180.; kT = 50; }
-    else if( mH == 250. ) { mu = 180.; kT = 50; }
-    else if( mH == 300. ) { mu = 180.; kT = 50; }
-    else if( mH == 350. ) { mu = 180.; kT = 50; }
-    else if( mH == 400. ) { mu = 180.; kT = 50; }
-    else if( mH == 450. ) { mu = 180.; kT = 50; }
-    else if( mH == 500. ) { mu = 180.; kT = 50; }
-    else if( mH == 550. ) { mu = 180.; kT = 50; }
-    else if( mH == 600. ) { mu = 180.; kT = 50; }
+    if     ( mH == 200. ) { mu = 203.; kT = 22.; }
+    else if( mH == 250. ) { mu = 203.; kT = 22.; }
+    else if( mH == 300. ) { mu = 203.; kT = 22.; }
+    else if( mH == 350. ) { mu = 203.; kT = 22.; }
+    else if( mH == 400. ) { mu = 240.; kT = 18.; }
+    else if( mH == 450. ) { mu = 240.; kT = 18.; }
+    else if( mH == 500. ) { mu = 240.; kT = 18.; }
+    else if( mH == 550. ) { mu = 257.; kT = 19.; }
+    else if( mH == 600. ) { mu = 257.; kT = 19.; }
+  }
+  
+  if( (step > 13) && (additionalCuts == "none") )
+  {
+    if     ( mH == 200. ) { mu = 246.; kT = 21.; }
+    else if( mH == 250. ) { mu = 246.; kT = 21.; }
+    else if( mH == 300. ) { mu = 246.; kT = 21.; }
+    else if( mH == 350. ) { mu = 246.; kT = 21.; }
+    else if( mH == 400. ) { mu = 246.; kT = 21.; }
+    else if( mH == 450. ) { mu = 246.; kT = 21.; }
+    else if( mH == 500. ) { mu = 246.; kT = 21.; }
+    else if( mH == 550. ) { mu = 246.; kT = 21.; }
+    else if( mH == 600. ) { mu = 246.; kT = 21.; }
+  }
+  
+  if( (step > 13) && (additionalCuts == "Dphi") )
+  {
+    if     ( mH == 200. ) { mu = 205.; kT = 20.; }
+    else if( mH == 250. ) { mu = 205.; kT = 20.; }
+    else if( mH == 300. ) { mu = 205.; kT = 20.; }
+    else if( mH == 350. ) { mu = 205.; kT = 20.; }
+    else if( mH == 400. ) { mu = 242.; kT = 18.; }
+    else if( mH == 450. ) { mu = 242.; kT = 18.; }
+    else if( mH == 500. ) { mu = 242.; kT = 18.; }
+    else if( mH == 550. ) { mu = 259.; kT = 20.; }
+    else if( mH == 600. ) { mu = 259.; kT = 20.; }
+  }
+
+}
+
+
+
+void GetAttenuateDoubleExponentialParameters(float& L1, float& L2, float& N, const float& mH, const int& step, const std::string& additionalCuts)
+{
+  if( (step <= 13) && (additionalCuts == "none") )
+  {
+    if     ( mH == 200. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+    else if( mH == 250. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+    else if( mH == 300. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+    else if( mH == 350. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+    else if( mH == 400. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+    else if( mH == 450. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+    else if( mH == 500. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+    else if( mH == 550. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+    else if( mH == 600. ) { L1 = 0.011; L2 = 0.037; N = 1950; }
+  }
+  
+  if( (step <= 13) && (additionalCuts == "Dphi") )
+  {
+    if     ( mH == 200. ) { L1 = 0.013; L2 = 0.060; N = 1.5e-05; }
+    else if( mH == 250. ) { L1 = 0.013; L2 = 0.060; N = 1.5e-05; }
+    else if( mH == 300. ) { L1 = 0.013; L2 = 0.060; N = 1.5e-05; }
+    else if( mH == 350. ) { L1 = 0.013; L2 = 0.060; N = 1.5e-05; }
+    else if( mH == 400. ) { L1 = 0.013; L2 = 0.060; N = 7.58e-07; }
+    else if( mH == 450. ) { L1 = 0.013; L2 = 0.060; N = 7.58e-07; }
+    else if( mH == 500. ) { L1 = 0.013; L2 = 0.060; N = 7.58e-07; }
+    else if( mH == 550. ) { L1 = 0.013; L2 = 0.057; N = 519; }
+    else if( mH == 600. ) { L1 = 0.013; L2 = 0.057; N = 519; }
+  }
+  
+  if( (step > 13) && (additionalCuts == "none") )
+  {
+    if     ( mH == 200. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+    else if( mH == 250. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+    else if( mH == 300. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+    else if( mH == 350. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+    else if( mH == 400. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+    else if( mH == 450. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+    else if( mH == 500. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+    else if( mH == 550. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+    else if( mH == 600. ) { L1 = 0.013; L2 = 0.057; N = 38900; }
+  }
+  
+  if( (step > 13) && (additionalCuts == "Dphi") )
+  {
+    if     ( mH == 200. ) { L1 = 0.010; L2 = 0.013; N = 146; }
+    else if( mH == 250. ) { L1 = 0.010; L2 = 0.013; N = 146; }
+    else if( mH == 300. ) { L1 = 0.010; L2 = 0.013; N = 146; }
+    else if( mH == 350. ) { L1 = 0.010; L2 = 0.013; N = 146; }
+    else if( mH == 400. ) { L1 = 0.011; L2 = 0.013; N = 150.; }
+    else if( mH == 450. ) { L1 = 0.011; L2 = 0.013; N = 150.; }
+    else if( mH == 500. ) { L1 = 0.011; L2 = 0.013; N = 150.; }
+    else if( mH == 550. ) { L1 = 0.013; L2 = 0.013; N = 170.; }
+    else if( mH == 600. ) { L1 = 0.013; L2 = 0.013; N = 170.; }
   }
 }
