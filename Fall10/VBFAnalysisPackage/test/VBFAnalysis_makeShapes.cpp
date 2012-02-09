@@ -548,9 +548,8 @@ int main(int argc, char** argv)
     
     
     
-    //---------------
-    // make datacards
-    
+    //------------------------------
+    // make datacards - bin counting
     
     std::vector<std::string> labels_bc_num;
     labels_bc_num.push_back("JESUp");
@@ -560,6 +559,10 @@ int main(int argc, char** argv)
     std::vector<std::string> labels_bc_num_names;
     labels_bc_num_names.push_back("JES    ");
     labels_bc_num_names.push_back("PU     ");
+    
+    
+    //--------------------------------
+    // make datacards - shape analysis
     
     std::vector<std::string> labels_sa_num;
     labels_sa_num.push_back("PUUp");
