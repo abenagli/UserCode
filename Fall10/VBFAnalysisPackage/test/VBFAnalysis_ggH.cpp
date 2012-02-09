@@ -23,7 +23,6 @@
 
 
 
-void SetStepNames(std::map<int, std::string>&, const std::string&, const int&, bool);
 bool AcceptHLTPath(const std::vector<std::string>&, const std::vector<float>&, const std::string&, bool& pathFound, const bool& verbosity = false);
 
 
@@ -131,6 +130,7 @@ int main(int argc, char** argv)
   
   float WPtMIN = gConfigParser -> readFloatOption("Cuts::WPtMIN");
   float WJPtMIN = gConfigParser -> readFloatOption("Cuts::WJPtMIN");
+  float WJEtaMAX = gConfigParser -> readFloatOption("Cuts::WJEtaMAX");
   
   float lepMetWDphiMIN = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMIN");
   float lepMetWDphiMAX = gConfigParser -> readFloatOption("Cuts::lepMetWDphiMAX");
@@ -193,12 +193,12 @@ int main(int argc, char** argv)
   
   
   // define event histogram
-  int nStep = 18;
+  int nStep = 17;
   
   TH1F* events = new TH1F("events", "events", nStep, 0., 1.*nStep);
-  TH1F* events_PURescaled = new TH1F("events_PURescaled", "events_PURescaled", nStep, 0., 1.*nStep);
+  TH1F* events_PURescaled     = new TH1F("events_PURescaled",     "events_PURescaled",     nStep, 0., 1.*nStep);
   TH1F* events_PURescaled_ele = new TH1F("events_PURescaled_ele", "events_PURescaled_ele", nStep, 0., 1.*nStep);
-  TH1F* events_PURescaled_mu = new TH1F("events_PURescaled_mu", "events_PURescaled_mu", nStep, 0., 1.*nStep);
+  TH1F* events_PURescaled_mu  = new TH1F("events_PURescaled_mu",  "events_PURescaled_mu",  nStep, 0., 1.*nStep);
   TH1F* events_plus_int  = new TH1F("events_plus_int",  "events_plus_int",  nStep, 0., 1.*nStep);
   TH1F* events_minus_int = new TH1F("events_minus_int", "events_minus_int", nStep, 0., 1.*nStep);
   
@@ -519,20 +519,19 @@ int main(int argc, char** argv)
   stepNames[2]  = "2) preselection";
   stepNames[3]  = "3) HLT";
   stepNames[4]  = "4) lepton ID+iso";
-  stepNames[5]  = "5) lepton pt";
-  stepNames[6]  = "6) lepton mt";
-  stepNames[7]  = "7) met";
-  stepNames[8]  = "8) W-jets pt";
+  stepNames[5]  = "5) lepton p_{T}";
+  stepNames[6]  = "6) lepton m_{T}";
+  stepNames[7]  = "7) ME_{T}";
+  stepNames[8]  = "8) jet p_{T}";
   stepNames[9]  = "9) b-tag veto";
   stepNames[10] = "10) jet veto";
-  stepNames[11] = "11) lepton eta";
-  stepNames[12] = "12) lep-met angles";
-  stepNames[13] = "13) WJ1-WJ2 angles";
-  stepNames[14] = "14) W pt";
-  stepNames[15] = "15) W mass";
-  stepNames[16] = "16) helicity likelihood";
-  stepNames[17] = "17) helicity BDT";
-  stepNames[18] = "18) Higgs mass";
+  stepNames[11] = "11) centrality";
+  stepNames[12] = "12) lepton-ME_{T} angles";
+  stepNames[13] = "13) jet_{1}-jet_{2} angles";
+  stepNames[14] = "14) W p_{T}";
+  stepNames[15] = "15) helicity";
+  stepNames[16] = "16) W mass";
+  stepNames[17] = "17) Higgs mass";
   
   
   
@@ -609,7 +608,6 @@ int main(int argc, char** argv)
     //**********************
     // STEP 2 - preselection
     step = 2;
-    //SetStepNames(stepNames, "preselection", step, verbosity);
     
     
     if( (leptonFLAVOUR == "e")  && (vars.lep_flavour != 11) ) continue;
@@ -620,7 +618,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -637,7 +635,6 @@ int main(int argc, char** argv)
     //*************
     // STEP 3 - HLT
     step += 1;
-    //SetStepNames(stepNames, "HLT", step, verbosity);
     
     
     bool pathFound = false;
@@ -790,7 +787,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -806,7 +803,6 @@ int main(int argc, char** argv)
     //**************************************
     // STEP 4 - Initial cuts - lepton ID+iso
     step += 1;
-    //SetStepNames(stepNames, "lepton ID+iso", step, verbosity);
     
     
     bool isId = true;
@@ -913,7 +909,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -929,7 +925,6 @@ int main(int argc, char** argv)
     //*******************
     // STEP 5 - lepton pt
     step += 1;
-    //SetStepNames(stepNames, "lepton pt", step, verbosity);
      
     if( (vars.lep_flavour == 11) && (vars.lep.pt() < elePtMIN) ) continue;
     if( (vars.lep_flavour == 11) && (vars.lep.pt() > elePtMAX) ) continue;
@@ -946,7 +941,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -962,7 +957,6 @@ int main(int argc, char** argv)
     //*******************
     // STEP 6 - lepton mt
     step += 1;
-    //SetStepNames(stepNames, "lepton mt", step, verbosity);
     
     if( (trainMVA == 0) && (lepMetMtCUT == 1) && (vars.lepMet_mt < lepMetMtMIN) ) continue;
     //if( (trainMVA == 0) && (lepMetMtCUT == 1) && (vars.lepNu_m > 110.) ) continue;
@@ -972,7 +966,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -989,7 +983,6 @@ int main(int argc, char** argv)
     //****************************
     // STEP 7 - Initial cuts - met
     step += 1;
-    //SetStepNames(stepNames, "met", step, verbosity);
     
     
     if( metCUT == 1 )
@@ -1003,7 +996,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1016,10 +1009,9 @@ int main(int argc, char** argv)
     
     
     
-    //**********************************
-    // STEP 8 - Initial cuts - W-jets pt
+    //********************************
+    // STEP 8 - Initial cuts - jets pt
     step += 1;
-    //SetStepNames(stepNames, "W-jet pt", step, verbosity);
     
     
     if( (vars.WJ1.pt() <= WJPtMIN) || (vars.WJ2.pt() <= WJPtMIN) ) continue;
@@ -1048,7 +1040,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1064,7 +1056,6 @@ int main(int argc, char** argv)
     //************************************
     // STEP 9 - Initial cuts - b-tag veto
     step += 1;
-    //SetStepNames(stepNames, "b-tag veto", step, verbosity);
     
     
     // Higgs selection
@@ -1087,7 +1078,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1104,7 +1095,6 @@ int main(int argc, char** argv)
     //*********************************
     // STEP 10 - Initial cuts - jet veto
     step += 1;
-    //SetStepNames(stepNames, "jet veto", step, verbosity);
     
     
     if( (ttSelection == 0) && (vars.nJets_cnt_pt30 > 3) ) continue;
@@ -1186,7 +1176,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1200,19 +1190,21 @@ int main(int argc, char** argv)
     
     
     //*********************
-    // STEP 11 - lepton eta
+    // STEP 11 - centrality
     step += 1;
-    //SetStepNames(stepNames, "lepton pt/eta", step, verbosity);
     
     if( (vars.lep_flavour == 11) && (fabs(vars.lep.eta()) > eleAbsEtaMAX) ) continue;
     if( (vars.lep_flavour == 13) && (fabs(vars.lep.eta()) > muAbsEtaMAX) ) continue;
+    if( fabs(vars.WJ1_eta) > WJEtaMAX ) continue;
+    if( fabs(vars.WJ2_eta) > WJEtaMAX ) continue;
+    if( fabs(vars.WJJ_eta) > WJEtaMAX ) continue;
     
     
     // fill distributions    
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1228,7 +1220,6 @@ int main(int argc, char** argv)
     //****************************************
     // STEP 12 - Initial cuts - lep-met angles
     step += 1;
-    //SetStepNames(stepNames, "lep-met angles", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepMet_Dphi) < lepMetDphiMIN) ) continue;
@@ -1239,7 +1230,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1255,7 +1246,6 @@ int main(int argc, char** argv)
     //****************************************
     // STEP 13 - Initial cuts - WJ1-WJ2 angles
     step += 1;
-    //SetStepNames(stepNames, "WJ1-WJ2 angle cuts", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( fabs(deltaR(vars.WJ1.eta(),vars.WJ1.phi(),vars.WJ2.eta(),vars.WJ2.phi())) < WJJDRMIN) ) continue;
@@ -1270,7 +1260,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1286,7 +1276,6 @@ int main(int argc, char** argv)
     ////******************************************
     //// STEP XX - Initial cuts - pt max/met  cuts
     //step += 1;
-    ////SetStepNames(stepNames, "pt max cuts", step, verbosity);
     //
     //
     //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN) ) continue;
@@ -1300,7 +1289,7 @@ int main(int argc, char** argv)
     //stepEvents[step] += 1;
     //stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     //if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    //if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    //if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     //if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     //if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     //if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1316,7 +1305,6 @@ int main(int argc, char** argv)
     //*******************************
     // STEP 14 - Initial cuts - W pt
     step += 1;
-    //SetStepNames(stepNames, "W pt", step, verbosity);
     
     
     if( ( (trainMVA == 0) && (massDependentCUTS == 1) ) && ( (vars.WJ1+vars.WJ2).Pt() < WPtMIN) ) continue;
@@ -1327,7 +1315,39 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    
+    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    
+    
+    
+    
+    
+    
+    //**********************************
+    // STEP 15 - Initial cuts - helicity
+    step += 1;
+    
+    
+    //if( vars.helicityLikelihood < 0.6 ) continue;
+    
+    if( (vars.lep_ctheta < lepCthetaMIN) || (vars.lep_ctheta >= lepCthetaMAX) ) continue;
+    if( (vars.lep_ctheta < lepCthetaMIN) || (vars.lep_ctheta >= lepCthetaMAX) ) continue;
+    if( (vars.WJ1_ctheta < WJ1CthetaMIN) || (vars.WJ1_ctheta >= WJ1CthetaMAX) ) continue;
+    if( (vars.WJ1_ctheta < WJ1CthetaMIN) || (vars.WJ1_ctheta >= WJ1CthetaMAX) ) continue;
+    if( (vars.lepNu_ctheta < lepNuCthetaMIN) || (vars.lepNu_ctheta >= lepNuCthetaMAX) ) continue;
+    if( (vars.lepNu_ctheta < lepNuCthetaMIN) || (vars.lepNu_ctheta >= lepNuCthetaMAX) ) continue;
+    
+    
+    // fill distributions
+    stepEvents[step] += 1;
+    stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1341,9 +1361,8 @@ int main(int argc, char** argv)
     
     
     //********************************
-    // STEP 15 - Initial cuts - W mass
+    // STEP 16 - Initial cuts - W mass
     step += 1;
-    //SetStepNames(stepNames, "W mass", step, verbosity);
     
     
     if( (trainMVA == 0) && ( (vars.WJ1+vars.WJ2).mass() < WJJMassMIN) ) continue;
@@ -1354,7 +1373,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1367,50 +1386,25 @@ int main(int argc, char** argv)
     
     
     
-    //*********************************************
-    // STEP 16 - Initial cuts - helicity likelihood
-    step += 1;
-    //SetStepNames(stepNames, "helicity likelihood", step, verbosity);
-    
-    if( vars.helicityLikelihood > 0.6 )
-    {
-      // fill distributions
-      stepEvents[step] += 1;
-      stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
-      if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-      if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
-      if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-      if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-      if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-      if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-      
-      if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    }
-    
-    
-    
-    
-    
     
     //**************************************
-    // STEP 17 - Initial cuts - helicity BDT
-    step += 1;
-    //SetStepNames(stepNames, "helicity BDT", step, verbosity);
-    
-    if( vars.mva > -0.25 )
-    {
-      // fill distributions
-      stepEvents[step] += 1;
-      stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
-      if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-      if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
-      if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-      if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-      if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-      if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-      
-      if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    }
+    // STEP XX - Initial cuts - helicity BDT
+    //step += 1;
+    //
+    //if( vars.mva > -0.25 )
+    //{
+    //  // fill distributions
+    //  stepEvents[step] += 1;
+    //  stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
+    //  if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
+    //  if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
+    //  if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
+    //  if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
+    //  if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
+    //  if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
+    //  
+    //  if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    //}
     
     
     
@@ -1418,9 +1412,8 @@ int main(int argc, char** argv)
     
     
     //************************************
-    // STEP 18 - Initial cuts - Higgs mass
+    // STEP 17 - Initial cuts - Higgs mass
     step += 1;
-    //SetStepNames(stepNames, "Higgs mass cut", step, verbosity);
     
     
     if( (trainMVA == 0) && (fabs(vars.lepNuW_m_KF) < lepNuWMMIN) ) continue;
@@ -1431,7 +1424,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
     if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step] += vars.eventWeight * vars.PUWeight;
+    if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
     if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
     if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
@@ -1465,7 +1458,7 @@ int main(int argc, char** argv)
     
     events_PURescaled_ele -> SetBinContent(step, stepEvents_PURescaled_ele[step]);
     events_PURescaled_ele -> GetXaxis() -> SetBinLabel(step, stepNames[step].c_str());
-
+    
     events_PURescaled_mu -> SetBinContent(step, stepEvents_PURescaled_mu[step]);
     events_PURescaled_mu -> GetXaxis() -> SetBinLabel(step, stepNames[step].c_str());
     
@@ -1499,9 +1492,9 @@ int main(int argc, char** argv)
   
   distrPU_MC -> Write();
   events -> Write();
-  events_PURescaled -> Write();
+  events_PURescaled     -> Write();
   events_PURescaled_ele -> Write();
-  events_PURescaled_mu -> Write();
+  events_PURescaled_mu  -> Write();
   events_plus_int -> Write();
   events_minus_int -> Write();
   for(int njetBin = 0; njetBin <= 5; ++njetBin)
@@ -1516,49 +1509,4 @@ int main(int argc, char** argv)
   
   
   return 0;
-}
-
-
-
-
-
-
-void SetStepNames(std::map<int, std::string>& stepNames, const std::string& stepName, const int& step, bool verbosity)
-{
-  char dummy[5];
-  sprintf(dummy, "%d)", step);
-  stepNames[step] = std::string(dummy)+" "+stepName;
-
-  if(verbosity)
-    std::cout << ">>>>>>>>> " << stepNames[step] << std::endl;
-}
-
-
-
-bool AcceptHLTPath(const std::vector<std::string>& HLT_Names,
-                   const std::vector<float>& HLT_Accept,
-                   const std::string& HLTPathName,
-                   bool& pathFound,
-                   const bool& verbosity)
-{
-  bool acceptEvent = false;
-  if ( HLTPathName == "HLT_dummy" ) {
-    pathFound = true;
-    return true;
-  }
-  
-  for(unsigned int HLTIt = 0; HLTIt < HLT_Names.size(); ++HLTIt)
-  {
-    if( HLT_Names.at(HLTIt) == HLTPathName )
-    {
-      pathFound = true;
-      if( HLT_Accept.at(HLTIt) == 1 )
-      {
-        acceptEvent = true;
-        if( verbosity ) std::cout << ">>> AcceptHLTPath::path " << HLTPathName << " has fired" << std::endl; 
-      }
-    }
-  }
-  
-  return acceptEvent;
 }
