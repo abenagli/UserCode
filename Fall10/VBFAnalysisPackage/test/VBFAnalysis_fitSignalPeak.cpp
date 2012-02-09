@@ -207,6 +207,9 @@ int main(int argc, char** argv)
   
   
   DrawHistograms(h_lepNuW_m,h_lepNuW_m_KF);
+  
+  outFile -> Close();
+  
   return 0;
 }
 
@@ -335,6 +338,13 @@ void DrawHistograms(std::map<std::string,TH1F*>& h_lepNuW_m, std::map<std::strin
     latex_KF -> Draw("same");  
 
 
+    outFile -> cd();
+    
+    h_lepNuW_m[label] -> Write();
+    h_lepNuW_m_KF[label] -> Write();
+    fitFunc -> Write();
+    fitFunc_KF -> Write();
+    
     c -> Print(("fitSignalPeak_"+label+".pdf").c_str(),"pdf");
     
     
