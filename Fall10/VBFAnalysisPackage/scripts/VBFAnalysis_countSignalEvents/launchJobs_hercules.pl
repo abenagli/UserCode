@@ -61,7 +61,7 @@ while(<SAMPLESListFile>)
   s/^\s+//;               # no leading white
   s/\s+$//;               # no trailing white
   
-  ($inputDir,$label,$xWidth,$step,$PUScale) = split(" ");
+  ($inputDir,$label,$onData,$xWidth,$step,$addCuts,$PUScale) = split(" ");
   
   print("label: ".$label."\n");
   $sampleDir = $OUTPUTSaveDir.$sample."/";
@@ -70,8 +70,10 @@ while(<SAMPLESListFile>)
   $selectionsCfgFile = "./selections_".$label.".cfg";
   system("cat ".$SELECTIONSCfgTemplate."   | sed -e s%INPUTDIR%".$inputDir.
                                        "%g | sed -e s%LABEL%".$label.
+                                       "%g | sed -e s%ONDATA%".$onData.
                                        "%g | sed -e s%XWIDTH%".$xWidth.
                                        "%g | sed -e s%STEP%".$step.
+                                       "%g | sed -e s%ADDCUTS%".$addCuts.
                                        "%g | sed -e s%PUSCALE%".$PUScale.
                                        "%g > ".$selectionsCfgFile);
   
