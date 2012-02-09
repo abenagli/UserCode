@@ -28,9 +28,11 @@ while (<USERCONFIG>)
 
 
 $INPUTDir         = $User_Preferences{"INPUTDir"};
-$step             = $User_Preferences{"step"};
 $xWidth           = $User_Preferences{"xWidth"};
 $flavour          = $User_Preferences{"flavour"};
+$step             = $User_Preferences{"step"};
+$additionalCuts   = $User_Preferences{"additionalCuts"};
+$onSidebands      = $User_Preferences{"onSidebands"};
 $analysisMethod   = $User_Preferences{"analysisMethod"};
 $fitFunction      = $User_Preferences{"fitFunction"};
 $combineMethod    = $User_Preferences{"combineMethod"};
@@ -43,10 +45,43 @@ $nMasses = @masses;
 
 
 
-$outputDir = $INPUTDir."/combine/binWidth".$xWidth."/step".$step."/";
+if( $onSidebands == 0 )
+{
+  if( $additionalCuts eq "none" )
+  {
+    $outputDir = $INPUTDir."/combine_signal/binWidth".$xWidth."/step".$step."/";
+    
+    $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    $plotName = "limitPlot_signal_step".$step."_binWidth".$xWidth."_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+  }
+  else
+  {
+    $outputDir = $INPUTDir."/combine_signal/binWidth".$xWidth."/step".$step."_".$additionalCuts."/";
+    
+    $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    $plotName = "limitPlot_signal_step".$step."_".$additionalCuts."_binWidth".$xWidth."_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+  }
+}
 
-$jobDir = $outputDir."limitPlot_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
-$plotName = "limitPlot_step".$step."_binWidth".$xWidth."_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+else
+{
+  if( $additionalCuts eq "none" )
+  {
+    $outputDir = $INPUTDir."/combine_sidebands/binWidth".$xWidth."/step".$step."/";
+    
+    $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    $plotName = "limitPlot_sidebands_step".$step."_binWidth".$xWidth."_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+  }
+  else
+  {
+    $outputDir = $INPUTDir."/combine_sidebands/binWidth".$xWidth."/step".$step."_".$additionalCuts."/";
+    
+    $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    $plotName = "limitPlot_sideband_step".$step."_".$additionalCuts."_binWidth".$xWidth."_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+  }
+}
+
+
 
 chop($plotName);
 print ">>> jobDir: ".$jobDir."\n";

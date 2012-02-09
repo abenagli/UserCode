@@ -481,11 +481,14 @@ int main(int argc, char** argv)
       
       if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
       {
+        // use smooth histograms for the signal shapes
+        /*  
         dh_H[label] = new RooDataHist(("dh_"+label).c_str(),"",RooArgList(*x),H_fit[label]);
         pdf_H[label] = new RooHistPdf(label.c_str(),"",RooArgList(*x),*dh_H[label],2);
         workspace -> import(*pdf_H[label]);
+        */
         
-        /*
+        // use a parametric function for the signal shapes
         double scb_muDouble     = 175.;
         double scb_kTDouble     = GetHiggsMassTurnOnWidth(mass);
         double scb_meanDouble   = fitFunc -> GetParameter(3);
@@ -524,7 +527,6 @@ int main(int argc, char** argv)
         workspace -> import(*(scb_alpha2[label]));
         workspace -> import(*(scb_n2[label]));
         workspace -> import(*(pdf_scb[label]));
-        */
       }
       
       inFile -> Close();

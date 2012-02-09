@@ -28,9 +28,11 @@ while (<USERCONFIG>)
 
 $CMSSWDir         = $User_Preferences{"CMSSWDir"};
 $INPUTDir         = $User_Preferences{"INPUTDir"};
-$step             = $User_Preferences{"step"};
 $xWidth           = $User_Preferences{"xWidth"};
 $flavour          = $User_Preferences{"flavour"};
+$step             = $User_Preferences{"step"};
+$additionalCuts   = $User_Preferences{"additionalCuts"};
+$onSidebands      = $User_Preferences{"onSidebands"};
 $analysisMethod   = $User_Preferences{"analysisMethod"};
 $fitFunction      = $User_Preferences{"fitFunction"};
 $combineMethod    = $User_Preferences{"combineMethod"};
@@ -50,8 +52,33 @@ $nMasses = @masses;
 
 
 
-$outputDir = $INPUTDir."/combine/binWidth".$xWidth."/step".$step."/";
-$jobDir = $outputDir."limitPlot_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+if( $onSidebands == 0 )
+{
+  if( $additionalCuts eq "none" )
+  {
+    $outputDir = $INPUTDir."/combine_signal/binWidth".$xWidth."/step".$step."/";
+    $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+  }
+  else
+  {
+    $outputDir = $INPUTDir."/combine_signal/binWidth".$xWidth."/step".$step."_".$additionalCuts."/";
+    $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+  }
+}
+
+else
+{
+  if( $additionalCuts eq "none" )
+  {
+    $outputDir = $INPUTDir."/combine_sidebands/binWidth".$xWidth."/step".$step."/";
+    $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+  }
+  else
+  {
+    $outputDir = $INPUTDir."/combine_sidebands/binWidth".$xWidth."/step".$step."_".$additionalCuts."/";
+    $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+  }
+}
 
 
 
@@ -93,7 +120,7 @@ for($massIt = 0; $massIt < $nMasses; ++$massIt)
   
   
   
-  $submit = "qsub -V -d ".$jobDir." -k n -q production ".$jobFile;
+  $submit = "qsub -V -d ".$jobDir." -k n -q longcms ".$jobFile;
   print ">>>>>>>>> submit: ".$submit."\n";
   system($submit);
 }
