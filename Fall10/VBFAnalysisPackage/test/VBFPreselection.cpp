@@ -671,7 +671,7 @@ int main(int argc, char** argv)
       ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);
       
       // jet et min
-      if( jet.pt() < jetPtMIN ) continue;
+      if( jet.pt() < 15. ) continue;
       
       // clean jets from selected lepton
       float DR = deltaR(jet.eta(), jet.phi(), vars.lep.eta(), vars.lep.phi());
@@ -790,7 +790,7 @@ int main(int argc, char** argv)
     
     //**************
     // >= n cnt jets 
-    if( vars.nJets_cnt < nJetCntMIN ) continue;
+    if( vars.nJets_cnt_pt30 < nJetCntMIN ) continue;
     
     if( vars.nJets_cnt > 0 )
       SetLeadingJetVariables(vars, reader, jetEtaCNT, verbosity);
