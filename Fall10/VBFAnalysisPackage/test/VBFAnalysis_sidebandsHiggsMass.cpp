@@ -16,6 +16,12 @@
 
 
 
+float GetXFitMIN1(const float& mH, const std::string& fitMethod = "", const int& step = -1);
+float GetXFitMAX1(const float& mH, const std::string& fitMethod = "");
+
+float GetXFitMIN2(const float& mH, const std::string& fitMethod = "");
+float GetXFitMAX2(const float& mH, const std::string& fitMethod = "");
+
 double correctionFunc(double* x, double* par);
 
 void ComputeCorrectionHisto(TH1F** h_alphaFit, const std::string& histoName,
@@ -561,4 +567,111 @@ void ApplyCorrectionFunc(TH1F** h_sigExtr, const std::string& histoName,
 {
   (*h_sigExtr) = (TH1F*)( h_sb->Clone(histoName.c_str()) );
   (*h_sigExtr) -> Multiply(h_alpha);
+}
+
+
+
+
+
+
+float GetXFitMIN1(const float& mH, const std::string& fitMethod, const int& step)
+{
+  if( (fitMethod == "exponential") || (fitMethod == "exponentialNoHoles") ||
+      (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
+    {
+      if     ( mH == 200. ) return 180.;
+      if     ( mH == 250. ) return 180.;
+      else if( mH == 300. ) return 180.;
+      else if( mH == 350. ) return 180.;
+      else if( mH == 400. ) return 180.;
+      else if( mH == 450. ) return 180.;
+      else if( mH == 500. ) return 180.;
+      else if( mH == 550. ) return 180.;
+      else if( mH == 600. ) return 180.;
+      else return 1.;
+    }
+  
+  else if( (fitMethod == "attenuatedExponential") || (fitMethod == "attenuatedExponentialNoHoles") ||
+           (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+    {
+      if     ( mH == 200. ) return 180.;
+      if     ( mH == 250. ) return 180.;
+      else if( mH == 300. ) return 180.;
+      else if( mH == 350. ) return 180.;
+      else if( mH == 400. ) return 180.;
+      else if( mH == 450. ) return 180.;
+      else if( mH == 500. ) return 180.;
+      else if( mH == 550. ) return 180.;
+      else if( mH == 600. ) return 180.;
+      else return 1.;
+    }
+  
+  else return -1.;
+}
+
+float GetXFitMAX1(const float& mH, const std::string& fitMethod)
+{
+  if( (fitMethod == "doubleExponentialNoHoles") ||
+      (fitMethod == "attenuatedExponentialNoHoles") ||
+      (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+    {
+      return -1.;
+    }
+  
+  else
+    {
+      if     ( mH == 200. ) return GetLepNuWMMIN(200.);
+      if     ( mH == 250. ) return GetLepNuWMMIN(250.);
+      else if( mH == 300. ) return GetLepNuWMMIN(300.);
+      else if( mH == 350. ) return GetLepNuWMMIN(350.);
+      else if( mH == 400. ) return GetLepNuWMMIN(400.);
+      else if( mH == 450. ) return GetLepNuWMMIN(450.);
+      else if( mH == 500. ) return GetLepNuWMMIN(500.);
+      else if( mH == 550. ) return GetLepNuWMMIN(550.);
+      else if( mH == 600. ) return GetLepNuWMMIN(600.);
+      else return -1.;
+    }
+}
+
+
+
+
+
+
+float GetXFitMIN2(const float& mH, const std::string& fitMethod)
+{
+  if( (fitMethod == "doubleExponentialNoHoles") ||
+      (fitMethod == "attenuatedExponentialNoHoles") ||
+      (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+    {
+      return -1.;
+    }
+  
+  else
+    {
+      if     ( mH == 200. ) return GetLepNuWMMAX(200.);
+      if     ( mH == 250. ) return GetLepNuWMMAX(250.);
+      else if( mH == 300. ) return GetLepNuWMMAX(300.);
+      else if( mH == 350. ) return GetLepNuWMMAX(350.);
+      else if( mH == 400. ) return GetLepNuWMMAX(400.);
+      else if( mH == 450. ) return GetLepNuWMMAX(450.);
+      else if( mH == 500. ) return GetLepNuWMMAX(500.);
+      else if( mH == 550. ) return GetLepNuWMMAX(550.);
+      else if( mH == 600. ) return GetLepNuWMMAX(600.);
+      else return -1.;
+    }
+}
+
+float GetXFitMAX2(const float& mH, const std::string& fitMethod)
+{
+  if     ( mH == 200. ) return 800.;
+  if     ( mH == 250. ) return 800.;
+  else if( mH == 300. ) return 800.;
+  else if( mH == 350. ) return 800.;
+  else if( mH == 400. ) return 800.;
+  else if( mH == 450. ) return 800.;
+  else if( mH == 500. ) return 800.;
+  else if( mH == 550. ) return 800.;
+  else if( mH == 600. ) return 800.;
+  else return -1.;
 }

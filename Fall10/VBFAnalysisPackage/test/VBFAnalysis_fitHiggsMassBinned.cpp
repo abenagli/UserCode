@@ -15,6 +15,12 @@
 
 
 
+float GetXFitMIN1(const float& mH, const std::string& fitMethod = "", const int& step = -1);
+float GetXFitMAX1(const float& mH, const std::string& fitMethod = "");
+
+float GetXFitMIN2(const float& mH, const std::string& fitMethod = "");
+float GetXFitMAX2(const float& mH, const std::string& fitMethod = "");
+
 double fitFunc(double* x, double* par);
 
 int fitHiggsMassBinned(TH1F* h_lepNuW_m,
@@ -25,8 +31,8 @@ void DrawPulls(TDirectory* outFile, TH1F* num, TH1F* den, const int& higgsMass, 
 
 std::string fitMethod = "";
 std::string varName = "lepNuW_m_KF"; 
-std::string WMassCut = "( (WJJ_m >= 65.) && (WJJ_m < 95.) )";
-//std::string WMassCut = "( ( (WJJ_m >= 55.) && (WJJ_m < 65.) ) || ( (WJJ_m >= 95.) && (WJJ_m < 120.) ) )";
+std::string WMassCut;
+
 
 
 
@@ -48,8 +54,7 @@ int main(int argc, char** argv)
   
   
   //[Input]
-  std::string baseDir      = gConfigParser -> readStringOption("Input::baseDir");
-  std::string jetType      = gConfigParser -> readStringOption("Input::jetType");
+  std::string baseDir = gConfigParser -> readStringOption("Input::baseDir");
   float lumi    = gConfigParser -> readFloatOption("Input::lumi");
   int higgsMass = gConfigParser -> readIntOption("Input::higgsMass");
   char higgsMassChar[50];
@@ -75,7 +80,7 @@ int main(int argc, char** argv)
   char xWidthChar[50];
   sprintf(xWidthChar,"%d",int(xWidth));
   
-  int step   = gConfigParser -> readIntOption("Options::step");
+  int step = gConfigParser -> readIntOption("Options::step");
   char stepChar[50];
   sprintf(stepChar,"%d",step);
   
@@ -89,6 +94,9 @@ int main(int argc, char** argv)
     WMassCut += " * (lep_flavour == 13)";
   }
   
+  int onSidebands = gConfigParser -> readIntOption("Options::onSidebands");
+  
+
   int onData = gConfigParser -> readIntOption("Options::onData");
   int onFake = gConfigParser -> readIntOption("Options::onFake");
   int onMC   = gConfigParser -> readIntOption("Options::onMC");
@@ -131,15 +139,24 @@ int main(int argc, char** argv)
   std::cout << "   xFitMAX1: " << xFitMAX1 << std::endl;
   std::cout << "   xFitMIN2: " << xFitMIN2 << std::endl;
   std::cout << "   xFitMAX2: " << xFitMAX2 << std::endl;
+
+  if( onSidebands == 0 )
+    WMassCut = "( (WJJ_m >= 65.) && (WJJ_m < 100.) )";
+  else
+    WMassCut = "( ( (WJJ_m >= 55.) && (WJJ_m < 65.) ) || ( (WJJ_m >= 100.) && (WJJ_m < 120.) ) )";
   
   
   
   // Define the output file
-  outputRootFilePath += "/combine/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
+  if( onSidebands == 0 )
+    outputRootFilePath += "/combine_signal/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
+  else
+    outputRootFilePath += "/combine_sidebands/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "/";
   std::string outputRootFullFileName;
   outputRootFullFileName = outputRootFilePath + outputRootFileName + "_" + fitMethod + "_H" + std::string(higgsMassChar) + "_" + flavour + ".root";
   TFile* outFile = new TFile(outputRootFullFileName.c_str(), "RECREATE");
-  TDirectory* dataDir = outFile -> mkdir("data");
+  TDirectory* dataDir    = outFile -> mkdir("data");
+  TDirectory* dataSigDir = outFile -> mkdir("dataSig");
   TDirectory* fakeDir = outFile -> mkdir("fake");
   TDirectory* MCDir   = outFile -> mkdir("MC");
   
@@ -151,6 +168,8 @@ int main(int argc, char** argv)
   // Define the histograms
   TH1F* h_data_lepNuW_m = new TH1F("h_data_lepNuW_m","",nBins,xMin,xMax);
   h_data_lepNuW_m -> Sumw2();
+  TH1F* h_dataSig_lepNuW_m = new TH1F("h_dataSig_lepNuW_m","",nBins,xMin,xMax);
+  h_dataSig_lepNuW_m -> Sumw2();
   
   TH1F* h_fake_lepNuW_m = new TH1F("h_fake_lepNuW_m","",nBins,xMin,xMax);
   h_fake_lepNuW_m -> Sumw2();
@@ -188,9 +207,10 @@ int main(int argc, char** argv)
   
   
   // Define the output tree
-  TTree* outTree_data = new TTree("ntu_data","ntu_data");
-  TTree* outTree_fake = new TTree("ntu_fake","ntu_fake");
-  TTree* outTree_MC   = new TTree("ntu_MC","  ntu_MC");
+  TTree* outTree_data    = new TTree("ntu_data",   "ntu_data");
+  TTree* outTree_dataSig = new TTree("ntu_dataSig","ntu_dataSig");
+  TTree* outTree_fake    = new TTree("ntu_fake",   "ntu_fake");
+  TTree* outTree_MC      = new TTree("ntu_MC",     "ntu_MC");
   
   int toyIt;
   
@@ -201,8 +221,9 @@ int main(int argc, char** argv)
   float chi2_sig;
   
   int nPar = -1;
-  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") ) nPar = 4;
+  if( (fitMethod == "exponential") || (fitMethod == "exponentialNoHoles") ) nPar = 2;
   if( (fitMethod == "attenuatedExponential") || (fitMethod == "attenuatedExponentialNoHoles") ) nPar = 4;
+  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") ) nPar = 4;
   if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") ) nPar = 6;
   
   float* par = new float[nPar];
@@ -237,6 +258,24 @@ int main(int argc, char** argv)
   outTree_data -> Branch("N_estimated",    &N_estimated,        "N_estimated/F");
   outTree_data -> Branch("N_estimated_err",&N_estimated_err,"N_estimated_err/F");
   outTree_data -> Branch("N_observed",     &N_observed,          "N_observed/F");
+  
+  // dataSig tree
+  outTree_dataSig -> Branch("xFitMIN1",   &xFitMIN1,      "xFitMIN1/F");
+  outTree_dataSig -> Branch("xFitMAX1",   &xFitMAX1,      "xFitMAX1/F");
+  outTree_dataSig -> Branch("xFitMIN2",   &xFitMIN2,      "xFitMIN2/F");
+  outTree_dataSig -> Branch("xFitMAX2",   &xFitMAX2,      "xFitMAX2/F");
+  outTree_dataSig -> Branch("lepNuWMMIN",&lepNuWMMIN,"lepNuWMMIN/F");
+  outTree_dataSig -> Branch("lepNuWMMAX",&lepNuWMMAX,"lepNuWMMAX/F");
+  
+  outTree_dataSig -> Branch("fitStatus",&fitStatus,"fitStatus/I");
+  outTree_dataSig -> Branch("chi2",     &chi2,          "chi2/F");
+  outTree_dataSig -> Branch("nPar",     &nPar,          "nPar/I");
+  outTree_dataSig -> Branch("par",       par,      "par[nPar]/F");
+  outTree_dataSig -> Branch("parErr",    parErr,"parErr[nPar]/F");
+  
+  outTree_dataSig -> Branch("N_estimated",    &N_estimated,        "N_estimated/F");
+  outTree_dataSig -> Branch("N_estimated_err",&N_estimated_err,"N_estimated_err/F");
+  outTree_dataSig -> Branch("N_observed",     &N_observed,          "N_observed/F");
   
   // fake tree
   outTree_fake -> Branch("xFitMIN1",   &xFitMIN1,      "xFitMIN1/F");
@@ -319,7 +358,8 @@ int main(int argc, char** argv)
       //weight << "( 1. ) * ( (lepNuW_m_KF < " << lepNuWMMIN << ") || ( lepNuW_m_KF >= " << lepNuWMMAX << ") )";
       std::string extendedCut = weight.str() + " * " + WMassCut;      
       
-      tree -> Draw((varName+" >>+ h_data_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
+      tree -> Draw((varName+" >>+ h_data_lepNuW_m").c_str(),   extendedCut.c_str(),"goff");
+      tree -> Draw((varName+" >>+ h_dataSig_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
     }
   }
   
@@ -415,6 +455,7 @@ int main(int argc, char** argv)
       std::string extendedCut = weight.str() + " * " + WMassCut;      
       
       tree -> Draw((varName+" >>+ h_sig_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
+      tree -> Draw((varName+" >>+ h_dataSig_lepNuW_m").c_str(),extendedCut.c_str(),"goff");
     }
   }
   
@@ -478,6 +519,62 @@ int main(int argc, char** argv)
     outFile -> cd();
     
     outTree_data -> Fill();
+  }
+  
+  
+  
+  if( onData == 1 )
+  {
+    // Do the fit
+    fitStatus = fitHiggsMassBinned(h_dataSig_lepNuW_m,
+                                   xFitMIN1,xFitMAX1,xFitMIN2,xFitMAX2,
+                                   &func,true,hint);
+    
+    
+    // Get the error bands
+    float bandIntegral = 0;
+    for(int bin = 1; bin <= hint->GetNbinsX(); ++bin)
+    {
+      float thisX = hint -> GetBinCenter(bin);
+      if( (thisX >= lepNuWMMIN) && (thisX < lepNuWMMAX) )
+        bandIntegral += hint -> GetBinError(bin);
+    }
+    
+    
+    chi2 = func->GetChisquare()/func->GetNDF();
+    
+    for(int iPar = 0; iPar < nPar; ++iPar)
+    {
+      par[iPar] = func -> GetParameter(4+iPar);
+      parErr[iPar] = func -> GetParError(4+iPar);
+    }
+    
+    
+    // Print the results
+    //std::cout << "**************************" << std::endl;
+    //std::cout << ">>> FIT RESULTS - DATA <<<" << std::endl;
+    //std::cout << "**************************" << std::endl;
+    
+    N_observed  = h_dataSig_lepNuW_m->Integral(binMin,binMax);
+    N_estimated = hint->Integral(binMin,binMax);
+    N_estimated_err = bandIntegral;
+    
+    std::cout << "Number of events OBSERVED  in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_observed << std::endl;  
+    std::cout << "Number of events ESTIMATED in [" << lepNuWMMIN << "," << lepNuWMMAX << "] = " << N_estimated << " +/- " << N_estimated_err << std::endl;
+    
+    
+    dataSigDir -> cd();
+    
+    h_dataSig_lepNuW_m -> Write();
+    func -> Write();
+    hint -> Write();
+    h_sig_lepNuW_m -> Write();
+    
+    DrawPulls(dataSigDir,h_dataSig_lepNuW_m,hint,higgsMass,fitMethod,step);
+    
+    outFile -> cd();
+    
+    outTree_dataSig -> Fill();
   }
   
   
@@ -785,11 +882,13 @@ double fitFunc(double* x, double* par)
   if( xx < xMin1 )                    TF1::RejectPoint();
   if( (xx >= xMax1) && (xx < xMin2) ) TF1::RejectPoint();
   if( xx >= xMax2 )                   TF1::RejectPoint();  
-  
-  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
-    return doubleExponential(x,&par[4]);
+
+  if( (fitMethod == "exponential") || (fitMethod == "exponentialNoHoles") )
+    return exponential(x,&par[4]);
   if( (fitMethod == "attenuatedExponential") || (fitMethod == "attenuatedExponentialNoHoles") )
     return attenuatedExponential(x,&par[4]);
+  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
+    return doubleExponential(x,&par[4]);
   if( (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
     return attenuatedDoubleExponential(x,&par[4]);
   else
@@ -838,19 +937,19 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
   
   
   
-  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
+  if( (fitMethod == "exponential") || (fitMethod == "exponentialNoHoles") )
   {
-    //-------------------
-    // double exponential
-    (*func) -> SetParameter(4,10.14);
-    (*func) -> SetParameter(5,0.015);
-    (*func) -> SetParameter(6,9.80);
-    (*func) -> SetParameter(7,0.011);
+    //------------
+    // exponential
+    
+    (*func) -> SetParLimits(4,0.,100.);
+    (*func) -> SetParLimits(5,0.,0.1);
+    
+    (*func) -> SetParameter(4,10.);
+    (*func) -> SetParameter(5,0.012);
     
     (*func) -> SetParName(4,"N1");
     (*func) -> SetParName(5,"#lambda1");
-    (*func) -> SetParName(6,"N2");
-    (*func) -> SetParName(7,"#lambda2");
   }
   
   
@@ -859,20 +958,42 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
     //-----------------------
     // attenuated exponential
     
-    (*func) -> SetParameter(4,130.);
-    (*func) -> SetParameter(5,20.);
-    (*func) -> SetParameter(6,10.);
-    (*func) -> SetParameter(7,0.012);
-    
     (*func) -> SetParLimits(4,0.,500.);
     (*func) -> SetParLimits(5,0.,100.);
     (*func) -> SetParLimits(6,0.,100.);
-    (*func) -> SetParLimits(7,0.,1.);
+    (*func) -> SetParLimits(7,0.,0.1);
+    
+    (*func) -> FixParameter(4,165.);
+    (*func) -> SetParameter(5,10.);
+    (*func) -> SetParameter(6,10.);
+    (*func) -> SetParameter(7,0.012);
     
     (*func) -> SetParName(4,"#mu");
     (*func) -> SetParName(5,"kT");
     (*func) -> SetParName(6,"N1");
     (*func) -> SetParName(7,"#lambda1");
+  }
+  
+  
+  if( (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
+  {
+    //-------------------
+    // double exponential
+    
+    (*func) -> SetParLimits(4,0.,100.);
+    (*func) -> SetParLimits(5,0.,0.1);
+    (*func) -> SetParLimits(6,0.,100.);
+    (*func) -> SetParLimits(7,0.,0.1);
+    
+    (*func) -> SetParameter(4,1.1);
+    (*func) -> SetParameter(5,0.057);
+    (*func) -> SetParameter(6,10.);
+    (*func) -> SetParameter(7,0.012);
+    
+    (*func) -> SetParName(4,"N1");
+    (*func) -> SetParName(5,"#lambda1");
+    (*func) -> SetParName(6,"N2");
+    (*func) -> SetParName(7,"#lambda2");
   }
   
   
@@ -884,16 +1005,16 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
     (*func) -> SetParLimits(4,0.,500.);
     (*func) -> SetParLimits(5,0.,100.);
     (*func) -> SetParLimits(6,0.,100.);
-    (*func) -> SetParLimits(7,0.,1.);
+    (*func) -> SetParLimits(7,0.,0.1);
     (*func) -> SetParLimits(8,0.,100.);
-    (*func) -> SetParLimits(9,0.,1.);
+    (*func) -> SetParLimits(9,0.,0.1);
     
-    (*func) -> FixParameter(4,190.);
-    (*func) -> FixParameter(5,55.);
-    (*func) -> SetParameter(6,10.);
-    (*func) -> SetParameter(7,0.013);
-    (*func) -> SetParameter(8,5.);
-    (*func) -> SetParameter(9,0.005);
+    (*func) -> FixParameter(4,165.);
+    (*func) -> SetParameter(5,50.);
+    (*func) -> SetParameter(6,12.);
+    (*func) -> SetParameter(7,0.023);
+    (*func) -> SetParameter(8,10.);
+    (*func) -> SetParameter(9,0.011);
     
     (*func) -> SetParName(4,"#mu");
     (*func) -> SetParName(5,"kT");
@@ -902,7 +1023,6 @@ int fitHiggsMassBinned(TH1F* h_lepNuW_m,
     (*func) -> SetParName(8,"N2");
     (*func) -> SetParName(9,"#lambda2");
   }
-  
   
   
   //----------------------------
@@ -1061,4 +1181,111 @@ void DrawPulls(TDirectory* outFile, TH1F* num, TH1F* den, const int& higgsMass, 
   
   delete g_pull;
   delete f_pol0;
+}
+
+
+
+
+
+
+float GetXFitMIN1(const float& mH, const std::string& fitMethod, const int& step)
+{
+  if( (fitMethod == "exponential") || (fitMethod == "exponentialNoHoles") ||
+      (fitMethod == "doubleExponential") || (fitMethod == "doubleExponentialNoHoles") )
+    {
+      if     ( mH == 200. ) return 180.;
+      if     ( mH == 250. ) return 180.;
+      else if( mH == 300. ) return 180.;
+      else if( mH == 350. ) return 180.;
+      else if( mH == 400. ) return 180.;
+      else if( mH == 450. ) return 180.;
+      else if( mH == 500. ) return 180.;
+      else if( mH == 550. ) return 180.;
+      else if( mH == 600. ) return 180.;
+      else return 1.;
+    }
+  
+  else if( (fitMethod == "attenuatedExponential") || (fitMethod == "attenuatedExponentialNoHoles") ||
+           (fitMethod == "attenuatedDoubleExponential") || (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+    {
+      if     ( mH == 200. ) return 180.;
+      if     ( mH == 250. ) return 180.;
+      else if( mH == 300. ) return 180.;
+      else if( mH == 350. ) return 180.;
+      else if( mH == 400. ) return 180.;
+      else if( mH == 450. ) return 180.;
+      else if( mH == 500. ) return 180.;
+      else if( mH == 550. ) return 180.;
+      else if( mH == 600. ) return 180.;
+      else return 1.;
+    }
+  
+  else return -1.;
+}
+
+float GetXFitMAX1(const float& mH, const std::string& fitMethod)
+{
+  if( (fitMethod == "doubleExponentialNoHoles") ||
+      (fitMethod == "attenuatedExponentialNoHoles") ||
+      (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+    {
+      return -1.;
+    }
+  
+  else
+    {
+      if     ( mH == 200. ) return GetLepNuWMMIN(200.);
+      if     ( mH == 250. ) return GetLepNuWMMIN(250.);
+      else if( mH == 300. ) return GetLepNuWMMIN(300.);
+      else if( mH == 350. ) return GetLepNuWMMIN(350.);
+      else if( mH == 400. ) return GetLepNuWMMIN(400.);
+      else if( mH == 450. ) return GetLepNuWMMIN(450.);
+      else if( mH == 500. ) return GetLepNuWMMIN(500.);
+      else if( mH == 550. ) return GetLepNuWMMIN(550.);
+      else if( mH == 600. ) return GetLepNuWMMIN(600.);
+      else return -1.;
+    }
+}
+
+
+
+
+
+
+float GetXFitMIN2(const float& mH, const std::string& fitMethod)
+{
+  if( (fitMethod == "doubleExponentialNoHoles") ||
+      (fitMethod == "attenuatedExponentialNoHoles") ||
+      (fitMethod == "attenuatedDoubleExponentialNoHoles") )
+    {
+      return -1.;
+    }
+  
+  else
+    {
+      if     ( mH == 200. ) return GetLepNuWMMAX(200.);
+      if     ( mH == 250. ) return GetLepNuWMMAX(250.);
+      else if( mH == 300. ) return GetLepNuWMMAX(300.);
+      else if( mH == 350. ) return GetLepNuWMMAX(350.);
+      else if( mH == 400. ) return GetLepNuWMMAX(400.);
+      else if( mH == 450. ) return GetLepNuWMMAX(450.);
+      else if( mH == 500. ) return GetLepNuWMMAX(500.);
+      else if( mH == 550. ) return GetLepNuWMMAX(550.);
+      else if( mH == 600. ) return GetLepNuWMMAX(600.);
+      else return -1.;
+    }
+}
+
+float GetXFitMAX2(const float& mH, const std::string& fitMethod)
+{
+  if     ( mH == 200. ) return 800.;
+  if     ( mH == 250. ) return 800.;
+  else if( mH == 300. ) return 800.;
+  else if( mH == 350. ) return 800.;
+  else if( mH == 400. ) return 800.;
+  else if( mH == 450. ) return 800.;
+  else if( mH == 500. ) return 800.;
+  else if( mH == 550. ) return 800.;
+  else if( mH == 600. ) return 800.;
+  else return -1.;
 }
