@@ -1,0 +1,33 @@
+********* H > WW > lvjj analysis for mH = 600 GeV/c^2 *********
+********* parametric shape analysis *********
+-----------------------------------------------------------------------------------------------------------------------------------------
+imax 1   # number of channels
+jmax 2   # number of processes - 1
+kmax *   # number of nuisance parameters (sources of systematic uncertainties)
+-----------------------------------------------------------------------------------------------------------------------------------------
+shapes *          emu_23j   shapes_fitNoHoles_attenuatedDoubleExponential_600_emu.root   workspace:$PROCESS workspace:$PROCESS_$SYSTEMATIC
+shapes data_obs   emu_23j   shapes_fitNoHoles_attenuatedDoubleExponential_600_emu.root   workspace:data_obs
+-----------------------------------------------------------------------------------------------------------------------------------------
+bin                           emu_23j
+observation                     49683
+-----------------------------------------------------------------------------------------------------------------------------------------
+bin                           emu_23j    emu_23j    emu_23j
+process                           ggH        qqH        bkg
+process                            -1         -2          1
+rate                            34.33       5.15   49683.00
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+norm                   lnU          -          -      1.500
+lumi                   lnN      1.045      1.045          -
+other                  lnN      1.060      1.060          -
+QCDscale_ggH           lnN      1.087          -          -
+QCDscale_qqH           lnN          -      1.015          -
+pdf_gg                 lnN      1.100          -          -
+pdf_qqbar              lnN          -      1.046          -
+theoryUncXS_HighMH     lnN      1.324          -          -
+CMS_HWWlvjj_PU         lnN      1.003      1.006          -
+CMS_HWWlvjj_JES      shape          1          1          - 
+-----------------------------------------------------------------------------------------------------------------------------------------
+N    param     1950.000000     1.   [0.,1000000.]
+L1   param        0.011000     1.   [0.,0.1]
+L2   param        0.037000     1.   [0.,0.1]
