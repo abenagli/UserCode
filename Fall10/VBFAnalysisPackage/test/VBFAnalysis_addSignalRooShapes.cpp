@@ -24,6 +24,7 @@
 #include "RooGenericPdf.h"
 #include "RooGaussian.h"
 #include "RooWorkspace.h"
+#include "RooSuperCrystalBall.h"
 #include "RooAttenuatedCrystalBallLowHigh.h"
 #include "RooGaussWithSkirt.h"
 #include "RooFitResult.h"
@@ -153,6 +154,8 @@ void fitSCB (RooDataHist & datasetHist, RooAbsPdf * scb, RooRealVar & x, RooArgL
   RooRealVar scb_alpha2 ("scb_alpha2", "scb_alpha2", 1, 0, 10) ;
   RooRealVar scb_n2     ("scb_n2",     "scb_n2",     50, 0, 200) ;
 
+//  scb = new RooSuperCrystalBall ("scb", "scb",
+//                              x, scb_mean, scb_sigma, scb_alpha, scb_n, scb_alpha2, scb_n2) ;
   scb = new RooAttenuatedCrystalBallLowHigh ("scb", "scb",
 					     x, scb_mu, scb_kT, scb_mean, scb_sigma, scb_alpha, scb_n, scb_alpha2, scb_n2) ;
   RooFitResult * scb_res = scb->fitTo (datasetHist, Save (), PrintLevel (-10)) ;   
