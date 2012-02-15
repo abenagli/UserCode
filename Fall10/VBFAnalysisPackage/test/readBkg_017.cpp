@@ -159,8 +159,8 @@ int main (int argc, char** argv)
   bool subtractZZ   = false;
   
   //fit the sideband *before* multiplying for the correction factor OR the extrapolated bkg *after* the multiplication
-  bool fitsideband = false; // fit sideband dati prima di ratio
-  bool fitbkg      = true;  // fit extrapolated bkg in signal region
+  bool fitsideband = true; // fit sideband dati prima di ratio
+  bool fitbkg      = false;  // fit extrapolated bkg in signal region
   
   //closure on data - closure on MC - final analysis
   bool martijn = false;
@@ -191,7 +191,7 @@ int main (int argc, char** argv)
   TH1F * m4_EvenHigher_TT   = (TH1F *) input.Get ("m4_EvenHigher_TT") ;
   TH1F * m4_EvenHigher_WW   = (TH1F *) input.Get ("m4_EvenHigher_WW") ;
   TH1F * m4_EvenHigher_WZ   = (TH1F *) input.Get ("m4_EvenHigher_WZ") ;
-  TH1F * m4_EvenHigher_Wjet = (TH1F *) input.Get ("m4_EvenHigher_Wjet") ;
+  TH1F * m4_EvenHigher_Wjet = (TH1F *) input.Get ("m4_EvenHigher_WJets") ;
   TH1F * m4_EvenHigher_ZZ   = (TH1F *) input.Get ("m4_EvenHigher_ZZ") ;
   TH1F * m4_EvenHigher_top  = (TH1F *) input.Get ("m4_EvenHigher_top") ;
   
@@ -210,7 +210,7 @@ int main (int argc, char** argv)
   TH1F * m4_upper_TT   = (TH1F *) input.Get ("m4_upper_TT") ;
   TH1F * m4_upper_WW   = (TH1F *) input.Get ("m4_upper_WW") ;
   TH1F * m4_upper_WZ   = (TH1F *) input.Get ("m4_upper_WZ") ;
-  TH1F * m4_upper_Wjet = (TH1F *) input.Get ("m4_upper_Wjet") ;
+  TH1F * m4_upper_Wjet = (TH1F *) input.Get ("m4_upper_WJets") ;
   TH1F * m4_upper_ZZ   = (TH1F *) input.Get ("m4_upper_ZZ") ;
   TH1F * m4_upper_top  = (TH1F *) input.Get ("m4_upper_top") ;
 
@@ -229,7 +229,7 @@ int main (int argc, char** argv)
   TH1F * m4_upper_c_TT   = (TH1F *) input.Get ("m4_upper_c_TT") ;
   TH1F * m4_upper_c_WW   = (TH1F *) input.Get ("m4_upper_c_WW") ;
   TH1F * m4_upper_c_WZ   = (TH1F *) input.Get ("m4_upper_c_WZ") ;
-  TH1F * m4_upper_c_Wjet = (TH1F *) input.Get ("m4_upper_c_Wjet") ;
+  TH1F * m4_upper_c_Wjet = (TH1F *) input.Get ("m4_upper_c_WJets") ;
   TH1F * m4_upper_c_ZZ   = (TH1F *) input.Get ("m4_upper_c_ZZ") ;
   TH1F * m4_upper_c_top  = (TH1F *) input.Get ("m4_upper_c_top") ;
   
@@ -248,7 +248,7 @@ int main (int argc, char** argv)
   TH1F * m4_upper_a_TT   = (TH1F *) input.Get ("m4_upper_a_TT") ;
   TH1F * m4_upper_a_WW   = (TH1F *) input.Get ("m4_upper_a_WW") ;
   TH1F * m4_upper_a_WZ   = (TH1F *) input.Get ("m4_upper_a_WZ") ;
-  TH1F * m4_upper_a_Wjet = (TH1F *) input.Get ("m4_upper_a_Wjet") ;
+  TH1F * m4_upper_a_Wjet = (TH1F *) input.Get ("m4_upper_a_WJets") ;
   TH1F * m4_upper_a_ZZ   = (TH1F *) input.Get ("m4_upper_a_ZZ") ;
   TH1F * m4_upper_a_top  = (TH1F *) input.Get ("m4_upper_a_top") ;
  
@@ -267,7 +267,7 @@ int main (int argc, char** argv)
   TH1F * m4_signal_TT   = (TH1F *) input.Get ("m4_signal_TT") ;
   TH1F * m4_signal_WW   = (TH1F *) input.Get ("m4_signal_WW") ;
   TH1F * m4_signal_WZ   = (TH1F *) input.Get ("m4_signal_WZ") ;
-  TH1F * m4_signal_Wjet = (TH1F *) input.Get ("m4_signal_Wjet") ;
+  TH1F * m4_signal_Wjet = (TH1F *) input.Get ("m4_signal_WJets") ;
   TH1F * m4_signal_ZZ   = (TH1F *) input.Get ("m4_signal_ZZ") ;
   TH1F * m4_signal_top  = (TH1F *) input.Get ("m4_signal_top") ;
   
@@ -294,7 +294,7 @@ int main (int argc, char** argv)
   TH1F * m4_lower_TT   = (TH1F *) input.Get ("m4_lower_TT") ;
   TH1F * m4_lower_WW   = (TH1F *) input.Get ("m4_lower_WW") ;
   TH1F * m4_lower_WZ   = (TH1F *) input.Get ("m4_lower_WZ") ;
-  TH1F * m4_lower_Wjet = (TH1F *) input.Get ("m4_lower_Wjet") ;
+  TH1F * m4_lower_Wjet = (TH1F *) input.Get ("m4_lower_WJets") ;
   TH1F * m4_lower_ZZ   = (TH1F *) input.Get ("m4_lower_ZZ") ;
   TH1F * m4_lower_top  = (TH1F *) input.Get ("m4_lower_top") ;
   
@@ -313,7 +313,7 @@ int main (int argc, char** argv)
   TH1F * m4_lower_c_TT   = (TH1F *) input.Get ("m4_lower_c_TT") ;
   TH1F * m4_lower_c_WW   = (TH1F *) input.Get ("m4_lower_c_WW") ;
   TH1F * m4_lower_c_WZ   = (TH1F *) input.Get ("m4_lower_c_WZ") ;
-  TH1F * m4_lower_c_Wjet = (TH1F *) input.Get ("m4_lower_c_Wjet") ;
+  TH1F * m4_lower_c_Wjet = (TH1F *) input.Get ("m4_lower_c_WJets") ;
   TH1F * m4_lower_c_ZZ   = (TH1F *) input.Get ("m4_lower_c_ZZ") ;
   TH1F * m4_lower_c_top  = (TH1F *) input.Get ("m4_lower_c_top") ;
   
@@ -332,7 +332,7 @@ int main (int argc, char** argv)
   TH1F * m4_lower_a_TT   = (TH1F *) input.Get ("m4_lower_a_TT") ;
   TH1F * m4_lower_a_WW   = (TH1F *) input.Get ("m4_lower_a_WW") ;
   TH1F * m4_lower_a_WZ   = (TH1F *) input.Get ("m4_lower_a_WZ") ;
-  TH1F * m4_lower_a_Wjet = (TH1F *) input.Get ("m4_lower_a_Wjet") ;
+  TH1F * m4_lower_a_Wjet = (TH1F *) input.Get ("m4_lower_a_WJets") ;
   TH1F * m4_lower_a_ZZ   = (TH1F *) input.Get ("m4_lower_a_ZZ") ;
   TH1F * m4_lower_a_top  = (TH1F *) input.Get ("m4_lower_a_top") ;
   
@@ -351,7 +351,7 @@ int main (int argc, char** argv)
   TH1F * m4_sideband_TT   = (TH1F *) input.Get ("m4_sideband_TT") ;
   TH1F * m4_sideband_WW   = (TH1F *) input.Get ("m4_sideband_WW") ;
   TH1F * m4_sideband_WZ   = (TH1F *) input.Get ("m4_sideband_WZ") ;
-  TH1F * m4_sideband_Wjet = (TH1F *) input.Get ("m4_sideband_Wjet") ;
+  TH1F * m4_sideband_Wjet = (TH1F *) input.Get ("m4_sideband_WJets") ;
   TH1F * m4_sideband_ZZ   = (TH1F *) input.Get ("m4_sideband_ZZ") ;
   TH1F * m4_sideband_top  = (TH1F *) input.Get ("m4_sideband_top") ;
   
@@ -441,13 +441,16 @@ int main (int argc, char** argv)
   TH1F* signalRegionWjet;
   TH1F* signalRegionZZ;
   TH1F* signalRegion;
-  
+  TH1F* sidebaRegion;
+  TH1F* signalRegionMC;
+  TH1F* sidebaRegionMC;
+
  if(martijn)
  { 
    cout << "Martijn\'s test" << endl ;
-   TH1F * sidebaRegionMC = (TH1F *) m4_upper_a_total->Clone ("sidebaRegionMC") ; 
+   sidebaRegionMC = (TH1F *) m4_upper_a_total->Clone ("sidebaRegionMC") ; 
    sidebaRegionMC->Add (m4_lower_a_total) ;
-   TH1F * signalRegionMC = (TH1F *) m4_upper_c_total->Clone ("signalRegionMC") ; 
+   signalRegionMC = (TH1F *) m4_upper_c_total->Clone ("signalRegionMC") ; 
    signalRegionMC->Add (m4_lower_c_total) ;
   
    //Subtract the MC shape from data in the sideband region 
@@ -467,7 +470,7 @@ int main (int argc, char** argv)
    if(subtractZZ   == true) m4_lower_a_DATA->Add (m4_lower_a_ZZ, -1);
 
    
-   TH1F * sidebaRegion = (TH1F *) m4_upper_a_DATA->Clone ("sidebaRegion") ; 
+   sidebaRegion = (TH1F *) m4_upper_a_DATA->Clone ("sidebaRegion") ; 
    sidebaRegion->Add (m4_lower_a_DATA) ;
 
    //FC FIXME: not really rigorous; check for other solutions!!!
@@ -513,9 +516,9 @@ int main (int argc, char** argv)
  {
    cout << "final analysis" << endl ;
    
-   TH1F * sidebaRegionMC = (TH1F *) m4_sideband_total->Clone ("sidebaRegionMC") ; 
+   sidebaRegionMC = (TH1F *) m4_sideband_total->Clone ("sidebaRegionMC") ; 
    
-   TH1F * signalRegionMC = (TH1F *) m4_signal_total->Clone ("signalRegionMC") ;
+   signalRegionMC = (TH1F *) m4_signal_total->Clone ("signalRegionMC") ;
   
    //Subtract the shape from data in the sideband region
    if(subtractWW   == true) m4_sideband_DATA->Add (m4_sideband_WW, -1) ;
@@ -526,9 +529,9 @@ int main (int argc, char** argv)
    if(subtractWjet == true) m4_sideband_DATA->Add (m4_sideband_Wjet, -1) ;
    if(subtractZZ   == true) m4_sideband_DATA->Add (m4_sideband_ZZ, -1) ;
 
-   TH1F * sidebaRegion   = (TH1F *) m4_sideband_DATA->Clone ("sidebaRegion") ;
+   sidebaRegion   = (TH1F *) m4_sideband_DATA->Clone ("sidebaRegion") ;
    
-   TH1F * signalRegion   = (TH1F *) m4_signal_DATA->Clone ("signalRegion") ;
+   signalRegion   = (TH1F *) m4_signal_DATA->Clone ("signalRegion") ;
   
    if(subtractWW   == true) TH1F * signalRegionWW = (TH1F *) m4_signal_WW->Clone ("signalRegionWW") ;
    if(subtractDY   == true) TH1F * signalRegionDY = (TH1F *) m4_signal_DY->Clone ("signalRegionDY") ;
@@ -539,10 +542,6 @@ int main (int argc, char** argv)
    if(subtractZZ   == true) TH1F * signalRegionZZ = (TH1F *) m4_signal_ZZ->Clone ("signalRegionZZ") ;
  }
 
- TH1F * sidebaRegionMC = (TH1F *) m4_sideband_total->Clone ("sidebaRegionMC") ; 
- TH1F * signalRegionMC = (TH1F *) m4_signal_total->Clone ("signalRegionMC") ;  
- TH1F * sidebaRegion   = (TH1F *) sidebaRegionMC->Clone ("sidebaRegion") ; 
- signalRegion   = (TH1F *) signalRegionMC->Clone ("signalRegion") ; 
  if(closure)
  {
    cout << "final analysis closure test" << endl ;
@@ -794,7 +793,7 @@ int main (int argc, char** argv)
   {
     //FC ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----   
     //FC fit the sideband shape (clone not to get the function on the sideband histo in the closure test)
-    TH1F * sideband_bkg = (TH1F *) sidebaRegion->Clone ("sideband_bkg") ;
+    sideband_bkg = (TH1F *) sidebaRegion->Clone ("sideband_bkg") ;
 
     TF1 * bkgFitFunc ;
     if (!attenuated)
@@ -1237,7 +1236,6 @@ int main (int argc, char** argv)
   g_pull_total.Write("g_pull_total");
   g_pull_forEveryBin.Write("g_pull_forEveryBin");
   gPullHisto_forEveryBin->Write();
-
 
   output.Close () ;
 
