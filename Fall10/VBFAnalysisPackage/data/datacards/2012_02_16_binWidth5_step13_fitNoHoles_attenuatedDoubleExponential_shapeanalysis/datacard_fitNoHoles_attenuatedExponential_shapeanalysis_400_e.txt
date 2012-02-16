@@ -1,0 +1,30 @@
+********* H > WW > lvjj analysis for mH = 400 GeV/c^2 *********
+********* parametric shape analysis *********
+-----------------------------------------------------------------------------------------------------------------------------------------
+imax 1   # number of channels
+jmax 2   # number of processes - 1
+kmax *   # number of nuisance parameters (sources of systematic uncertainties)
+-----------------------------------------------------------------------------------------------------------------------------------------
+shapes *          e      shapes_fitNoHoles_attenuatedExponential_400_e.root   workspace:$PROCESS workspace:$PROCESS_$SYSTEMATIC
+shapes data_obs   e      shapes_fitNoHoles_attenuatedExponential_400_e.root   workspace:data_obs
+-----------------------------------------------------------------------------------------------------------------------------------------
+bin                                 e       
+observation                         25017   
+-----------------------------------------------------------------------------------------------------------------------------------------
+bin                                 e          e          e       
+process                             ggH        qqH        bkg     
+process                             -2         -1         1       
+rate                                104.55     6.70       25017.00
+-----------------------------------------------------------------------------------------------------------------------------------------
+lumi                        lnN     1.045      1.045      -       
+QCDscale_ggH                lnN     1.073      -          -       
+QCDscale_qqH                lnN     -          1.008      -       
+pdf_gg                      lnN     1.088      -          -       
+pdf_qqbar                   lnN     -          1.037      -       
+theoryUncXS_HighMH          lnN     1.096      -          -       
+CMS_HWWlvjj_PU              lnN     1.002      1.002      -       
+CMS_HWWlvjj_JES             shape   1.         1.         -       
+CMS_HWWlvjj_e_other         lnN     1.060      1.060      -       
+CMS_HWWlvjj_e_bkgNorm       lnU     -          -          1.500   
+-----------------------------------------------------------------------------------------------------------------------------------------
+CMS_HWWlvjj_e_L1   param   0.012          1.   [0.,0.1]
