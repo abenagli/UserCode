@@ -325,10 +325,10 @@ int main(int argc, char** argv)
     {
       data  = (TH1F*)(inFile->Get("signalRegion"));    
       hint  = (TH1F*)(inFile->Get("extrapolated_bkg"));
-      alpha = (TH1F*)(inFile->Get("h_correctionBand"));
+      alpha = (TH1F*)(inFile->Get("num_fit_error"));
       
       xMin = alpha -> GetBinLowEdge(1);
-      xMax = alpha -> GetBinLowEdge(hint->GetNbinsX()) + xWidth;
+      xMax = alpha -> GetBinLowEdge(alpha->GetNbinsX()) + xWidth;
     }
     
     
