@@ -711,10 +711,10 @@ int main(int argc, char** argv)
       {
         datacard_sa << "shapes *          " << setw(4) << flavour << "   "
 	  	    << "shapes_" << analysisMethod << "_" << mass << "_" << flavour << ".root   "
-                    << "workspace:$PROCESS workspace:$PROCESS_$SYSTEMATIC" << std::endl;
+                    << "$PROCESS $PROCESS_$SYSTEMATIC" << std::endl;
         datacard_sa << "shapes data_obs   " << setw(4) << flavour << "   "
                     << "shapes_" << analysisMethod << "_" << mass << "_" << flavour << ".root   "
-                    << "workspace:data_obs" << std::endl;
+                    << "data_obs" << std::endl;
       }
       else
       {

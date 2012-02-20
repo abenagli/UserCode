@@ -148,7 +148,7 @@ for($massIt = 0; $massIt < $nMasses; ++$massIt)
   
   open(JOBFILE, ">", $jobFile);
   
-  print JOBFILE "source /gwpool/initcms/slc5_64-cmssw.csh\n";
+  print JOBFILE "source /gwpool/initcms/slc5_64-cmssw.sh\n";
   print JOBFILE "cd ".$CMSSWDir."\n";
   print JOBFILE "eval `scramv1 runt -sh`\n";
   print JOBFILE "cd ".$jobDir."\n";
