@@ -134,9 +134,17 @@ for($massIt = 0; $massIt < $nMasses; ++$massIt)
   
   $jobFile = $jobDir."job_H".$mass.".sh";
   $outFile = $jobDir."out_H".$mass.".txt";
-  $datacard ="datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_".$flavour.".txt";
-  $shapes = "shapes_".$analysisMethod."_".$fitFunction."_".$mass."_".$flavour.".root";
   
+  if( $analysisMethod eq "sidebands")
+  {
+    $datacard ="datacard_".$analysisMethod."_".$combineTechnique."_".$mass."_".$flavour.".txt";
+    $shapes = "shapes_".$analysisMethod."_".$mass."_".$flavour.".root";
+  }
+  else
+  {
+    $datacard ="datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_".$flavour.".txt";
+    $shapes = "shapes_".$analysisMethod."_".$fitFunction."_".$mass."_".$flavour.".root";
+  }
   
   open(JOBFILE, ">", $jobFile);
   
