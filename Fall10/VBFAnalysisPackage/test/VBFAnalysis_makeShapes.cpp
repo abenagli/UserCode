@@ -366,8 +366,8 @@ int main(int argc, char** argv)
     {
       // background
       bkg            = new TH1F("bkg",           "",nBins,xMin,xMax);
-      bkg_fitErrUp   = new TH1F("bkg_fitErrUp",  "",nBins,xMin,xMax);
-      bkg_fitErrDown = new TH1F("bkg_fitErrDown","",nBins,xMin,xMax);
+      bkg_fitErrUp   = new TH1F(("CMS_HWWlvjj_"+flavour+"_bkgSystUp").c_str(),  "",nBins,xMin,xMax);
+      bkg_fitErrDown = new TH1F(("CMS_HWWlvjj_"+flavour+"_bkgSystDown").c_str(),"",nBins,xMin,xMax);
       
       for(int bin = 1; bin <= hint->GetNbinsX(); ++bin)
       {
@@ -794,13 +794,13 @@ int main(int argc, char** argv)
       
       if( analysisMethod == "sidebands" )
       {
-        name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgNorm";
-        datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnU" << "   " << setw(8) << "-" << "   " << setw(8) << "-" << "   " << setw(8) << "1.500" << std::endl;
+        name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgSyst";
+        datacard_sa << setw(25) << name.str() << "   " << setw(5) << "shape" << "   " << setw(8) << "-" << "   " << setw(8) << "-" << "   " << setw(8) << "1." << std::endl;
       }
       else
       {
-        name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgSyst";
-        datacard_sa << setw(25) << name.str() << "   " << setw(5) << "shape" << "   " << setw(8) << "-" << "   " << setw(8) << "-" << "   " << setw(8) << "1." << std::endl;
+        name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgNorm";
+        datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnU" << "   " << setw(8) << "-" << "   " << setw(8) << "-" << "   " << setw(8) << "1.500" << std::endl;
       }
       
       if( analysisMethod != "sidebands" )
