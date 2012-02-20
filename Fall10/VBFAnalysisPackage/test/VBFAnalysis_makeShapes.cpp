@@ -134,6 +134,7 @@ int main(int argc, char** argv)
     TH1F* bkg;
     TH1F* bkg_fitErrUp;
     TH1F* bkg_fitErrDown;
+    TH1F* alpha;
     double n_bkg;
     double n_bkg_err;
     
@@ -322,11 +323,12 @@ int main(int argc, char** argv)
     
     if( analysisMethod == "sidebands" )
     {
-      data = (TH1F*)(inFile->Get("signalRegion"));    
-      hint = (TH1F*)(inFile->Get("extrapolated_bkg"));
+      data  = (TH1F*)(inFile->Get("signalRegion"));    
+      hint  = (TH1F*)(inFile->Get("extrapolated_bkg"));
+      alpha = (TH1F*)(inFile->Get("h_correctionBand"));
       
-      xMin = hint -> GetBinLowEdge(1);
-      xMax = hint -> GetBinLowEdge(hint->GetNbinsX()) + xWidth;
+      xMin = alpha -> GetBinLowEdge(1);
+      xMax = alpha -> GetBinLowEdge(hint->GetNbinsX()) + xWidth;
     }
     
     
