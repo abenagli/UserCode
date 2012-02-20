@@ -148,6 +148,9 @@ int main(int argc, char** argv)
     RooWorkspace* workspace;
     
     RooRealVar* x;
+    RooRealVar* rooXMin;
+    RooRealVar* rooXMax;
+    RooRealVar* rooXWidth;
     RooRealVar* rooN_data_obs;
     std::map<std::string,RooRealVar*> rooN_H;
     
@@ -239,7 +242,16 @@ int main(int argc, char** argv)
       
       x = new RooRealVar("x","lepNuW_m_KF",0.,1000.);
       x -> setRange(xMin,xMax);
+      
+      rooXMin   = new RooRealVar("rooXMin",  "",xMin,xMin,xMin);
+      rooXMax   = new RooRealVar("rooXMax",  "",xMax,xMax,xMax);
+      rooXWidth = new RooRealVar("rooXWidth","",xWidth,xWidth,xWidth);
+      
       workspace -> import(*x);
+      workspace -> import(*rooXMin);
+      workspace -> import(*rooXMax);
+      workspace -> import(*rooXWidth);
+      
       
       
       float tempMu = -1.; 
@@ -313,8 +325,8 @@ int main(int argc, char** argv)
       data = (TH1F*)(inFile->Get("signalRegion"));    
       hint = (TH1F*)(inFile->Get("extrapolated_bkg"));
       
-      xMin = GetXFitMIN1(mass,step,additionalCuts);
-      xMax = GetXFitMAX2(mass);
+      xMin = hint -> GetBinLowEdge(1);
+      xMax = hint -> GetBinLowEdge(hint->GetNbinsX()) + xWidth;
     }
     
     
@@ -733,10 +745,20 @@ int main(int argc, char** argv)
                   << setw(8) << "-1" << "   "
                   << setw(8) << "1" << std::endl;
       
-      datacard_sa << setw(33) << "rate" << "   "
-                  << std::setprecision(2) << setw(8) << n_H["ggH"] << "   "
-                  << std::setprecision(2) << setw(8) << n_H["qqH"] << "   "
-                  << std::setprecision(2) << setw(8) << n_data_obs << std::endl;
+      if( analysisMethod == "sidebands")
+      {
+        datacard_sa << setw(33) << "rate" << "   "
+                    << std::setprecision(2) << setw(8) << n_H["ggH"] << "   "
+                    << std::setprecision(2) << setw(8) << n_H["qqH"] << "   "
+                    << std::setprecision(2) << setw(8) << n_bkg << std::endl;
+      }
+      else
+      {
+        datacard_sa << setw(33) << "rate" << "   "
+                    << std::setprecision(2) << setw(8) << n_H["ggH"] << "   "
+                    << std::setprecision(2) << setw(8) << n_H["qqH"] << "   "
+                    << std::setprecision(2) << setw(8) << n_data_obs << std::endl;
+      }
       
       datacard_sa  << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
       datacard_sa << setw(25) << "lumi"     << "   " << setw(5) << "lnN" << "   " << setw(8) << "1.045" << "   " << setw(8) << "1.045" << "   " << setw(8) << "-" << std::endl;
