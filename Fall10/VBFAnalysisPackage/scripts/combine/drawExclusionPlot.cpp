@@ -172,7 +172,7 @@ int main(int argc, char** argv)
   m_exclusion_b_band_graph_2sigma->GetYaxis()->SetTitle("r = #sigma_{95%CL} / #sigma_{SM}");
   m_exclusion_b_band_graph_2sigma->GetXaxis()->SetTitle("Higgs mass (GeV/c^{2})");
   m_exclusion_b_band_graph_2sigma->SetMinimum(0.);
-  m_exclusion_b_band_graph_2sigma->SetMaximum(5.);
+  m_exclusion_b_band_graph_2sigma->SetMaximum(10.);
   m_exclusion_b_band_graph_2sigma->SetTitle("");
   m_exclusion_b_band_graph_2sigma->Draw("A3");
   
@@ -188,6 +188,7 @@ int main(int argc, char** argv)
   f->Draw("same");
   
   c1->Print(("lin_"+name+".pdf").c_str(),"pdf");
+  c1->Print(("lin_"+name+".png").c_str(),"png");
   
   
   
@@ -214,6 +215,8 @@ int main(int argc, char** argv)
   f->Draw("same");
   
   c2->Print(("log_"+name+".pdf").c_str(),"pdf");
+  c2->Print(("log_"+name+".png").c_str(),"png");
+  
   
   
   return 0;

@@ -380,8 +380,8 @@ int main(int argc, char** argv)
     {
       // background
       bkg            = new TH1F("bkg",           "",nBins,xMin,xMax);
-      bkg_fitErrUp   = new TH1F(("CMS_HWWlvjj_"+flavour+"_bkgSystUp").c_str(),  "",nBins,xMin,xMax);
-      bkg_fitErrDown = new TH1F(("CMS_HWWlvjj_"+flavour+"_bkgSystDown").c_str(),"",nBins,xMin,xMax);
+      bkg_fitErrUp   = new TH1F(("bkg_CMS_HWWlvjj_"+flavour+"_bkgSystUp").c_str(),  "",nBins,xMin,xMax);
+      bkg_fitErrDown = new TH1F(("bkg_CMS_HWWlvjj_"+flavour+"_bkgSystDown").c_str(),"",nBins,xMin,xMax);
       
       for(int bin = 1; bin <= hint->GetNbinsX(); ++bin)
       {
