@@ -57,12 +57,28 @@ if( $onSidebands == 0 )
   if( $additionalCuts eq "none" )
   {
     $outputDir = $INPUTDir."/combine_signal/binWidth".$xWidth."/step".$step."/";
-    $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    
+    if( $analysisMethod eq "sidebands" )
+    {
+      $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    }
+    else
+    {
+      $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    }
   }
   else
   {
     $outputDir = $INPUTDir."/combine_signal/binWidth".$xWidth."/step".$step."_".$additionalCuts."/";
-    $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    
+    if( $analysisMethod eq "sidebands" )
+    {
+      $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    }
+    else
+    {
+      $jobDir = $outputDir."limitPlot_signal_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    }
   }
 }
 
@@ -71,12 +87,28 @@ else
   if( $additionalCuts eq "none" )
   {
     $outputDir = $INPUTDir."/combine_sidebands/binWidth".$xWidth."/step".$step."/";
-    $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    
+    if( $analysisMethod eq "sidebands" )
+    {
+      $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    }
+    else
+    {
+      $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    }
   }
   else
   {
     $outputDir = $INPUTDir."/combine_sidebands/binWidth".$xWidth."/step".$step."_".$additionalCuts."/";
-    $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    
+    if( $analysisMethod eq "sidebands" )
+    {
+      $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    }
+    else
+    {
+      $jobDir = $outputDir."limitPlot_sidebands_".$analysisMethod."_".$fitFunction."_".$flavour."_".$combineMethod."_".$combineTechnique."/";
+    }
   }
 }
 
