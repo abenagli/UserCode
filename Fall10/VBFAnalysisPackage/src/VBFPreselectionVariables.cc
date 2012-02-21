@@ -1695,15 +1695,21 @@ void SetHVariables(VBFPreselectionVariables& vars, treeReader& reader, const int
   if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetHVariables" << std::endl;
   
   vars.lepNu_nSolutions = GetNeutrino(vars.nu1,vars.nu2,vars.lep,vars.met);
+  //vars.lepNu_nSolutions = GetNeutrino_FNAL(vars.nu1,vars.nu2,vars.lep,vars.met);
   vars.p_nu1 = &(vars.nu1);
   vars.p_nu2 = &(vars.nu2);
-  
-  if( fabs(vars.nu1.Pz()) < fabs(vars.nu2.Pz()) )
-    vars.nu = vars.nu1;
-  else
-    vars.nu = vars.nu2;
-  
+  vars.nu = vars.nu1;
   vars.p_nu = &(vars.nu);
+  
+  //std::cout << "\n\n\n**************** nSolutions: " << vars.lepNu_nSolutions << "****************" << std::endl;
+  //std::cout << ">>> MILANO method:   pt_1: " << vars.nu1.pt() << "   pz_1: " << vars.nu1.pz() << "   M: " << (vars.nu1+vars.lep).mass() << std::endl;
+  //std::cout << ">>> MILANO method:   pt_2: " << vars.nu2.pt() << "   pz_2: " << vars.nu2.pz() << "   M: " << (vars.nu2+vars.lep).mass() << std::endl;
+  //
+  //GetNeutrino_FNAL(vars.nu1,vars.nu2,vars.lep,vars.met);
+  //
+  //std::cout << ">>>   FNAL method:   pt_1: " << vars.nu1.pt() << "   pz_1: " << vars.nu1.pz() << "   M: " << (vars.nu1+vars.lep).mass() << std::endl;
+  //std::cout << ">>>   FNAL method:   pt_2: " << vars.nu2.pt() << "   pz_2: " << vars.nu2.pz() << "   M: " << (vars.nu2+vars.lep).mass() << std::endl;
+  
   vars.lepNu_m = (vars.lep+vars.nu).mass();
   vars.lepW = vars.lep + vars.WJJ;
   vars.lepW_pt = vars.lepW.pt();
