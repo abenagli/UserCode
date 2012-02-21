@@ -95,7 +95,7 @@ while(<SAMPLESListFile>)
   
   
   
-  print SAMPLEJOBLISTFILE "echo \"qsub -V -q longcms -d ./ ".$sampleJobFile."\"\n";
-  print SAMPLEJOBLISTFILE "qsub -V -q longcms -d ./ ".$sampleJobFile."\n";
+  print SAMPLEJOBLISTFILE "echo \"qsub -V -q shortcms -d ./ ".$sampleJobFile."\"\n";
+  print SAMPLEJOBLISTFILE "qsub -V -q shortcms -d ./ ".$sampleJobFile."\n";
   
 }

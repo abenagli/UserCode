@@ -155,7 +155,7 @@ for($massIt = 0; $massIt < $nMasses; ++$massIt)
   print JOBFILE "cp ".$outputDir."/".$datacard." ./\n";
   print JOBFILE "cp ".$outputDir."/".$shapes." ./\n";
   
-  $combineCommand = "unbuffer combine -M ".$combineMethod." ".$combineOptions." -v 3 -n HWWlvjj -m ".$mass." -d ".$datacard." >> ".$outFile."\n";
+  $combineCommand = "unbuffer combine -M ".$combineMethod." ".$combineOptions." -n HWWlvjj -m ".$mass." -d ".$datacard." >> ".$outFile."\n";
   print JOBFILE $combineCommand."\n";
   
   
