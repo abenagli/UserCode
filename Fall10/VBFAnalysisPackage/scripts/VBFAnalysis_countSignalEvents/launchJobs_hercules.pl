@@ -29,6 +29,7 @@ $BASEDir               = $VBFANALYSISPKG;
 $SELECTIONSCfgTemplate = $User_Preferences{"SELECTIONSCfgTemplate"};
 $EXEName               = $User_Preferences{"EXEName"};
 $SAMPLESListFile       = $User_Preferences{"SAMPLESListFile"};
+$OUTPUTDir             = $User_Preferences{"OUTPUTDir"};
 
 $SELECTIONSCfgTemplate = $BASEDir."/".$SELECTIONSCfgTemplate;
 
@@ -36,6 +37,7 @@ print "BASEDir = "              .$BASEDir."\n" ;
 print "SELECTIONSCfgTemplate = ".$SELECTIONSCfgTemplate."\n";
 print "EXEName = "              .$EXEName."\n";
 print "SAMPLESListFile = "      .$SAMPLESListFile."\n";
+print "OUTPUTDir = "            .$OUTPUTDir."\n";
 
 
 
@@ -69,6 +71,7 @@ while(<SAMPLESListFile>)
   
   $selectionsCfgFile = "./selections_".$label.".cfg";
   system("cat ".$SELECTIONSCfgTemplate."   | sed -e s%INPUTDIR%".$inputDir.
+                                       "%g | sed -e s%OUTPUTDIR%".$OUTPUTDir.
                                        "%g | sed -e s%LABEL%".$label.
                                        "%g | sed -e s%ONDATA%".$onData.
                                        "%g | sed -e s%XWIDTH%".$xWidth.
