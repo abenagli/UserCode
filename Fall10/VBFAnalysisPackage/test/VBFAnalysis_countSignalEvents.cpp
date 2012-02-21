@@ -259,7 +259,7 @@ int main(int argc, char** argv)
       
       
       // non mass-dependent cuts
-      if( (WJJ_m < 65.) || (WJJ_m >= 100.) ) continue;
+      if( (WJJ_m < 65.) || (WJJ_m >= 95.) ) continue;
       //if( WJ1_ctheta > 0.6 ) continue;
       //if( fabs(lepNu_ctheta) > 0.65 ) continue;
       
