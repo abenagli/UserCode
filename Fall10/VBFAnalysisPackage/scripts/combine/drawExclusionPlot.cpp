@@ -116,7 +116,7 @@ int main(int argc, char** argv)
   int n_points = numMass;
   for(int i = 0; i < n_points; ++i)
   {
-    std::cout << ">>> mass: " << mass[i] << "   obs: " << b_vals_exclusion_median_data[i] << std::endl;
+    std::cout << ">>> mass: " << mass[i] << "   obs: " << b_vals_exclusion_median_data[i] << " , exp median: " << b_vals_exclusion_median[i] << std::endl;
   }
   
   
