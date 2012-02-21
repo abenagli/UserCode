@@ -160,7 +160,7 @@ for($massIt = 0; $massIt < $nMasses; ++$massIt)
   
   
   
-  $submit = "qsub -V -d ".$jobDir." -k n -q longcms ".$jobFile;
+  $submit = "qsub -V -d ".$jobDir." -k n -q shortcms ".$jobFile;
   print ">>>>>>>>> submit: ".$submit."\n";
   system($submit);
 }
