@@ -257,7 +257,8 @@ int main(int argc, char** argv)
   
   
   // define the quark-gluon likelihood
-  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator();
+  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/gwpool/users/benaglia/COLLISIONS7TeV/Fall10/NtuplePackage/data/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summe\
+r11-PU_S3_START42_V11-v2.root");
   
   
   

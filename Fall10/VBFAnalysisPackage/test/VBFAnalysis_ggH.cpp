@@ -470,7 +470,7 @@ int main(int argc, char** argv)
   
   
   // define the quark-gluon likelihood
-  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator();
+  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/gwpool/users/benaglia/COLLISIONS7TeV/Fall10/NtuplePackage/data/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
   // define the angular likelihood
   HelicityLikelihoodDiscriminant* helicitylikeli = new HelicityLikelihoodDiscriminant();  
   
@@ -1130,16 +1130,16 @@ int main(int argc, char** argv)
     
     
     // qg likelihood
-    //if( vars.WJ1.pt() > 0. )
-    //  vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
-    //if( vars.WJ2.pt() > 0. )
-    //  vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
-    //if( vars.WJ2.pt() > vars.WJ1.pt() )
-    //{
-    //  float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
-    //  vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
-    //  vars.WJ1_QGLikelihood = QGLikelihoodDummy;
-    //}
+    if( vars.WJ1.pt() > 0. )
+      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+    if( vars.WJ2.pt() > 0. )
+      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+    if( vars.WJ2.pt() > vars.WJ1.pt() )
+    {
+      float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
+      vars.WJ2_QGLikelihood = vars.WJ1_QGLikelihood;
+      vars.WJ1_QGLikelihood = QGLikelihoodDummy;
+    }
     
     
     // helicity likelihood

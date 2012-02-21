@@ -115,7 +115,7 @@ int main(int argc, char** argv)
   drawTStack* stack = new drawTStack(inputDir, samplesListFile, inputFileName, fullOutputDir, imgFormat);
   
   stack -> SetXLegend(0.76, 0.99);
-  stack -> SetYLegend(0.60, 0.85);
+  stack -> SetYLegend(0.50, 0.90);
   
   stack -> DrawEvents("events", lumi, step, true, PURescale, stackSig);
   stack -> DrawEvents("eventsScaled", lumi, step, true, PURescale, stackSig);
@@ -160,7 +160,7 @@ int main(int argc, char** argv)
   
   
   
-  
+    
   
   
   //---------------------------------------------  
