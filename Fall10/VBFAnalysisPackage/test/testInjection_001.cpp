@@ -1,11 +1,10 @@
-
 #include "TH1.h"
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TFile.h"
 #include "TROOT.h"
-#include "TPaveText.h" ;
+#include "TPaveText.h"
 #include "TStyle.h"
 #include <fstream>
 #include <vector>
@@ -30,7 +29,6 @@
 #include "RooChi2Var.h"
 #endif 
 
-#include "SUperCrystalBall.h"
 #include "RooGaussWithSkirt.h"
 
 using namespace RooFit ;

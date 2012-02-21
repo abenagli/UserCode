@@ -19,7 +19,7 @@ testInjection_002.exe ./step13_5/shapes_fitNoHoles_attenuatedDoubleExponential_6
 #include "TF1.h"
 #include "TFile.h"
 #include "TROOT.h"
-#include "TPaveText.h" ;
+#include "TPaveText.h"
 #include "TStyle.h"
 #include <fstream>
 #include <vector>
