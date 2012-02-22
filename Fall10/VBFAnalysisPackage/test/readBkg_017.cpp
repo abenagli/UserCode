@@ -1,5 +1,5 @@
 /*
-bin/readBkg_017.exe /gwpool/users/ldimatt/scratch0/PHD_MiBi/Fall11_ForDataVsMC_SideBand/VBFAnalysisPackage 400
+bin/readBkg_017.exe /gwpool/users/ldimatt/scratch0/PHD_MiBi/MakeLimits/VBFAnalysisPackage 400
 */
 
 using namespace std;
@@ -142,7 +142,7 @@ int main (int argc, char** argv)
   gStyle->SetPalette(1);
   gROOT->ForceStyle(1);  //If uncommented removes the color from the THStack
 
-  bool histosRatio = false ; //PG calculate the correction factor as the simple ratio of MC histograms, 
+  bool histosRatio = true ; //PG calculate the correction factor as the simple ratio of MC histograms, 
                              //PG and the error comes is due to MC statistics
   bool makeToys = false ; //PG calculate the error with a set of toys generated within the error band of the fits
                           //PG to the numerator and denominator
@@ -159,7 +159,7 @@ int main (int argc, char** argv)
   bool subtractZZ   = false;
   
   //fit the sideband *before* multiplying for the correction factor OR the extrapolated bkg *after* the multiplication
-  bool fitsideband = true; // fit sideband dati prima di ratio
+  bool fitsideband = false; // fit sideband data before the ratio
   bool fitbkg      = false;  // fit extrapolated bkg in signal region
   
   //closure on data - closure on MC - final analysis
@@ -169,7 +169,7 @@ int main (int argc, char** argv)
 
   //PG type of fit
   bool attenuated = false ;
-  //PG change this further on : double startFit = 225; //GeV, bin from where to start the num & den fit for corr factor
+  //PG change this further on : double startFit = 220; //GeV, bin from where to start the num & den fit for corr factor
 
   TString inputFile =  argv[1] ;
   inputFile += "/testBkg_017_S" ;
@@ -561,7 +561,7 @@ int main (int argc, char** argv)
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
  
   double binSize = (m4_max - m4_min) / nBins ;
-  double startFit = 225; //GeV, bin from where to start the num & den fit for corr factor
+  double startFit = 220; //GeV, bin from where to start the num & den fit for corr factor
   double endFit = 800;   //GeV, bin from where to end the num & den fit for corr factor
   
   int fitBins = (endFit-startFit) / binSize ;
@@ -609,18 +609,22 @@ int main (int argc, char** argv)
   num_fit_error->Draw ("E3same") ;
   signalRegionMC->Draw ("sames") ;
   c1->Print ("01_numerator_MC_fit.png", "png") ;
+  c1->SaveAs ("01_numerator_MC_fit.C") ;
   c1->SetLogy () ;
   signalRegionMC->Draw () ;
   num_fit_error->Draw ("E3same") ;
   signalRegionMC->Draw ("sames") ;
   c1->Print ("02_numerator_MC_fit_log.png", "png") ;
+  c1->SaveAs ("02_numerator_MC_fit_log.C") ;
   c1->SetLogy (0) ;
 
   signalRegion->Draw () ;
   c1->Print ("03_signal.png", "png") ;
+  c1->SaveAs ("03_signal.C") ;
   c1->SetLogy () ;
   signalRegion->Draw () ;
   c1->Print ("04_signal_log.png", "png") ;
+  c1->SaveAs ("04_signal_log.C") ;
   c1->SetLogy (0) ;
 
   TF1 * denFitFunc ;
@@ -653,18 +657,22 @@ int main (int argc, char** argv)
   den_fit_error->Draw ("E3same") ;
   sidebaRegionMC->Draw ("sames") ;
   c1->Print ("05_denominator_MC_fit.png", "png") ;
+  c1->SaveAs ("05_denominator_MC_fit.C") ;
   c1->SetLogy () ;
   sidebaRegionMC->Draw () ;
   den_fit_error->Draw ("E3same") ;
   sidebaRegionMC->Draw ("sames") ;
   c1->Print ("06_denominator_MC_fit_log.png", "png") ;
+  c1->SaveAs ("06_denominator_MC_fit_log.C") ;
   c1->SetLogy (0) ;
 
   sidebaRegion->Draw () ;
   c1->Print ("07_sideband.png", "png") ;
+  c1->SaveAs ("07_sideband.C") ;
   c1->SetLogy () ;
   sidebaRegion->Draw () ;
   c1->Print ("08_sideband_log.png", "png") ;
+  c1->SaveAs ("08_sideband_log.C") ;
   c1->SetLogy (0) ;
 
   TH1F * h_correctionBand ;
@@ -783,6 +791,7 @@ int main (int argc, char** argv)
   ratio_total->Draw ("same") ;
   leg_correctionFactor->Draw () ;
   c1->Print ("09_correctionFactor.png", "png") ;
+  c1->SaveAs ("09_correctionFactor.C") ;
  
     
   //PG fit the data sideband before the extrapolation
@@ -841,9 +850,11 @@ int main (int argc, char** argv)
     sideband_bkg_fitBand->SetFillColor (kBlue) ;
     sideband_bkg_fitBand->Draw ("E3same") ;
     c1->Print ("10_sidebandFittedBackground.png", "png") ;
+    c1->Print ("10_sidebandFittedBackground.C") ;
     c1->SetLogy (0) ;
     c1->Update () ;
     c1->Print ("11_sidebandFittedBackground_lin.png", "png") ;
+    c1->Print ("11_sidebandFittedBackground_lin.C") ;
 
     int startFitBin = sideband_bkg->FindBin(startFit);
     int endFitBin   = sideband_bkg->FindBin(endFit);
@@ -861,6 +872,7 @@ int main (int argc, char** argv)
   
     sidebandFitPull.Fit ("gaus","QL") ;
     c1->Print ("12_sidebandFit_pull.png", "png") ;
+    c1->Print ("12_sidebandFit_pull.C") ;
   
   } //PG if(fitsideband)
 
@@ -869,7 +881,7 @@ int main (int argc, char** argv)
   if( fitsideband == true )  extrapolated_bkg = (TH1F *) sideband_bkg_fitBand->Clone ("extrapolated_bkg") ;
   if( fitsideband == false ) extrapolated_bkg = (TH1F *) sidebaRegion->Clone ("extrapolated_bkg") ;
   extrapolated_bkg->Multiply(h_correctionBand);
-  
+    
   extrapolated_bkg->SetStats (0) ;
   extrapolated_bkg->SetTitle ("") ;
   extrapolated_bkg->SetLineColor (kBlack) ;
@@ -921,10 +933,11 @@ int main (int argc, char** argv)
     extrapolated_bkg_fitBand->SetFillColor (kBlue) ;
     extrapolated_bkg_fitBand->Draw ("E3same") ;
     c1->Print ("13_fittedBackground.png", "png") ;
+    c1->Print ("13_fittedBackground.C") ;
     c1->SetLogy (0) ;
     c1->Update () ;
     c1->Print ("14_fittedBackground_lin.png", "png") ;
-
+    c1->Print ("14_fittedBackground_lin.C") ;
     
     //LS set the error to this estimate of the background
     for (int iBin = 1 ; iBin <= extrapolated_bkg->GetNbinsX () ; ++iBin)
@@ -932,10 +945,11 @@ int main (int argc, char** argv)
         double center = extrapolated_bkg->GetBinCenter (iBin) ;
         int iBinBand = extrapolated_bkg_fitBand->GetXaxis()->FindBin (center) ;
         if(iBinBand == 0) continue;
-
+        
+        
         double errBkg = 0. ;
         if(extrapolated_bkg->GetBinContent (iBin)==0||extrapolated_bkg_fitBand->GetBinContent (iBinBand)==0){
-            cout << "warning!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! denominator = 0" << endl;
+            cout << "warning!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! denominator = 0 " << " for mH -> " << center << endl;
             continue;
         }
         
@@ -945,6 +959,7 @@ int main (int argc, char** argv)
 
 //         double errTot = sqrt (errFit * errFit + errBkg * errBkg) * extrapolated_bkg_fitBand->GetBinContent (iBinBand) ;
         double errTot = sqrt (errFit * errFit) * extrapolated_bkg_fitBand->GetBinContent (iBinBand) ;
+        
 
         extrapolated_bkg->SetBinContent (iBin,extrapolated_bkg_fitBand->GetBinContent (iBinBand)); 
         extrapolated_bkg->SetBinError (iBin, errTot) ;
@@ -954,9 +969,11 @@ int main (int argc, char** argv)
 
   extrapolated_bkg->Draw ("E3L") ;
   c1->Print ("15_extrapolatedBkg.png", "png") ;
+  c1->Print ("15_extrapolatedBkg.C") ;
   c1->SetLogy () ; 
   c1->Update () ; 
   c1->Print ("16_extrapolatedBkg_log.png", "png") ;
+  c1->Print ("16_extrapolatedBkg_log.C") ;
   c1->SetLogy (0) ; 
 
   
@@ -995,19 +1012,23 @@ int main (int argc, char** argv)
   signalRegion->Draw ("same") ;
   leg_extrapAndData->Draw () ;
   c1->Print ("17_extrapAndData.png", "png") ;
+  c1->Print ("17_extrapAndData.C") ;
   c1->SetLogy (0) ;
   c1->Update () ;
   c1->Print ("18_extrapAndData_lin.png", "png") ;
+  c1->Print ("18_extrapAndData_lin.C") ;
   
   pair<TGraphErrors*, TGraphErrors*> extrapAndData_pulls =
     getPullTrend (signalRegion, extrapolated_bkg) ;
   extrapAndData_pulls.second->Draw ("AE3") ;
   extrapAndData_pulls.first->Draw ("samePE") ;
   c1->Print ("19_extrapAndData_pull.png", "png") ;
+  c1->Print ("19_extrapAndData_pull.C") ;
 
   TH1F * extrapAndData_pull = getPullPlot (signalRegion, extrapolated_bkg, startFit, endFit) ;
   extrapAndData_pull->Draw () ;
   c1->Print ("20_extrapAndData_pull2.png", "png") ;
+  c1->Print ("20_extrapAndData_pull2.C") ;
   
   //PG prepare the windows for the fast cut-n-count thing
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -1181,12 +1202,14 @@ int main (int argc, char** argv)
   g_total.Draw ("EPsame") ;
   leg_results->Draw () ;
   c1->Print ("21_results.png", "png") ;
+  c1->Print ("21_results.C") ;
   c1->SetLogy (0) ;
 
   c1->DrawFrame (200, 0, 700, 200) ;
   g_error.SetLineWidth (2) ;
   g_error.Draw ("L") ;
   c1->Print ("22_systematic_and_statistics.png", "png") ;
+  c1->Print ("22_systematic_and_statistics.C") ;
   
   
   g_pull_total.SetMarkerStyle(21);
@@ -1194,16 +1217,19 @@ int main (int argc, char** argv)
   g_pull_total.GetYaxis()->SetTitle("total - expbkg");
   g_pull_total.Draw("AP");
   c1->Print ("23_resultsPull.png", "png") ;
+  c1->Print ("23_resultsPull.C") ;
   
   g_pull_forEveryBin.SetMarkerStyle(1);
   g_pull_forEveryBin.GetYaxis()->SetTitle("(total - exp bkg)/err");
   g_pull_forEveryBin.GetYaxis()->SetRangeUser(-3,3);
   g_pull_forEveryBin.Draw("AP");
   c1->Print ("24_resultsPull_forEveryBin.png", "png") ;
+  c1->Print ("24_resultsPull_forEveryBin.C") ;
   
   gPullHisto_forEveryBin->Draw();
   gPullHisto_forEveryBin->Fit("gaus","QL");
   c1->Print ("25_resultsPull_forEveryBin_histo.png", "png") ;
+  c1->Print ("25_resultsPull_forEveryBin_histo.C") ;
 
 
   TFile output ("output_017.root", "recreate") ;
