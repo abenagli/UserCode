@@ -27,7 +27,7 @@ void makeJetHltSyst(){
   
   const int n_periods = 2;
     
-  TString inFileSigName_1 = "/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_WPt20/";
+  TString inFileSigName_1 = "/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT15_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_NoHLT/";
   TString inFileSigName_2 = "_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/VBFAnalysis_PFlow.root";
   std::vector<TString> vs_HiggsType;
   vs_HiggsType.push_back("GluGluToHToWWToLNuQQ_M-");
@@ -40,7 +40,7 @@ void makeJetHltSyst(){
   TH1F* h_mass_noHLT[9];
   int massIndex = 0;
 
-  for ( int iMass = 200; iMass <= 600; iMass += 50 ) {
+  for ( int iMass = 400; iMass <= 400; iMass += 50 ) {
     TString s_iMass = "";
     s_iMass += iMass;
     float crossSection; 
@@ -91,5 +91,72 @@ void makeJetHltSyst(){
     std::cout << "errore syst relativo per il segnale a " << s_iMass << " GeV/c^2 = " << error/integral * 100. << std::endl;
     massIndex++;
   }
+  
+  gStyle->SetOptStat(0);
 
+  // Draw the nice histo
+  TCanvas* c1 = new TCanvas("c1","c1",600,600);
+  c1 -> cd();
+  TPad* p1 = new TPad("p1","p1",0., 0.25, 1., 1.);
+  TPad* p2 = new TPad("p2","p2",0., 0., 1., 0.25);
+  p1 -> Draw();
+  p2 -> Draw();
+
+  p1 -> cd();
+  p1 -> SetGridx();
+  p1 -> SetGridy();
+
+  TLegend* leg = new TLegend(0.8,0.8,0.95,0.95);
+  leg -> SetFillColor(kWhite);
+  h_mass_HLT[0] -> SetLineColor(kRed);
+  h_mass_HLT[0] -> SetLineStyle(2);
+  h_mass_HLT[0] -> GetXaxis() -> SetRangeUser(200,600);  
+  h_mass_HLT[0] -> GetXaxis() -> SetTitle("m_{l#nujj} (GeV/c^{2})");  
+  h_mass_HLT[0] -> GetYaxis() -> SetTitle("a.u.");  
+  h_mass_HLT[0] -> DrawNormalized();
+  leg -> AddEntry(h_mass_HLT[0],"HLT","l");
+  h_mass_noHLT[0] -> SetLineColor(kBlack);
+  h_mass_noHLT[0] -> DrawNormalized("same");
+  leg -> AddEntry(h_mass_noHLT[0],"no HLT","l");
+  leg -> Draw();
+  
+  p2 -> cd();
+  p2 -> SetGridx();
+  p2 -> SetGridy();
+
+  TH1F* h_ratio      = ratioHisto(h_mass_noHLT[0],h_mass_noHLT[0],0.95,1.05);
+  TH1F* h_ratio_Up   = ratioHisto(h_mass_HLT[0],h_mass_noHLT[0],0.95,1.05);
+  h_ratio      -> SetLineColor(kBlack);
+  h_ratio_Up   -> SetLineColor(kRed);
+  h_ratio_Up   -> SetLineStyle(2);
+  h_ratio      -> SetLineWidth(2);
+  h_ratio_Up   -> SetLineWidth(2);
+  h_ratio -> GetXaxis() -> SetRangeUser(200,600);  
+  h_ratio_Up -> GetXaxis() -> SetRangeUser(200,600);  
+  h_ratio -> Draw();
+  h_ratio_Up -> Draw("same");
+
+  c1 -> Print("HLTonOff_mH.pdf","pdf");
+
+}
+
+
+TH1F* ratioHisto(TH1F* h_num, TH1F* h_den, const float& yMin, const float& yMax)
+{
+  TH1F* h_ratio = (TH1F*)( h_num->Clone() );
+  h_ratio -> Divide(h_den);
+  
+  h_ratio -> GetYaxis() -> SetRangeUser(yMin,yMax);
+  h_ratio -> GetXaxis() -> SetLabelSize(0.09);
+  h_ratio -> GetYaxis() -> SetLabelSize(0.09);
+  h_ratio -> GetXaxis() -> SetLabelFont(42);
+  h_ratio -> GetYaxis() -> SetLabelFont(42);
+  h_ratio -> GetYaxis() -> SetTitleSize(0.15);
+  h_ratio -> GetYaxis() -> SetTitleFont(42);
+  h_ratio -> GetYaxis() -> SetTitleOffset(0.42);
+  h_ratio -> GetYaxis() -> SetNdivisions(206);
+  h_ratio -> GetXaxis() -> SetTitle("");
+  h_ratio -> GetYaxis() -> SetTitle("ratio");
+  
+  return h_ratio;
 }
