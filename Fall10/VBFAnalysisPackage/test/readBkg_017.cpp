@@ -1,5 +1,5 @@
-/*
-bin/readBkg_017.exe /gwpool/users/ldimatt/scratch0/PHD_MiBi/MakeLimits/VBFAnalysisPackage 400
+/* to run it (the root file should have a default name)
+ readBkg_017.exe `pwd` 350
 */
 
 using namespace std;
