@@ -1,5 +1,5 @@
 /* to run it (the root file should have a default name)
- readBkg_017.exe `pwd` 350
+ readBkg_017.exe rootFile.root 350
 */
 
 using namespace std;
@@ -172,11 +172,11 @@ int main (int argc, char** argv)
   //PG change this further on : double startFit = 220; //GeV, bin from where to start the num & den fit for corr factor
 
   TString inputFile =  argv[1] ;
-  inputFile += "/testBkg_017_S" ;
-  inputFile += argv[2] ;
+  //  inputFile += "/testBkg_017_S" ;
+  //  inputFile += argv[2] ;
 
 //  inputFile += "_LI_2011AB.root" ; //PG likelihood discriminant
-  inputFile += "_2011AB.root" ;
+//  inputFile += "_2011AB.root" ;
   cout << inputFile << endl ;
   TFile input (inputFile) ;
   
