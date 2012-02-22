@@ -1,5 +1,5 @@
 /*
-testBkg_017.exe cfg/2011-10-11-listaFile.txt  
+testBkg_017.exe cfg/testBkg_017-fileList.txt  
 
 Optimized cuts on WJJ_m for signal/sideband regions
 
@@ -81,7 +81,7 @@ int main (int argc, char** argv)
       return 1 ;
     }
 
-  float LUMI = 4236.79 ; //PG to have output in 1/fb
+  float LUMI = 4680 ; //PG to have output in 1/fb
   
   string mass = argv[2] ;
 
@@ -89,7 +89,7 @@ int main (int argc, char** argv)
   cout << "samples " << inputFileList << endl ;
 
   map<string, TChain *> collections ;
-  string treeName = "ntu_14" ; //PG all the preselections + deta_jj
+  string treeName = "ntu_13" ; //PG all the preselections + deta_jj
   ReadFile (collections, inputFileList, treeName) ;
   
   TH1::SetDefaultSumw2 (kTRUE) ;
@@ -118,7 +118,7 @@ int main (int argc, char** argv)
 //      |   +--------------------+
 //      +-------------------------------  m4
 
-  int nBins = 200 ;
+  int nBins = 100 ;
   double m4_min = 0. ;
   double m4_max = 1000. ;
 
@@ -127,8 +127,10 @@ int main (int argc, char** argv)
 //  generalCut = generalCut && "(helicityLikelihood > 0.5)" ; //PG helicity likelihood di HZZ
 //  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
 //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
-//   generalCut = generalCut && "lep_flavour == 13" ; //PG only muons
-//   generalCut = generalCut && "lep_flavour == 11" ; //PG only electrons
+//  generalCut = generalCut && "lep_flavour == 13" && "nJets_cnt_pt30 == 2" ; //PG only muons 2 jet
+//  generalCut = generalCut && "lep_flavour == 13" && "nJets_cnt_pt30 != 2" ; //PG only muons 3 jet
+//  generalCut = generalCut && "lep_flavour == 11" && "nJets_cnt_pt30 == 2" ; //PG only ele 2 jet
+//  generalCut = generalCut && "lep_flavour == 11" && "nJets_cnt_pt30 != 2" ; //PG only ele 3 jet
   
   std::string outputRootFullFileName = "testBkg_017_S" + mass + "_2011AB.root" ;
 //  std::string outputRootFullFileName = "testBkg_017_S" + mass + "_LI_2011AB.root" ;  //PG helicity likelihood di HZZ
@@ -300,14 +302,14 @@ int main (int argc, char** argv)
   cout << "   filling DONE" << endl ;
 
   //PG get the Wjets histograms from collections
-  TH1F * m4_upper_c_Wjet = m4_upper_c.findHisto ("m4_upper_c_Wjet") ;
-  TH1F * m4_upper_a_Wjet = m4_upper_a.findHisto ("m4_upper_a_Wjet") ;
-  TH1F * m4_signal_Wjet = m4_signal.findHisto ("m4_signal_Wjet") ;
+  TH1F * m4_upper_c_WJets = m4_upper_c.findHisto ("m4_upper_c_WJets") ;
+  TH1F * m4_upper_a_WJets = m4_upper_a.findHisto ("m4_upper_a_WJets") ;
+  TH1F * m4_signal_WJets = m4_signal.findHisto ("m4_signal_WJets") ;
 
   //FC fix the empty bins in the Wjets sample
-  setErrorForEmptyBins_v2 (m4_upper_c_Wjet);
-  setErrorForEmptyBins_v2 (m4_upper_a_Wjet);
-  setErrorForEmptyBins_v2 (m4_signal_Wjet);
+  setErrorForEmptyBins_v2 (m4_upper_c_WJets);
+  setErrorForEmptyBins_v2 (m4_upper_a_WJets);
+  setErrorForEmptyBins_v2 (m4_signal_WJets);
   
   
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
