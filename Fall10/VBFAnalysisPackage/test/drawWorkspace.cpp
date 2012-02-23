@@ -51,6 +51,9 @@ int main(int argc, char** argv)
   std::string analysisMethod = gConfigParser -> readStringOption("Input::analysisMethod");
   std::string fitMethod      = gConfigParser -> readStringOption("Input::fitMethod");
   
+  //[Output]
+  std::string outputDir = gConfigParser -> readStringOption("Output::outputDir");
+  
   //[Options]
   float mass = gConfigParser -> readIntOption("Options::mH");
     
@@ -89,9 +92,9 @@ int main(int argc, char** argv)
   
   std::stringstream outFileName;
   if( analysisMethod != "sidebands" )
-    outFileName << inputDir << "/drawWorkspace_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root";
+    outFileName << outputDir << "/drawWorkspace_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root";
   else
-    outFileName << inputDir << "/drawWorkspace_" << analysisMethod << "_" << mass << "_" << flavour << ".root";
+    outFileName << outputDir << "/drawWorkspace_" << analysisMethod << "_" << mass << "_" << flavour << ".root";
   
   
   
