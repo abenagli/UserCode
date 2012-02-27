@@ -124,6 +124,8 @@ int main (int argc, char** argv)
 
   //PG the cuts
   TCut generalCut = "" ;
+//   generalCut = generalCut && "lep_flavour == 13"; //PG only muons
+  generalCut = generalCut && "lep_flavour == 11"; //PG only electrons
 //  generalCut = generalCut && "(helicityLikelihood > 0.5)" ; //PG helicity likelihood di HZZ
 //  generalCut = generalCut && "WJJ_pt > 40" ; //PG pt cut on hadronic W
 //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
@@ -132,9 +134,10 @@ int main (int argc, char** argv)
 //  generalCut = generalCut && "lep_flavour == 11" && "nJets_cnt_pt30 == 2" ; //PG only ele 2 jet
 //  generalCut = generalCut && "lep_flavour == 11" && "nJets_cnt_pt30 != 2" ; //PG only ele 3 jet
   
-  std::string outputRootFullFileName = "testBkg_017_S" + mass + "_2011AB.root" ;
+//   std::string outputRootFullFileName = "testBkg_017_S" + mass + "_2011AB.root" ;
 //  std::string outputRootFullFileName = "testBkg_017_S" + mass + "_LI_2011AB.root" ;  //PG helicity likelihood di HZZ
-//   std::string outputRootFullFileName = "testBkg_004_mu_S" + mass + "_2011AB.root" ;
+//   std::string outputRootFullFileName = "testBkg_017_mu_S" + mass + "_2011AB.root" ;
+  std::string outputRootFullFileName = "testBkg_017_el_S" + mass + "_2011AB.root" ;
 //   std::string outputRootFullFileName = "testBkg_004_el_S" + mass + "_2011AB.root" ;
   
 
@@ -311,6 +314,88 @@ int main (int argc, char** argv)
   setErrorForEmptyBins_v2 (m4_upper_a_WJets);
   setErrorForEmptyBins_v2 (m4_signal_WJets);
   
+  //FC get the signal and sideband histograms from collections
+  THStack m4_signalStack   = m4_signal.makeStack () ;
+  THStack m4_sidebandStack = m4_sideband.makeStack () ;
+  
+  TH1F * m4_signal_Bkg   = (TH1F*) m4_signalStack.GetStack() -> Last() ;
+  TH1F * m4_sideband_Bkg = (TH1F*) m4_sidebandStack.GetStack() -> Last() ;
+
+  vector<double> xbins ;
+  int enough = true ;
+  int minEvents = 20 ;
+  int eventsInBin_signal = 0 ;
+  int eventsInBin_sideband = 0 ;
+  
+  //PG loop on the bins of the histogram
+  for (int iBin = 1 ; iBin < m4_signal_Bkg->GetNbinsX () ; ++iBin)
+    {
+      if (enough) xbins.push_back (m4_signal_Bkg->GetBinLowEdge (iBin)) ;
+      
+      eventsInBin_signal += m4_signal_Bkg->GetBinContent (iBin) ;
+      eventsInBin_sideband += m4_sideband_Bkg->GetBinContent (iBin) ;
+      if (eventsInBin_signal < minEvents ||
+          eventsInBin_sideband < minEvents )
+        {
+          enough = false ;
+        }
+      else
+        {
+          enough = true ;
+          eventsInBin_signal = 0 ;
+          eventsInBin_sideband = 0 ;
+        }        
+    } //PG loop on the bins of the histogram
+
+  xbins.push_back (m4_max) ;
+  
+  cout << "Float_t xAxis [" << xbins.size () << "] = {" ;
+  for (int i = 0 ; i < xbins.size () - 1; ++i) cout << xbins.at (i) << ", " ; 
+  cout << m4_max << "} ;\n" ; 
+  
+    
+  TH1F * m4_signal_reBinned   = new TH1F ("m4_signal_reBinned", "m4_signal_reBinned", xbins.size() - 1, m4_min, m4_max) ;
+  TH1F * m4_sideband_reBinned = new TH1F ("m4_sideband_reBinned", "m4_sideband_reBinned", xbins.size() - 1, m4_min, m4_max) ;
+  m4_signal_reBinned   -> GetXaxis() -> Set(xbins.size() - 1, &xbins[0]) ;
+  m4_sideband_reBinned -> GetXaxis() -> Set(xbins.size() - 1, &xbins[0]) ;
+  
+  double binContent_signal   = 0. ;
+  double binContent_sideband = 0. ;
+  int iVector = 1 ;
+  
+  //FC fill the rebinned histos
+  for (int iBin = 1 ; iBin <= m4_signal_Bkg->GetNbinsX () ; ++iBin)
+   {
+     double center = m4_signal_Bkg->GetBinCenter (iBin) ;
+     int binInRebinned = m4_signal_reBinned->GetXaxis ()->FindBin (center) ;
+     
+     double signal   = m4_signal_Bkg->GetBinContent (iBin) ;
+     double sideband = m4_sideband_Bkg->GetBinContent (iBin) ;  
+     
+     if (center < xbins.at(iVector)) {
+       binContent_signal   += signal ;
+       binContent_sideband += sideband ;  
+     }
+     
+     else {
+       m4_signal_reBinned   -> SetBinContent(binInRebinned - 1, binContent_signal) ;
+       m4_sideband_reBinned -> SetBinContent(binInRebinned - 1, binContent_sideband) ;
+       m4_signal_reBinned   -> SetBinError(binInRebinned - 1, sqrt(binContent_signal)) ;
+       m4_sideband_reBinned -> SetBinError(binInRebinned - 1, sqrt(binContent_sideband)) ;
+       
+       binContent_signal   = signal ;
+       binContent_sideband = sideband ;    
+       
+       iVector++;
+     }
+   }  
+     
+  //fill the last bin of the rebinned histos  
+  m4_signal_reBinned   -> SetBinContent(xbins.size() - 1, binContent_signal) ;
+  m4_sideband_reBinned -> SetBinContent(xbins.size() - 1, binContent_sideband) ;  
+  m4_signal_reBinned   -> SetBinError(xbins.size() - 1, sqrt(binContent_signal)) ;
+  m4_sideband_reBinned -> SetBinError(xbins.size() - 1, sqrt(binContent_sideband)) ;     
+  
   
   TFile* outputRootFile = new TFile (outputRootFullFileName.c_str (), "RECREATE") ;
   outputRootFile->cd () ;
@@ -325,6 +410,9 @@ int main (int argc, char** argv)
   m4_lower_a.save (outputRootFile) ;
   m4_sideband.save (outputRootFile) ;
 
+  m4_signal_reBinned   -> Write() ;
+  m4_sideband_reBinned -> Write() ;
+   
   m4_upper_DATA->Write () ;   
   m4_upper_c_DATA->Write () ;   
   m4_upper_a_DATA->Write () ;   

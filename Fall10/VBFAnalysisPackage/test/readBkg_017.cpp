@@ -172,11 +172,12 @@ int main (int argc, char** argv)
   //PG change this further on : double startFit = 220; //GeV, bin from where to start the num & den fit for corr factor
 
   TString inputFile =  argv[1] ;
-  //  inputFile += "/testBkg_017_S" ;
-  //  inputFile += argv[2] ;
+   inputFile += "/testBkg_017_el_S" ;
+//    inputFile += "/testBkg_017_S" ;
+   inputFile += argv[2] ;
 
 //  inputFile += "_LI_2011AB.root" ; //PG likelihood discriminant
-//  inputFile += "_2011AB.root" ;
+  inputFile += "_2011AB.root" ;
   cout << inputFile << endl ;
   TFile input (inputFile) ;
   
@@ -373,6 +374,10 @@ int main (int argc, char** argv)
   if(subtractZZ   == false) stack_m4_sideband->Add(m4_sideband_ZZ);
   if(subtracttop  == false) stack_m4_sideband->Add(m4_sideband_top);
   
+  //rebinned bkg histograms for signal and sideband
+  TH1F * m4_signal_reBinned    = (TH1F *) input.Get ("m4_signal_reBinned") ;
+  TH1F * m4_sideband_reBinned  = (TH1F *) input.Get ("m4_sideband_reBinned") ;
+  
   //FC get the signal samples
   THStack * stack_m4_EvenHigher_SIG = (THStack *) input.Get ("stack_m4_EvenHigher_SIG") ;
   TH1F * m4_EvenHigher_total_SIG = (TH1F*) stack_m4_EvenHigher_SIG->GetStack ()->Last () ;    
@@ -444,6 +449,8 @@ int main (int argc, char** argv)
   TH1F* sidebaRegion;
   TH1F* signalRegionMC;
   TH1F* sidebaRegionMC;
+  TH1F* signalRegionMC_reBinned;
+  TH1F* sidebaRegionMC_reBinned;  
 
  if(martijn)
  { 
@@ -520,6 +527,10 @@ int main (int argc, char** argv)
    
    signalRegionMC = (TH1F *) m4_signal_total->Clone ("signalRegionMC") ;
   
+   sidebaRegionMC_reBinned = (TH1F *) m4_sideband_reBinned->Clone ("sidebaRegionMC_reBinned") ; 
+   signalRegionMC_reBinned = (TH1F *) m4_signal_reBinned->Clone ("signalRegionMC_reBinned") ;
+   
+   
    //Subtract the shape from data in the sideband region
    if(subtractWW   == true) m4_sideband_DATA->Add (m4_sideband_WW, -1) ;
    if(subtractDY   == true) m4_sideband_DATA->Add (m4_sideband_DY, -1) ;
@@ -572,10 +583,14 @@ int main (int argc, char** argv)
   //PG correction factor from the ratio of histograms 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
+  
   TH1F * ratio_total = (TH1F *) signalRegionMC->Clone ("ratio") ;
   ratio_total->Divide (sidebaRegionMC) ;
   ratio_total->SetMarkerColor (kOrange) ;
 
+  TH1F * ratio_total_reBinned = (TH1F *) signalRegionMC_reBinned->Clone ("ratio_reBinned") ;
+  ratio_total_reBinned->Divide (sidebaRegionMC_reBinned) ;
+  ratio_total_reBinned->SetMarkerColor (kOrange) ;
   
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -676,13 +691,15 @@ int main (int argc, char** argv)
   c1->SetLogy (0) ;
 
   TH1F * h_correctionBand ;
-
+  TH1F * h_correctionBand_reBinned ;
+  
   //PG toy experiments to determine the size of the error band on the extrapolation factor
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   if (histosRatio)
     {
-      h_correctionBand = (TH1F *) ratio_total->Clone ("h_correctionBand") ; 
+      h_correctionBand = (TH1F *) ratio_total->Clone ("h_correctionBand") ;
+      h_correctionBand_reBinned = (TH1F *) ratio_total_reBinned->Clone ("h_correctionBand_reBinned") ;
       if (makeToys)  
         {  
           TRandom3 r ;
@@ -792,7 +809,24 @@ int main (int argc, char** argv)
   leg_correctionFactor->Draw () ;
   c1->Print ("09_correctionFactor.png", "png") ;
   c1->SaveAs ("09_correctionFactor.C") ;
- 
+
+  
+  //FC return to the original binning
+  h_correctionBand->Reset() ;
+  
+  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
+   {
+     double center = h_correctionBand->GetBinCenter (iBin) ;
+     int binInRebinned = h_correctionBand_reBinned->GetXaxis ()->FindBin (center) ;
+     
+     double content = h_correctionBand_reBinned->GetBinContent (binInRebinned) ;
+     double error = h_correctionBand_reBinned->GetBinError (binInRebinned) ;
+     
+     h_correctionBand->SetBinContent(iBin, content) ;
+     h_correctionBand->SetBinError(iBin, error) ;
+     
+   }  
+   
     
   //PG fit the data sideband before the extrapolation
   TH1F * sideband_bkg;
@@ -1246,6 +1280,7 @@ int main (int argc, char** argv)
 
   ratio_total->Write();
   h_correctionBand->Write();
+  h_correctionBand_reBinned->Write();
   
   if (fitsideband) sideband_bkg->Write();
   if (fitsideband) sideband_bkg_fitBand->Write();
