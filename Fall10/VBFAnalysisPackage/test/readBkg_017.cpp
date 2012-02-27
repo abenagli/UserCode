@@ -160,7 +160,10 @@ int main (int argc, char** argv)
   
   //fit the sideband *before* multiplying for the correction factor OR the extrapolated bkg *after* the multiplication
   bool fitsideband = false; // fit sideband data before the ratio
-  bool fitbkg      = false;  // fit extrapolated bkg in signal region
+  bool fitbkg      = true;  // fit extrapolated bkg in signal region
+  
+  //error evaluation : useful only if fitbkg is set to true
+  bool conserror = false; // evaluate the bkg error band as the one contained bewteen the bkg+error fit and the bkg-error fit 
   
   //closure on data - closure on MC - final analysis
   bool martijn = false;
@@ -168,16 +171,15 @@ int main (int argc, char** argv)
   bool final   = true;
 
   //PG type of fit
-  bool attenuated = false ;
+  bool attenuated = true ;
   //PG change this further on : double startFit = 220; //GeV, bin from where to start the num & den fit for corr factor
 
   TString inputFile =  argv[1] ;
-   inputFile += "/testBkg_017_el_S" ;
-//    inputFile += "/testBkg_017_S" ;
-   inputFile += argv[2] ;
+  //  inputFile += "/testBkg_017_S" ;
+  //  inputFile += argv[2] ;
 
 //  inputFile += "_LI_2011AB.root" ; //PG likelihood discriminant
-  inputFile += "_2011AB.root" ;
+//  inputFile += "_2011AB.root" ;
   cout << inputFile << endl ;
   TFile input (inputFile) ;
   
@@ -374,10 +376,6 @@ int main (int argc, char** argv)
   if(subtractZZ   == false) stack_m4_sideband->Add(m4_sideband_ZZ);
   if(subtracttop  == false) stack_m4_sideband->Add(m4_sideband_top);
   
-  //rebinned bkg histograms for signal and sideband
-  TH1F * m4_signal_reBinned    = (TH1F *) input.Get ("m4_signal_reBinned") ;
-  TH1F * m4_sideband_reBinned  = (TH1F *) input.Get ("m4_sideband_reBinned") ;
-  
   //FC get the signal samples
   THStack * stack_m4_EvenHigher_SIG = (THStack *) input.Get ("stack_m4_EvenHigher_SIG") ;
   TH1F * m4_EvenHigher_total_SIG = (TH1F*) stack_m4_EvenHigher_SIG->GetStack ()->Last () ;    
@@ -449,8 +447,6 @@ int main (int argc, char** argv)
   TH1F* sidebaRegion;
   TH1F* signalRegionMC;
   TH1F* sidebaRegionMC;
-  TH1F* signalRegionMC_reBinned;
-  TH1F* sidebaRegionMC_reBinned;  
 
  if(martijn)
  { 
@@ -527,10 +523,6 @@ int main (int argc, char** argv)
    
    signalRegionMC = (TH1F *) m4_signal_total->Clone ("signalRegionMC") ;
   
-   sidebaRegionMC_reBinned = (TH1F *) m4_sideband_reBinned->Clone ("sidebaRegionMC_reBinned") ; 
-   signalRegionMC_reBinned = (TH1F *) m4_signal_reBinned->Clone ("signalRegionMC_reBinned") ;
-   
-   
    //Subtract the shape from data in the sideband region
    if(subtractWW   == true) m4_sideband_DATA->Add (m4_sideband_WW, -1) ;
    if(subtractDY   == true) m4_sideband_DATA->Add (m4_sideband_DY, -1) ;
@@ -572,7 +564,8 @@ int main (int argc, char** argv)
   double m4_max = m4_signal_DATA->GetXaxis ()->GetXmax () ;
  
   double binSize = (m4_max - m4_min) / nBins ;
-  double startFit = 220; //GeV, bin from where to start the num & den fit for corr factor
+  //double startFit = 200; //GeV, bin from where to start the num & den fit for corr factor mu
+  double startFit = 160; //GeV, bin from where to start the num & den fit for corr factor ele
   double endFit = 800;   //GeV, bin from where to end the num & den fit for corr factor
   
   int fitBins = (endFit-startFit) / binSize ;
@@ -581,16 +574,12 @@ int main (int argc, char** argv)
   
 
   //PG correction factor from the ratio of histograms 
-  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+  //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- --------
 
-  
   TH1F * ratio_total = (TH1F *) signalRegionMC->Clone ("ratio") ;
   ratio_total->Divide (sidebaRegionMC) ;
   ratio_total->SetMarkerColor (kOrange) ;
 
-  TH1F * ratio_total_reBinned = (TH1F *) signalRegionMC_reBinned->Clone ("ratio_reBinned") ;
-  ratio_total_reBinned->Divide (sidebaRegionMC_reBinned) ;
-  ratio_total_reBinned->SetMarkerColor (kOrange) ;
   
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -691,15 +680,13 @@ int main (int argc, char** argv)
   c1->SetLogy (0) ;
 
   TH1F * h_correctionBand ;
-  TH1F * h_correctionBand_reBinned ;
-  
+
   //PG toy experiments to determine the size of the error band on the extrapolation factor
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   if (histosRatio)
     {
-      h_correctionBand = (TH1F *) ratio_total->Clone ("h_correctionBand") ;
-      h_correctionBand_reBinned = (TH1F *) ratio_total_reBinned->Clone ("h_correctionBand_reBinned") ;
+      h_correctionBand = (TH1F *) ratio_total->Clone ("h_correctionBand") ; 
       if (makeToys)  
         {  
           TRandom3 r ;
@@ -809,24 +796,7 @@ int main (int argc, char** argv)
   leg_correctionFactor->Draw () ;
   c1->Print ("09_correctionFactor.png", "png") ;
   c1->SaveAs ("09_correctionFactor.C") ;
-
-  
-  //FC return to the original binning
-  h_correctionBand->Reset() ;
-  
-  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
-   {
-     double center = h_correctionBand->GetBinCenter (iBin) ;
-     int binInRebinned = h_correctionBand_reBinned->GetXaxis ()->FindBin (center) ;
-     
-     double content = h_correctionBand_reBinned->GetBinContent (binInRebinned) ;
-     double error = h_correctionBand_reBinned->GetBinError (binInRebinned) ;
-     
-     h_correctionBand->SetBinContent(iBin, content) ;
-     h_correctionBand->SetBinError(iBin, error) ;
-     
-   }  
-   
+ 
     
   //PG fit the data sideband before the extrapolation
   TH1F * sideband_bkg;
@@ -931,7 +901,8 @@ int main (int argc, char** argv)
 
 //PG ---- ---- ---- riletto fino a qui ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 
   
-  
+  TF1 * bkgFitFuncDown ;
+  TF1 * bkgFitFuncUp ;
 
   if(fitbkg)
   {
@@ -973,6 +944,59 @@ int main (int argc, char** argv)
     c1->Print ("14_fittedBackground_lin.png", "png") ;
     c1->Print ("14_fittedBackground_lin.C") ;
     
+    //Prepare for the conservative error setting of the background
+    TH1F* extrapolated_bkgUpTmp   = (TH1F*) extrapolated_bkg->Clone("extrapolated_bkgUp");
+    TH1F* extrapolated_bkgDownTmp = (TH1F*) extrapolated_bkg->Clone("extrapolated_bkgDown");
+    for (int iBin = 1 ; iBin <= extrapolated_bkg->GetNbinsX () ; ++iBin) 
+    {
+      extrapolated_bkgUpTmp -> SetBinContent(iBin, extrapolated_bkg -> GetBinContent(iBin) + extrapolated_bkg -> GetBinError(iBin));
+      extrapolated_bkgDownTmp -> SetBinContent(iBin, extrapolated_bkg -> GetBinContent(iBin) - extrapolated_bkg -> GetBinError(iBin));
+      extrapolated_bkgUpTmp -> SetBinError(iBin, extrapolated_bkg -> GetBinError(iBin));
+      extrapolated_bkgDownTmp -> SetBinError(iBin, extrapolated_bkg -> GetBinError(iBin));
+      std::cout << "center " << extrapolated_bkg -> GetBinContent(iBin) << " up " << extrapolated_bkgUpTmp -> GetBinContent(iBin) << " down " << extrapolated_bkgDownTmp -> GetBinContent(iBin) << std::endl;
+    }
+    //Fit down
+    if (!attenuated)
+      {
+        bkgFitFuncDown = new TF1 ("bkgFitFuncDown", doubleExponential, 0., 1000., 4);
+        setDoubleExpPars (bkgFitFuncDown);
+      } else
+      {   
+        bkgFitFuncDown = new TF1 ("bkgFitFuncDown", attenuatedDoubleExponential, 0., 1000., 6);
+        setAttenuatedDoubleExpPars (bkgFitFuncDown);    
+      }
+    TFitResultPtr fitResultPtr4 = extrapolated_bkgDownTmp->Fit (bkgFitFuncDown, "L", "", startFit, endFit) ;
+    fitStatus = (int)(fitResultPtr4) ;
+    loops = 0 ; 
+    while (fitStatus != 0 && loops < 30)
+      {
+        fitResultPtr4 = extrapolated_bkgDownTmp->Fit (bkgFitFuncDown, "L", "", startFit, endFit) ;
+        fitStatus = (int)(fitResultPtr4) ;
+        ++loops ;
+      }
+    cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
+    //Fit up
+    if (!attenuated)
+      {
+        bkgFitFuncUp = new TF1 ("bkgFitFuncUp", doubleExponential, 0., 1000., 4);
+        setDoubleExpPars (bkgFitFuncUp);
+      } else
+      {   
+        bkgFitFuncUp = new TF1 ("bkgFitFuncUp", attenuatedDoubleExponential, 0., 1000., 6);
+        setAttenuatedDoubleExpPars (bkgFitFuncUp);    
+      }
+    TFitResultPtr fitResultPtr5 = extrapolated_bkgUpTmp->Fit (bkgFitFuncUp, "L", "", startFit, endFit) ;
+    fitStatus = (int)(fitResultPtr5) ;
+    loops = 0 ; 
+    while (fitStatus != 0 && loops < 30)
+      {
+        fitResultPtr5 = extrapolated_bkgUpTmp->Fit (bkgFitFuncUp, "L", "", startFit, endFit) ;
+        fitStatus = (int)(fitResultPtr5) ;
+        ++loops ;
+      }
+    cout << "`--> " << fitStatus << " @ " << loops << "\n" ;
+
+    
     //LS set the error to this estimate of the background
     for (int iBin = 1 ; iBin <= extrapolated_bkg->GetNbinsX () ; ++iBin)
       {
@@ -994,9 +1018,19 @@ int main (int argc, char** argv)
 //         double errTot = sqrt (errFit * errFit + errBkg * errBkg) * extrapolated_bkg_fitBand->GetBinContent (iBinBand) ;
         double errTot = sqrt (errFit * errFit) * extrapolated_bkg_fitBand->GetBinContent (iBinBand) ;
         
+        if ( !conserror ) { 
+          extrapolated_bkg->SetBinContent (iBin,extrapolated_bkg_fitBand->GetBinContent (iBinBand)); 
+          extrapolated_bkg->SetBinError (iBin, errTot) ;
+         }
+        
+        else {
+          float mass = extrapolated_bkg -> GetBinCenter(iBin);
+          float error;
+          error = fabs(bkgFitFunc -> Eval(mass) - bkgFitFuncUp -> Eval(mass))*0.5 + fabs(bkgFitFunc -> Eval(mass) - bkgFitFuncDown -> Eval(mass))*0.5;
+          extrapolated_bkg->SetBinContent (iBin,bkgFitFunc -> Eval(mass)); 
+          extrapolated_bkg->SetBinError (iBin, error) ;
+        }
 
-        extrapolated_bkg->SetBinContent (iBin,extrapolated_bkg_fitBand->GetBinContent (iBinBand)); 
-        extrapolated_bkg->SetBinError (iBin, errTot) ;
       }
   
   }
@@ -1018,12 +1052,21 @@ int main (int argc, char** argv)
   
   for (int iBin=1; iBin <= extrapolated_bkg->GetNbinsX(); iBin++) {
     
-    double binContent = extrapolated_bkg->GetBinContent(iBin);
-    double binError   = extrapolated_bkg->GetBinError(iBin);
+    if ( !conserror ) {
+      double binContent = extrapolated_bkg->GetBinContent(iBin);
+      double binError   = extrapolated_bkg->GetBinError(iBin);
     
-    extrapolated_bkgUp  ->SetBinContent(iBin, binContent + binError);
-    extrapolated_bkgDown->SetBinContent(iBin, binContent - binError);
+      extrapolated_bkgUp  ->SetBinContent(iBin, binContent + binError);
+      extrapolated_bkgDown->SetBinContent(iBin, binContent - binError);
+    }
     
+    if ( conserror ) {
+      float mass = extrapolated_bkg->GetBinCenter(iBin);
+    
+      extrapolated_bkgDown  ->SetBinContent(iBin, bkgFitFuncDown -> Eval(mass)) ;
+      extrapolated_bkgUp  ->SetBinContent(iBin, bkgFitFuncUp -> Eval(mass)) ;
+    }
+
   }
   
   //PG first plot of the result
@@ -1280,7 +1323,6 @@ int main (int argc, char** argv)
 
   ratio_total->Write();
   h_correctionBand->Write();
-  h_correctionBand_reBinned->Write();
   
   if (fitsideband) sideband_bkg->Write();
   if (fitsideband) sideband_bkg_fitBand->Write();
