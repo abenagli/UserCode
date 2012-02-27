@@ -41,14 +41,20 @@ void MakeSelectionLatexTable(){
   vector<string> Higgs300Folders;
   Higgs300Folders.push_back("GluGluToHToWWToLNuQQ_M-300_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
   Higgs300Folders.push_back("VBF_HToWWToLNuQQ_M-300_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  Higgs300Folders.push_back("GluGluToHToWWToTauNuQQ_M-300_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  Higgs300Folders.push_back("VBF_HToWWToTauNuQQ_M-300_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
   
   vector<string> Higgs400Folders;
   Higgs400Folders.push_back("GluGluToHToWWToLNuQQ_M-400_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
   Higgs400Folders.push_back("VBF_HToWWToLNuQQ_M-400_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  Higgs400Folders.push_back("GluGluToHToWWToTauNuQQ_M-400_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  Higgs400Folders.push_back("VBF_HToWWToTauNuQQ_M-400_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
 
   vector<string> Higgs500Folders;
   Higgs500Folders.push_back("GluGluToHToWWToLNuQQ_M-500_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
   Higgs500Folders.push_back("VBF_HToWWToLNuQQ_M-500_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  Higgs500Folders.push_back("GluGluToHToWWToTauNuQQ_M-500_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  Higgs500Folders.push_back("VBF_HToWWToTauNuQQ_M-500_7TeV-powheg-pythia6_abenagli-SQWaT_PAT_42X_Fall11_v3/");
   
   vector<string> VVFolders;
   VVFolders.push_back("WW_TuneZ2_7TeV_pythia6_tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
