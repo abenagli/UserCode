@@ -376,6 +376,61 @@ int main (int argc, char** argv)
   if(subtractZZ   == false) stack_m4_sideband->Add(m4_sideband_ZZ);
   if(subtracttop  == false) stack_m4_sideband->Add(m4_sideband_top);
   
+  //rebinned signal
+  TH1F * m4_signal_reBinned_DY   = (TH1F *) input.Get ("m4_signal_reBinned_DY") ;
+  TH1F * m4_signal_reBinned_TT   = (TH1F *) input.Get ("m4_signal_reBinned_TT") ;
+  TH1F * m4_signal_reBinned_WW   = (TH1F *) input.Get ("m4_signal_reBinned_WW") ;
+  TH1F * m4_signal_reBinned_WZ   = (TH1F *) input.Get ("m4_signal_reBinned_WZ") ;
+  TH1F * m4_signal_reBinned_Wjet = (TH1F *) input.Get ("m4_signal_reBinned_WJets") ;
+  TH1F * m4_signal_reBinned_ZZ   = (TH1F *) input.Get ("m4_signal_reBinned_ZZ") ;
+  TH1F * m4_signal_reBinned_top  = (TH1F *) input.Get ("m4_signal_reBinned_top") ;
+  
+  TH1F * m4_signal_total_reBinned = (TH1F*) m4_signal_reBinned_DY->Clone ("m4_signal_total_reBinned");
+  if(subtractDY   == true)  m4_signal_total_reBinned->Reset();
+  if(subtractTT   == false) m4_signal_total_reBinned->Add(m4_signal_reBinned_TT);
+  if(subtractWW   == false) m4_signal_total_reBinned->Add(m4_signal_reBinned_WW);
+  if(subtractWZ   == false) m4_signal_total_reBinned->Add(m4_signal_reBinned_WZ);
+  if(subtractWjet == false) m4_signal_total_reBinned->Add(m4_signal_reBinned_Wjet);
+  if(subtractZZ   == false) m4_signal_total_reBinned->Add(m4_signal_reBinned_ZZ);
+  if(subtracttop  == false) m4_signal_total_reBinned->Add(m4_signal_reBinned_top);
+  m4_signal_total_reBinned->SetTitle ("");
+  THStack * stack_m4_signal_reBinned = new THStack("stack_m4_signal_reBinned","");
+  if(subtractDY   == false) stack_m4_signal_reBinned->Add(m4_signal_reBinned_DY);
+  if(subtractTT   == false) stack_m4_signal_reBinned->Add(m4_signal_reBinned_TT);
+  if(subtractWW   == false) stack_m4_signal_reBinned->Add(m4_signal_reBinned_WW);
+  if(subtractWZ   == false) stack_m4_signal_reBinned->Add(m4_signal_reBinned_WZ);
+  if(subtractWjet == false) stack_m4_signal_reBinned->Add(m4_signal_reBinned_Wjet);
+  if(subtractZZ   == false) stack_m4_signal_reBinned->Add(m4_signal_reBinned_ZZ);
+  if(subtracttop  == false) stack_m4_signal_reBinned->Add(m4_signal_reBinned_top);
+  
+  //rebinned sideband_total
+  TH1F * m4_sideband_reBinned_DY   = (TH1F *) input.Get ("m4_sideband_reBinned_DY") ;
+  TH1F * m4_sideband_reBinned_TT   = (TH1F *) input.Get ("m4_sideband_reBinned_TT") ;
+  TH1F * m4_sideband_reBinned_WW   = (TH1F *) input.Get ("m4_sideband_reBinned_WW") ;
+  TH1F * m4_sideband_reBinned_WZ   = (TH1F *) input.Get ("m4_sideband_reBinned_WZ") ;
+  TH1F * m4_sideband_reBinned_Wjet = (TH1F *) input.Get ("m4_sideband_reBinned_WJets") ;
+  TH1F * m4_sideband_reBinned_ZZ   = (TH1F *) input.Get ("m4_sideband_reBinned_ZZ") ;
+  TH1F * m4_sideband_reBinned_top  = (TH1F *) input.Get ("m4_sideband_reBinned_top") ;
+  
+  TH1F * m4_sideband_total_reBinned = (TH1F*) m4_sideband_reBinned_DY->Clone ("m4_sideband_total_reBinned");
+  if(subtractDY   == true)  m4_sideband_total_reBinned->Reset();
+  if(subtractTT   == false) m4_sideband_total_reBinned->Add(m4_sideband_reBinned_TT);
+  if(subtractWW   == false) m4_sideband_total_reBinned->Add(m4_sideband_reBinned_WW);
+  if(subtractWZ   == false) m4_sideband_total_reBinned->Add(m4_sideband_reBinned_WZ);
+  if(subtractWjet == false) m4_sideband_total_reBinned->Add(m4_sideband_reBinned_Wjet);
+  if(subtractZZ   == false) m4_sideband_total_reBinned->Add(m4_sideband_reBinned_ZZ);
+  if(subtracttop  == false) m4_sideband_total_reBinned->Add(m4_sideband_reBinned_top);
+  m4_sideband_total_reBinned->SetTitle ("");
+  THStack * stack_m4_sideband_reBinned = new THStack("stack_m4_sideband_reBinned","");
+  if(subtractDY   == false) stack_m4_sideband_reBinned->Add(m4_sideband_reBinned_DY);
+  if(subtractTT   == false) stack_m4_sideband_reBinned->Add(m4_sideband_reBinned_TT);
+  if(subtractWW   == false) stack_m4_sideband_reBinned->Add(m4_sideband_reBinned_WW);
+  if(subtractWZ   == false) stack_m4_sideband_reBinned->Add(m4_sideband_reBinned_WZ);
+  if(subtractWjet == false) stack_m4_sideband_reBinned->Add(m4_sideband_reBinned_Wjet);
+  if(subtractZZ   == false) stack_m4_sideband_reBinned->Add(m4_sideband_reBinned_ZZ);
+  if(subtracttop  == false) stack_m4_sideband_reBinned->Add(m4_sideband_reBinned_top);
+  
+  
   //FC get the signal samples
   THStack * stack_m4_EvenHigher_SIG = (THStack *) input.Get ("stack_m4_EvenHigher_SIG") ;
   TH1F * m4_EvenHigher_total_SIG = (TH1F*) stack_m4_EvenHigher_SIG->GetStack ()->Last () ;    
@@ -447,7 +502,9 @@ int main (int argc, char** argv)
   TH1F* sidebaRegion;
   TH1F* signalRegionMC;
   TH1F* sidebaRegionMC;
-
+  TH1F* signalRegionMC_reBinned;
+  TH1F* sidebaRegionMC_reBinned;  
+  
  if(martijn)
  { 
    cout << "Martijn\'s test" << endl ;
@@ -520,9 +577,11 @@ int main (int argc, char** argv)
    cout << "final analysis" << endl ;
    
    sidebaRegionMC = (TH1F *) m4_sideband_total->Clone ("sidebaRegionMC") ; 
-   
    signalRegionMC = (TH1F *) m4_signal_total->Clone ("signalRegionMC") ;
   
+   sidebaRegionMC_reBinned = (TH1F *) m4_sideband_total_reBinned->Clone ("sidebaRegionMC_reBinned") ; 
+   signalRegionMC_reBinned = (TH1F *) m4_signal_total_reBinned->Clone ("signalRegionMC_reBinned") ;
+   
    //Subtract the shape from data in the sideband region
    if(subtractWW   == true) m4_sideband_DATA->Add (m4_sideband_WW, -1) ;
    if(subtractDY   == true) m4_sideband_DATA->Add (m4_sideband_DY, -1) ;
@@ -579,8 +638,11 @@ int main (int argc, char** argv)
   TH1F * ratio_total = (TH1F *) signalRegionMC->Clone ("ratio") ;
   ratio_total->Divide (sidebaRegionMC) ;
   ratio_total->SetMarkerColor (kOrange) ;
-
   
+  TH1F * ratio_total_reBinned = (TH1F *) signalRegionMC_reBinned->Clone ("ratio_reBinned") ;
+  ratio_total_reBinned->Divide (sidebaRegionMC_reBinned) ;
+  ratio_total_reBinned->SetMarkerColor (kOrange) ;
+
   //PG fit separately numerator and denominator of MC 
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
   TF1 * numFitFunc ;
@@ -680,13 +742,15 @@ int main (int argc, char** argv)
   c1->SetLogy (0) ;
 
   TH1F * h_correctionBand ;
-
+  TH1F * h_correctionBand_reBinned ;
+  
   //PG toy experiments to determine the size of the error band on the extrapolation factor
   //PG ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
   if (histosRatio)
     {
       h_correctionBand = (TH1F *) ratio_total->Clone ("h_correctionBand") ; 
+      h_correctionBand_reBinned = (TH1F *) ratio_total_reBinned->Clone ("h_correctionBand_reBinned") ;
       if (makeToys)  
         {  
           TRandom3 r ;
@@ -797,7 +861,24 @@ int main (int argc, char** argv)
   c1->Print ("09_correctionFactor.png", "png") ;
   c1->SaveAs ("09_correctionFactor.C") ;
  
-    
+  
+  //FC return to the original binning  -- comment if you don't want a rebinned alpha factor
+  h_correctionBand->Reset() ;
+  
+  for (int iBin = 1 ; iBin <= h_correctionBand->GetNbinsX () ; ++iBin)
+   {
+     double center = h_correctionBand->GetBinCenter (iBin) ;
+     int binInRebinned = h_correctionBand_reBinned->GetXaxis ()->FindBin (center) ;
+     
+     double content = h_correctionBand_reBinned->GetBinContent (binInRebinned) ;
+     double error = h_correctionBand_reBinned->GetBinError (binInRebinned) ;
+     
+     h_correctionBand->SetBinContent(iBin, content) ;
+     h_correctionBand->SetBinError(iBin, error) ;
+     
+   }  
+   
+   
   //PG fit the data sideband before the extrapolation
   TH1F * sideband_bkg;
   TH1F * sideband_bkg_fitBand;
@@ -1323,6 +1404,7 @@ int main (int argc, char** argv)
 
   ratio_total->Write();
   h_correctionBand->Write();
+  h_correctionBand_reBinned->Write();
   
   if (fitsideband) sideband_bkg->Write();
   if (fitsideband) sideband_bkg_fitBand->Write();
