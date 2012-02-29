@@ -87,7 +87,7 @@ int main (int argc, char** argv)
   cout << "samples " << inputFileList << endl ;
   
   map<string, TChain *> collections ;
-  string treeName = "ntu_14" ; //PG all the preselections + deta_jj
+  string treeName = "ntu_13" ; //PG all the preselections + deta_jj
   ReadFile (collections, inputFileList, treeName) ;
   
   TH1::SetDefaultSumw2 (kTRUE) ;
@@ -127,6 +127,7 @@ int main (int argc, char** argv)
   //  generalCut = generalCut && "lepMetW_mt > 40" ; //PG mt cut on leptonic W
   // generalCut = generalCut && "nJets_cnt_pt30 == 2" ; //only 2 jets
   // generalCut = generalCut && "nJets_cnt_pt30 != 2" ; //only 3 jets
+  // generalCut = generalCut && "WJ1_ctheta < 0.6 && abs(lepNu_ctheta) < 0.65 && lepMet_Dphi < 2.5 && WJJ_Dphi < 2"; // AB cut based analysis
   
   std::string outputRootFullFileName = "testBkg_017_S" + mass + "_2011AB.root" ;  
   
@@ -444,27 +445,34 @@ int main (int argc, char** argv)
     
     vector<double> xbins ;
     int enough = true ;
-    int minEvents = 20 ;
-    int eventsInBin_signal = 0 ;
-    int eventsInBin_sideband = 0 ;
+    // Set the binning content to have at max the error which is sqrt(maxErrorSq) 
+    float maxErrorSq = 0.5 ;
+    float errorSq_signal = 0. ;
+    float contentSq_signal = 0. ;
+    float errorSq_sideband = 0. ;
+    float contentSq_sideband = 0. ;
     
     //PG loop on the bins of the histogram
     for (int iBin = 1 ; iBin < m4_signal_Bkg->GetNbinsX () ; ++iBin)
     {
       if (enough) xbins.push_back (m4_signal_Bkg->GetBinLowEdge (iBin)) ;
       
-      eventsInBin_signal += m4_signal_Bkg->GetBinContent (iBin) ;
-      eventsInBin_sideband += m4_sideband_Bkg->GetBinContent (iBin) ;
-      if (eventsInBin_signal < minEvents ||
-	eventsInBin_sideband < minEvents )
+      errorSq_signal += (m4_signal_Bkg->GetBinError (iBin))*(m4_signal_Bkg->GetBinError (iBin)) ;
+      contentSq_signal += (m4_signal_Bkg->GetBinContent (iBin))*(m4_signal_Bkg->GetBinContent (iBin)) ;
+      errorSq_sideband += (m4_sideband_Bkg->GetBinError (iBin))*(m4_sideband_Bkg->GetBinError (iBin));
+      contentSq_sideband += (m4_sideband_Bkg->GetBinContent (iBin))*(m4_sideband_Bkg->GetBinContent (iBin));
+      if ( contentSq_signal == 0 || contentSq_sideband == 0 ) enough = false ;
+      else if (errorSq_signal/contentSq_signal > maxErrorSq ||
+	        errorSq_sideband/contentSq_sideband > maxErrorSq )
       {
-	enough = false ;
+        enough = false ;
       }
       else
       {
-	enough = true ;
-	eventsInBin_signal = 0 ;
-	eventsInBin_sideband = 0 ;
+       	enough = true ;
+	      errorSq_signal = 0 ;
+	      contentSq_signal = 0 ;
+	      contentSq_sideband = 0 ;
       }        
     } //PG loop on the bins of the histogram
     
