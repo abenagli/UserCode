@@ -445,12 +445,12 @@ int main (int argc, char** argv)
     
     vector<double> xbins ;
     int enough = true ;
-    // Set the binning content to have at max the error which is sqrt(maxErrorSq) 
-    float maxErrorSq = 0.5 ;
+    // Set the binning content to have relative error smaller than maxRelativeError
+    float maxRelativeError = 0.4 ;
     float errorSq_signal = 0. ;
-    float contentSq_signal = 0. ;
+    float content_signal = 0. ;
     float errorSq_sideband = 0. ;
-    float contentSq_sideband = 0. ;
+    float content_sideband = 0. ;
     
     //PG loop on the bins of the histogram
     for (int iBin = 1 ; iBin < m4_signal_Bkg->GetNbinsX () ; ++iBin)
@@ -458,21 +458,22 @@ int main (int argc, char** argv)
       if (enough) xbins.push_back (m4_signal_Bkg->GetBinLowEdge (iBin)) ;
       
       errorSq_signal += (m4_signal_Bkg->GetBinError (iBin))*(m4_signal_Bkg->GetBinError (iBin)) ;
-      contentSq_signal += (m4_signal_Bkg->GetBinContent (iBin))*(m4_signal_Bkg->GetBinContent (iBin)) ;
+      content_signal += m4_signal_Bkg->GetBinContent (iBin) ;
       errorSq_sideband += (m4_sideband_Bkg->GetBinError (iBin))*(m4_sideband_Bkg->GetBinError (iBin));
-      contentSq_sideband += (m4_sideband_Bkg->GetBinContent (iBin))*(m4_sideband_Bkg->GetBinContent (iBin));
-      if ( contentSq_signal == 0 || contentSq_sideband == 0 ) enough = false ;
-      else if (errorSq_signal/contentSq_signal > maxErrorSq ||
-	        errorSq_sideband/contentSq_sideband > maxErrorSq )
+      content_sideband += m4_sideband_Bkg->GetBinContent (iBin);
+      if ( content_signal == 0 || content_sideband == 0 ) enough = false ;
+      else if (sqrt(errorSq_signal)/content_signal > maxRelativeError ||
+	        sqrt(errorSq_sideband)/content_sideband > maxRelativeError )
       {
         enough = false ;
       }
       else
       {
        	enough = true ;
+		  errorSq_sideband = 0;
 	      errorSq_signal = 0 ;
-	      contentSq_signal = 0 ;
-	      contentSq_sideband = 0 ;
+	      content_signal = 0 ;
+	      content_sideband = 0 ;
       }        
     } //PG loop on the bins of the histogram
     
