@@ -3,7 +3,8 @@
 EfficiencyCorrector::EfficiencyCorrector(std::string& eleEffFileName,
                 			                   std::string& muEffFileName,
                                          std::string& metEffFileName,
-                                         std::string& jetEffFileName)
+                                         std::string& jetEffFileName,
+                                         std::string& mtEffFileName)
 {
 
   periodNames.push_back("0");
@@ -13,9 +14,10 @@ EfficiencyCorrector::EfficiencyCorrector(std::string& eleEffFileName,
   periodNames.push_back("4");
 
   inFile_eleEff = TFile::Open(eleEffFileName.c_str(),"READ");
-  inFile_muEff = TFile::Open(muEffFileName.c_str(),"READ");
+  inFile_muEff  = TFile::Open(muEffFileName.c_str(),"READ");
   inFile_metEff = TFile::Open(metEffFileName.c_str(),"READ");
   inFile_jetEff = TFile::Open(jetEffFileName.c_str(),"READ");
+  inFile_mtEff  = TFile::Open(mtEffFileName.c_str(),"READ");
   
   for ( int iPeriod = 0; iPeriod < nPeriodsEle; iPeriod++ ) {
     // ele
@@ -26,6 +28,8 @@ EfficiencyCorrector::EfficiencyCorrector(std::string& eleEffFileName,
     metEffHlt[iPeriod] = (TH1F*)( inFile_metEff->Get("metEffHLT"+periodNames[iPeriod]) );
     // jet
     jetEffHlt[iPeriod] = (TH2F*)( inFile_jetEff->Get("jetEffHLT"+periodNames[iPeriod]) );
+    // mt
+    mtEffHlt[iPeriod]  = (TH2F*)( inFile_mtEff->Get("mtEffHLT"+periodNames[iPeriod]) );
   }
 
   for ( int iPeriod = 0; iPeriod < nPeriodsMu; iPeriod++ ) {
@@ -48,6 +52,8 @@ EfficiencyCorrector::~EfficiencyCorrector()
     delete[] metEffHlt[iPeriod];
     // jet
     delete[] jetEffHlt[iPeriod];
+    // mt
+    delete[] mtEffHlt[iPeriod];
   }
 
   for ( int iPeriod = 0; iPeriod < nPeriodsMu; iPeriod++ ) {
@@ -60,6 +66,7 @@ EfficiencyCorrector::~EfficiencyCorrector()
   inFile_muEff -> Close();
   inFile_metEff -> Close();
   inFile_jetEff -> Close();
+  inFile_mtEff -> Close();
 
 }
 
@@ -141,6 +148,29 @@ float EfficiencyCorrector::getEleEff(float pt, float eta, std::string& mode) {
   if ( mode.find("H") >= 0 ) theTotalEff *= theHltEff;
   
   return theTotalEff;
+    
+}
+
+float EfficiencyCorrector::getMtEff(float mt, float eta) {
+
+  // boundaries check
+  float xMin = mtEffHlt[thisPeriodEle] -> GetXaxis() -> GetXmin();
+  float xMax = mtEffHlt[thisPeriodEle] -> GetXaxis() -> GetXmax();
+  if ( mt < xMin ) mt = xMin; //underflow
+  if ( mt > xMax ) mt = xMax - 0.001; //overflow
+  float yMin = mtEffHlt[thisPeriodEle] -> GetYaxis() -> GetXmin();
+  float yMax = mtEffHlt[thisPeriodEle] -> GetYaxis() -> GetXmax();
+  if ( eta < yMin ) eta = yMin; //underflow
+  if ( eta > yMax ) eta = yMax - 0.001; //overflow
+  
+  // default values in case of no correction
+  float theHltEff = 1.;
+  int thisBin = -1;
+  
+  thisBin = mtEffHlt[thisPeriodEle] -> FindBin(mt, eta);
+  theHltEff = mtEffHlt[thisPeriodEle] -> GetBinContent(thisBin);
+    
+  return theHltEff;
     
 }
 

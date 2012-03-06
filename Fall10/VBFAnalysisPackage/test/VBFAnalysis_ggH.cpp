@@ -55,6 +55,7 @@ int main(int argc, char** argv)
   std::string muEffFileName  = gConfigParser -> readStringOption("Input::muEffFileName");
   std::string jetEffFileName = gConfigParser -> readStringOption("Input::jetEffFileName");
   std::string metEffFileName = gConfigParser -> readStringOption("Input::metEffFileName");
+  std::string mtEffFileName  = gConfigParser -> readStringOption("Input::mtEffFileName");
   
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
@@ -69,6 +70,7 @@ int main(int argc, char** argv)
   int trainMVA = gConfigParser -> readIntOption("Options::trainMVA"); 
   int applyMVA = gConfigParser -> readIntOption("Options::applyMVA"); 
   int ttSelection = gConfigParser -> readIntOption("Options::ttSelection"); 
+  int useElePfMtHLT = gConfigParser -> readIntOption("Options::useElePfMtHLT");
   
   int HLTCUT = gConfigParser -> readIntOption("Cuts::HLTCUT");
   int EffCorrection = gConfigParser -> readIntOption("Cuts::EffCorrection");
@@ -179,7 +181,7 @@ int main(int argc, char** argv)
   
   // get the efficiency correction histos
   EfficiencyCorrector* theEffCorrector;
-  if ( EffCorrection > 0 ) theEffCorrector = new EfficiencyCorrector(eleEffFileName, muEffFileName, metEffFileName, jetEffFileName);
+  if ( EffCorrection > 0 ) theEffCorrector = new EfficiencyCorrector(eleEffFileName, muEffFileName, metEffFileName, jetEffFileName, mtEffFileName);
   
   // define map with events
   std::map<std::pair<int,std::pair<int,int> >,int> eventsMap;  
@@ -399,7 +401,7 @@ int main(int argc, char** argv)
   //--------------
   // mc - electron
   
-  if( (dataRunFlag == "2011A") || (dataRunFlag == "2011AB") )
+  if( (dataRunFlag == "2011A") || (dataRunFlag == "2011AB") && useElePfMtHLT == 0 )
   {
     // 0-th - Run2011A
     HLTLabels_e.push_back("2011A-0");
@@ -414,7 +416,7 @@ int main(int argc, char** argv)
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
   }
   
-  if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
+  if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB")  && useElePfMtHLT == 0  )
   { 
     // 2-th - Run2011B
     HLTLabels_e.push_back("2011B-0");
@@ -436,6 +438,42 @@ int main(int argc, char** argv)
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
   }
   
+  if( (dataRunFlag == "2011A") || (dataRunFlag == "2011AB") && useElePfMtHLT == 1 )
+  {
+    // 0-th - Run2011A
+    HLTLabels_e.push_back("2011A-0");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+    
+    // 1-th - Run2011A
+    HLTLabels_e.push_back("2011A-1");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  }
+  
+  if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB")  && useElePfMtHLT == 1  )
+  { 
+    // 2-th - Run2011B
+    HLTLabels_e.push_back("2011B-0");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+    
+    // 3-th - Run2011B
+    HLTLabels_e.push_back("2011B-1");
+    dummyHLTPathNames.clear();
+    dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+    
+    // 4-th - Run2011B
+    HLTLabels_e.push_back("2011B-2");
+    dummyHLTPathNames.clear();
+    if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    else dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    HLTPathNames_e_MC.push_back(dummyHLTPathNames);
+  }
   
   //----------
   // mc - muon
@@ -470,7 +508,7 @@ int main(int argc, char** argv)
   
   
   // define the quark-gluon likelihood
-  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/gwpool/users/benaglia/COLLISIONS7TeV/Fall10/NtuplePackage/data/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/gwteraz/users/benaglia/data/QGPdfs/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2_CHS.root");
   // define the angular likelihood
   HelicityLikelihoodDiscriminant* helicitylikeli = new HelicityLikelihoodDiscriminant();  
   
@@ -753,17 +791,30 @@ int main(int argc, char** argv)
       //  if( vars.lep_HOverE         > 0.025 ) continue;
       //}
       
-      if( (HLTLabel == "2011A-0") && (vars.lep.pt() < 30.) ) continue;
-      if( (HLTLabel == "2011A-1") && (vars.lep.pt() < 30.) ) continue;
-      if( (HLTLabel == "2011B-0") && (vars.lep.pt() < 30.) ) continue;
-      if( (HLTLabel == "2011B-1") && (vars.lep.pt() < 33.) ) continue;
-      if( (HLTLabel == "2011B-2") && (vars.lep.pt() < 30.) ) continue;
+      if( (HLTLabel == "2011A-0") && (vars.lep.pt() < 30.) && useElePfMtHLT == 0 ) continue;
+      if( (HLTLabel == "2011A-1") && (vars.lep.pt() < 30.) && useElePfMtHLT == 0  ) continue;
+      if( (HLTLabel == "2011B-0") && (vars.lep.pt() < 30.) && useElePfMtHLT == 0  ) continue;
+      if( (HLTLabel == "2011B-1") && (vars.lep.pt() < 33.) && useElePfMtHLT == 0  ) continue;
+      if( (HLTLabel == "2011B-2") && (vars.lep.pt() < 30.) && useElePfMtHLT == 0  ) continue;
       
-      if( (metCUT == 1) && (HLTLabel == "2011A-0") && (vars.met.Et() <  0.) ) continue;
-      if( (metCUT == 1) && (HLTLabel == "2011A-1") && (vars.met.Et() < 30.) ) continue;
-      if( (metCUT == 1) && (HLTLabel == "2011B-0") && (vars.met.Et() < 30.) ) continue;
-      if( (metCUT == 1) && (HLTLabel == "2011B-1") && (vars.met.Et() < 35.) ) continue;
-      if( (metCUT == 1) && (HLTLabel == "2011B-2") && (vars.met.Et() < 30.) ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011A-0") && (vars.met.Et() <  0.) && useElePfMtHLT == 0  ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011A-1") && (vars.met.Et() < 30.) && useElePfMtHLT == 0  ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011B-0") && (vars.met.Et() < 30.) && useElePfMtHLT == 0  ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011B-1") && (vars.met.Et() < 35.) && useElePfMtHLT == 0  ) continue;
+      if( (metCUT == 1) && (HLTLabel == "2011B-2") && (vars.met.Et() < 30.) && useElePfMtHLT == 0  ) continue;
+
+      if( (HLTLabel == "2011A-0") && (vars.lep.pt() < 30.) && useElePfMtHLT == 1 ) continue;
+      if( (HLTLabel == "2011A-1") && (vars.lep.pt() < 33.) && useElePfMtHLT == 1  ) continue;
+      if( (HLTLabel == "2011B-0") && (vars.lep.pt() < 33.) && useElePfMtHLT == 1  ) continue;
+      if( (HLTLabel == "2011B-1") && (vars.lep.pt() < 33.) && useElePfMtHLT == 1  ) continue;
+      if( (HLTLabel == "2011B-2") && (vars.lep.pt() < 33.) && useElePfMtHLT == 1  ) continue;
+
+      if( (lepMetMtCUT == 1) && (HLTLabel == "2011A-0") && (vars.lepMet_mt <  0.) && useElePfMtHLT == 1  ) continue;
+      if( (lepMetMtCUT == 1) && (HLTLabel == "2011A-1") && (vars.lepMet_mt < 50.) && useElePfMtHLT == 1  ) continue;
+      if( (lepMetMtCUT == 1) && (HLTLabel == "2011B-0") && (vars.lepMet_mt < 50.) && useElePfMtHLT == 1  ) continue;
+      if( (lepMetMtCUT == 1) && (HLTLabel == "2011B-1") && (vars.lepMet_mt < 50.) && useElePfMtHLT == 1  ) continue;
+      if( (lepMetMtCUT == 1) && (HLTLabel == "2011B-2") && (vars.lepMet_mt < 50.) && useElePfMtHLT == 1  ) continue;
+            
     }
     
     //// muon trigger emulation
@@ -1017,25 +1068,7 @@ int main(int argc, char** argv)
     if( (vars.WJ1.pt() <= WJPtMIN) || (vars.WJ2.pt() <= WJPtMIN) ) continue;
     if( std::max(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMaxPtMIN ) continue;
     if( std::min(vars.WJ1.pt(), vars.WJ2.pt()) < WJJMinPtMIN ) continue;
-    
-    /*
-    TF1* f_metTurnOn = new TF1("f_metTurnOn"," ([0] + ([1]-[0])/2 * (1 +TMath::Erf((x-[2])/([3]*sqrt(2)))))",0.,1000.);
-    f_metTurnOn -> SetParameter(0,3.06396e-01);
-    f_metTurnOn -> SetParameter(1,9.93169e-01);
-    f_metTurnOn -> SetParameter(2,2.02097e+01);
-    f_metTurnOn -> SetParameter(3,1.20391e+01);
-    
-    TF2* f_jetTurnOn = new TF2("j_jetTurnOn","(([0] + ([1]-[0])/2 * (1 +TMath::Erf((x-[2])/([3]*sqrt(2)))))) * ([0] + ([1]-[0])/2 * (1 +TMath::Erf((y-[2])/([3]*sqrt(2)))))");
-    f_jetTurnOn -> SetParameter(0,2.28966e-01);
-    f_jetTurnOn -> SetParameter(1,9.53513e-01);
-    f_jetTurnOn -> SetParameter(2,2.66816e+01);
-    f_jetTurnOn -> SetParameter(3,7.17539e+00);
-    
-    if(vars.dataFlag != 1)
-      vars.eventWeight *= f_metTurnOn -> Eval(vars.met_et) * f_jetTurnOn -> Eval(vars.WJ1.pt(),vars.WJ2.pt());
-    */
-    
-    
+        
     // Fill distributions
     stepEvents[step] += 1;
     stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
@@ -1047,10 +1080,6 @@ int main(int argc, char** argv)
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
     if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
     
     
     //************************************
@@ -1103,9 +1132,10 @@ int main(int argc, char** argv)
     // hlt weight
     if ( vars.dataFlag == 0 ) {
       std::string lepEffMode = "RIH";
-      if ( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
+      if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 13 ) vars.leptonWeight = theEffCorrector -> getMuEff  ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
-      if ( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
+      if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0  ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
+      if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 1  ) vars.metWeight = theEffCorrector -> getMtEff  ( vars.lepMet_mt, vars.lep.eta() );
 
       std::vector<float> jets_pt;
       if ( vars.p_jet1->pt() > 15 && fabs(vars.p_jet1->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet1->pt());
@@ -1121,7 +1151,7 @@ int main(int argc, char** argv)
       if ( vars.p_jet4->pt() > 15 && fabs(vars.p_jet4->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet4->eta());
       if ( vars.p_jet5->pt() > 15 && fabs(vars.p_jet5->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet5->eta());
       if ( vars.p_jet6->pt() > 15 && fabs(vars.p_jet6->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet6->eta());
-      if( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.jetWeight = theEffCorrector -> getJetEff ( jets_pt, jets_eta );
+      if( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0 ) vars.jetWeight = theEffCorrector -> getJetEff ( jets_pt, jets_eta );
       vars.eventWeight *= vars.leptonWeight*vars.metWeight*vars.jetWeight;
     }
     
