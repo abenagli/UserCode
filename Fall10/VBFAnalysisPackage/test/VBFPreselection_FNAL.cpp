@@ -51,7 +51,6 @@ int main(int argc, char** argv)
   int MCFlag              = gConfigParser -> readIntOption("Options::MCFlag");
   float crossSection      = gConfigParser -> readFloatOption("Options::crossSection");
   int TMVA4JetTraining    = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
-  int correctMet          = gConfigParser -> readIntOption("Options::correctMet");
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
   int ttSelection         = gConfigParser -> readIntOption("Options::ttSelection"); 
   int doTnP               = gConfigParser -> readIntOption("Options::doTnP"); 
@@ -386,14 +385,14 @@ int main(int argc, char** argv)
       if( ( pt > 20.)  &&
           ( fabs(eta) < 2.5 ) &&
           ( (fabs(etaSC) < 1.4442) || (fabs(etaSC) > 1.5660) ) &&
-          ( fabs(z-vars.PV_z) < 0.2 ) && 
-          ( fabs(dxy) < 0.02 ) &&
+          //( fabs(z-vars.PV_z) < 0.2 ) && 
+          //( fabs(dxy) < 0.02 ) &&
           ( tkIso/pt < 0.1 ) &&   // standard
           //( tkIso/pt < 0.5 ) &&    // loose for QCD studies
           ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&  // standard
           ( ( (isEB == 1) && (DphiIn < 0.060) )        || ( (isEB == 0) && (DphiIn < 0.030) ) ) &&         // standard
           ( ( (isEB == 1) && (DetaIn < 0.004) )        || ( (isEB == 0) && (DetaIn < 0.007) ) ) &&         // standard
-          ( ( (isEB == 1) && (HOverE < 0.040) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&         // standard
+          //( ( (isEB == 1) && (HOverE < 0.040) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&         // standard
           //( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&   // loose for QCD studies
           //( ( (isEB == 1) && (DphiIn < 0.800) )        || ( (isEB == 0) && (DphiIn < 0.700) ) ) &&          // loose for QCD studies
           //( ( (isEB == 1) && (DetaIn < 0.007) )        || ( (isEB == 0) && (DetaIn < 0.010) ) ) &&          // loose for QCD studies
@@ -414,7 +413,7 @@ int main(int argc, char** argv)
       if( isTightElectron == true ) continue;
       
       bool isLooseElectron = false;
-      if( ( pt > 15. ) &&
+      if( ( pt > 20. ) &&
           ( fabs(eta) < 2.5 ) &&
           ( (fabs(etaSC) < 1.4442) || (fabs(etaSC) > 1.5660) ) &&
 	  ( tkIso/pt < 0.2) &&   // standard
@@ -422,7 +421,8 @@ int main(int argc, char** argv)
           ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&
           ( ( (isEB == 1) && (DphiIn < 0.800) )        || ( (isEB == 0) && (DphiIn < 0.700) ) ) &&
           ( ( (isEB == 1) && (DetaIn < 0.007) )        || ( (isEB == 0) && (DetaIn < 0.010) ) ) &&
-          ( ( (isEB == 1) && (HOverE < 0.150) )        || ( (isEB == 0) && (HOverE < 0.070) ) ) )
+          //( ( (isEB == 1) && (HOverE < 0.150) )        || ( (isEB == 0) && (HOverE < 0.070) ) )
+          ( mishits == 0 ) )
       {
         isLooseElectron = true;
 	vars.electrons_loose.push_back( reader.Get4V("electrons")->at(eleIt) );
@@ -487,14 +487,16 @@ int main(int argc, char** argv)
       // tight selection
       bool isTightMuon = false;
       if( ( pt > 20. ) &&
-          ( fabs(eta) < 2.1 ) &&
-	  ( tkIso/pt < 0.05 ) &&   // standard
+          ( fabs(eta) < 2.4 ) &&
+          ( (tkIso+emIso+hadIso)/pt < 0.3) &&
+	  //( tkIso/pt < 0.05 ) &&   // standard
 	  //( tkIso/pt < 0.50 ) &&   // loose for QCD studies
           ( fabs(z-vars.PV_z) < 0.2 ) && 
           ( fabs(dxy) < 0.02 ) &&
           ( tracker == 1 ) &&
           //( standalone == 1 ) &&
           ( global == 1 ) &&
+          ( tracker == 1 ) &&
           ( normalizedChi2 < 10. ) &&
           ( pixelLayersWithMeasurement > 0 ) &&
           ( numberOfValidTrackerHits > 10 ) &&
@@ -517,7 +519,8 @@ int main(int argc, char** argv)
       bool isLooseMuon = false;
       if( ( pt > 10. ) &&
           ( fabs(eta) < 2.5 ) &&
-	  ( tkIso/pt < 0.20 ) &&
+	  ( (tkIso+emIso+hadIso)/pt < 0.300 ) &&
+          ( tracker == 1) &&
           ( global == 1) )
       {
         isLooseMuon = true;
@@ -655,7 +658,10 @@ int main(int argc, char** argv)
     
     //*****************
     // met and neutrino
-    SetMetVariables(vars, reader, jetType, correctMet, JESScaleVariation, JECUncertainty, verbosity);
+    SetMetVariables(vars, reader, jetType, 0, JESScaleVariation, JECUncertainty, verbosity);
+    
+    if( vars.met_et < 20. ) continue;
+    if( vars.lepMet_mt < 40. ) continue;
     
     //****************
     SetBTagVariables(vars, reader, jetType, jetEtaCNT, verbosity);

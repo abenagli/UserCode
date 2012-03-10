@@ -52,6 +52,7 @@ struct VBFPreselectionVariables
   int PUoot_early_n;
   int PUoot_late_n;
   float rhoForIsolation;
+  float rhoForIsolationPFlow;
   float rhoForJets;
   float rhoForJetsPFlow;
   
@@ -234,6 +235,7 @@ struct VBFPreselectionVariables
   
   float met_et;
   float met_phi;
+  float sumEt;
   
   int met_mcMatched;
   float met_mcMatchDR;
@@ -572,7 +574,7 @@ void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
 void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType,
-		     const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity = 0);
+                     const int& correctMet, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity = 0);
 void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT, const int& verbosity = 0);
 void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD,
                      const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity = 0);

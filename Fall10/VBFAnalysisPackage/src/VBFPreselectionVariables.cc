@@ -45,13 +45,14 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   
   
   // PU variables
-  vars.m_reducedTree -> Branch("PUtrue_n",        &vars.PUtrue_n,               "PUtrue_n/I");
-  vars.m_reducedTree -> Branch("PUit_n",          &vars.PUit_n,                   "PUit_n/I");
-  vars.m_reducedTree -> Branch("PUoot_early_n",   &vars.PUoot_early_n,     "PUoot_early_n/I");
-  vars.m_reducedTree -> Branch("PUoot_late_n",    &vars.PUoot_late_n,       "PUoot_late_n/I");
-  vars.m_reducedTree -> Branch("rhoForIsolation", &vars.rhoForIsolation, "rhoForIsolation/F");
-  vars.m_reducedTree -> Branch("rhoForJets",      &vars.rhoForJets,           "rhoForJets/F");
-  vars.m_reducedTree -> Branch("rhoForJetsPFlow", &vars.rhoForJetsPFlow, "rhoForJetsPFlow/F");
+  vars.m_reducedTree -> Branch("PUtrue_n",             &vars.PUtrue_n,                         "PUtrue_n/I");
+  vars.m_reducedTree -> Branch("PUit_n",               &vars.PUit_n,                             "PUit_n/I");
+  vars.m_reducedTree -> Branch("PUoot_early_n",        &vars.PUoot_early_n,               "PUoot_early_n/I");
+  vars.m_reducedTree -> Branch("PUoot_late_n",         &vars.PUoot_late_n,                 "PUoot_late_n/I");
+  vars.m_reducedTree -> Branch("rhoForIsolation",      &vars.rhoForIsolation,           "rhoForIsolation/F");
+  vars.m_reducedTree -> Branch("rhoForIsolationPFlow", &vars.rhoForIsolationPFlow, "rhoForIsolationPFlow/F");
+  vars.m_reducedTree -> Branch("rhoForJets",           &vars.rhoForJets,                     "rhoForJets/F");
+  vars.m_reducedTree -> Branch("rhoForJetsPFlow",      &vars.rhoForJetsPFlow,           "rhoForJetsPFlow/F");
   
   
   // HLT variables
@@ -168,6 +169,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("nu2",   "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu2);
   vars.m_reducedTree -> Branch("met_et",       &vars.met_et,             "met_et/F");
   vars.m_reducedTree -> Branch("met_phi",      &vars.met_phi,           "met_phi/F");
+  vars.m_reducedTree -> Branch("sumEt",        &vars.sumEt,               "sumEt/F");
   vars.m_reducedTree -> Branch("lepMet_pt",    &vars.lepMet_pt,       "lepMet_pt/F");
   vars.m_reducedTree -> Branch("lepMet_mt",    &vars.lepMet_mt,       "lepMet_mt/F");
   vars.m_reducedTree -> Branch("lepMet_Dphi",  &vars.lepMet_Dphi,   "lepMet_Dphi/F");
@@ -416,6 +418,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.PUoot_early_n = -1;
   vars.PUoot_late_n = -1;
   vars.rhoForIsolation = -99.;
+  vars.rhoForIsolationPFlow = -99.;
   vars.rhoForJets = -99.;
   vars.rhoForJetsPFlow = -99.;
   
@@ -576,6 +579,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.p_nu2 = NULL;
   vars.met_et = -1.;
   vars.met_phi = -1.;
+  vars.sumEt = -1.;
   
   vars.met_mcMatched = -1;
   vars.met_mcMatchDR = -99.;
@@ -925,9 +929,10 @@ void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
     vars.PUoot_late_n  = (int)(reader.GetInt("mc_PUoot_late_NumInteractions")->at(0));
   }
   
-  vars.rhoForIsolation = reader.GetFloat("rho_isolation")->at(0);
-  vars.rhoForJets      = reader.GetFloat("rho_jets")->at(0);
-  vars.rhoForJetsPFlow = reader.GetFloat("rho_jetsPFlow")->at(0);
+  vars.rhoForIsolation      = reader.GetFloat("rho_isolation")->at(0);
+  vars.rhoForIsolationPFlow = reader.GetFloat("rho_isolationPFlow")->at(0);
+  vars.rhoForJets           = reader.GetFloat("rho_jets")->at(0);
+  vars.rhoForJetsPFlow      = reader.GetFloat("rho_jetsPFlow")->at(0);
 }
 
 
@@ -1260,7 +1265,7 @@ void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 
 
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, 
-                     const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
+                     const int& correctMet, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
 {
   if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetMetVariables" << std::endl;
   
@@ -1269,6 +1274,36 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
     vars.met = reader.Get4V("type1Met")->at(0);
   if(jetType == "PF")
     vars.met = reader.Get4V("PFMet")->at(0);
+  
+  vars.sumEt = reader.GetFloat("sumEt")->at(0);
+  
+  
+  
+  if( correctMet == 1 )
+  {
+    float cx0,cx1;
+    float cy0,cy1;
+    
+    if( vars.dataFlag == 1)
+    {
+      cx1 = -0.00563109; cx0 = +0.959742;
+      cy1 = +0.00586162; cy0 = -0.540137;
+    }
+    else
+    {
+      cx1 = -0.00069992; cx0 = +0.430059;
+      cy1 = +0.00262869; cy0 = +0.210784;
+    }
+    
+    float metx = vars.met.px();
+    float mety = vars.met.py();
+    
+    metx -= (cx0 + cx1*vars.sumEt);
+    mety -= (cy0 + cy1*vars.sumEt);
+    
+    vars.met.SetPxPyPzE(metx,mety,0.,sqrt(metx*metx+mety*mety));
+  }
+  
   
   
   if( JESScaleVariation != 0. )
