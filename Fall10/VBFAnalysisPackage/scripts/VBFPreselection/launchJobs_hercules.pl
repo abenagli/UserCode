@@ -226,10 +226,10 @@ while (<LISTOFSamples>)
     # submit job
     ############
     
-    $command = "echo \"qsub -V -q longcms -d ".$jobDir." ".$tempBjob."\"\n" ;
+    $command = "echo \"qsub -V -q shortcms -d ".$jobDir." ".$tempBjob."\"\n" ;
     print SAMPLEJOBLISTFILE $command."\n";
     
-    $command = "qsub -V -q longcms -d ".$jobDir." ".$tempBjob."\n" ; 
+    $command = "qsub -V -q shortcms -d ".$jobDir." ".$tempBjob."\n" ; 
     print SAMPLEJOBLISTFILE $command."\n";
     
     #print "\n" ;
