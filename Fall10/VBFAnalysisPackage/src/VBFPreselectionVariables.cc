@@ -1265,7 +1265,7 @@ void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 
 
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, 
-                     const int& correctMet, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
+                     const int& correctMet, const std::string& run, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
 {
   if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetMetVariables" << std::endl;
   
@@ -1286,14 +1286,32 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
     
     if( vars.dataFlag == 1)
     {
-      cx1 = -0.00563109; cx0 = +0.959742;
-      cy1 = +0.00586162; cy0 = -0.540137;
+      if( run == "2011A" )
+      {
+        cx1 = +0.004801; cx0 = -0.3365;
+        cy1 = -0.006124; cy0 = +0.2578;
+      }
+      if( run == "2011B" )
+      {
+        cx1 = +0.005162; cx0 = -0.3265;
+        cy1 = -0.006299; cy0 = -0.1956;
+      }
     }
     else
     {
-      cx1 = -0.00069992; cx0 = +0.430059;
-      cy1 = +0.00262869; cy0 = +0.210784;
+      if( run == "2011A" )
+      {
+        cx1 = +0.0001815; cx0 = -0.09389;
+        cy1 = -0.003710;  cy0 = +0.1571;      
+      }
+      if( run == "2011B" )
+      {
+        cx1 = +0.00009587; cx0 = -0.1070;
+        cy1 = -0.003357;   cy0 = +0.01517;
+      }
     }
+    
+    //std::cout << "bef met: " << vars.met.Et() << "   metx: " << vars.met.px() << "   mety: " << vars.met.py() << std::endl;
     
     float metx = vars.met.px();
     float mety = vars.met.py();
@@ -1302,6 +1320,8 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
     mety -= (cy0 + cy1*vars.sumEt);
     
     vars.met.SetPxPyPzE(metx,mety,0.,sqrt(metx*metx+mety*mety));
+    
+    //std::cout << "aft met: " << vars.met.Et() << "   metx: " << vars.met.px() << "   mety: " << vars.met.py() << std::endl;
   }
   
   

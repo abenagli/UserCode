@@ -399,6 +399,7 @@ int main(int argc, char** argv)
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
     dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v8");
+    dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v9");
     HLTPathNames_e_DATA.push_back(dummyHLTPathNames);
     ++HLTLumiIt;
   }
@@ -508,14 +509,14 @@ int main(int argc, char** argv)
     HLTLabels_e.push_back("2011A-2");
     dummyHLTPathNames.clear();
     if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele27_WP80_PFMT50_v4");
-    else dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    else dummyHLTPathNames.push_back("HLT_Ele27_WP80_PFMT50_v4");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
-
+    
     // 3-th - Run2011A
     HLTLabels_e.push_back("2011A-3");
     dummyHLTPathNames.clear();
     if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
-    else dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    else dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
   }
   
@@ -525,7 +526,7 @@ int main(int argc, char** argv)
     HLTLabels_e.push_back("2011B-0");
     dummyHLTPathNames.clear();
     if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
-    else dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    else dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
   }
   
@@ -580,11 +581,6 @@ int main(int argc, char** argv)
     
     MVAReader -> BookMVA("kBDT_H250",MVAWeightsFile);
   }
-  
-  
-  // met phi correction
-  //TFile* inFile_correction_met_phi = TFile::Open("/gwteraz/users/benaglia/data/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB/computeMetPhiCorrection.root");
-  //TF1* f_correction_met_phi = (TF1*)( inFile_correction_met_phi->Get("f_corr") );
   
   
   
@@ -813,8 +809,18 @@ int main(int argc, char** argv)
       
     
     if( pathFound == false )
-      std::cout << ">>>>>>>>> AcceptHLTPath::Warning: no paths found in the HLT menu" << std::endl;  
-    
+    {
+      std::cout << ">>>>>>>>> AcceptHLTPath::Warning: following paths were not found in the HLT menu of run " << vars.runId << std::endl;  
+      for(unsigned int HLTIt = 0; HLTIt < HLTPathNames.size(); ++HLTIt) std::cout << ">>>>>>>>>>>> " << HLTPathNames.at(HLTIt) << std::endl;       
+      //for(unsigned int HLTIt = 0; HLTIt < (*HLT_Names).size(); ++HLTIt)
+      //{
+      //  std::cout << "HLT_Bit: "       << std::setw(3)  << HLTIt
+      //            << "   HLT_Name: "   << std::setw(50) << (*HLT_Names).at(HLTIt)
+      //            << "   HLT_Accept: " << std::setw(2)  <<(*HLT_Accept).at(HLTIt)
+      //            << std::endl;
+      //}
+    }
+        
     if( (HLTCUT == 1) && (skipEvent == true) ) continue;
     
     
@@ -858,10 +864,10 @@ int main(int argc, char** argv)
       if( (metCUT == 1) && (HLTLabel == "2011B-2") && (vars.met.Et() < 30.) && useElePfMtHLT == 0  ) continue;
 
       if( (HLTLabel == "2011A-0") && (vars.lep.pt() < 30.) && useElePfMtHLT == 1 ) continue;
-      if( (HLTLabel == "2011A-1") && (vars.lep.pt() < 33.) && useElePfMtHLT == 1  ) continue;
+      if( (HLTLabel == "2011A-1") && (vars.lep.pt() < 35.) && useElePfMtHLT == 1  ) continue;
       if( (HLTLabel == "2011A-2") && (vars.lep.pt() < 30.) && useElePfMtHLT == 1  ) continue;
-      if( (HLTLabel == "2011A-3") && (vars.lep.pt() < 33.) && useElePfMtHLT == 1  ) continue;
-      if( (HLTLabel == "2011B-0") && (vars.lep.pt() < 33.) && useElePfMtHLT == 1  ) continue;
+      if( (HLTLabel == "2011A-3") && (vars.lep.pt() < 35.) && useElePfMtHLT == 1  ) continue;
+      if( (HLTLabel == "2011B-0") && (vars.lep.pt() < 35.) && useElePfMtHLT == 1  ) continue;
 
       if( (lepMetMtCUT == 1) && (HLTLabel == "2011A-0") && (vars.lepMet_mt <  0.) && useElePfMtHLT == 1  ) continue;
       if( (lepMetMtCUT == 1) && (HLTLabel == "2011A-1") && (vars.lepMet_mt <  0.) && useElePfMtHLT == 1  ) continue;
@@ -960,7 +966,6 @@ int main(int argc, char** argv)
     bool isAntiIsolated = true;
     
     float rho = vars.rhoForIsolation;
-    //float rho = vars.rhoForJetsPFlow;
     //float rho = 0.;
     
     if( vars.lep_flavour == 11 )
@@ -1189,7 +1194,7 @@ int main(int argc, char** argv)
       if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 13 ) vars.leptonWeight = theEffCorrector -> getMuEff  ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0  ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
-      if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 1  ) vars.metWeight = theEffCorrector -> getMtEff  ( vars.lepMet_mt, vars.lep.eta() );
+      //if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 1  ) vars.metWeight = theEffCorrector -> getMtEff  ( vars.lepMet_mt, vars.lep.eta() );
 
       std::vector<float> jets_pt;
       if ( vars.p_jet1->pt() > 15 && fabs(vars.p_jet1->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet1->pt());
@@ -1211,13 +1216,14 @@ int main(int argc, char** argv)
     
     // kinematic fit
     DoKinematicFit(vars,0.1,"MIB");
+    if( vars.lepNuW_m_KF < 160. ) continue; 
     
     
     // qg likelihood
     if( vars.WJ1.pt() > 0. )
-      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolation,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolationPFlow,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
     if( vars.WJ2.pt() > 0. )
-      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolation,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolationPFlow,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
     if( vars.WJ2.pt() > vars.WJ1.pt() )
     {
       float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
