@@ -9,6 +9,7 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TRandom3.h"
 
 
 
@@ -201,6 +202,7 @@ int main(int argc, char** argv)
   
   //*********************
   // LOOP OVER THE EVENTS
+  TRandom3 r;
   
   std::cout << ">>>>> VBFPreselection::Read " << chain -> GetEntries() << " entries" << std::endl;  
   for(int entry = entryFIRST ; entry < chain -> GetEntries() ; ++entry)
@@ -655,7 +657,20 @@ int main(int argc, char** argv)
     
     //*****************
     // met and neutrino
-    SetMetVariables(vars, reader, jetType, correctMet, JESScaleVariation, JECUncertainty, verbosity);
+    std::string run;
+    if( vars.dataFlag == 1 )
+    {
+      if( vars.runId <= 173692 ) run = "2011A";
+      else                       run = "2011B";
+    }
+    if( vars.dataFlag == 0 )
+    {
+      float val = r.Uniform(0.,4680.45);
+      if( val <= 2168.25 ) run = "2011A";
+      else                 run = "2011B";
+    }
+    
+    SetMetVariables(vars, reader, jetType, correctMet, run, JESScaleVariation, JECUncertainty, verbosity);
     
     //****************
     SetBTagVariables(vars, reader, jetType, jetEtaCNT, verbosity);
