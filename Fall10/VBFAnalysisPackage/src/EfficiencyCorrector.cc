@@ -151,26 +151,15 @@ float EfficiencyCorrector::getEleEff(float pt, float eta, std::string& mode) {
     
 }
 
-float EfficiencyCorrector::getMtEff(float mt, float eta) {
+float EfficiencyCorrector::getMtEff(float mt) {
 
   // boundaries check
   float xMin = mtEffHlt[thisPeriodEle] -> GetXaxis() -> GetXmin();
   float xMax = mtEffHlt[thisPeriodEle] -> GetXaxis() -> GetXmax();
   if ( mt < xMin ) mt = xMin; //underflow
   if ( mt > xMax ) mt = xMax - 0.001; //overflow
-  float yMin = mtEffHlt[thisPeriodEle] -> GetYaxis() -> GetXmin();
-  float yMax = mtEffHlt[thisPeriodEle] -> GetYaxis() -> GetXmax();
-  if ( eta < yMin ) eta = yMin; //underflow
-  if ( eta > yMax ) eta = yMax - 0.001; //overflow
-  
-  // default values in case of no correction
-  float theHltEff = 1.;
-  int thisBin = -1;
-  
-  thisBin = mtEffHlt[thisPeriodEle] -> FindBin(mt, eta);
-  theHltEff = mtEffHlt[thisPeriodEle] -> GetBinContent(thisBin);
-    
-  return theHltEff;
+  int thisBin = mtEffHlt[thisPeriodEle] -> FindBin(mt);  
+  return mtEffHlt[thisPeriodEle] -> GetBinContent(thisBin);    
     
 }
 

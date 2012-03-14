@@ -1194,7 +1194,7 @@ int main(int argc, char** argv)
       if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 13 ) vars.leptonWeight = theEffCorrector -> getMuEff  ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0  ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
-      //if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 1  ) vars.metWeight = theEffCorrector -> getMtEff  ( vars.lepMet_mt, vars.lep.eta() );
+      if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 1  ) vars.metWeight = theEffCorrector -> getMtEff  ( vars.lepMet_mt );
 
       std::vector<float> jets_pt;
       if ( vars.p_jet1->pt() > 15 && fabs(vars.p_jet1->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet1->pt());
