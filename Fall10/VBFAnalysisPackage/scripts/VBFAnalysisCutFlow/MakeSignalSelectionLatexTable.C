@@ -6,10 +6,8 @@ void MakeSignalSelectionLatexTable(){
   cout.precision(3);
   cout.unsetf(std::ios::scientific);
     
-//  string leptonType = "mu";
-  TString leptonType = "ele";
-  TString histoName = "events_PURescaled_" + leptonType;
-  string InputPath = "/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_WithEffCorr/";
+  TString histoName = "events_PURescaled";
+  string InputPath = "/gwterax2/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow/";
 
   vector<string> SignalMasses;
   const int nSignals = 3;
@@ -51,8 +49,8 @@ void MakeSignalSelectionLatexTable(){
   theSteps.push_back(10);
   theSteps.push_back(11);
   theSteps.push_back(13);
-  theSteps.push_back(14);
-  theSteps.push_back(15);
+//  theSteps.push_back(14);
+//  theSteps.push_back(15);
   theSteps.push_back(16);
       
 //  string outputType = "twiki";
@@ -62,7 +60,8 @@ void MakeSignalSelectionLatexTable(){
   float crossSection;
   int lep_flavour; 
   float lumi = 4680;
-  float totEvents, weight;
+  float weight, PUWeight, eventWeight;
+  int totEvents; 
   
   // Get with the right weight the signal samples
   for ( int iSignal = 0; iSignal < nSignals; iSignal++ ) {
@@ -71,15 +70,26 @@ void MakeSignalSelectionLatexTable(){
       string thisFile = InputPath + SignalChannels[iChannel] + SignalMasses[iSignal] + SignalMCgenerator + fileName;
       TFile* myFile = new TFile (thisFile.c_str(),"READ");
 
-      TTree* myTree = (TTree*) myFile -> Get("ntu_15");  
+      TH1F* tmpHisto = new TH1F("tmpHisto","tmpHisto",20,0,20);
+
+      TTree* myTree = (TTree*) myFile -> Get("ntu_13");  
       myTree -> SetBranchAddress("crossSection", &crossSection);
       myTree -> SetBranchAddress("lep_flavour", &lep_flavour);
+      myTree -> SetBranchAddress("totEvents", &totEvents);
+      myTree -> SetBranchAddress("eventWeight", &eventWeight);
+      myTree -> SetBranchAddress("PUWeight", &PUWeight);
       myTree -> GetEntry(0);
+      
+      TString s_weight = Form("(WJJ_m < 95 && WJJ_m > 65) * ( crossSection * %f / totEvents) * (eventWeight * PUWeight)", lumi);
+      myTree -> Draw("lep_flavour >> tmpHisto",s_weight);
 
       theEventsHistos[iSignal][iChannel] = (TH1F*) myFile -> Get(histoName);
       totEvents = theEventsHistos[iSignal][iChannel] -> GetBinContent(1);
       weight = crossSection * lumi / totEvents;
       theEventsHistos[iSignal][iChannel] -> Scale(weight);
+      theEventsHistos[iSignal][iChannel] -> SetBinContent(16, tmpHisto -> Integral());
+            
+      delete tmpHisto;
 
     }  
   }
