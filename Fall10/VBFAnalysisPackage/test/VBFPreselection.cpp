@@ -395,7 +395,7 @@ int main(int argc, char** argv)
           ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&  // standard
           ( ( (isEB == 1) && (DphiIn < 0.060) )        || ( (isEB == 0) && (DphiIn < 0.030) ) ) &&         // standard
           ( ( (isEB == 1) && (DetaIn < 0.004) )        || ( (isEB == 0) && (DetaIn < 0.007) ) ) &&         // standard
-          ( ( (isEB == 1) && (HOverE < 0.040) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&         // standard
+          ( ( (isEB == 1) && (HOverE < 0.025) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&         // standard
           //( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&   // loose for QCD studies
           //( ( (isEB == 1) && (DphiIn < 0.800) )        || ( (isEB == 0) && (DphiIn < 0.700) ) ) &&          // loose for QCD studies
           //( ( (isEB == 1) && (DetaIn < 0.007) )        || ( (isEB == 0) && (DetaIn < 0.010) ) ) &&          // loose for QCD studies
