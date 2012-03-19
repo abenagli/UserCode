@@ -15,17 +15,43 @@ double powerLaw(double* x, double* par)
 {
   //[0] = N   normalization factor
   //[1] = n   slope
+  //[2] = a   shift
+  
+  // variable
+  double xx = x[0];
+  // parameters
+  double N  = par[0];
+  double n  = par[1];
+  double a  = par[2];
+  
+  
+  //std::cout << "x: " << xx << "   N: " << N << "   n: " << n << "   a: " << a << std::endl;
+  return N * pow((500.+a)/(fabs(xx+a)),n);
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** doublePowerLaw ***/
+double doublePowerLaw(double* x, double* par)
+{
+  //[0] = N   normalization factor
+  //[1] = n   slope
+  //[2] = a   shift
+  //[2] = b   shift
   
   // variable
   double xx = x[0];
   // parameters
   double N = par[0];
-  double x0 = par[1];
-  double lambda = par[2];
-  double n = par[3];
+  double n = par[1];
+  double a = par[2];
+  double b = par[3];
   
-  //std::cout << "N: " << N << "   x0: " << x0 << "   lambda: " << lambda << "   n: " << n << std::endl;
-  return pow(N,n) * pow(fabs((xx+x0)/lambda),-1.*n);
+  
+  //std::cout << "x: " << xx << "   N: " << N << "   n: " << n << "   a: " << a << "   b: " << b << std::endl;
+  return N * pow((500.*500.+b*500.+a)/(fabs(xx*xx+b*xx+a)),n);
 }
 
 
@@ -43,7 +69,7 @@ double exponential(double* x, double* par)
   double lambda = par[1];
   
   //std::cout << "N: " << N << "   lambda: " << lambda << std::endl;
-  return exp(N) * exp(-1.*lambda*xx);
+  return N * exp(-1.*lambda*xx);
 }
 
 
@@ -62,7 +88,7 @@ double doubleExponential(double* x, double* par)
   double lambda2 = par[3];
 
   //std::cout << "N: " << N << "   lambda: " << lambda << std::endl;
-  return exp(N1) * exp(-1.*lambda1*xx) + exp(N2) * exp(-1.*lambda2*xx);
+  return N1 * ( N2 * exp(-1.*lambda1*xx) + (1.-N2) * exp(-1.*lambda2*xx) );
 }
 
 
@@ -464,6 +490,72 @@ double breitWigner_gaussian(double* x, double* par)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
+/*** exp-polynomial of second order ***/
+double expPol2order (double* x, double* par)
+{
+  double xx = x[0];
+  double N = par[0];
+  double a = par[1];
+  double b = par[2];
+  
+  //std::cout << "N: " << N << "   a: " << a << "   b: " << b << std::endl;
+  return N * exp( -1.* (pow(b/500.*xx,2) + a/500.*xx) );
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** exp-polynomial of third order ***/
+double expPol3order (double* x, double* par)
+{
+  double xx = x[0];
+  double N = par[0];
+  double a = par[1];
+  double b = par[2];
+  double c = par[3];
+  
+  return N * exp( -1.* (pow(c/500.*xx,3) + pow(b/500.*xx,2) + a/500.*xx) );
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+/*** exp-polynomial of fourth order ***/
+double expPol4order (double* x, double* par)
+{
+  double xx = x[0];
+  double N = par[0];
+  double a = par[1];
+  double b = par[2];
+  double c = par[3];
+  double d = par[4];
+  
+  return N * exp( -1.* (pow(d/500.*xx,4) + pow(c/500.*xx,3) + pow(b/500.*xx,2) + a/500.*xx) );
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+/*** exp-polynomial of fifth order ***/
+double expPol5order (double* x, double* par)
+{
+  double xx = x[0];
+  double N = par[0];
+  double a = par[1];
+  double b = par[2];
+  double c = par[3];
+  double d = par[4];
+  double e = par[5];
+  
+  return N * exp( -1.* (pow(e/500.*xx,5) + pow(d/500.*xx,4) + pow(c/500.*xx,3) + pow(b/500.*xx,2) + a/500.*xx) );
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
 /*** polynomial of fourth order ***/
 double pol4order (double* x, double* par)
 {
@@ -587,7 +679,7 @@ double attenuatedDoubleExponentialCumLeadingEdge(double* x, double* par)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-double attenuatedCrystallBallHigh(double* x, double* par)
+double attenuatedCrystalBallHigh(double* x, double* par)
 {
   return antiFermi(x,par) * crystalBallHigh(x,&par[2]);
 }
@@ -599,6 +691,42 @@ double attenuatedCrystallBallHigh(double* x, double* par)
 double attenuatedCrystalBallLowHigh(double* x, double* par)
 {
   return antiFermi(x,par) * crystalBallLowHigh(x,&par[2]);
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+double attenuatedExpPol2order(double* x, double* par)
+{
+  return antiFermi(x,par) * expPol2order(x,&par[2]);
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+double attenuatedExpPol3order(double* x, double* par)
+{
+  return antiFermi(x,par) * expPol3order(x,&par[2]);
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+double attenuatedExpPol4order(double* x, double* par)
+{
+  return antiFermi(x,par) * expPol4order(x,&par[2]);
+}
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+double attenuatedExpPol5order(double* x, double* par)
+{
+  return antiFermi(x,par) * expPol5order(x,&par[2]);
 }
 
 

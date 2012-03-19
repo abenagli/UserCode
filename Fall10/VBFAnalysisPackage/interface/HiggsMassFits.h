@@ -25,4 +25,17 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
 
 float GetHiggsMassTurnOnWidth(const float& mH);
 
+
+
+void FitData(TF1** fitFunc, const std::string& funcName,
+             TH1F* h, const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts,
+             const std::string& fitMethod);
+
+void GetTurnOnParameters(const std::string& fitMethod,
+                         float& mu, float& kT,
+                         const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts);
+
+void GetParameters(const std::string& fitMethod,
+                   std::vector<float>& initPars, const int& iStart,
+                   const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts);
 #endif

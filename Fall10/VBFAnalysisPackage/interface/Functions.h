@@ -56,14 +56,26 @@ double breitWigner_crystalBallLow(double* x, double* par);
 /*** breit-wigner convoluted with a gaussian ***/
 double breitWigner_gaussian(double* x, double* par);
 
+/*** exp-polynomial of second order ***/
+double expPol2order(double* x, double* par);
+
+/*** exp-polynomial of third order ***/
+double expPol3order(double* x, double* par);
+
+/*** exp-polynomial of fourth order ***/
+double expPol4order(double* x, double* par);
+
+/*** exp-polynomial of fifth order ***/
+double expPol5order(double* x, double* par);
+
 /*** polynomial of fourth order ***/
-double pol4order (double* x, double* par);
+double pol4order(double* x, double* par);
 
 /*** polynomial of fifth order ***/
-double pol5order (double* x, double* par);
+double pol5order(double* x, double* par);
 
 /*** polynomial of fourth order in the Bernstein base ***/
-double pol4orderBernstein (double* x, double* par);
+double pol4orderBernstein(double* x, double* par);
 
 
 
@@ -85,6 +97,11 @@ double attenuatedDoubleExponentialCumLeadingEdge(double* x, double* par);
 double attenuatedCrystalBallHigh(double* x, double* par);
 
 double attenuatedCrystalBallLowHigh(double* x, double* par);
+
+double attenuatedExpPol2order(double* x, double* par);
+double attenuatedExpPol3order(double* x, double* par);
+double attenuatedExpPol4order(double* x, double* par);
+double attenuatedExpPol5order(double* x, double* par);
 
 double antiFermiWithScale (double* x, double* par);
 
