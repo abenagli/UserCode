@@ -13,7 +13,11 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
   //--------------------------
   // 1st pre-fit with gaussian
   
-  TF1* preFitFunc = new TF1("preFitFunc","gaus",mH-100,mH+100);
+  TF1* preFitFunc = new TF1("preFitFunc","[0]*exp(-1.*(x-[1])*(x-[1])/(2.*[2]*[2]))",mH-100,mH+100);
+  
+  preFitFunc -> SetParLimits(0,0.5*h->GetMaximum(),1.5*h->GetMaximum());
+  preFitFunc -> SetParLimits(1,mH-50.,mH+50.);
+  preFitFunc -> SetParLimits(2,0.,200.);
   
   preFitFunc -> SetParameter(0,h->GetMaximum());
   preFitFunc -> SetParameter(1,mH);
@@ -23,7 +27,7 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
   preFitFunc -> SetLineColor(kBlack);
   preFitFunc -> SetLineWidth(2);
   
-  h -> Fit("preFitFunc","NRQ+");
+  h -> Fit("preFitFunc","RQ+");
   
   double preN     = preFitFunc -> GetParameter(0);
   double preMu    = preFitFunc -> GetParameter(1);
@@ -34,7 +38,11 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
   //--------------------------
   // 2nd pre-fit with gaussian
   
-  TF1* preFitFunc2 = new TF1("preFitFunc2","gaus",preMu-0.5*preSigma,preMu+0.5*preSigma);
+  TF1* preFitFunc2 = new TF1("preFitFunc2","[0]*exp(-1.*(x-[1])*(x-[1])/(2.*[2]*[2]))",preMu-0.5*preSigma,preMu+0.5*preSigma);
+  
+  preFitFunc2 -> SetParLimits(0,0.5*h->GetMaximum(),1.5*h->GetMaximum());
+  preFitFunc2 -> SetParLimits(1,mH-50.,mH+50.);
+  preFitFunc2 -> SetParLimits(2,0.,200.);
   
   preFitFunc2 -> SetParameter(0,preN);
   preFitFunc2 -> SetParameter(1,preMu);
@@ -55,7 +63,11 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
   //--------------------------
   // 3rd pre-fit with gaussian
   
-  TF1* preFitFunc3 = new TF1("preFitFunc3","gaus",preMu2-preSigma2,preMu2+preSigma2);
+  TF1* preFitFunc3 = new TF1("preFitFunc3","[0]*exp(-1.*(x-[1])*(x-[1])/(2.*[2]*[2]))",preMu2-preSigma2,preMu2+preSigma2);
+  
+  preFitFunc3 -> SetParLimits(0,0.5*h->GetMaximum(),1.5*h->GetMaximum());
+  preFitFunc3 -> SetParLimits(1,mH-50.,mH+50.);
+  preFitFunc3 -> SetParLimits(2,0.,200.);
   
   preFitFunc3 -> SetParameter(0,preN2);
   preFitFunc3 -> SetParameter(1,preMu2);
@@ -65,7 +77,7 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
   preFitFunc3 -> SetLineColor(kGreen+1);
   preFitFunc3 -> SetLineWidth(2);
   
-  h -> Fit("preFitFunc3","NRQ+");
+  h -> Fit("preFitFunc3","RQ+");
   
   double preN3     = preFitFunc3 -> GetParameter(0);
   double preMu3    = preFitFunc3 -> GetParameter(1);
@@ -103,7 +115,7 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
   preFitFunc4 -> SetLineColor(kGreen+2);
   preFitFunc4 -> SetLineWidth(2);
   
-  h -> Fit("preFitFunc4","QNR+");
+  h -> Fit("preFitFunc4","QR+");
   preFitFunc4 -> Draw("same");
   
   double preAlphaHigh = preFitFunc4 -> GetParameter(3);  
@@ -145,7 +157,7 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
   preFitFunc5 -> SetLineColor(kGreen+2);
   preFitFunc5 -> SetLineWidth(2);
   
-  h -> Fit("preFitFunc5","QNR+","",0.,preMu3);
+  h -> Fit("preFitFunc5","QR+","",0.,preMu3);
   preFitFunc5 -> Draw("same");
 
   double preAlphaLow = preFitFunc5 -> GetParameter(7);
@@ -258,4 +270,483 @@ float GetHiggsMassTurnOnWidth(const float& mH)
   else if( mH == 550. ) return 18.5;
   else if( mH == 600. ) return 16.4;
   else                  return -1.;
+}
+
+
+
+
+
+
+void FitData(TF1** fitFunc, const std::string& funcName,
+             TH1F* h, const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts,
+             const std::string& fitMethod)
+{
+  std::cout << ">>> HiggsMassFits::FitData::fitting " << flavour << " data for mH " << mH << " with function " << fitMethod << std::endl;
+  
+  
+  
+  TVirtualFitter::SetDefaultFitter("Minuit2");
+  
+  
+  
+  //------------------------
+  // define the fit function
+  
+  int nPar;
+  
+  if( fitMethod == "attenuatedExponential" )
+  {
+    nPar = 4;
+    (*fitFunc) = new TF1(funcName.c_str(),attenuatedExponential,180.,800.,nPar);
+  }
+  if( fitMethod == "attenuatedDoubleExponential" )
+  {
+    nPar = 6;
+    (*fitFunc) = new TF1(funcName.c_str(),attenuatedDoubleExponential,180.,800.,nPar);
+  }
+  if( fitMethod == "attenuatedPowerLaw" )
+  {
+    nPar = 5;
+    (*fitFunc) = new TF1(funcName.c_str(),attenuatedPowerLaw,180.,800.,nPar);
+  }
+  if( fitMethod == "attenuatedExpPol2order" )
+  {
+    nPar = 5;
+    (*fitFunc) = new TF1(funcName.c_str(),attenuatedExpPol2order,180.,800.,nPar);
+  }
+  if( fitMethod == "attenuatedExpPol3order" )
+  {
+    nPar = 6;
+    (*fitFunc) = new TF1(funcName.c_str(),attenuatedExpPol3order,180.,800.,nPar);
+  }
+  if( fitMethod == "attenuatedExpPol4order" )
+  {
+    nPar = 7;
+    (*fitFunc) = new TF1(funcName.c_str(),attenuatedExpPol4order,180.,800.,nPar);
+  }  
+  
+  std::vector<float> initPars(nPar);
+  
+  
+  //-----------------------
+  // set turn-on parameters
+  
+  bool isAttenuated = false;
+  int iStart = 0;
+  
+  if( (fitMethod == "attenuatedExponential") ||
+      (fitMethod == "attenuatedDoubleExponential") ||
+      (fitMethod == "attenuatedPowerLaw") ||
+      (fitMethod == "attenuatedExpPol2order") ||
+      (fitMethod == "attenuatedExpPol3order") ||
+      (fitMethod == "attenuatedExpPol4order") )
+  {
+    isAttenuated = true;
+    
+    GetTurnOnParameters(fitMethod,initPars[0],initPars[1],mH,step,flavour,additionalCuts);
+    
+    (*fitFunc) -> FixParameter(0,initPars[0]);
+    (*fitFunc) -> FixParameter(1,initPars[1]); 
+    
+    (*fitFunc) -> SetParName(0,"mu");
+    (*fitFunc) -> SetParName(1,"kT");
+  }
+  
+  if( isAttenuated == true ) iStart = 2;
+  
+  
+  
+  //---------------------
+  // set other parameters
+  
+  GetParameters(fitMethod,initPars,iStart,mH,step,flavour,additionalCuts);
+  
+  if( fitMethod == "attenuatedExponential" )
+  {
+    (*fitFunc) -> SetParLimits(iStart+0,0.,1000000.);
+    (*fitFunc) -> SetParLimits(iStart+1,0.,0.1);
+    
+    (*fitFunc) -> SetParameter(iStart+0,1000.);
+    (*fitFunc) -> SetParameter(iStart+1,initPars[iStart+0]);
+    
+    (*fitFunc) -> SetParName(iStart+0,"N");
+    (*fitFunc) -> SetParName(iStart+1,"#lambda");
+    
+    (*fitFunc) -> SetLineColor(kRed);
+  }
+  
+  if( fitMethod == "attenuatedDoubleExponential" )
+  {
+    (*fitFunc) -> SetParLimits(iStart+0,0.,1000000.);
+    (*fitFunc) -> SetParLimits(iStart+1,0.,0.1);
+    (*fitFunc) -> SetParLimits(iStart+2,0.,1.);
+    (*fitFunc) -> SetParLimits(iStart+3,0.,0.1);
+    
+    (*fitFunc) -> SetParameter(iStart+0,50000.);
+    (*fitFunc) -> SetParameter(iStart+1,initPars[iStart+0]);
+    (*fitFunc) -> SetParameter(iStart+2,initPars[iStart+1]);
+    (*fitFunc) -> SetParameter(iStart+3,initPars[iStart+2]);
+    
+    (*fitFunc) -> SetParName(iStart+0,"N1");
+    (*fitFunc) -> SetParName(iStart+1,"#lambda1");
+    (*fitFunc) -> SetParName(iStart+2,"N2");
+    (*fitFunc) -> SetParName(iStart+3,"#lambda2");
+    
+    (*fitFunc) -> SetLineColor(kMagenta);
+  }
+  
+  if( fitMethod == "attenuatedPowerLaw" )
+  {
+    (*fitFunc) -> SetParLimits(iStart+0,0.,1000000.);
+    (*fitFunc) -> SetParLimits(iStart+1,0.,1000.);
+    (*fitFunc) -> SetParLimits(iStart+2,0.,10000.);
+    
+    (*fitFunc) -> SetParameter(iStart+0,100.);
+    (*fitFunc) -> SetParameter(iStart+1,initPars[iStart+0]);
+    (*fitFunc) -> SetParameter(iStart+2,initPars[iStart+1]);
+    
+    (*fitFunc) -> SetParName(iStart+0,"N");
+    (*fitFunc) -> SetParName(iStart+1,"n");
+    (*fitFunc) -> SetParName(iStart+2,"a");
+    
+    (*fitFunc) -> SetLineColor(kCyan);
+  }
+  
+  if( fitMethod == "attenuatedExpPol2order" )
+  {
+    (*fitFunc) -> SetParLimits(iStart+0,0.,1000000.);
+    (*fitFunc) -> SetParLimits(iStart+1,-10.,10.);
+    (*fitFunc) -> SetParLimits(iStart+2,-10.,10.);
+    
+    (*fitFunc) -> SetParameter(iStart+0,10000.);
+    (*fitFunc) -> SetParameter(iStart+1,initPars[iStart+0]);
+    (*fitFunc) -> SetParameter(iStart+2,initPars[iStart+1]);
+    
+    (*fitFunc) -> SetParName(iStart+0,"N");
+    (*fitFunc) -> SetParName(iStart+1,"a");
+    (*fitFunc) -> SetParName(iStart+2,"b");
+    
+    (*fitFunc) -> SetLineColor(kOrange);
+  }
+  
+  if( fitMethod == "attenuatedExpPol3order" )
+  {
+    (*fitFunc) -> SetParLimits(iStart+0,0.,1000000.);
+    (*fitFunc) -> SetParLimits(iStart+1,-10.,10.);
+    (*fitFunc) -> SetParLimits(iStart+2,-10.,10.);
+    (*fitFunc) -> SetParLimits(iStart+3,-10.,10.);
+    
+    (*fitFunc) -> SetParameter(iStart+0,10000.);
+    (*fitFunc) -> SetParameter(iStart+1,initPars[iStart+0]);
+    (*fitFunc) -> SetParameter(iStart+2,initPars[iStart+1]);
+    (*fitFunc) -> SetParameter(iStart+3,initPars[iStart+2]);
+    
+    (*fitFunc) -> SetParName(iStart+0,"N");
+    (*fitFunc) -> SetParName(iStart+1,"a");
+    (*fitFunc) -> SetParName(iStart+2,"b");
+    (*fitFunc) -> SetParName(iStart+3,"c");
+    
+    (*fitFunc) -> SetLineColor(kOrange+1);
+  }
+  
+  if( fitMethod == "attenuatedExpPol4order" )
+  {
+    (*fitFunc) -> SetParLimits(iStart+0,0.,1000000.);
+    (*fitFunc) -> SetParLimits(iStart+1,-10.,10.);
+    (*fitFunc) -> SetParLimits(iStart+2,-10.,10.);
+    (*fitFunc) -> SetParLimits(iStart+3,-10.,10.);
+    (*fitFunc) -> SetParLimits(iStart+4,-10.,10.);
+    
+    (*fitFunc) -> SetParameter(iStart+0,10000.);
+    (*fitFunc) -> SetParameter(iStart+1,initPars[iStart+0]);
+    (*fitFunc) -> SetParameter(iStart+2,initPars[iStart+1]);
+    (*fitFunc) -> SetParameter(iStart+3,initPars[iStart+2]);
+    (*fitFunc) -> SetParameter(iStart+4,initPars[iStart+3]);
+    
+    (*fitFunc) -> SetParName(iStart+0,"N");
+    (*fitFunc) -> SetParName(iStart+1,"a");
+    (*fitFunc) -> SetParName(iStart+2,"b");
+    (*fitFunc) -> SetParName(iStart+3,"c");
+    (*fitFunc) -> SetParName(iStart+4,"d");
+    
+    (*fitFunc) -> SetLineColor(kOrange+2);
+  }
+  
+  
+  
+  //------------------
+  // fit the histogram
+  
+  (*fitFunc) -> SetNpx(10000);
+  (*fitFunc) -> SetLineWidth(2);
+  
+  int counter = 0;
+  int fitStatus = -1;
+  while( counter < 5 )
+  {
+    TFitResultPtr fitResultPtr = h -> Fit(funcName.c_str(),"NQLRS+","",180.,800.);
+    fitStatus = (int)(fitResultPtr);
+    if( fitStatus == 0 ) break;
+    ++counter;
+  }
+  
+}
+
+
+
+
+
+
+void GetTurnOnParameters(const std::string& fitMethod,
+                         float& mu, float& kT,
+                         const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts)
+{
+  if( fitMethod == "attenuatedExponential" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      mu = 180.;
+      kT = 0.793;
+      //mu = 0.376;
+      //kT = 1.34;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      mu = 178.;
+      kT = 0.149;
+      //mu = 0.415;
+      //kT = 2.83;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedDoubleExponential" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      mu = 142.;
+      kT = 19.8;
+      //mu = 0.347;
+      //kT = 1.15;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      mu = 178.;
+      kT = 0.155;
+      //mu = 0.413;
+      //kT = 2.59;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedPowerLaw" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      mu = 173.;
+      kT = 3.69;
+      //mu = 0.310;
+      //kT = 1.01;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      mu = 108.;
+      kT = 70.6;
+      //mu = 0.412;
+      //kT = 2.49;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedExpPol2order" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      mu = 180.;
+      kT = 0.736;
+      //mu = 0.376;
+      //kT = 1.34;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      mu = 178.;
+      kT = 0.159;
+      //mu = 0.415;
+      //kT = 2.83;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedExpPol3order" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      mu = 163.;
+      kT = 7.20;
+      //mu = 0.341;
+      //kT = 1.12;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      mu = 178.;
+      kT = 0.200;
+      //mu = 0.416;
+      //kT = 2.96;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedExpPol4order" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      mu = 134.;
+      kT = 19.6;
+      //mu = 0.341;
+      //kT = 1.12;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      mu = 179.;
+      kT = 0.224;
+      //mu = 0.418;
+      //kT = 3.41;
+    }
+  }
+}
+
+
+
+
+
+
+
+void GetParameters(const std::string& fitMethod,
+                   std::vector<float>& initPars, const int& iStart,
+                   const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts)
+{
+  if( fitMethod == "attenuatedExponential" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 0.0116;
+      //initPars[iStart+0] = 0.0116;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 0.0118;
+      //initPars[iStart+0] = 0.0118;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedDoubleExponential" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 0.0224;
+      initPars[iStart+1] = 0.606;
+      initPars[iStart+2] = 0.0113;
+      //initPars[iStart+0] = 0.0121;
+      //initPars[iStart+1] = 0.996;
+      //initPars[iStart+2] = 0.00535;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 0.0119;
+      initPars[iStart+1] = 0.999;
+      initPars[iStart+2] = 3.15e-09;
+      //initPars[iStart+0] = 0.0120;
+      //initPars[iStart+1] = 0.999;
+      //initPars[iStart+2] = 0.00473;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedPowerLaw" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 96.1;
+      initPars[iStart+1] = 7920.;
+      //initPars[iStart+0] = 28.6;
+      //initPars[iStart+1] = 2080.;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 19.8;
+      initPars[iStart+1] = 1210.;
+      //initPars[iStart+0] = 91.4;
+      //initPars[iStart+1] = 7380.;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedExpPol2order" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 5.80;
+      initPars[iStart+1] = -0.0000145;
+      //initPars[iStart+0] = 5.79;
+      //initPars[iStart+1] = 4.64e-08;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 5.92;
+      initPars[iStart+1] = 0.0000359;
+      //initPars[iStart+0] = 5.91;
+      //initPars[iStart+1] = 0.0000530;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedExpPol3order" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 5.93;
+      initPars[iStart+1] = -0.000605;
+      initPars[iStart+2] = -0.415;
+      //initPars[iStart+0] = 5.96;
+      //initPars[iStart+1] = 0.532;
+      //initPars[iStart+2] = -0.672;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 4.39;
+      initPars[iStart+1] = 1.50;
+      initPars[iStart+2] = -1.00;
+      //initPars[iStart+0] = 5.20;
+      //initPars[iStart+1] = 1.06;
+      //initPars[iStart+2] = -0.802;
+    }
+  }
+  
+  
+  if( fitMethod == "attenuatedExpPol4order" )
+  {
+    if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 3.00;
+      initPars[iStart+1] = -2.70;
+      initPars[iStart+2] = -1.93;
+      initPars[iStart+3] = -1.24;
+      //initPars[iStart+0] = 5.96;
+      //initPars[iStart+1] = -0.531;
+      //initPars[iStart+2] = -0.672;
+      //initPars[iStart+3] = -0.0133;
+    }
+    if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
+    {
+      initPars[iStart+0] = 2.48;
+      initPars[iStart+1] = -2.49;
+      initPars[iStart+2] = -1.63;
+      initPars[iStart+3] = -0.998;
+      //initPars[iStart+0] = 3.36;
+      //initPars[iStart+1] = 2.17;
+      //initPars[iStart+2] = -1.49;
+      //initPars[iStart+3] = -0.932;
+    }
+  }
 }
