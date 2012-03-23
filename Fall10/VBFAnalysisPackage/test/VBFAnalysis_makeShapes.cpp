@@ -63,8 +63,11 @@ int main(int argc, char** argv)
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
   
   //[Options]
+  int useTurnOn   = gConfigParser -> readIntOption("Options::useTurnOn");
   int blockTurnOn = gConfigParser -> readIntOption("Options::blockTurnOn");
   int blockParams = gConfigParser -> readIntOption("Options::blockParams");
+  if( useTurnOn == 0 ) blockTurnOn = 1;
+  
   int sigSyst = gConfigParser -> readIntOption("Options::sigSyst");
   int bkgSyst = gConfigParser -> readIntOption("Options::bkgSyst");
   
@@ -286,7 +289,7 @@ int main(int argc, char** argv)
         
         if( toyIt == 0 )
         {
-          nPars = DefineRooFitFunction(x,&pdf_bkg,pars,parNames,fitMethod,blockTurnOn,blockParams,mass,step,flavour,additionalCuts);
+          nPars = DefineRooFitFunction(x,&pdf_bkg,pars,parNames,fitMethod,useTurnOn,blockTurnOn,blockParams,mass,step,flavour,additionalCuts);
           
           for(int parIt = 0; parIt < nPars; ++parIt)
             workspace -> import(*pars[parIt]);
@@ -931,11 +934,14 @@ int main(int argc, char** argv)
           
           datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
           
-          int parIt = 0;
-          if( blockTurnOn == 1 ) parIt = 2;
-          if( blockParams == 1 ) parIt = nPars;
+          int parItMin = 0;
+          if( blockTurnOn == 1 ) parItMin = 2;
+          if( blockParams == 1 ) parItMin = nPars;
           
-          for(int parIt = 0; parIt < nPars; ++parIt)
+          int parItMax = nPars;
+          if( (blockTurnOn == 0) && (blockParams == 1) ) parItMax = 2; 
+          
+          for(int parIt = parItMin; parIt < parItMax; ++parIt)
           {
             datacard_sa << setw(25) << parNames[parIt] << "   param   "
                         << setw(12) << pars[parIt]->getVal() << "   1.   ["
