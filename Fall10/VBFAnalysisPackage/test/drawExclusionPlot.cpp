@@ -62,11 +62,11 @@ int main(int argc, char** argv)
   //------------------------
   // set optional parameters
   
-  if( argc == 4 ) drawObserved = atoi(argv[3]);
-  if( argc == 5 ) yMin_lin     = atoi(argv[4]);
-  if( argc == 6 ) yMax_lin     = atoi(argv[5]);
-  if( argc == 7 ) yMin_log     = atoi(argv[6]);
-  if( argc == 8 ) yMax_log     = atoi(argv[7]);
+  if( argc >= 4 ) drawObserved = atoi(argv[3]);
+  if( argc >= 5 ) yMin_lin     = atof(argv[4]);
+  if( argc >= 6 ) yMax_lin     = atof(argv[5]);
+  if( argc >= 7 ) yMin_log     = atof(argv[6]);
+  if( argc >= 8 ) yMax_log     = atof(argv[7]);
   
   
   
@@ -142,9 +142,9 @@ int main(int argc, char** argv)
   g_lin_2s     -> Draw("3,same");
   g_lin_1s     -> Draw("3,same");
   g_lin_median -> Draw("L,same");
-  legend       -> Draw("same");
   f            -> Draw("same");
   if( drawObserved >= 1 ) g_lin_observed -> Draw("PL,same");
+  legend       -> Draw("same");
   
   c1 -> Print(("lin_"+name+".pdf").c_str(),"pdf");
   c1 -> Print(("lin_"+name+".png").c_str(),"png");
@@ -160,10 +160,10 @@ int main(int argc, char** argv)
   g_log_2s     -> Draw("3,same");
   g_log_1s     -> Draw("3,same");
   g_log_median -> Draw("L,same");
-  legend       -> Draw("same");
   f            -> Draw("same");
   if( drawObserved >= 1 ) g_log_observed -> Draw("PL,same");
-  
+  legend       -> Draw("same");
+    
   c2 -> Print(("log_"+name+".pdf").c_str(),"pdf");
   c2 -> Print(("log_"+name+".png").c_str(),"png");
   
