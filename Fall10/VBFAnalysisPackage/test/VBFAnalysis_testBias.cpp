@@ -8,6 +8,7 @@
 
 #include "TFile.h"
 #include "TCanvas.h"
+#include "TNtuple.h"
 
 #include "RooMsgService.h"
 #include "RooWorkspace.h"
@@ -158,11 +159,17 @@ int main(int argc, char** argv)
   
   //-------------------
   // get the parent pdf
+  
+  std::cout << "\n\n\n***********************************************************" << std::endl;
+  std::cout << "*** PARENT ***" << std::endl;
+  std::cout << "***********************************************************" << std::endl;
+  
   std::stringstream parentName;
   parentName << "H" << mass << "/fitFunc_" << mass << "_" << flavour << "_" << parentMethod;
   
   TF1* parent = (TF1*)( inFile2->Get(parentName.str().c_str()) );
   parent -> SetName("parent");
+  parent -> Print();
   
   
   
@@ -207,7 +214,7 @@ int main(int argc, char** argv)
   TH1F* h_diffB_parentB_fitBS  = new TH1F("h_diffB_parentB_fitBS", "",20000,-10.,10.);
   TH1F* h_diffS_parentB_fitBS  = new TH1F("h_diffS_parentB_fitBS", "",20000,-10.,10.);
   
-  
+  TNtuple *ntuple = new TNtuple("ntuple","ntuple","n_parent_S:n_parent_B");
   
   //--------------------------------------
   // define background parent distribution
@@ -229,6 +236,10 @@ int main(int argc, char** argv)
   double n_parent_S = integral_parent_S->getVal() * (n_H);
   std::cout << ">>> n_parent_S: " << n_parent_S << std::endl; 
   
+  //----------------------------------
+  // fill the ntuple with nS and nB
+  ntuple->Fill(n_parent_S,n_parent_B);
+
   
   
   //------------
@@ -242,8 +253,16 @@ int main(int argc, char** argv)
     
     TH1F* h_B_toy = new TH1F("h_B_toy","",nBins,xMin,xMax);
     h_B_toy -> Sumw2();
-    h_B_toy -> FillRandom("parent",int(bkgStrength*n_data_obs));
-    h_B_toy -> Scale(1./bkgStrength);
+    for(int bin = 1; bin <= h_B_toy->GetNbinsX(); ++bin)
+    {
+      float binCenter = h_B_toy -> GetBinCenter(bin);
+      float binLowEdge = binCenter - 0.5 * xWidth;
+      float binHigEdge = binCenter + 0.5 * xWidth;
+      float binContent = parent->Integral(binLowEdge,binHigEdge) / xWidth;
+      h_B_toy -> SetBinContent(bin,binContent);
+      h_B_toy -> SetBinError(bin,sqrt(binContent/bkgStrength));
+    }
+    
     RooDataHist* dh_B_toy = new RooDataHist("dh_B_toy","",RooArgList(*x),h_B_toy);
     
     RooDataSet* ds_S_toy = rooParentPdf_S -> generate(*x,int(n_H));
@@ -255,6 +274,18 @@ int main(int argc, char** argv)
     
     
     
+    TF1* fitFunc;
+
+    FitData(&fitFunc,"fitFunc_"+fitMethod,
+            h_B_toy,mass,step,flavour,additionalCuts,
+            fitMethod,false);
+    
+    double n_toy_B = fitFunc->Integral(lepNuWMMIN,lepNuWMMAX)/fitFunc->Integral(xMin,xMax) * int(n_data_obs);
+    
+    h_diffB_parentB_fitB -> Fill(n_toy_B/n_parent_B - 1.);
+    
+    
+    /*
     // generate B - fit B
     RooRealVar* B_toy = new RooRealVar("B_toy","",n_data_obs,0.,2.*n_data_obs);
     
@@ -264,7 +295,7 @@ int main(int argc, char** argv)
     nPars = DefineRooFitFunction(x,&bkg_toy,pars_toy,parNames_toy,fitMethod,mass,step,flavour,additionalCuts);
     
     RooAddPdf* rooTotPdf_B_toy = new RooAddPdf("rooTotPdf_B_toy","",RooArgList(*bkg_toy),RooArgList(*B_toy));
-    rooTotPdf_B_toy -> fitTo(*dh_B_toy,Extended(kTRUE),Save(),PrintLevel(-10));
+    rooTotPdf_B_toy -> fitTo(*dh_B_toy,Extended(kTRUE),Save(),PrintLevel(3));
     
     RooAbsReal* integral_B_toy = rooTotPdf_B_toy -> createIntegral(*x,NormSet(*x),Range("signal"));
     double n_B_toy = integral_B_toy->getVal() * B_toy->getVal();
@@ -335,7 +366,7 @@ int main(int argc, char** argv)
     double n_S4_toy = integral_S4_toy->getVal() * S4_toy->getVal();
     
     h_diffB_parentB_fitBS -> Fill(n_B4_toy/n_parent_B - 1.);
-    h_diffS_parentB_fitBS -> Fill(n_S4_toy/n_parent_S);
+    h_diffS_parentB_fitBS -> Fill(n_S4_toy/n_parent_S); */
     
     
     
@@ -349,14 +380,20 @@ int main(int argc, char** argv)
       outFile -> mkdir(dirName);
       outFile -> cd(dirName);
       
+      h_B_toy -> Write();
+      parent -> Write();
+      fitFunc -> Write();
+      
+      /*
       char canvasName[50];
       
       sprintf(canvasName,"parentB_fitB_%d",toyIt);
       TCanvas* c_parentB_fitB_toy = new TCanvas(canvasName);
+      parent -> Draw();
       RooPlot* plot_parentB_fitB_toy = x->frame();
       dh_B_toy -> plotOn(plot_parentB_fitB_toy);
-      rooTotPdf_B_toy -> plotOn(plot_parentB_fitB_toy);
-      plot_parentB_fitB_toy -> Draw();
+      rooTotPdf_B_toy -> plotOn(plot_parentB_fitB_toy,RooFit::LineColor(kRed));
+      plot_parentB_fitB_toy -> Draw("same");
       c_parentB_fitB_toy -> Write();
       delete plot_parentB_fitB_toy;
       delete c_parentB_fitB_toy;
@@ -389,11 +426,12 @@ int main(int argc, char** argv)
       plot_parentB_fitBS_toy -> Draw();
       c_parentB_fitBS_toy -> Write();
       delete plot_parentB_fitBS_toy;
-      delete c_parentB_fitBS_toy;
+      delete c_parentB_fitBS_toy;*/
     }
     
     
     
+    /*
     delete integral_B_toy;
     delete rooTotPdf_B_toy;
     delete bkg_toy;
@@ -432,11 +470,11 @@ int main(int argc, char** argv)
       delete pars4_toy[parIt];
     pars4_toy.clear();
     parNames4_toy.clear();
-    delete B4_toy;
+    delete B4_toy; 
     
     delete integral_S4_toy;
     delete sig4_toy;
-    delete S4_toy;
+    delete S4_toy;*/
     
     delete dh_B_toy;
     delete h_B_toy;
@@ -457,6 +495,7 @@ int main(int argc, char** argv)
   h_diffS_parentBS_fitBS -> Write();
   h_diffB_parentB_fitBS -> Write();
   h_diffS_parentB_fitBS -> Write();
+  ntuple -> Write();
   
   outFile -> Close();
   
