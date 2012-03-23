@@ -144,7 +144,7 @@ int main(int argc, char** argv)
   g_lin_median -> Draw("L,same");
   legend       -> Draw("same");
   f            -> Draw("same");
-  if( drawObserved == 1 ) g_lin_observed -> Draw("PL,same");
+  if( drawObserved >= 1 ) g_lin_observed -> Draw("PL,same");
   
   c1 -> Print(("lin_"+name+".pdf").c_str(),"pdf");
   c1 -> Print(("lin_"+name+".png").c_str(),"png");
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
   g_log_median -> Draw("L,same");
   legend       -> Draw("same");
   f            -> Draw("same");
-  if( drawObserved == 1 ) g_log_observed -> Draw("PL,same");
+  if( drawObserved >= 1 ) g_log_observed -> Draw("PL,same");
   
   c2 -> Print(("log_"+name+".pdf").c_str(),"pdf");
   c2 -> Print(("log_"+name+".png").c_str(),"png");
