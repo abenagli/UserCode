@@ -19,8 +19,8 @@ int drawObserved = 1;
 float yMin_lin = 0.;
 float yMax_lin = 15.;
 
-float yMin_log = 0.2;
-float yMax_log = 20.;
+float yMin_log = 0.3;
+float yMax_log = 30.;
 
 int ReadVals(const std::string& folder,
              double* vals_masses,
