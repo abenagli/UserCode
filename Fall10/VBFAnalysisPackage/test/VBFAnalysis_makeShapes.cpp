@@ -63,6 +63,11 @@ int main(int argc, char** argv)
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
   
   //[Options]
+  int blockTurnOn = gConfigParser -> readIntOption("Options::blockTurnOn");
+  int blockParams = gConfigParser -> readIntOption("Options::blockParams");
+  int sigSyst = gConfigParser -> readIntOption("Options::sigSyst");
+  int bkgSyst = gConfigParser -> readIntOption("Options::bkgSyst");
+  
   float xWidth = gConfigParser -> readFloatOption("Options::xWidth");
   char xWidthChar[50];
   sprintf(xWidthChar,"%d",int(xWidth));
@@ -281,7 +286,7 @@ int main(int argc, char** argv)
         
         if( toyIt == 0 )
         {
-          nPars = DefineRooFitFunction(x,&pdf_bkg,pars,parNames,fitMethod,mass,step,flavour,additionalCuts);
+          nPars = DefineRooFitFunction(x,&pdf_bkg,pars,parNames,fitMethod,blockTurnOn,blockParams,mass,step,flavour,additionalCuts);
           
           for(int parIt = 0; parIt < nPars; ++parIt)
             workspace -> import(*pars[parIt]);
@@ -797,100 +802,143 @@ int main(int argc, char** argv)
         }
         
         datacard_sa  << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-        datacard_sa << setw(25) << "lumi"     << "   " << setw(5) << "lnN" << "   " << setw(8) << "1.045" << "   " << setw(8) << "1.045" << "   " << setw(8) << "-" << std::endl;
         
-        datacard_sa << setw(25) << "QCDscale_ggH" << "   " << setw(5) << "lnN" << "   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsQCDScaleSyst(mass,"gg","up")+HiggsQCDScaleSyst(mass,"gg","down")) << "   "
-                    << setw(8) << "-" << "   " 
-                    << setw(8) << "-" << std::endl;
         
-        datacard_sa << setw(25) << "QCDscale_qqH" << "   " << setw(5) << "lnN" << "   "
-                    << setw(8) << "-" << "   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsQCDScaleSyst(mass,"qq","up")+HiggsQCDScaleSyst(mass,"qq","down")) << "   "
-                    << setw(8) << "-" << std::endl;
+        datacard_sa << std::setprecision(3);
         
-        datacard_sa << setw(25) << "pdf_gg" << "   " << setw(5) << "lnN" << "   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsPDFSyst(mass,"gg","up")+HiggsPDFSyst(mass,"gg","down")) << "   "
-                    << setw(8) << "-" << "   "
-                    << setw(8) << "-" << std::endl;
-        
-        datacard_sa << setw(25) << "pdf_qqbar" << "   " << setw(5) << "lnN" << "   "
-                    << setw(8) << "-" << "   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsPDFSyst(mass,"qq","up")+HiggsPDFSyst(mass,"qq","down")) << "   "
-                    << setw(8) << "-" << std::endl;
-        
-        datacard_sa << setw(25) << "theoryUncXS_HighMH" << "   " << setw(5) << "lnN" << "   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsHighMassSyst(mass,"gg","up")+HiggsHighMassSyst(mass,"gg","down")) << "   "
-                    << setw(8) << "-" << "   "
-                    << setw(8) << "-" << std::endl;
-        
-        for(unsigned int labelIt = 0; labelIt < labels_sa_num_names.size(); ++labelIt)
+        if( sigSyst == 1 )
         {
-          double ggH_errUp   = fabs(n_H["ggH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt)]   - n_H["ggH"]);
-          double qqH_errUp   = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt)]   - n_H["qqH"]);
-          double ggH_errDown = fabs(n_H["ggH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt+1)] - n_H["ggH"]);
-          double qqH_errDown = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt+1)] - n_H["qqH"]);
+          datacard_sa << setw(25) << "lumi"     << "   " << setw(5) << "lnN" << "   "
+                       << setw(8) << "1.045" << "   "
+                      << setw(8) << "1.045" << "   "
+                      << setw(8) << "-" << std::endl;
           
-          double ggH_errAve  = 0.5*(ggH_errUp + ggH_errDown);
-          double qqH_errAve  = 0.5*(qqH_errUp + qqH_errDown);
+          datacard_sa << setw(25) << "QCDscale_ggH" << "   " << setw(5) << "lnN" << "   "
+                      << setw(8) << 1.+0.5*(HiggsQCDScaleSyst(mass,"gg","up")+HiggsQCDScaleSyst(mass,"gg","down")) << "   "
+                      << setw(8) << "-" << "   " 
+                      << setw(8) << "-" << std::endl;
           
-          datacard_sa << setw(25) << labels_sa_num_names.at(labelIt) << "   " << setw(5) << "lnN" << "   "
-                      << std::setprecision(3) << setw(8) << 1. + ggH_errAve/n_H["ggH"] << "   "
-                      << std::setprecision(3) << setw(8) << 1. + qqH_errAve/n_H["qqH"] << "   "
+          datacard_sa << setw(25) << "QCDscale_qqH" << "   " << setw(5) << "lnN" << "   "
+                      << setw(8) << "-" << "   "
+                      << setw(8) << 1.+0.5*(HiggsQCDScaleSyst(mass,"qq","up")+HiggsQCDScaleSyst(mass,"qq","down")) << "   "
+                      << setw(8) << "-" << std::endl;
+          
+          datacard_sa << setw(25) << "pdf_gg" << "   " << setw(5) << "lnN" << "   "
+                      << setw(8) << 1.+0.5*(HiggsPDFSyst(mass,"gg","up")+HiggsPDFSyst(mass,"gg","down")) << "   "
+                      << setw(8) << "-" << "   "
+                      << setw(8) << "-" << std::endl;
+          
+          datacard_sa << setw(25) << "pdf_qqbar" << "   " << setw(5) << "lnN" << "   "
+                      << setw(8) << "-" << "   "
+                      << setw(8) << 1.+0.5*(HiggsPDFSyst(mass,"qq","up")+HiggsPDFSyst(mass,"qq","down")) << "   "
+                      << setw(8) << "-" << std::endl;
+          
+          datacard_sa << setw(25) << "theoryUncXS_HighMH" << "   " << setw(5) << "lnN" << "   "
+                      << setw(8) << 1.+0.5*(HiggsHighMassSyst(mass,"gg","up")+HiggsHighMassSyst(mass,"gg","down")) << "   "
+                      << setw(8) << "-" << "   "
+                      << setw(8) << "-" << std::endl;
+          
+          for(unsigned int labelIt = 0; labelIt < labels_sa_num_names.size(); ++labelIt)
+          {
+            double ggH_errUp   = fabs(n_H["ggH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt)]   - n_H["ggH"]);
+            double qqH_errUp   = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt)]   - n_H["qqH"]);
+            double ggH_errDown = fabs(n_H["ggH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt+1)] - n_H["ggH"]);
+            double qqH_errDown = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt+1)] - n_H["qqH"]);
+            
+            double ggH_errAve  = 0.5*(ggH_errUp + ggH_errDown);
+            double qqH_errAve  = 0.5*(qqH_errUp + qqH_errDown);
+            
+            datacard_sa << setw(25) << labels_sa_num_names.at(labelIt) << "   " << setw(5) << "lnN" << "   "
+                        << setw(8) << 1. + ggH_errAve/n_H["ggH"] << "   "
+                        << setw(8) << 1. + qqH_errAve/n_H["qqH"] << "   "
+                        << setw(8) << "-" << std::endl;
+          }
+          for(unsigned int labelIt = 0; labelIt < labels_sa_shape_names.size(); ++labelIt)
+          {
+            datacard_sa << setw(25) << labels_sa_shape_names.at(labelIt) << "   " << setw(5) << "shape" << "   "
+                        << setw(8) << "1." << "   "
+                        << setw(8) << "1." << "   "
+                        << setw(8) << "-" << std::endl;
+          }
+          
+          name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_lepHLT";
+          if( flavour == "e" )
+            datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
+                        << setw(8) << "1.003" << "   "
+                        << setw(8) << "1.003" << "   "
+                        << setw(8) << "-" << std::endl;
+          if( flavour == "mu" )
+          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8)
+                      << "1.010" << "   "
+                      << setw(8) << "1.010" << "   "
+                      << setw(8) << "-" << std::endl;
+          
+          name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_mTHLT";
+          if( flavour == "e" )
+            datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
+                        << setw(8) << "1.014" << "   "
+                        << setw(8) << "1.014" << "   "
+                        << setw(8) << "-" << std::endl;
+          
+          name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_lep";
+          if( flavour == "e" )
+            datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
+                        << setw(8) << "1.022" << "   "
+                        << setw(8) << "1.022" << "   "
+                        << setw(8) << "-" << std::endl;
+          if( flavour == "mu" )
+            datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
+                        << setw(8) << "1.008" << "   "
+                        << setw(8) << "1.008" << "   "
+                        << setw(8) << "-" << std::endl;
+          
+          name.str(std::string()); name << "CMS_HWWlvjj_bTag";
+          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
+                      << setw(8) << "1.010" << "   "
+                      << setw(8) << "1.010" << "   "
                       << setw(8) << "-" << std::endl;
         }
-        for(unsigned int labelIt = 0; labelIt < labels_sa_shape_names.size(); ++labelIt)
+        
+        
+        
+        if( (analysisMethod == "fitNoHoles") && (bkgSyst == 1) )
         {
-          datacard_sa << setw(25) << labels_sa_shape_names.at(labelIt) << "   " << setw(5) << "shape" << "   "
-                      << setw(8) << "1." << "   "
-                      << setw(8) << "1." << "   "
+          name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bias";
+          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
+                      << setw(8) << 1.+FitBiasSyst(mass,flavour) << "   "
+                      << setw(8) << 1.+FitBiasSyst(mass,flavour) << "   "
                       << setw(8) << "-" << std::endl;
         }
         
-        name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_lepHLT";
-        if( flavour == "e" )
-          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8) << "1.003" << "   " << setw(8) << "1.003" << "   " << setw(8) << "-" << std::endl;
-        if( flavour == "mu" )
-          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8) << "1.010" << "   " << setw(8) << "1.010" << "   " << setw(8) << "-" << std::endl;
-        
-        name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_mTHLT";
-        if( flavour == "e" )
-          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8) << "1.014" << "   " << setw(8) << "1.014" << "   " << setw(8) << "-" << std::endl;
-        
-        name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_lep";
-        if( flavour == "e" )
-          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8) << "1.022" << "   " << setw(8) << "1.022" << "   " << setw(8) << "-" << std::endl;
-        if( flavour == "mu" )
-          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8) << "1.008" << "   " << setw(8) << "1.008" << "   " << setw(8) << "-" << std::endl;
-
-        name.str(std::string()); name << "CMS_HWWlvjj_bTag";
-        datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8) << "1.010" << "   " << setw(8) << "1.010" << "   " << setw(8) << "-" << std::endl;
-        
-        
-        name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bias";
-        datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
-                    << std::setprecision(3) << setw(8) << 1.+FitBiasSyst(mass,flavour) << "   "
-                    << std::setprecision(3) << setw(8) << 1.+FitBiasSyst(mass,flavour) << "   "
-                    << setw(8) << "-" << std::endl;
-        
-        if( analysisMethod == "sidebands" )
+        if( (analysisMethod == "sidebands") && (bkgSyst == 1) )
         {
           name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgSyst";
-          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "shape" << "   " << setw(8) << "-" << "   " << setw(8) << "-" << "   " << setw(8) << "1." << std::endl;
+          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "shape" << "   "
+                      << setw(8) << "-" << "   "
+                      << setw(8) << "-" << "   "
+                      << setw(8) << "1." << std::endl;
         }
-        else
-        {
-          name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgNorm";
-          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnU" << "   " << setw(8) << "-" << "   " << setw(8) << "-" << "   " << setw(8) << "1.500" << std::endl;
-        }
+        
+        
         
         if( analysisMethod == "fitNoHoles" )
         {
+          name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgNorm";
+          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnU"<< "   "
+                      << setw(8) << "-" << "   "
+                      << setw(8) << "-" << "   "
+                      << setw(8) << "1.500" << std::endl;
+          
           datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-          for(int parIt = 2; parIt < nPars; ++parIt)
+          
+          int parIt = 0;
+          if( blockTurnOn == 1 ) parIt = 2;
+          if( blockParams == 1 ) parIt = nPars;
+          
+          for(int parIt = 0; parIt < nPars; ++parIt)
           {
             datacard_sa << setw(25) << parNames[parIt] << "   param   "
-                        << std::setprecision(3) << setw(12) << pars[parIt]->getVal() << "   1.   ["
+                        << setw(12) << pars[parIt]->getVal() << "   1.   ["
                         << pars[parIt]->getMin() << "," << pars[parIt]->getMax() << "]"  << std::endl; 
           }
         }
