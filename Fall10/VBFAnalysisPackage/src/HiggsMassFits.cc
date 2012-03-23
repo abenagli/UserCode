@@ -279,7 +279,7 @@ float GetHiggsMassTurnOnWidth(const float& mH)
 
 void FitData(TF1** fitFunc, const std::string& funcName,
              TH1F* h, const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts,
-             const std::string& fitMethod)
+             const std::string& fitMethod, const bool& fixTurnOn)
 {
   std::cout << ">>> HiggsMassFits::FitData::fitting " << flavour << " data for mH " << mH << " with function " << fitMethod << std::endl;
   
@@ -345,8 +345,16 @@ void FitData(TF1** fitFunc, const std::string& funcName,
     
     GetTurnOnParameters(fitMethod,initPars[0],initPars[1],mH,step,flavour,additionalCuts);
     
-    (*fitFunc) -> FixParameter(0,initPars[0]);
-    (*fitFunc) -> FixParameter(1,initPars[1]); 
+    if( fixTurnOn == true )
+    {
+      (*fitFunc) -> FixParameter(0,initPars[0]);
+      (*fitFunc) -> FixParameter(1,initPars[1]); 
+    }
+    else
+    {
+      (*fitFunc) -> SetParameter(0,initPars[0]);
+      (*fitFunc) -> SetParameter(1,initPars[1]);     
+    }
     
     (*fitFunc) -> SetParName(0,"mu");
     (*fitFunc) -> SetParName(1,"kT");
@@ -505,15 +513,15 @@ void GetTurnOnParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      mu = 180.;
-      kT = 0.793;
+      mu = 178.;
+      kT = 1.67;
       //mu = 0.376;
       //kT = 1.34;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      mu = 178.;
-      kT = 0.149;
+      mu = 88.0;
+      kT = 26.7;
       //mu = 0.415;
       //kT = 2.83;
     }
@@ -524,15 +532,15 @@ void GetTurnOnParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      mu = 142.;
-      kT = 19.8;
+      mu = 148.;
+      kT = 29.6;
       //mu = 0.347;
       //kT = 1.15;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      mu = 178.;
-      kT = 0.155;
+      mu = 171.;
+      kT = 75.7;
       //mu = 0.413;
       //kT = 2.59;
     }
@@ -543,15 +551,15 @@ void GetTurnOnParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      mu = 173.;
-      kT = 3.69;
+      mu = 160.;
+      kT = 8.95;
       //mu = 0.310;
       //kT = 1.01;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
       mu = 108.;
-      kT = 70.6;
+      kT = 70.2;
       //mu = 0.412;
       //kT = 2.49;
     }
@@ -562,15 +570,15 @@ void GetTurnOnParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      mu = 180.;
-      kT = 0.736;
+      mu = 178.;
+      kT = 1.67;
       //mu = 0.376;
       //kT = 1.34;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      mu = 178.;
-      kT = 0.159;
+      mu = 88.0;
+      kT = 26.7;
       //mu = 0.415;
       //kT = 2.83;
     }
@@ -581,15 +589,15 @@ void GetTurnOnParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      mu = 163.;
-      kT = 7.20;
+      mu = 165.;
+      kT = 6.52;
       //mu = 0.341;
       //kT = 1.12;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      mu = 178.;
-      kT = 0.200;
+      mu = 75.5;
+      kT = 59.8;
       //mu = 0.416;
       //kT = 2.96;
     }
@@ -600,21 +608,20 @@ void GetTurnOnParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      mu = 134.;
-      kT = 19.6;
+      mu = 182.;
+      kT = 0.124;
       //mu = 0.341;
       //kT = 1.12;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      mu = 179.;
-      kT = 0.224;
+      mu = 82.2;
+      kT = 65.0;
       //mu = 0.418;
       //kT = 3.41;
     }
   }
 }
-
 
 
 
@@ -634,7 +641,7 @@ void GetParameters(const std::string& fitMethod,
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 0.0118;
+      initPars[iStart+0] = 0.0119;
       //initPars[iStart+0] = 0.0118;
     }
   }
@@ -644,8 +651,8 @@ void GetParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 0.0224;
-      initPars[iStart+1] = 0.606;
+      initPars[iStart+0] = 0.0287;
+      initPars[iStart+1] = 0.901;
       initPars[iStart+2] = 0.0113;
       //initPars[iStart+0] = 0.0121;
       //initPars[iStart+1] = 0.996;
@@ -653,9 +660,9 @@ void GetParameters(const std::string& fitMethod,
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 0.0119;
-      initPars[iStart+1] = 0.999;
-      initPars[iStart+2] = 3.15e-09;
+      initPars[iStart+0] = 0.0195;
+      initPars[iStart+1] = 0.911;
+      initPars[iStart+2] = 0.0106;
       //initPars[iStart+0] = 0.0120;
       //initPars[iStart+1] = 0.999;
       //initPars[iStart+2] = 0.00473;
@@ -667,15 +674,15 @@ void GetParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 96.1;
-      initPars[iStart+1] = 7920.;
+      initPars[iStart+0] = 74.6;
+      initPars[iStart+1] = 6050.;
       //initPars[iStart+0] = 28.6;
       //initPars[iStart+1] = 2080.;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 19.8;
-      initPars[iStart+1] = 1210.;
+      initPars[iStart+0] = 19.9;
+      initPars[iStart+1] = 1220.;
       //initPars[iStart+0] = 91.4;
       //initPars[iStart+1] = 7380.;
     }
@@ -687,14 +694,14 @@ void GetParameters(const std::string& fitMethod,
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
       initPars[iStart+0] = 5.80;
-      initPars[iStart+1] = -0.0000145;
+      initPars[iStart+1] = 6.12e-08;
       //initPars[iStart+0] = 5.79;
       //initPars[iStart+1] = 4.64e-08;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 5.92;
-      initPars[iStart+1] = 0.0000359;
+      initPars[iStart+0] = 5.96;
+      initPars[iStart+1] = -4.10e-06;
       //initPars[iStart+0] = 5.91;
       //initPars[iStart+1] = 0.0000530;
     }
@@ -706,17 +713,17 @@ void GetParameters(const std::string& fitMethod,
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
       initPars[iStart+0] = 5.93;
-      initPars[iStart+1] = -0.000605;
-      initPars[iStart+2] = -0.415;
+      initPars[iStart+1] = 0.000526;
+      initPars[iStart+2] = -0.412;
       //initPars[iStart+0] = 5.96;
       //initPars[iStart+1] = 0.532;
       //initPars[iStart+2] = -0.672;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 4.39;
-      initPars[iStart+1] = 1.50;
-      initPars[iStart+2] = -1.00;
+      initPars[iStart+0] = 6.55;
+      initPars[iStart+1] = 0.00551;
+      initPars[iStart+2] = -0.631;
       //initPars[iStart+0] = 5.20;
       //initPars[iStart+1] = 1.06;
       //initPars[iStart+2] = -0.802;
@@ -728,10 +735,10 @@ void GetParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 3.00;
-      initPars[iStart+1] = -2.70;
-      initPars[iStart+2] = -1.93;
-      initPars[iStart+3] = -1.24;
+      initPars[iStart+0] = -0.229;
+      initPars[iStart+1] = -3.59;
+      initPars[iStart+2] = -2.24;
+      initPars[iStart+3] = -1.36;
       //initPars[iStart+0] = 5.96;
       //initPars[iStart+1] = -0.531;
       //initPars[iStart+2] = -0.672;
@@ -739,10 +746,10 @@ void GetParameters(const std::string& fitMethod,
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      initPars[iStart+0] = 2.48;
-      initPars[iStart+1] = -2.49;
-      initPars[iStart+2] = -1.63;
-      initPars[iStart+3] = -0.998;
+      initPars[iStart+0] = 6.77;
+      initPars[iStart+1] = -0.0249;
+      initPars[iStart+2] = -0.775;
+      initPars[iStart+3] = 0.563;
       //initPars[iStart+0] = 3.36;
       //initPars[iStart+1] = 2.17;
       //initPars[iStart+2] = -1.49;
