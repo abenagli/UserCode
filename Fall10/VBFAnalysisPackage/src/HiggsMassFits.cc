@@ -277,9 +277,11 @@ float GetHiggsMassTurnOnWidth(const float& mH)
 
 
 
-void FitData(TF1** fitFunc, const std::string& funcName,
-             TH1F* h, const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts,
-             const std::string& fitMethod, const bool& fixTurnOn)
+TFitResultPtr 
+FitData(TF1** fitFunc, const std::string& funcName,
+        TH1F* h, const float& mH, const int& step, const std::string& flavour, const std::string& additionalCuts,
+        const std::string& fitMethod, const bool& fixTurnOn, 
+        double fitMin, double fitMax)
 {
   std::cout << ">>> HiggsMassFits::FitData::fitting " << flavour << " data for mH " << mH << " with function " << fitMethod << std::endl;
   
@@ -490,15 +492,22 @@ void FitData(TF1** fitFunc, const std::string& funcName,
   
   int counter = 0;
   int fitStatus = -1;
+  TFitResultPtr fitResultPtr ;
   while( counter < 5 )
   {
-    TFitResultPtr fitResultPtr = h -> Fit(funcName.c_str(),"NQLRS+","",180.,800.);
+    fitResultPtr = h -> Fit(funcName.c_str(),"NQLRS+","",fitMin,fitMax);
     fitStatus = (int)(fitResultPtr);
     if( fitStatus == 0 ) break;
     ++counter;
   }
-  
+  return fitResultPtr ;
 }
+
+
+
+
+
+
 
 
 
