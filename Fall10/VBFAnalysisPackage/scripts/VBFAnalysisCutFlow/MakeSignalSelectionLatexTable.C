@@ -59,7 +59,7 @@ void MakeSignalSelectionLatexTable(){
   // Set up everything to do the weighting
   float crossSection;
   int lep_flavour; 
-  float lumi = 4680;
+  float lumi = 4970;
   float weight, PUWeight, eventWeight;
   int totEvents; 
   
