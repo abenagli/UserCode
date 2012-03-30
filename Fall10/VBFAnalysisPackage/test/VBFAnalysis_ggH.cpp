@@ -1187,7 +1187,7 @@ int main(int argc, char** argv)
     // hlt weight
     if ( vars.dataFlag == 0 ) {
       std::string lepEffMode = "RIH";
-      if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
+      if ( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 13 ) vars.leptonWeight = theEffCorrector -> getMuEff  ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0  ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
       if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 1  ) vars.metWeight = theEffCorrector -> getMtEff  ( vars.lepMet_mt );
