@@ -1027,11 +1027,11 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
     // Draw::Define the caption
     char lumiBuffer[200];
     if( mode == "eventsScaled" )
-      sprintf(lumiBuffer, "CMS Preliminary 2011   -   #sqrt{s}=7 TeV   L=%.2f fb^{-1}",lumi);
+      sprintf(lumiBuffer, "CMS Preliminary 2011   -   #sqrt{s}=7 TeV   L=%.1f fb^{-1}",lumi);
     if( mode == "sameAreaNoStack" )
       sprintf(lumiBuffer, "CMS Preliminary 2011   -   histograms normalized to unit area");
     if( mode == "sameAreaStack" )
-      sprintf(lumiBuffer, "CMS Preliminary 2011   -   #sqrt{s}=7 TeV   L=%.2f fb^{-1}",lumi);
+      sprintf(lumiBuffer, "CMS Preliminary 2011   -   #sqrt{s}=7 TeV   L=%.1f fb^{-1}",lumi);
     if( mode == "integralStack" )
       sprintf(lumiBuffer, "CMS Preliminary 2011   -   integral distributions");
     if( mode == "integralNoStack" )
@@ -1614,9 +1614,9 @@ void drawTStack::DrawEvents(const std::string& mode,
     if( mode == "events" )
       sprintf(lumiBuffer, "CMS Preliminary 2011   -   no normalization");
     if( mode == "eventsScaled" )
-      sprintf(lumiBuffer, "CMS Preliminary 2011   -   MC normalized to L=%.2f fb^{-1}",lumi);
+      sprintf(lumiBuffer, "CMS Preliminary 2011   -   MC normalized to L=%.1f fb^{-1}",lumi);
     if( mode == "eventsScaledStack" )
-      sprintf(lumiBuffer, "CMS Preliminary 2011   -   #sqrt{s}=7 TeV   L=%.2f fb^{-1}",lumi);
+      sprintf(lumiBuffer, "CMS Preliminary 2011   -   #sqrt{s}=7 TeV   L=%.1f fb^{-1}",lumi);
     if( mode == "efficiencies" )
       sprintf(lumiBuffer, "CMS Preliminary 2011   -   efficiencies");
     if( mode == "efficienciesRelative" )
