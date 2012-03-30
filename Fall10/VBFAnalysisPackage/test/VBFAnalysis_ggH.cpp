@@ -355,7 +355,7 @@ int main(int argc, char** argv)
   if( ((dataRunFlag == "2011A") || (dataRunFlag == "2011AB")) && useElePfMtHLT == 1 )
   {
     // 0-th - Run2011A
-    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+211.60);
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+211.02);
     dummyHLTRunRanges.first = 160404; dummyHLTRunRanges.second = 163869; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1");
@@ -365,7 +365,7 @@ int main(int argc, char** argv)
     ++HLTLumiIt;
     
     // 1-th - Run2011A
-    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+139.08);
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+136.43);
     dummyHLTRunRanges.first = 165088; dummyHLTRunRanges.second = 165633; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3");
@@ -373,7 +373,7 @@ int main(int argc, char** argv)
     ++HLTLumiIt;
 
     // 2-th - Run2011A
-    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+790.67);
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+818.85);
     dummyHLTRunRanges.first = 165970; dummyHLTRunRanges.second = 167913; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele25_WP80_PFMT40_v1");
@@ -382,7 +382,7 @@ int main(int argc, char** argv)
     ++HLTLumiIt;
 
     // 3-th - Run2011A
-    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+1026.91);
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+1096.58);
     dummyHLTRunRanges.first = 170249; dummyHLTRunRanges.second = 173692; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v3");
@@ -394,7 +394,7 @@ int main(int argc, char** argv)
   if( ((dataRunFlag == "2011B") || (dataRunFlag == "2011AB")) && useElePfMtHLT == 1 )
   {
     // 4-th - Run2011B
-    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+2512.2);
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+2715.89);
     dummyHLTRunRanges.first = 175832; dummyHLTRunRanges.second = 180252; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
@@ -413,7 +413,7 @@ int main(int argc, char** argv)
   if( (dataRunFlag == "2011A") || (dataRunFlag == "2011AB") )
   { 
     // 0-th - Run2011A
-    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+1921.73);
+    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+1997.57);
     dummyHLTRunRanges.first = 160404; dummyHLTRunRanges.second = 173198; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_IsoMu24_v1");
@@ -427,7 +427,7 @@ int main(int argc, char** argv)
     ++HLTLumiIt;
     
     // 1-th - Run2011A
-    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+246.53);
+    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+265.31);
     dummyHLTRunRanges.first = 173236; dummyHLTRunRanges.second = 173692; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
@@ -438,7 +438,7 @@ int main(int argc, char** argv)
   if( (dataRunFlag == "2011B") || (dataRunFlag == "2011AB") )
   { 
     // 2-th - Run2011B
-    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+2512.20);
+    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+2715.89);
     dummyHLTRunRanges.first = 175832; dummyHLTRunRanges.second = 180252; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v3");
@@ -501,22 +501,19 @@ int main(int argc, char** argv)
     // 1-th - Run2011A
     HLTLabels_e.push_back("2011A-1");
     dummyHLTPathNames.clear();
-    if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v7");
-    else dummyHLTPathNames.push_back("HLT_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_v2");
+    dummyHLTPathNames.push_back("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v7");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
 
     // 2-th - Run2011A
     HLTLabels_e.push_back("2011A-2");
     dummyHLTPathNames.clear();
-    if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele27_WP80_PFMT50_v4");
-    else dummyHLTPathNames.push_back("HLT_Ele27_WP80_PFMT50_v4");
+    dummyHLTPathNames.push_back("HLT_Ele27_WP80_PFMT50_v4");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
     
     // 3-th - Run2011A
     HLTLabels_e.push_back("2011A-3");
     dummyHLTPathNames.clear();
-    if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
-    else dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
+    dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
   }
   
@@ -525,8 +522,7 @@ int main(int argc, char** argv)
     // 4-th - Run2011B
     HLTLabels_e.push_back("2011B-0");
     dummyHLTPathNames.clear();
-    if ( vars.dataFlag == 0 && EffCorrection == 0 ) dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
-    else dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
+    dummyHLTPathNames.push_back("HLT_Ele32_WP70_PFMT50_v4");
     HLTPathNames_e_MC.push_back(dummyHLTPathNames);
   }
   
