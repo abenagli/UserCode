@@ -61,6 +61,8 @@ int main(int argc, char** argv)
   bool weightEvent = gConfigParser -> readBoolOption("Options::weightEvent");
   bool stackSig = gConfigParser -> readBoolOption("Options::stackSig");
   bool higgsMassCut = gConfigParser -> readBoolOption("Options::higgsMassCut");
+  bool leptonWeight = gConfigParser -> readBoolOption("Options::leptonWeight");
+  bool metWeight = gConfigParser -> readBoolOption("Options::metWeight");
   std::string method = gConfigParser -> readStringOption("Options::method");
   std::string jetType = gConfigParser -> readStringOption("Options::jetType");
   
@@ -143,11 +145,12 @@ int main(int argc, char** argv)
   cuts2 -> push_back("");
   
   std::stringstream ss;
-  ss << " ( lepNuW_m_KF >= " << GetLepNuWMMIN(higgsMass) << " && lepNuW_m_KF < " << GetLepNuWMMAX(higgsMass) << ") ";
+  ss << " * ( lepNuW_m_KF >= " << GetLepNuWMMIN(higgsMass) << " && lepNuW_m_KF < " << GetLepNuWMMAX(higgsMass) << ") ";
   
-  std::string generalCut;
-  if( higgsMassCut == true ) generalCut = ss.str();
-  else                       generalCut = "(1 == 1)";
+  std::string generalCut = "(1 == 1)";
+  if( higgsMassCut == true )  generalCut += ss.str();
+  if( leptonWeight == false ) generalCut += " * 1./leptonWeight ";
+  if( metWeight    == false ) generalCut += " * 1./metWeight ";
   stack -> SetGeneralCut(generalCut);
   
   std::string histoName;
@@ -648,6 +651,14 @@ int main(int argc, char** argv)
   stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
   
+  variableNames.at(0) = "lepMet_Dphi";
+  histoName = "ele_lepMet_Dphi";
+  cuts -> at(0) = "( lep_flavour == 11 )";
+  stack -> SetXaxisRange(0., 3.14159);
+  stack -> SetXaxisTitle("#Delta#phi_{lepton-ME_{T}}");
+  stack -> SetUnit("rad");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  
   
   
   
@@ -977,6 +988,14 @@ int main(int argc, char** argv)
   stack -> SetXaxisTitle("m_{T}^{lepton+ME_{T}}");
   stack -> SetUnit("GeV/c^{2}");
   stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  
+  variableNames.at(0) = "lepMet_Dphi";
+  histoName = "mu_lepMet_Dphi";
+  cuts -> at(0) = "( lep_flavour == 13 )";
+  stack -> SetXaxisRange(0., 3.14159);
+  stack -> SetXaxisTitle("#Delta#phi_{lepton-ME_{T}}");
+  stack -> SetUnit("rad");
+  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
   
   
   
