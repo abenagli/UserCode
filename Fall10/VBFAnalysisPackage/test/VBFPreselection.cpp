@@ -55,6 +55,7 @@ int main(int argc, char** argv)
   int correctMet          = gConfigParser -> readIntOption("Options::correctMet");
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
   int ttSelection         = gConfigParser -> readIntOption("Options::ttSelection"); 
+  int QCDSelection        = gConfigParser -> readIntOption("Options::QCDSelection"); 
   int doTnP               = gConfigParser -> readIntOption("Options::doTnP"); 
   int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy");
     
@@ -317,7 +318,7 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     
     
-    
+
     
     
         
@@ -390,22 +391,22 @@ int main(int argc, char** argv)
           ( (fabs(etaSC) < 1.4442) || (fabs(etaSC) > 1.5660) ) &&
           ( fabs(z-vars.PV_z) < 0.2 ) && 
           ( fabs(dxy) < 0.02 ) &&
-          ( tkIso/pt < 0.1 ) &&   // standard
-          //( tkIso/pt < 0.5 ) &&    // loose for QCD studies
-          ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&  // standard
-          ( ( (isEB == 1) && (DphiIn < 0.060) )        || ( (isEB == 0) && (DphiIn < 0.030) ) ) &&         // standard
-          ( ( (isEB == 1) && (DetaIn < 0.004) )        || ( (isEB == 0) && (DetaIn < 0.007) ) ) &&         // standard
-          ( ( (isEB == 1) && (HOverE < 0.025) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) &&         // standard
-          //( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&   // loose for QCD studies
-          //( ( (isEB == 1) && (DphiIn < 0.800) )        || ( (isEB == 0) && (DphiIn < 0.700) ) ) &&          // loose for QCD studies
-          //( ( (isEB == 1) && (DetaIn < 0.007) )        || ( (isEB == 0) && (DetaIn < 0.010) ) ) &&          // loose for QCD studies
-          //( ( (isEB == 1) && (HOverE < 0.150) )        || ( (isEB == 0) && (HOverE < 0.070) ) ) &&          // loose for QCD studies
+          ( (QCDSelection == 0 && tkIso/pt < 0.1 ) ||   // standard
+            (QCDSelection == 1 && tkIso/pt > 0.1 )) &&   // QCD selection
+          ( (QCDSelection == 0 &&  ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) ) || // standard
+            (QCDSelection == 1 &&  ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) ) ) &&  // QCD selection
+          ( (QCDSelection == 0 &&  ( ( (isEB == 1) && (DphiIn < 0.060) )        || ( (isEB == 0) && (DphiIn < 0.030) ) ) ) || // standard
+            (QCDSelection == 1 &&  ( ( (isEB == 1) && (DphiIn < 0.800) )        || ( (isEB == 0) && (DphiIn < 0.700) ) ) ) ) &&  // QCD selection
+          ( (QCDSelection == 0 &&  ( ( (isEB == 1) && (DetaIn < 0.004) )        || ( (isEB == 0) && (DetaIn < 0.007) ) ) ) || // standard
+            (QCDSelection == 1 &&  ( ( (isEB == 1) && (DetaIn < 0.007) )        || ( (isEB == 0) && (DetaIn < 0.010) ) ) ) ) &&  // QCD selection
+          ( (QCDSelection == 0 &&  ( ( (isEB == 1) && (HOverE < 0.025) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) ) || // standard
+            (QCDSelection == 1 &&  ( ( (isEB == 1) && (HOverE < 0.150) )        || ( (isEB == 0) && (HOverE < 0.070) ) ) ) ) &&  // QCD selection
           ( mishits == 0 ) &&
           ( ( fabs(dist) > 0.02 ) || ( fabs(dcot) > 0.02 ) ) )
       {
         isTightElectron = true;
         SetElectronVariables(vars, reader, eleIt, verbosity);
-        
+
         nLep += 1;
         nEle += 1;
       }
@@ -490,8 +491,8 @@ int main(int argc, char** argv)
       bool isTightMuon = false;
       if( ( pt > 20. ) &&
           ( fabs(eta) < 2.1 ) &&
-	  ( tkIso/pt < 0.05 ) &&   // standard
-	  //( tkIso/pt < 0.50 ) &&   // loose for QCD studies
+          ( (QCDSelection == 0 && tkIso/pt < 0.5)  ||   // standard
+            (QCDSelection == 1 && tkIso/pt > 0.1) ) &&   // QCD selection
           ( fabs(z-vars.PV_z) < 0.2 ) && 
           ( fabs(dxy) < 0.02 ) &&
           ( tracker == 1 ) &&
@@ -572,13 +573,12 @@ int main(int argc, char** argv)
     
     //*******************
     // STEP 9 - muon veto
-    
     step += 1;
     SetStepNames(stepNames, "muon veto", step, verbosity);
 
     if( nMu_loose > 0 ) continue;
-    if( (leptonFLAVOUR == "e") && (nMu > 0) ) continue;
-    if( (leptonFLAVOUR == "mu") && (doTnP == 0) && (nMu > 1) ) continue;
+    if( (leptonFLAVOUR == "e") && (nMu > 0) && (QCDSelection == 0) ) continue;
+    if( (leptonFLAVOUR == "mu") && (doTnP == 0) && (nMu > 1) && (QCDSelection == 0) ) continue;
     
     
     // fIll event counters
@@ -595,8 +595,8 @@ int main(int argc, char** argv)
     SetStepNames(stepNames, "electron veto", step, verbosity);
     
     if( nEle_loose > 0 ) continue;
-    if( (leptonFLAVOUR == "e") && (doTnP == 0) && (nEle > 1) ) continue;
-    if( (leptonFLAVOUR == "mu") && (nEle > 0) ) continue;
+    if( (leptonFLAVOUR == "e") && (doTnP == 0) && (nEle > 1) && (QCDSelection == 0) ) continue;
+    if( (leptonFLAVOUR == "mu") && (nEle > 0) && (QCDSelection == 0) ) continue;
     
     
     // fIll event counters
