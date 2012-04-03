@@ -491,8 +491,8 @@ int main(int argc, char** argv)
       bool isTightMuon = false;
       if( ( pt > 20. ) &&
           ( fabs(eta) < 2.1 ) &&
-          ( (QCDSelection == 0 && tkIso/pt < 0.5)  ||   // standard
-            (QCDSelection == 1 && tkIso/pt > 0.1) ) &&   // QCD selection
+          ( (QCDSelection == 0 && tkIso/pt < 0.05)  ||   // standard
+            (QCDSelection == 1 && tkIso/pt > 0.05) ) &&   // QCD selection
           ( fabs(z-vars.PV_z) < 0.2 ) && 
           ( fabs(dxy) < 0.02 ) &&
           ( tracker == 1 ) &&
