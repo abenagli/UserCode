@@ -1,234 +1,207 @@
-{
-  using namespace RooFit;
-  
-  std::string BKGPath = "/grid_mnt/data__HOME/llr/cms/abenagli/COLLISIONS7TeV/Fall10/VBFAnalysisPackage/data/VBFAnalysis_AK5PF_H160_ET30_maxDeta_minDeta_2010PU_EG_noMetCut/";
-  
-  std::string WJetsFolder = "2_WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
-  std::string ZJetsFolder = "2_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v3/";
-  std::string GJets_HT40To100Folder = "2_GJets_TuneD6T_HT-40To100_7TeV-madgraph_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
-  std::string GJets_HT100To200Folder = "2_GJets_TuneD6T_HT-100To200_7TeV-madgraph_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
-  std::string GJets_HT200Folder = "2_GJets_TuneD6T_HT-200_7TeV-madgraph_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
-  std::string TTJetsFolder = "3_TTJets_TuneZ2_7TeV-madgraph-tauola_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v3/";
-  std::string WWFolder = "2_WWtoAnything_TuneZ2_7TeV-pythia6-tauola_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
-  std::string WZFolder = "2_WZtoAnything_TuneZ2_7TeV-pythia6-tauola_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
-  std::string TJets_schannelFolder = "2_TToBLNu_TuneZ2_s-channel_7TeV-madgraph_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
-  std::string TJets_tchannelFolder = "2_TToBLNu_TuneZ2_t-channel_7TeV-madgraph_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
-  std::string TJets_tWchannelFolder = "2_TToBLNu_TuneZ2_tW-channel_7TeV-madgraph_Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/";
+/*
+To compile
+g++ rooBinnedFit_shapeFromHisto.C -o rooBinnedFit_shapeFromHisto `root-config --cflags --glibs` -lRooFitCore -lRooFit -lMinuit -lFoam
+*/
 
-  std::string variableName = "met.Et()";
-  std::string cutNameQCD = "lep_flavour == 11 && (lep_tkIso+lep_emIso+lep_hadIso)/lep.pt() > 0.3 && (lep_tkIso+lep_emIso+lep_hadIso)/lep.pt() < 0.5";
-  std::string cutName = "lep_flavour == 11";
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+
+#include "TH1F.h"
+#include "TF1.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TChain.h"
+#include "TCanvas.h"
+
+#include "RooMsgService.h"
+#include "RooRealVar.h"
+#include "RooDataHist.h"
+#include "RooAbsPdf.h"
+#include "RooHistPdf.h"
+#include "RooGenericPdf.h"
+#include "RooWorkspace.h"
+#include "RooGaussian.h"
+#include "RooAddPdf.h"
+#include "RooPlot.h"
+
+using namespace RooFit;
+
+int main (int argc, char** argv) {
 
   
-  int step = 8;
+  std::string BKGPath = "/gwteray/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow_noEleHLTcorr_NoMET/";
+  std::string QCDPath = "/gwteray/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow_QCDSelection_noEleHLTcorr_NoIso_NoId_NoMET/";
+  std::string DATAPath = "/gwteray/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow_noEleHLTcorr_NoMET/";
+
+  std::vector<std::string> BKG_names;
+  BKG_names.push_back("WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v2/");
+  BKG_names.push_back("DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v3_2/");
+  BKG_names.push_back("TTJets_TuneZ2_7TeV-madgraph-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("Tbar_TuneZ2_s-channel_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("Tbar_TuneZ2_t-channel_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("Tbar_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("T_TuneZ2_s-channel_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("T_TuneZ2_t-channel_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("T_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("WW_TuneZ2_7TeV_pythia6_tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("WZ_TuneZ2_7TeV_pythia6_tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+  BKG_names.push_back("ZZ_TuneZ2_7TeV_pythia6_tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
+
+  std::vector<std::string> DATA_names;
+  DATA_names.push_back("data_SingleEle_SingleMu_Run2011A-May10ReReco-v1/");
+  DATA_names.push_back("data_SingleEle_SingleMu_Run2011A-05Aug2011-v1/");
+  DATA_names.push_back("data_SingleEle_SingleMu_Run2011A-PromptReco-v6/");
+  DATA_names.push_back("data_SingleEle_SingleMu_Run2011A-PromptReco-v4/");
+  DATA_names.push_back("data_SingleEle_SingleMu_Run2011B-PromptReco-v1/");
+
+  std::vector<std::string> QCD_names;
+  QCD_names.push_back("data_SingleEle_SingleMu_Run2011A-May10ReReco-v1/");
+  QCD_names.push_back("data_SingleEle_SingleMu_Run2011A-05Aug2011-v1/");
+  QCD_names.push_back("data_SingleEle_SingleMu_Run2011A-PromptReco-v6/");
+  QCD_names.push_back("data_SingleEle_SingleMu_Run2011A-PromptReco-v4/");
+  QCD_names.push_back("data_SingleEle_SingleMu_Run2011B-PromptReco-v1/");
+    
+  int step = 10;
   char treeName[50];
   sprintf(treeName, "ntu_%d", step);
   
-  float lumi = 35.;
+  float lumi = 5000.;
+  std::string s_lumi = "5000.";
   
   int nBins = 100;
-  double xMin = 0.;
-  double xMin_signal = 25.;
+  double xMin = 20.;
+  double xMin_signal = 30.;
   double xMax = 200.;
   
-  
+  std::string variableName = "met_et";
+  std::string cutNameDATA_ele = "(lep_flavour == 11)";
+  std::string cutNameQCD_ele  = "(lep_flavour == 11)";
+  std::string cutNameMC_ele   = "(lep_flavour == 11) * (eventWeight * PUWeight * crossSection / totEvents * " + s_lumi + ")" ;
+  std::string cutNameDATA_mu = "(lep_flavour == 13)";
+  std::string cutNameQCD_mu  = "(lep_flavour == 13)";
+  std::string cutNameMC_mu   = "(lep_flavour == 13) * (eventWeight * PUWeight * crossSection / totEvents * " + s_lumi + ")" ;
+
+  TFile* outfile = new TFile("plots.root","RECREATE");
     
   // get the QCD shape histogram
-  TFile* inFile_QCDShape = TFile::Open("QCDShape.root");
-  inFile_QCDShape.cd();
+  TH1F* QCDShapeHisto_ele = new TH1F("QCDShapeHisto_ele", "QCDShapeHisto_ele", nBins, xMin, xMax);
+  QCDShapeHisto_ele -> Sumw2();
+  TH1F* QCDShapeHisto_mu = new TH1F("QCDShapeHisto_mu", "QCDShapeHisto_mu", nBins, xMin, xMax);
+  QCDShapeHisto_mu -> Sumw2();
+  TChain* QCDShapeTree = new TChain(treeName,"");
+  for ( unsigned int iQCD = 0; iQCD < QCD_names.size(); iQCD++ ) QCDShapeTree -> AddFile ( (QCDPath + QCD_names[iQCD] + "VBFAnalysis_PFlow.root").c_str() );
+  QCDShapeTree -> Draw( (variableName+">>+ QCDShapeHisto_ele").c_str(), cutNameQCD_ele.c_str()  );
+  QCDShapeTree -> Draw( (variableName+">>+ QCDShapeHisto_mu").c_str(), cutNameQCD_mu.c_str()  );
   
-  TTree* QCDShapeTree;
-  QCDShapeTree = inFile_QCDShape.GetObject(treeName, QCDShapeTree);
+  QCDShapeHisto_ele -> Write();
+  QCDShapeHisto_mu -> Write();
   
-  TH1F* QCDShapeHisto = new TH1F("QCDShapeHisto", "QCDShapeHisto", nBins, xMin, xMax);
-  QCDShapeTree -> Draw( (variableName+">> QCDShapeHisto").c_str(), cutNameQCD.c_str()  );
-  QCDShapeHisto -> Sumw2();  
-  //inFile_QCDShape.Close();
+  //the background shape histograms
+  TH1F* BKGShapeHisto_ele = new TH1F("BKGShapeHisto_ele", "BKGShapeHisto_ele", nBins, xMin, xMax);
+  BKGShapeHisto_ele -> Sumw2();
+  TH1F* BKGShapeHisto_mu = new TH1F("BKGShapeHisto_mu", "BKGShapeHisto_mu", nBins, xMin, xMax);
+  BKGShapeHisto_mu -> Sumw2();
+  TChain* BKGShapeTree = new TChain(treeName,"");
+  for ( unsigned int iBKG = 0; iBKG < BKG_names.size(); iBKG++ ) BKGShapeTree -> AddFile ( (BKGPath + BKG_names[iBKG] + "VBFAnalysis_PFlow.root").c_str() );
+  BKGShapeTree -> Draw( (variableName+">>+ BKGShapeHisto_ele").c_str(), cutNameMC_ele.c_str()  );
+  BKGShapeTree -> Draw( (variableName+">>+ BKGShapeHisto_mu").c_str(), cutNameMC_mu.c_str()  );
   
+  float NBKG_MC_ele = BKGShapeHisto_ele -> Integral();
+  float NBKG_MC_mu  = BKGShapeHisto_mu  -> Integral();
   
-  
-  // get the W shape histogram
-  TFile* inFile_WShape = TFile::Open( (BKGPath+WJetsFolder+"VBFAnalysis_AK5PF.root").c_str() );
-  inFile_WShape.cd();
-  
-  TTree* WShapeTree;
-  WShapeTree = inFile_WShape.GetObject(treeName, WShapeTree);
-  
-  TH1F* WShapeHisto = new TH1F("WShapeHisto", "WShapeHisto", nBins, xMin, xMax);
-  WShapeTree -> Draw( (variableName+">> WShapeHisto").c_str(), cutName.c_str() );
-  WShapeHisto -> Sumw2();
-  
-  TTree* WShapeTree;
-  WShapeTree = inFile_WShape.GetObject(treeName, WShapeTree);
-
-  TH1F* eventsHisto;
-  eventsHisto = inFile_WShape.GetObject("events", eventsHisto);
-  int totEvents = eventsHisto -> GetBinContent(1);
-
-  float crossSection;
-  WShapeTree -> SetBranchAddress("crossSection", &crossSection);
-  WShapeTree -> GetEntry(0);
-  float NW_MC = eventsHisto -> GetBinContent(step) / totEvents * crossSection * lumi;
-  //inFile_WShape.Close();
-  
-  
-  
-  // get the other background shape histograms
-  TH1F* BKGShapeHisto = new TH1F("BKGShapeHisto", "BKGShapeHisto", nBins, xMin, xMax);
-  BKGShapeHisto -> Sumw2();
-  float NBKG_MC = 0;
-  
-  int nBKG = 10;
-  std::string* BKGNames = new std::string[nBKG];
-  BKGNames[0] = BKGPath+ZJetsFolder+"VBFAnalysis_AK5PF.root";
-  BKGNames[1] = BKGPath+GJets_HT40To100Folder+"VBFAnalysis_AK5PF.root";
-  BKGNames[2] = BKGPath+GJets_HT100To200Folder+"VBFAnalysis_AK5PF.root";
-  BKGNames[3] = BKGPath+GJets_HT200Folder+"VBFAnalysis_AK5PF.root";
-  BKGNames[4] = BKGPath+TTJetsFolder+"VBFAnalysis_AK5PF.root";
-  BKGNames[5] = BKGPath+WWFolder+"VBFAnalysis_AK5PF.root";
-  BKGNames[6] = BKGPath+WZFolder+"VBFAnalysis_AK5PF.root";
-  BKGNames[7] = BKGPath+TJets_schannelFolder+"VBFAnalysis_AK5PF.root";
-  BKGNames[8] = BKGPath+TJets_tchannelFolder+"VBFAnalysis_AK5PF.root";
-  BKGNames[9] = BKGPath+TJets_tWchannelFolder+"VBFAnalysis_AK5PF.root";
-  
-  std::string* BKGShortNames = new std::string[nBKG];
-  BKGShortNames[0] = "ZJets";
-  BKGShortNames[1] = "GJets_HT40To100";
-  BKGShortNames[2] = "GJets_HT100To200";
-  BKGShortNames[3] = "GJets_HT200";
-  BKGShortNames[4] = "TTJets";
-  BKGShortNames[5] = "WW";
-  BKGShortNames[6] = "WZ";
-  BKGShortNames[7] = "TJets_schannel";
-  BKGShortNames[8] = "TJets_tchannel";
-  BKGShortNames[9] = "TJets_tWchannel";
-  
-  for(int i = 0; i < nBKG; ++i)
-  {
-    TFile* inFile_BKGShape = TFile::Open((BKGNames[i]).c_str());
-    inFile_BKGShape.cd();
-    
-    TTree* BKGShapeTree;
-    BKGShapeTree = inFile_BKGShape.GetObject(treeName, BKGShapeTree);
-    
-    eventsHisto = inFile_BKGShape.GetObject("events", eventsHisto);
-    totEvents = eventsHisto -> GetBinContent(1);
-    
-    BKGShapeTree -> SetBranchAddress("crossSection", &crossSection);
-    BKGShapeTree -> GetEntry(0);
-    
-    
-    char TMPvariableName[50];
-    sprintf(TMPvariableName, "TMP%sHisto", BKGShortNames[i].c_str());
-    TH1F* TMPShapeHisto = new TH1F(TMPvariableName, TMPvariableName, nBins, xMin, xMax);
-    BKGShapeTree -> Draw( (variableName+">> "+TMPvariableName).c_str(), cutName.c_str() );
-    TMPShapeHisto -> Sumw2();
-    TMPShapeHisto -> Scale(1.*crossSection/totEvents);    
-    
-    
-    BKGShapeHisto.Add(TMPShapeHisto);
-    NBKG_MC += eventsHisto -> GetBinContent(step) / totEvents * crossSection * lumi;
-    //inFile_WShape.Close();
-  }
-  
-  
+  BKGShapeHisto_ele -> Write();
+  BKGShapeHisto_mu -> Write();
   
   // get the data histogram
-  TFile* inFile_data = TFile::Open("data.root");
-  inFile_data.cd();
-  
-  TTree* dataTree;
-  dataTree = inFile_data.GetObject(treeName, dataTree);
-  
-  TH1F* dataHisto = new TH1F("dataHisto", "dataHisto", nBins, xMin, xMax);
-  dataTree -> Draw( (variableName+">> dataHisto").c_str(), cutName.c_str() );
-  dataHisto -> Sumw2();
-  //inFile_data.Close();
-  
-  
+  TH1F* DATAShapeHisto_ele = new TH1F("DATAShapeHisto_ele", "DATAShapeHisto_ele", nBins, xMin, xMax);
+  DATAShapeHisto_ele -> Sumw2();
+  TH1F* DATAShapeHisto_mu = new TH1F("DATAShapeHisto_mu", "DATAShapeHisto_mu", nBins, xMin, xMax);
+  DATAShapeHisto_mu -> Sumw2();
+  TChain* DATAShapeTree = new TChain(treeName,"");
+  for ( unsigned int iDATA = 0; iDATA < DATA_names.size(); iDATA++ ) DATAShapeTree -> AddFile ( (DATAPath + DATA_names[iDATA] + "VBFAnalysis_PFlow.root").c_str() );
+  DATAShapeTree -> Draw( (variableName+">>+ DATAShapeHisto_ele").c_str(), cutNameDATA_ele.c_str()  );
+  DATAShapeTree -> Draw( (variableName+">>+ DATAShapeHisto_mu").c_str(), cutNameDATA_mu.c_str()  );
+
+  DATAShapeHisto_ele -> Write();
+  DATAShapeHisto_mu -> Write();
   
   // define the RooRealVars
   RooRealVar x("x", variableName.c_str(), xMin, xMax);
-  x.setRange("signal", xMin_signal, xMax);
-  
-  
+//  x.setRange("signal", xMin_signal, xMax); 
+  x.setRange("signal", xMin, xMax); 
+    
   // define the RooDataHist
-  RooDataHist rooDataHisto("rooDataHisto", "data", RooArgList(x), dataHisto);
-  RooDataHist rooWShapeHisto("rooWShapeHisto", "W", RooArgList(x), WShapeHisto);
-  RooDataHist rooBKGShapeHisto("rooBKGShapeHisto", "BKG", RooArgList(x), BKGShapeHisto);
-  RooDataHist rooQCDShapeHisto("rooQCDShapeHisto", "QCD", RooArgList(x), QCDShapeHisto);
-  
-  
+  RooDataHist rooDataHisto_ele("rooDataHisto_ele", "data_ele", RooArgList(x), DATAShapeHisto_ele);
+  RooDataHist rooBKGShapeHisto_ele("rooBKGShapeHisto_ele", "BKG_ele", RooArgList(x), BKGShapeHisto_ele);
+  RooDataHist rooQCDShapeHisto_ele("rooQCDShapeHisto_ele", "QCD_ele", RooArgList(x), QCDShapeHisto_ele);
+
+  RooDataHist rooDataHisto_mu("rooDataHisto_mu", "data_mu", RooArgList(x), DATAShapeHisto_mu);
+  RooDataHist rooBKGShapeHisto_mu("rooBKGShapeHisto_mu", "BKG_mu", RooArgList(x), BKGShapeHisto_mu);
+  RooDataHist rooQCDShapeHisto_mu("rooQCDShapeHisto_mu", "QCD_mu", RooArgList(x), QCDShapeHisto_mu);
+    
   // define the signal/bkg shapes from histograms
-  RooHistPdf WPdf("WPdf", "W", x, rooWShapeHisto, 0) ;
-  RooHistPdf BKGPdf("BKGPdf", "BKG", x, rooBKGShapeHisto, 0) ;
-  RooHistPdf QCDPdf("QCDPdf", "QCD", x, rooQCDShapeHisto, 0) ;
-  
+  RooHistPdf BKGPdf_ele("BKGPdf_ele", "BKG_ele", x, rooBKGShapeHisto_ele, 0) ;
+  RooHistPdf QCDPdf_ele("QCDPdf_ele", "QCD_ele", x, rooQCDShapeHisto_ele, 0) ;
+
+  RooHistPdf BKGPdf_mu("BKGPdf_mu", "BKG_mu", x, rooBKGShapeHisto_mu, 0) ;
+  RooHistPdf QCDPdf_mu("QCDPdf_mu", "QCD_mu", x, rooQCDShapeHisto_mu, 0) ;
   
   // define the total shape
-  //RooRealVar NW("NW", "NW", 1000., 0., 10000000.);
-  RooRealVar alpha("alpha", "alpha", 1., 0.5, 1.5);
-  
-  RooRealVar NW("NW", "NW", NW_MC, NW_MC, NW_MC);
-  RooFormulaVar NWfit("NWfit", "alpha*NW", RooArgSet(alpha,NW));
-  
-  RooRealVar NBKG("NBKG", "NBKG", NBKG_MC, NBKG_MC, NBKG_MC);
-  RooFormulaVar NBKGfit("NBKGfit", "alpha*NBKG", RooArgSet(alpha,NBKG));
-  
-  RooRealVar NQCDfit("NQCDfit", "NQCDfit", 1000., 0., 10000000.);
+  RooRealVar NBKG_ele("NBKG_ele", "NBKG_ele", NBKG_MC_ele, NBKG_MC_ele, NBKG_MC_ele);
+  RooRealVar NBKGfit_ele("NBKGfit_ele", "NBKGfit_ele", NBKG_MC_ele, NBKG_MC_ele*0.8, NBKG_MC_ele*1.2);
+  RooRealVar NQCDfit_ele("NQCDfit_ele", "NQCDfit_ele", 1000., 0., 10000000.);
 
-  RooAddPdf totPdf("totPdf", "tot", RooArgList(QCDPdf,WPdf,BKGPdf), RooArgList(NQCDfit,NWfit,NBKGfit));
-  
+  RooRealVar NBKG_mu("NBKG_mu", "NBKG_mu", NBKG_MC_mu, NBKG_MC_mu, NBKG_MC_mu);
+  RooRealVar NBKGfit_mu("NBKGfit_mu", "NBKGfit_mu", NBKG_MC_mu, NBKG_MC_mu*0.8, NBKG_MC_mu*1.2);
+  RooRealVar NQCDfit_mu("NQCDfit_mu", "NQCDfit_mu", 1000., 0., 10000000.);
+
+//  RooAddPdf totPdf("totPdf", "tot", RooArgList(QCDPdf,BKGPdf), RooArgList(NQCDfit,NBKGfit));
+  RooAddPdf totPdf_ele("totPdf_ele", "tot_ele", RooArgList(QCDPdf_ele,BKGPdf_ele), RooArgList(NQCDfit_ele,NBKG_ele));
+  RooAddPdf totPdf_mu("totPdf_mu", "tot_mu", RooArgList(QCDPdf_mu,BKGPdf_mu), RooArgList(NQCDfit_mu,NBKG_mu));
   
   // fit the histo
-  totPdf.fitTo(rooDataHisto, RooFit::Extended(1), RooFit::Minos(1), RooFit::SumW2Error(kTRUE));
-  
+  totPdf_ele.fitTo(rooDataHisto_ele, RooFit::Extended(1), RooFit::Minos(1), RooFit::SumW2Error(kTRUE));
+  totPdf_mu.fitTo(rooDataHisto_mu, RooFit::Extended(1), RooFit::Minos(1), RooFit::SumW2Error(kTRUE));
   
   // calculate events in signal region
-  RooAbsReal* WIntegral = WPdf.createIntegral(x, NormSet(x), Range("signal")); 
-  RooAbsReal* BKGIntegral = BKGPdf.createIntegral(x, NormSet(x), Range("signal")); 
-  RooAbsReal* QCDIntegral = QCDPdf.createIntegral(x, NormSet(x), Range("signal"));   
+  RooAbsReal* BKGIntegral_ele = BKGPdf_ele.createIntegral(x, NormSet(x), Range("signal")); 
+  RooAbsReal* QCDIntegral_ele = QCDPdf_ele.createIntegral(x, NormSet(x), Range("signal"));   
+
+  RooAbsReal* BKGIntegral_mu = BKGPdf_mu.createIntegral(x, NormSet(x), Range("signal")); 
+  RooAbsReal* QCDIntegral_mu = QCDPdf_mu.createIntegral(x, NormSet(x), Range("signal"));   
   
-  std::cout << "NW in signal region = " << WIntegral->getVal() * NWfit.getVal() << std::endl;
-  std::cout << "NBKG in signal region = " << BKGIntegral->getVal() * NBKGfit.getVal() << std::endl;
-  std::cout << "NQCD in signal region = " << QCDIntegral->getVal() * NQCDfit.getVal() << std::endl;
-  
+  std::cout << "NBKG_ele in signal region = " << BKGIntegral_ele->getVal() * NBKG_ele.getVal() << std::endl;
+  std::cout << "NQCD_ele in signal region = " << QCDIntegral_ele->getVal() * NQCDfit_ele.getVal() << std::endl;
+
+  std::cout << "NBKG_mu in signal region = " << BKGIntegral_mu->getVal() * NBKG_mu.getVal() << std::endl;
+  std::cout << "NQCD_mu in signal region = " << QCDIntegral_mu->getVal() * NQCDfit_mu.getVal() << std::endl;
   
   
   // plot 
-  RooPlot* rooPlot = x.frame();
-  rooDataHisto.plotOn(rooPlot, DataError(RooAbsData::SumW2));
-  totPdf.plotOn(rooPlot, LineColor(kRed));
-  totPdf.plotOn(rooPlot, Components(QCDPdf), LineColor(kCyan+2));
-  totPdf.plotOn(rooPlot, Components(WPdf), LineColor(kOrange+2));
-  totPdf.plotOn(rooPlot, Components(BKGPdf), LineColor(kBlack));
-  TCanvas c1;
-  rooPlot->Draw();
-  
-  char WString[50];
-  //sprintf(WString, "NW = %.3f^{+%.1f}_{-%.1f}", NWfit.getVal(), NWfit.getAsymErrorHi(), NWfit.getAsymErrorLo());
-  
-  char BKGString[50];
-  //sprintf(BKGString, "NBKG = %.3f^{+%.1f}_{-%.1f}", NBKGfit.getVal(), NBKGfit.getAsymErrorHi(), NBKGfit.getAsymErrorLo());
-    
-  char QCDString[50];
-  //sprintf(QCDString, "NQCD = %.3f^{+%.1f}_{-%.1f}", NQCDfit.getVal(), NQCDfit.getAsymErrorHi(), NQCDfit.getAsymErrorLo());
+  outfile -> cd();
+  TCanvas* c_plot_ele = new TCanvas("c_plot_ele","c_plot_ele");
+  RooPlot* rooPlot_ele = x.frame();
+  rooDataHisto_ele.plotOn(rooPlot_ele, DataError(RooAbsData::SumW2));
+  totPdf_ele.plotOn(rooPlot_ele, LineColor(kRed));
+  totPdf_ele.plotOn(rooPlot_ele, Components(QCDPdf_ele), LineColor(kCyan+2));
+  totPdf_ele.plotOn(rooPlot_ele, Components(BKGPdf_ele), LineColor(kBlack));
+  rooPlot_ele->Draw();
+  c_plot_ele -> Write();
+  delete rooPlot_ele;
+  delete c_plot_ele;
 
-  TLatex WLatex(0.65, 0.85, WString);
-  WLatex.SetNDC();
-  WLatex.SetTextFont(42);
-  WLatex.SetTextSize(0.03);
-  WLatex.Draw("same");
-  
-  TLatex BKGLatex(0.65, 0.75, BKGString);
-  BKGLatex.SetNDC();
-  BKGLatex.SetTextFont(42);
-  BKGLatex.SetTextSize(0.03);
-  BKGLatex.Draw("same");
-  
-  TLatex QCDLatex(0.65, 0.65, QCDString);
-  QCDLatex.SetNDC();
-  QCDLatex.SetTextFont(42);
-  QCDLatex.SetTextSize(0.03);
-  QCDLatex.Draw("same");
+  TCanvas* c_plot_mu = new TCanvas("c_plot_mu","c_plot_mu");
+  RooPlot* rooPlot_mu = x.frame();
+  rooDataHisto_mu.plotOn(rooPlot_mu, DataError(RooAbsData::SumW2));
+  totPdf_mu.plotOn(rooPlot_mu, LineColor(kRed));
+  totPdf_mu.plotOn(rooPlot_mu, Components(QCDPdf_mu), LineColor(kCyan+2));
+  totPdf_mu.plotOn(rooPlot_mu, Components(BKGPdf_mu), LineColor(kBlack));
+  rooPlot_mu->Draw();
+  c_plot_mu -> Write();
+  delete rooPlot_mu;
+  delete c_plot_mu;
+
+  return 1;
 }
