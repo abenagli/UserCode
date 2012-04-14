@@ -14,6 +14,7 @@ g++ rooBinnedFit_shapeFromHisto.C -o rooBinnedFit_shapeFromHisto `root-config --
 #include "TTree.h"
 #include "TChain.h"
 #include "TCanvas.h"
+#include "TNtuple.h"
 
 #include "RooMsgService.h"
 #include "RooRealVar.h"
@@ -83,7 +84,7 @@ int main (int argc, char** argv) {
   std::string cutNameQCD_mu  = "(lep_flavour == 13)";
   std::string cutNameMC_mu   = "(lep_flavour == 13) * (eventWeight * PUWeight * crossSection / totEvents * " + s_lumi + ")" ;
 
-  TFile* outfile = new TFile("plots.root","RECREATE");
+  TFile* outfile = new TFile("QCD_fit.root","RECREATE");
     
   // get the QCD shape histogram
   TH1F* QCDShapeHisto_ele = new TH1F("QCDShapeHisto_ele", "QCDShapeHisto_ele", nBins, xMin, xMax);
@@ -202,6 +203,10 @@ int main (int argc, char** argv) {
   c_plot_mu -> Write();
   delete rooPlot_mu;
   delete c_plot_mu;
-
+  
+  TNtuple *ntuple = new TNtuple("ntuple","ntuple","n_QCD_ele:n_QCD_mu");
+  ntuple -> Fill(QCDIntegral_ele->getVal() * NQCDfit_ele.getVal(), QCDIntegral_mu->getVal() * NQCDfit_mu.getVal());
+  ntuple -> Write();
+  
   return 1;
 }
