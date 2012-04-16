@@ -116,7 +116,7 @@ float EfficiencyCorrector::getJetEff(std::vector<float>& jet_pt, std::vector<flo
           
 }
 
-float EfficiencyCorrector::getEleEff(float pt, float eta, std::string& mode) {
+float EfficiencyCorrector::getEleEff(float pt, float eta, const std::string& mode) {
 
   // boundaries check
   float xMin = eleEffReco[thisPeriodEle] -> GetXaxis() -> GetXmin();
@@ -163,7 +163,7 @@ float EfficiencyCorrector::getMtEff(float mt) {
     
 }
 
-float EfficiencyCorrector::getMuEff(float pt, float eta, std::string& mode) {
+float EfficiencyCorrector::getMuEff(float pt, float eta, const std::string& mode) {
 
   // boundaries check
   float xMin = muEffIso[thisPeriodMu] -> GetXaxis() -> GetXmin();

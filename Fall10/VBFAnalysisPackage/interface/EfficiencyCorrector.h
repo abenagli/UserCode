@@ -21,8 +21,8 @@ class EfficiencyCorrector{
     float getMetEff(float met);
     float getMtEff(float mt);
     float getJetEff(std::vector<float>& jet_pt, std::vector<float>& jet_eta);
-    float getEleEff(float pt, float eta, std::string& mode);
-    float getMuEff(float pt, float eta, std::string& mode);
+    float getEleEff(float pt, float eta, const std::string& mode);
+    float getMuEff(float pt, float eta, const std::string& mode);
     
   private:    
     //DATA MEMBERS
