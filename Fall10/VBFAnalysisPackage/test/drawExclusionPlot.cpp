@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <fstream>
 #include <cmath>
+#include <cstdlib>
 
 #include "TGraphAsymmErrors.h"
 #include "TCanvas.h"
