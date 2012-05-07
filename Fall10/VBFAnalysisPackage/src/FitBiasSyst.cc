@@ -6,6 +6,8 @@ double FitBiasSyst(const float& mH, const std::string& flavour)
 {
   if( flavour == "e" )
   {
+    //return 0.228;
+    
     if     ( mH == 250 ) return 0.083;
     else if( mH == 300 ) return 0.242;
     else if( mH == 350 ) return 0.202;
@@ -19,6 +21,8 @@ double FitBiasSyst(const float& mH, const std::string& flavour)
   
   if( flavour == "mu" )
   {
+    //return 0.117;
+    
     if     ( mH == 250 ) return 0.098;
     else if( mH == 300 ) return 0.088;
     else if( mH == 350 ) return 0.075;
