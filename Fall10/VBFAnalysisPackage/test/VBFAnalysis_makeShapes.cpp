@@ -890,7 +890,7 @@ int main(int argc, char** argv)
                         << setw(8) << "1.003" << "   "
                         << setw(8) << "-" << std::endl;
           if( flavour == "mu" )
-          datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8)
+            datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8)
                       << "1.010" << "   "
                       << setw(8) << "1.010" << "   "
                       << setw(8) << "-" << std::endl;
