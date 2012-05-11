@@ -70,7 +70,7 @@ int main(int argc, char** argv)
   
   int sigSyst = gConfigParser -> readIntOption("Options::sigSyst");
   int bkgSyst = gConfigParser -> readIntOption("Options::bkgSyst");
-  
+
   float xWidth = gConfigParser -> readFloatOption("Options::xWidth");
   char xWidthChar[50];
   sprintf(xWidthChar,"%d",int(xWidth));
@@ -78,12 +78,17 @@ int main(int argc, char** argv)
   int step = gConfigParser -> readIntOption("Options::step");
   char stepChar[50];
   sprintf(stepChar,"%d",step);  
+
+  int injMass = gConfigParser -> readIntOption("Options::injMass");
+  char injMassChar[50];
+  sprintf(injMassChar,"%d",injMass);  
   
   std::string additionalCuts = gConfigParser -> readStringOption("Options::additionalCuts");
   
   std::string flavour = gConfigParser -> readStringOption("Options::flavour");
   
   float sigStrength = gConfigParser -> readFloatOption("Options::sigStrength");
+  float sigInjStrength = gConfigParser -> readFloatOption("Options::sigInjStrength");
   
   int nToys = gConfigParser -> readIntOption("Options::nToys");  
   std::string toyParent = gConfigParser -> readStringOption("Options::toyParent");
@@ -98,8 +103,6 @@ int main(int argc, char** argv)
     inputDir += "/countSignalEvents/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "_" + additionalCuts + "/";
     outputRootFilePath += "/combine_signal/binWidth" + std::string(xWidthChar) + "/step" + std::string(stepChar) + "_" + additionalCuts + "/";
   }
-
-  
   
   std::vector<int> masses = GetMasses();
   unsigned int nMasses = masses.size();
@@ -233,6 +236,21 @@ int main(int argc, char** argv)
       
       //------------------------------------------------------------------------
       
+      // Prepare the signal for eventual injection
+      TH1F* injSignal;
+      TH1F* tmpInjSignal;
+      if ( injMass > -1 ) {
+          
+        std::string injMassString(injMassChar);
+  
+        injSignal = (TH1F*)( inFile->Get(("H"+injMassString+"/h_ggH"+injMassString+"_"+flavour).c_str()) );
+        tmpInjSignal = (TH1F*) ( inFile->Get(("H"+injMassString+"/h_qqH"+injMassString+"_"+flavour).c_str()) );
+        injSignal -> Add(tmpInjSignal);
+        injSignal -> Scale(sigInjStrength);
+  
+      }
+
+      //------------------------------------------------------------------------
       
       if( analysisMethod == "fit" )
       {
@@ -261,6 +279,7 @@ int main(int argc, char** argv)
         histoName.str(std::string());
         histoName << "H" << mass << "/h_data" << mass << "_" << flavour;
         data = (TH1F*)( inFile->Get(histoName.str().c_str()) );
+        if ( injMass > -1 ) data -> Add ( injSignal );
         
         xMin = GetXFitMIN1(mass,step,additionalCuts);
         xMax = GetXFitMAX2(mass);
@@ -805,10 +824,10 @@ int main(int argc, char** argv)
         }
         
         datacard_sa  << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-        
+
         
         datacard_sa << std::setprecision(3);
-        
+
         if( sigSyst == 1 )
         {
           datacard_sa << setw(25) << "lumi"     << "   " << setw(5) << "lnN" << "   "
