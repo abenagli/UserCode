@@ -831,8 +831,8 @@ int main(int argc, char** argv)
         if( sigSyst == 1 )
         {
           datacard_sa << setw(25) << "lumi"     << "   " << setw(5) << "lnN" << "   "
-                       << setw(8) << "1.045" << "   "
-                      << setw(8) << "1.045" << "   "
+                      << setw(8) << "1.022" << "   "
+                      << setw(8) << "1.022" << "   "
                       << setw(8) << "-" << std::endl;
           
           datacard_sa << setw(25) << "QCDscale_ggH" << "   " << setw(5) << "lnN" << "   "
