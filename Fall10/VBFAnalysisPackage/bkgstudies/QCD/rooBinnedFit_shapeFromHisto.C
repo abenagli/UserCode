@@ -11,7 +11,7 @@ g++ rooBinnedFit_shapeFromHisto.C -o rooBinnedFit_shapeFromHisto `root-config --
 #include "TH1F.h"
 #include "TF1.h"
 #include "TFile.h"
-#include "TTree.h"
+#include "TTree.h"	
 #include "TChain.h"
 #include "TCanvas.h"
 #include "TNtuple.h"
@@ -32,12 +32,23 @@ using namespace RooFit;
 int main (int argc, char** argv) {
 
   
-  std::string BKGPath = "/gwteray/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow_noEleHLTcorr_NoMET/";
-  std::string QCDPath = "/gwteray/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow_QCDSelection_noEleHLTcorr_NoIso_NoId_NoMET/";
-  std::string DATAPath = "/gwteray/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow_noEleHLTcorr_NoMET/";
+  std::string BKGPath = "/gwteray/users/ldimatt/fcolombo/data/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_effCorr/";
+  std::string QCDPath = "/gwteray/users/ldimatt/fcolombo/data/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_effCorr_QCDSelection/";
+  std::string DATAPath = "/gwteray/users/ldimatt/fcolombo/data/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_effCorr/";
+
+  bool useExclusiveWW = true;
 
   std::vector<std::string> BKG_names;
-  BKG_names.push_back("WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v2/");
+  if (useExclusiveWW) {
+    BKG_names.push_back("WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v2_0j/");
+    BKG_names.push_back("W1Jet_TuneZ2_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v2_2/");
+    BKG_names.push_back("W2Jets_TuneZ2_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v2_2/");
+    BKG_names.push_back("WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v2_3j/");
+    BKG_names.push_back("W4Jets_TuneZ2_7TeV-madgraph-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/"); 
+  }
+
+  else BKG_names.push_back("WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v2/");
+
   BKG_names.push_back("DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_govoni-SQWaT_PAT_42X_Fall11_v3_2/");
   BKG_names.push_back("TTJets_TuneZ2_7TeV-madgraph-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
   BKG_names.push_back("Tbar_TuneZ2_s-channel_7TeV-powheg-tauola_abenagli-SQWaT_PAT_42X_Fall11_v3/");
@@ -64,17 +75,19 @@ int main (int argc, char** argv) {
   QCD_names.push_back("data_SingleEle_SingleMu_Run2011A-PromptReco-v4/");
   QCD_names.push_back("data_SingleEle_SingleMu_Run2011B-PromptReco-v1/");
     
-  int step = 10;
+  int step = 13;
   char treeName[50];
   sprintf(treeName, "ntu_%d", step);
   
-  float lumi = 5000.;
-  std::string s_lumi = "5000.";
-  
-  int nBins = 100;
+  float lumi = 4978.77;
+  std::string s_lumi = "4978.77";
+
+  int nBins = 56;
   double xMin = 20.;
   double xMin_signal = 30.;
-  double xMax = 200.;
+  double xMax = 300.;
+
+  bool fixBkg = true;
   
   std::string variableName = "met_et";
   std::string cutNameDATA_ele = "(lep_flavour == 11)";
@@ -158,10 +171,23 @@ int main (int argc, char** argv) {
   RooRealVar NBKGfit_mu("NBKGfit_mu", "NBKGfit_mu", NBKG_MC_mu, NBKG_MC_mu*0.8, NBKG_MC_mu*1.2);
   RooRealVar NQCDfit_mu("NQCDfit_mu", "NQCDfit_mu", 1000., 0., 10000000.);
 
-//  RooAddPdf totPdf("totPdf", "tot", RooArgList(QCDPdf,BKGPdf), RooArgList(NQCDfit,NBKGfit));
-  RooAddPdf totPdf_ele("totPdf_ele", "tot_ele", RooArgList(QCDPdf_ele,BKGPdf_ele), RooArgList(NQCDfit_ele,NBKG_ele));
-  RooAddPdf totPdf_mu("totPdf_mu", "tot_mu", RooArgList(QCDPdf_mu,BKGPdf_mu), RooArgList(NQCDfit_mu,NBKG_mu));
+  RooArgList coeffEle(NQCDfit_ele);
+  RooArgList coeffMu (NQCDfit_mu);
   
+  if (fixBkg == true) {
+  coeffEle.add (NBKG_ele);
+  coeffMu.add  (NBKG_mu);
+  }
+
+  else {
+  coeffEle.add (NBKGfit_ele);
+  coeffMu.add  (NBKGfit_mu); 
+  }
+
+  //  RooAddPdf totPdf("totPdf", "tot", RooArgList(QCDPdf,BKGPdf), RooArgList(NQCDfit,NBKGfit));
+  RooAddPdf totPdf_ele("totPdf_ele", "tot_ele", RooArgList(QCDPdf_ele,BKGPdf_ele), coeffEle);
+  RooAddPdf totPdf_mu("totPdf_mu", "tot_mu", RooArgList(QCDPdf_mu,BKGPdf_mu), coeffMu);
+
   // fit the histo
   totPdf_ele.fitTo(rooDataHisto_ele, RooFit::Extended(1), RooFit::Minos(1), RooFit::SumW2Error(kTRUE));
   totPdf_mu.fitTo(rooDataHisto_mu, RooFit::Extended(1), RooFit::Minos(1), RooFit::SumW2Error(kTRUE));
@@ -173,10 +199,12 @@ int main (int argc, char** argv) {
   RooAbsReal* BKGIntegral_mu = BKGPdf_mu.createIntegral(x, NormSet(x), Range("signal")); 
   RooAbsReal* QCDIntegral_mu = QCDPdf_mu.createIntegral(x, NormSet(x), Range("signal"));   
   
-  std::cout << "NBKG_ele in signal region = " << BKGIntegral_ele->getVal() * NBKG_ele.getVal() << std::endl;
+  if (fixBkg == true) std::cout << "NBKG_ele in signal region = " << BKGIntegral_ele->getVal() * NBKG_ele.getVal() << std::endl;
+  else                std::cout << "NBKG_ele in signal region = " << BKGIntegral_ele->getVal() * NBKGfit_ele.getVal() << std::endl;
   std::cout << "NQCD_ele in signal region = " << QCDIntegral_ele->getVal() * NQCDfit_ele.getVal() << std::endl;
 
-  std::cout << "NBKG_mu in signal region = " << BKGIntegral_mu->getVal() * NBKG_mu.getVal() << std::endl;
+  if (fixBkg == true) std::cout << "NBKG_mu in signal region = " << BKGIntegral_mu->getVal() * NBKG_mu.getVal() << std::endl;
+  else                std::cout << "NBKG_mu in signal region = " << BKGIntegral_mu->getVal() * NBKGfit_mu.getVal() << std::endl;
   std::cout << "NQCD_mu in signal region = " << QCDIntegral_mu->getVal() * NQCDfit_mu.getVal() << std::endl;
   
   
@@ -204,8 +232,12 @@ int main (int argc, char** argv) {
   delete rooPlot_mu;
   delete c_plot_mu;
   
-  TNtuple *ntuple = new TNtuple("ntuple","ntuple","n_QCD_ele:n_QCD_mu");
-  ntuple -> Fill(QCDIntegral_ele->getVal() * NQCDfit_ele.getVal(), QCDIntegral_mu->getVal() * NQCDfit_mu.getVal());
+  TNtuple *ntuple = new TNtuple("ntuple","ntuple","n_QCD_ele:n_QCD_mu:kFactorEle:kFactorMu");
+  
+  //Fill the output ntuple by rescaling the QCD with a 1/kFactor so when ALL bkgs are multiplied by kFactor QCD gets the right normalization
+  float kFactorEle = NBKGfit_ele.getVal()/NBKG_ele.getVal();
+  float kFactorMu = NBKGfit_mu.getVal()/NBKG_mu.getVal();
+  ntuple -> Fill(QCDIntegral_ele->getVal() * NQCDfit_ele.getVal()/kFactorEle, QCDIntegral_mu->getVal() * NQCDfit_mu.getVal()/kFactorMu, kFactorEle, kFactorMu);
   ntuple -> Write();
   
   return 1;
