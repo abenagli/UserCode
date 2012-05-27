@@ -30,8 +30,8 @@ g++ makeWeightedQCDtrees.cpp -o makeWeightedQCDtrees `root-config --cflags --gli
 int main (int argc, char** argv) {
 
   
-  std::string OldPath = "/gwteray/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow_QCDSelection_noEleHLTcorr_NoIso_NoId_NoMET/";
-  std::string NewPath = "/gwteray/users/ldimatt/NTUPLES/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_EGMu_PFlow_noEleHLTcorr_NoMET/";
+  std::string OldPath = "/gwteray/users/benaglia/data/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_effCorr_QCDSelection/";
+  std::string NewPath = "/gwteray/users/benaglia/data/Fall11_v3/EGMu/VBFAnalysis_PFlow_allH_PT30_maxSumPt_maxDeta_Fall11_v3_EGMu_Run2011AB_effCorr_noMet/";
   
   std::string fileName = "VBFAnalysis_PFlow.root";
 
@@ -51,6 +51,12 @@ int main (int argc, char** argv) {
   
   float lumiTot = 0;
   for ( unsigned int iPeriod = 0; iPeriod < v_lumi.size(); iPeriod++ ) lumiTot += v_lumi[iPeriod];
+  std::cout << "lumiTot: " << lumiTot << std::endl; 
+  
+  
+  
+  //------------------------------
+  // number of electrons after fit
   
   TFile* inFile_nQCD = new TFile("QCD_fit.root","READ");
   TNtuple* ntuple = (TNtuple*) inFile_nQCD -> Get("ntuple");
@@ -60,18 +66,54 @@ int main (int argc, char** argv) {
   ntuple ->SetBranchAddress("n_QCD_mu",&QCDtotMu);
   ntuple -> GetEntry(0);
   
+  std::cout << ">>> QCD_ele after fit: " << QCDtotEle << std::endl;
+  std::cout << ">>> QCD_mu  after fit: " << QCDtotMu  << std::endl;  
+  
+  
+  
+  //-------------------------------
+  // number of electrons before fit
+  
+  int fitStep = 13;
+  float nEle = 0.;
+  float nMu = 0.;
+  char treeName[50];
+    
+  for ( unsigned int iFile = 0; iFile < DATA_names.size(); iFile++ ) {
+
+    TFile* oldfile = new TFile((OldPath + DATA_names[iFile] + fileName).c_str(),"READ");  
+   
+    sprintf(treeName, "ntu_%d", fitStep);
+    oldfile -> cd();
+    TTree* oldtree = (TTree*) oldfile -> Get(treeName);
+    
+    TH1F* tempHisto = new TH1F("tempHisto","tempHisto",3,11,14);
+    oldtree -> Draw("lep_flavour >> tempHisto","met_et > 0 && met_et < 150","goff");
+    nEle += tempHisto -> GetBinContent(1);
+    nMu  += tempHisto -> GetBinContent(3);
+    delete tempHisto;
+  }
+  
+  std::cout << ">>> QCD_ele before fit: " << nEle << std::endl;
+  std::cout << ">>> QCD_mu  before fit: " << nMu  << std::endl;  
+  
+  std::cout << std::endl;
+  
+  std::cout << ">>> Electron scale factor: " << QCDtotEle / nEle << std::endl;
+  std::cout << ">>> Muon scale factor: "     << QCDtotMu  / nMu << std::endl;
+  
+  
+  //--------------------
+  // compute new weights
+  
   float OldEventWeight;
   float NewEventWeight;
   int   totEvents;
   int   survEvents;
   int   lep_flavour;
-    
-  float lumi = 5000.;
-  std::string s_lumi = "5000.";
-    
+  
   int step_min = 10;
   int step_max = 13;
-  char treeName[50];
   
   for ( unsigned int iFile = 0; iFile < DATA_names.size(); iFile++ ) {
 
@@ -95,17 +137,11 @@ int main (int argc, char** argv) {
       TTree* newtree = oldtree -> CloneTree(0);
       newtree->SetBranchAddress("eventWeight",&NewEventWeight);
       
-      TH1F* tempHisto = new TH1F("tempHisto","tempHisto",3,11,14);
-      oldtree -> Draw("lep_flavour >> tempHisto","","goff");
-      float nEle = tempHisto -> GetBinContent(1);
-      float nMu  = tempHisto -> GetBinContent(3);
-      delete tempHisto;
-      
       for ( int iEntry = 0; iEntry < survEvents; iEntry++ ) {
       
         oldtree -> GetEntry(iEntry);
-        if ( lep_flavour == 11 )  NewEventWeight = OldEventWeight * v_lumi[iFile]/lumiTot/lumiTot * QCDtotEle * totEvents / nEle;
-        if ( lep_flavour == 13 )  NewEventWeight = OldEventWeight * v_lumi[iFile]/lumiTot/lumiTot * QCDtotMu  * totEvents / nMu;
+        if ( lep_flavour == 11 )  NewEventWeight = OldEventWeight / lumiTot * totEvents * (QCDtotEle / nEle);
+        if ( lep_flavour == 13 )  NewEventWeight = OldEventWeight / lumiTot * totEvents * (QCDtotMu / nMu);
         newtree -> Fill();
       
       } 
@@ -114,9 +150,9 @@ int main (int argc, char** argv) {
 
       if ( istep == step_min ) {
         float nRef = events -> GetBinContent(step_min);
-        events -> Scale ( 1./nRef * (QCDtotEle + QCDtotMu) * v_lumi[iFile]/lumiTot/lumiTot * totEvents );
+        events -> Scale ( 1./nRef * (QCDtotEle + QCDtotMu) / lumiTot * totEvents );
         nRef = events_PURescaled -> GetBinContent(step_min);
-        events_PURescaled -> Scale ( 1./nRef * (QCDtotEle + QCDtotMu) * v_lumi[iFile]/lumiTot/lumiTot * totEvents ); 
+        events_PURescaled -> Scale ( 1./nRef * (QCDtotEle + QCDtotMu) / lumiTot * totEvents ); 
       }
 
       events -> SetBinContent(1,totEvents);
