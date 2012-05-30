@@ -158,6 +158,8 @@ int main(int argc, char** argv)
     double n_data_obs;
      
     TH1F* hint = NULL;
+    TH1F* hintUp = NULL;
+    TH1F* hintDown = NULL;
     TH1F* bkg = NULL;
     TH1F* bkg_fitErrUp = NULL;
     TH1F* bkg_fitErrDown = NULL;
@@ -227,8 +229,8 @@ int main(int argc, char** argv)
         fileName << inputDir << "/countSignalEvents.root";
       
       if( analysisMethod == "sidebands" )
-        fileName << inputDir << "/output_017.root";
-      
+        fileName << inputDir << "/output_017_" + flavour + ".root";
+     
       inFile = TFile::Open(fileName.str().c_str(),"READ");
       //std::cout << ">>> opened file " << fileName.str() << std::endl; 
       inFile -> cd();
@@ -325,14 +327,49 @@ int main(int argc, char** argv)
       {
         data  = (TH1F*)(inFile->Get("signalRegion"));    
         hint  = (TH1F*)(inFile->Get("extrapolated_bkg"));
-        alpha = (TH1F*)(inFile->Get("num_fit_error"));
+        hintUp = (TH1F*)(inFile->Get("extrapolated_bkgUp"));
+        hintDown = (TH1F*)(inFile->Get("extrapolated_bkgDown"));
+        //alpha = (TH1F*)(inFile->Get("num_fit_error"));
         
-        xMin = alpha -> GetBinLowEdge(1);
-        xMax = alpha -> GetBinLowEdge(alpha->GetNbinsX()) + xWidth;
+        //xMin = alpha -> GetBinLowEdge(1);
+        //xMax = alpha -> GetBinLowEdge(alpha->GetNbinsX()) + xWidth;
+
+        if ( mass == 250 ) {
+          xMin = 220;
+          xMax = 280;
+        }
+        if ( mass == 300 ) {
+          xMin = 270;
+          xMax = 380;
+        }
+        if ( mass == 350 ) {
+          xMin = 300;
+          xMax = 430;
+        }
+       if ( mass == 400 ) {
+          xMin = 300;
+          xMax = 520;
+        }
+       if ( mass == 450 ) {
+          xMin = 310;
+          xMax = 590;
+       }
+       if ( mass == 500 ) {
+          xMin = 340;
+          xMax = 740;
+       }
+       if ( mass == 550 ) {
+         xMin = 370;
+         xMax = 800;
+       }
+       if ( mass == 600 ) {
+         xMin = 390;
+         xMax = 800;       
+       }
+      
       }
       
-      
-      
+
       //------------------------------------------------------------------------
       
       
@@ -405,12 +442,14 @@ int main(int argc, char** argv)
           float binCenter  = hint -> GetBinCenter(bin);
           float binContent = hint -> GetBinContent(bin);
           float binError   = hint -> GetBinError(bin);
+          float binErrorUp = hintUp->GetBinContent(bin);
+          float binErrorDown = hintDown->GetBinContent(bin);
           if( (binCenter >= xMin) && (binCenter < xMax) )
           {
             int localBin = bkg -> Fill(binCenter,binContent);
             bkg -> SetBinError(localBin,binError);
-            bkg_fitErrUp   -> Fill(binCenter,binContent+binError);
-            bkg_fitErrDown -> Fill(binCenter,binContent-binError);
+            bkg_fitErrUp   -> Fill(binCenter,/*binContent+binError*/ binErrorUp);
+            bkg_fitErrDown -> Fill(binCenter,/*binContent-binError*/ binErrorDown);
           }
         }
         
