@@ -4,28 +4,113 @@ float GetEffArea( int flavour,
                 float eta )
 {
   float effArea = -1;
+  
   //electrons
   if ( flavour == 11 ) {
-    if ( fabs(eta) < 1.0 ) effArea = 0.10;
-    if ( fabs(eta) > 1.0 && fabs(eta) < 1.479 ) effArea = 0.12;
-    if ( fabs(eta) > 1.479 && fabs(eta) < 2.0 ) effArea = 0.085;
-    if ( fabs(eta) > 2.0 && fabs(eta) < 2.2 )   effArea = 0.11;
-    if ( fabs(eta) > 2.2 && fabs(eta) < 2.3 )   effArea = 0.12;
-    if ( fabs(eta) > 2.3 && fabs(eta) < 2.4 )   effArea = 0.12;
-    if ( fabs(eta) > 2.4 ) effArea = 0.13;
-  }
+    if ( fabs(eta) < 1.0                        ) effArea = 0.10;
+    if ( fabs(eta) > 1.0   && fabs(eta) < 1.479 ) effArea = 0.12;
+    if ( fabs(eta) > 1.479 && fabs(eta) < 2.0   ) effArea = 0.085;
+    if ( fabs(eta) > 2.0   && fabs(eta) < 2.2   ) effArea = 0.11;
+    if ( fabs(eta) > 2.2   && fabs(eta) < 2.3   ) effArea = 0.12;
+    if ( fabs(eta) > 2.3   && fabs(eta) < 2.4   ) effArea = 0.12;
+    if ( fabs(eta) > 2.4                        ) effArea = 0.13;
+  }    
   
   //muons
   if ( flavour == 13 ) {
-    if ( fabs(eta) < 1.0 ) effArea = 0.132;
-    if ( fabs(eta) > 1.0 && fabs(eta) < 1.479 ) effArea = 0.120;
-    if ( fabs(eta) > 1.479 && fabs(eta) < 2.0 ) effArea = 0.114;
-    if ( fabs(eta) > 2.0 && fabs(eta) < 2.2 )   effArea = 0.139;
-    if ( fabs(eta) > 2.2 && fabs(eta) < 2.3 )   effArea = 0.168;
-    if ( fabs(eta) > 2.3 && fabs(eta) < 2.4 )   effArea = 0.189;
+    if ( fabs(eta) < 1.0                        ) effArea = 0.674;
+    if ( fabs(eta) > 1.0   && fabs(eta) < 1.479 ) effArea = 0.565;
+    if ( fabs(eta) > 1.479 && fabs(eta) < 2.0   ) effArea = 0.442;
+    if ( fabs(eta) > 2.0   && fabs(eta) < 2.2   ) effArea = 0.515;
+    if ( fabs(eta) > 2.2   && fabs(eta) < 2.3   ) effArea = 0.821;
+    if ( fabs(eta) > 2.3   && fabs(eta) < 2.4   ) effArea = 0.660;
   }
   
   return effArea;
+}
+
+
+//  ------------------------------------------------------------
+
+bool GetEleId(float pt,
+              float eta,
+              float mva, 
+              float combIso, 
+              float WPval, 
+               bool Trig)
+{
+  float idCut  =  1000;
+  float isoCut = -1000;
+
+  //Trig, low Pt
+  if ( Trig && pt < 20 ) {
+    //WP70
+    if ( WPval == 70 && fabs(eta) < 0.8 )                      { idCut =  0.390; isoCut = 0.144; }
+    if ( WPval == 70 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut =  0.301; isoCut = 0.129; }
+    if ( WPval == 70 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut =  0.574; isoCut = 0.191; }
+    //WP80
+    if ( WPval == 80 && fabs(eta) < 0.8 )                      { idCut =  0.013; isoCut = 0.167; }
+    if ( WPval == 80 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut =  0.308; isoCut = 0.213; }
+    if ( WPval == 80 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut =  0.397; isoCut = 0.233; }
+    //WP95
+    if ( WPval == 95 && fabs(eta) < 0.8 )                      { idCut = -0.288; isoCut = 0.408; }
+    if ( WPval == 95 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut =  0.039; isoCut = 2.375; }
+    if ( WPval == 95 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = -0.017; isoCut = 0.463; }
+  }
+  //Trig, medium-high Pt
+  else if ( Trig && pt > 20 ) {
+    //WP70
+    if ( WPval == 70 && fabs(eta) < 0.8 )                      { idCut = 0.977; isoCut = 0.093; }
+    if ( WPval == 70 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut = 0.956; isoCut = 0.095; }
+    if ( WPval == 70 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = 0.966; isoCut = 0.171; }
+    //WP80
+    if ( WPval == 80 && fabs(eta) < 0.8 )                      { idCut = 0.913; isoCut = 0.105; }
+    if ( WPval == 80 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut = 0.964; isoCut = 0.178; }
+    if ( WPval == 80 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = 0.899; isoCut = 0.150; }
+    //WP95
+    if ( WPval == 95 && fabs(eta) < 0.8 )                      { idCut = 0.858; isoCut = 0.253; }
+    if ( WPval == 95 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut = 0.425; isoCut = 0.225; }
+    if ( WPval == 95 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = 0.759; isoCut = 0.308; }
+  }
+  
+  //NonTrig, low Pt
+  else if ( !Trig && pt < 10 ) {
+    //WP70
+    if ( WPval == 70 && fabs(eta) < 0.8 )                      { idCut =  0.307; isoCut = 0.406; }
+    if ( WPval == 70 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut =  0.304; isoCut = 0.454; }
+    if ( WPval == 70 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut =  0.147; isoCut = 0.658; }
+    //WP80
+    if ( WPval == 80 && fabs(eta) < 0.8 )                      { idCut =  0.100; isoCut = 0.671; }
+    if ( WPval == 80 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut =  0.062; isoCut = 0.655; }
+    if ( WPval == 80 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = -0.158; isoCut = 0.757; }
+    //WP95
+    if ( WPval == 95 && fabs(eta) < 0.8 )                      { idCut = -0.286; isoCut = 48.948; }
+    if ( WPval == 95 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut = -0.568; isoCut = 1.361; }
+    if ( WPval == 95 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = -0.706; isoCut = 1.400; }
+  }
+  //NonTrig, medium-high Pt
+  else if ( !Trig && pt > 10 ) {
+    //WP70
+    if ( WPval == 70 && fabs(eta) < 0.8 )                      { idCut = 0.975; isoCut = 0.173; }
+    if ( WPval == 70 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut = 0.966; isoCut = 0.195; }
+    if ( WPval == 70 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = 0.930; isoCut = 0.184; }
+    //WP80
+    if ( WPval == 80 && fabs(eta) < 0.8 )                      { idCut = 0.971; isoCut = 0.625; }
+    if ( WPval == 80 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut = 0.903; isoCut = 0.205; }
+    if ( WPval == 80 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = 0.910; isoCut = 0.330; }
+    //WP90
+    if ( WPval == 90 && fabs(eta) < 0.8 )                      { idCut = 0.877; isoCut = 0.426; }
+    if ( WPval == 90 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut = 0.811; isoCut = 0.481; }
+    if ( WPval == 90 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = 0.707; isoCut = 0.390; }
+    //WP95
+    if ( WPval == 95 && fabs(eta) < 0.8 )                      { idCut = 0.634; isoCut = 0.567; }
+    if ( WPval == 95 && fabs(eta) > 0.8 && fabs(eta) < 1.479 ) { idCut = 0.719; isoCut = 0.909; }
+    if ( WPval == 95 && fabs(eta) > 1.479 && fabs(eta) < 2.5 ) { idCut = 0.593; isoCut = 0.665; }
+  }
+  else std::cout << "ERROR>>>>>>> MVA EleID WP NOT found !" << std::endl;
+  
+  if ( mva > idCut && combIso/pt < isoCut ) return true;
+  else return false;
 }
 
 

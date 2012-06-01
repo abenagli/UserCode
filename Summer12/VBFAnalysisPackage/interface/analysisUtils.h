@@ -12,9 +12,17 @@
 #include "Math/Vector4D.h"
 #include "Math/Boost.h"
 
+/** get the electron Id with fixed reference efficiency **/
+bool GetEleId(float pt,
+              float eta,
+              float mva, 
+              float combIso, 
+              float WPval, 
+              bool Trig);
+
 /** get the effective area for the isolation PU correction **/
 float GetEffArea( int flavour,
-                float eta );
+                  float eta );
 
 /** get the neutrino from W mass constraint **/
 int GetNeutrino(ROOT::Math::XYZTVector& nu1,
