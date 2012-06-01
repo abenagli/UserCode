@@ -24,7 +24,6 @@ struct VBFPreselectionVariables
   int MCFlag;
   int totEvents;
   float crossSection;
-  int TMVA4Jet;
   int runId; 
   int lumiId; 
   Long64_t eventId; 
@@ -51,10 +50,7 @@ struct VBFPreselectionVariables
   int PUit_n;
   int PUoot_early_n;
   int PUoot_late_n;
-  float rhoForIsolation;
   float rhoForIsolationPFlow;
-  float rhoForJets;
-  float rhoForJetsPFlow;
   
   
   
@@ -119,6 +115,7 @@ struct VBFPreselectionVariables
   std::vector<int> electrons_mishits;
   std::vector<float> electrons_dist;
   std::vector<float> electrons_dcot;
+  std::vector<int> electrons_passConvVeto;
   std::vector<int> muons_tracker;
   std::vector<int> muons_standalone;
   std::vector<int> muons_global;
@@ -168,6 +165,7 @@ struct VBFPreselectionVariables
   int lep_mishits;
   float lep_dist;
   float lep_dcot;
+  int lep_passConvVeto;
   int lep_tracker;
   int lep_standalone;
   int lep_global;
@@ -179,9 +177,6 @@ struct VBFPreselectionVariables
   
   int lep_mcMatched;
   float lep_mcMatchDR;
-  int lep_hltMatched;
-  float lep_hltMatchPt;  
-  int lep_hltPass;
   
   
   ROOT::Math::XYZTVector lep2;
@@ -216,6 +211,7 @@ struct VBFPreselectionVariables
   int lep2_mishits;
   float lep2_dist;
   float lep2_dcot;
+  int lep2_passConvVeto;
   int lep2_tracker;
   int lep2_standalone;
   int lep2_global;
@@ -227,9 +223,6 @@ struct VBFPreselectionVariables
   
   int lep2_mcMatched;
   float lep2_mcMatchDR;
-  int lep2_hltMatched;
-  float lep2_hltMatchPt;
-  int lep2_hltPass;
   
   
   // met variables
@@ -244,7 +237,6 @@ struct VBFPreselectionVariables
   
   float met_et;
   float met_phi;
-  float sumEt;
   
   int met_mcMatched;
   float met_mcMatchDR;
@@ -358,19 +350,6 @@ struct VBFPreselectionVariables
   float jet4_bTag;
   float jet5_bTag;
   float jet6_bTag;
-  
-  int jet1_hltMatched;
-  int jet2_hltMatched;
-  int jet3_hltMatched;
-  int jet4_hltMatched;
-  int jet5_hltMatched;
-  int jet6_hltMatched;
-  float jet1_hltMatchPt;
-  float jet2_hltMatchPt;
-  float jet3_hltMatchPt;
-  float jet4_hltMatchPt;
-  float jet5_hltMatchPt;
-  float jet6_hltMatchPt;
   
   
   // W-jet variables

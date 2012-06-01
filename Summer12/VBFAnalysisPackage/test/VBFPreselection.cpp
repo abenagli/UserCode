@@ -59,6 +59,7 @@ int main(int argc, char** argv)
   int QCDSelection        = gConfigParser -> readIntOption("Options::QCDSelection"); 
   int doTnP               = gConfigParser -> readIntOption("Options::doTnP"); 
   int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy");
+  float intLumi           = gConfigParser -> readFloatOption("Input::intLumi");
     
   int nJetCntMIN    = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
   float lepJetDRMIN = gConfigParser -> readFloatOption("Cuts::lepJetDRMIN");
@@ -87,25 +88,11 @@ int main(int argc, char** argv)
   stepName = "AllEvents/totalEvents";
   std::map<int,int> totalEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
-  //stepName = "NonScrapedEvents/passedEvents";
-  //std::map<int,int> nonScrapedEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
-  
-  //stepName = "GoodVtxEvents/passedEvents";
-  //std::map<int,int> goodVtxEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
-  
-  stepName = "LeptonsFilterEvents/totalEvents";
-  bool isNewNT = false;
-  int pos = -1;
-  pos = outputRootFilePath.find("PAT_52X");
-  if ( pos >= 0 ) isNewNT = true; 
-  std::string stepNameTmp = stepName;
-  if ( isNewNT ) stepNameTmp = "LeptonsFilterPFlowEvents/totalEvents";
-  std::map<int,int> leptonFilterEvents = GetTotalEvents(stepNameTmp.c_str(), inputFileList.c_str());  
+  stepName = "LeptonsFilter"+jetAlgorithm+"Events/totalEvents";
+  std::map<int,int> leptonFilterEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
   
   stepName = "JetFilter"+jetAlgorithm+"Events/totalEvents";
   std::map<int,int> jetFilterEvents = GetTotalEvents(stepName.c_str(), inputFileList.c_str());  
-  
-  
   
   
   // Get the JEC uncertainty file, if needed
@@ -115,10 +102,6 @@ int main(int argc, char** argv)
     TFile* temp = TFile::Open(JECUncertaintyFile.c_str(),"READ");
     JECUncertainty = (TH2F*)( temp -> Get("histo") );
   }
-  
-  
-  
-  
   
   
   // Open old tree
@@ -156,10 +139,7 @@ int main(int argc, char** argv)
   vars.MCFlag = MCFlag;
   vars.totEvents = totalEvents[1];
   vars.crossSection = crossSection;
-  vars.TMVA4Jet = -1;
   vars.eventNaiveId = -1;
-  
-  
   
   
     
@@ -241,9 +221,6 @@ int main(int argc, char** argv)
     if (doPDFstudy) SetPDFVariables(vars, reader, verbosity);
     SetPVVariables(vars, reader, verbosity);
     
-    //if( vars.eventId != 177044 ) continue;
-    
-    
         
     //**************
     // DUMP MC TRUTH
@@ -260,36 +237,6 @@ int main(int argc, char** argv)
     std::vector<ROOT::Math::XYZTVector> mcQuarks_tag;
     std::vector<ROOT::Math::XYZTVector> mcQuarks_W;
     
-    //if( vars.mH > 0 )
-    //{
-    //  mcH = reader.Get4V("mc_H")->at(0);
-    //  mcW1 = reader.Get4V("mcV1")->at(0);
-    //  mcW2 = reader.Get4V("mcV2")->at(0);
-    //  mcQ1_tag = (reader.Get4V("mcQ1_tag"))->at(0);
-    //  mcQ2_tag = (reader.Get4V("mcQ2_tag"))->at(0);
-    //  mcQ1_W   = (reader.Get4V("mcF1_fromV2"))->at(0);
-    //  mcQ2_W   = (reader.Get4V("mcF2_fromV2"))->at(0);
-    //  mcLepton = (reader.Get4V("mcF1_fromV1"))->at(0);
-    //  if( (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 12) ||
-    //      (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 14) ||
-    //      (fabs(reader.GetFloat("mcF1_fromV1_pdgId")->at(0)) == 16) )
-    //  mcLepton = (reader.Get4V("mcF2_fromV1"))->at(0);
-    //  
-    //  mcQuarks.push_back( mcQ1_tag );
-    //  mcQuarks.push_back( mcQ2_tag );
-    //  mcQuarks.push_back( mcQ1_W );
-    //  mcQuarks.push_back( mcQ2_W );
-    //
-    //  mcQuarks_tag.push_back( mcQ1_tag );
-    //  mcQuarks_tag.push_back( mcQ2_tag );
-    //  mcQuarks_W.push_back( mcQ1_W );
-    //  mcQuarks_W.push_back( mcQ2_W );
-    //}
-    
-    
-    
-    
-    
     
     //********************
     // STEP 6 - HCAL noise
@@ -302,10 +249,6 @@ int main(int argc, char** argv)
     
     // fill event counters
     stepEvents[step] += 1;
-    
-    
-    
-    
     
     
     //*****************
@@ -325,8 +268,6 @@ int main(int argc, char** argv)
     
 
     
-    
-        
     //*********************
     // STEP 8 - >= 1 lepton
     step += 1;
@@ -356,8 +297,32 @@ int main(int argc, char** argv)
       float chIso  = reader.GetFloat("electrons_chargedHadronIso")->at(eleIt); 
       float nhIso  = reader.GetFloat("electrons_neutralHadronIso")->at(eleIt);
       float phIso  = reader.GetFloat("electrons_photonIso")->at(eleIt);
-      float effArea = GetEffArea(11, eta);
+      float puIso  = reader.GetFloat("electrons_PUIso")->at(eleIt);
+      float effArea = GetEffArea(11, etaSC);
+      // EA correction
       float combIso = chIso + std::max((double) (nhIso + phIso - vars.rhoForIsolationPFlow * effArea), 0.);
+      
+      // // DB correction
+      // float combIso = chIso + std::max((double) (nhIso + phIso - 0.5 * puIso), 0.);
+            
+      float mvaTrig = reader.GetFloat("electrons_mvaTrig")->at(eleIt);
+      float mvaNonTrig = reader.GetFloat("electrons_mvaNonTrig")->at(eleIt);
+      bool isWP70       = GetEleId(pt,etaSC,mvaTrig   ,combIso,70,true);  //tag lepton
+      bool isWP90noTrig = GetEleId(pt,etaSC,mvaNonTrig,combIso,90,false); //veto lepton
+      bool isWP95noIso  = GetEleId(pt,etaSC,mvaTrig   ,-1     ,95,true);  //qcd lepton
+
+      /*std::cout << "event --> " << vars.eventId << "\n"
+                << "iEle  --> " << eleIt << "\n"
+                << "chIso --> " << chIso << "\n"
+                << "nhIso --> " << nhIso << "\n" 
+                << "phIso --> " << phIso << "\n" 
+                << "rho   --> " << vars.rhoForIsolationPFlow << "\n" 
+                << "eta   --> " << etaSC << "\n" 
+                << "pt    --> " << pt << "\n" 
+                << "EA    --> " << effArea << "\n" 
+                << "mvaTri--> " << mvaTrig << "\n" 
+                << "mvaNonTri--> " << mvaNonTrig << "\n" 
+                << std::endl;*/
 
       float z   = reader.GetFloat("electrons_z")->at(eleIt);      
       float dxy = reader.GetFloat("electrons_dB")->at(eleIt);
@@ -368,9 +333,61 @@ int main(int argc, char** argv)
       float DetaIn = fabs(reader.GetFloat("electrons_deltaEtaIn")->at(eleIt));
       float HOverE = reader.GetFloat("electrons_hOverE")->at(eleIt);
       
+      // Old WP if old ntuples (signals)  
+      bool isNewNT = false;
+      int pos = -1;
+      pos = outputRootFilePath.find("PAT_52X");
+      if ( pos >= 0 ) isNewNT = true; 
+      if ( !isNewNT ) {
+      
+        bool isTight = true;
+        bool isLoose = true;
+        
+        // barrel
+        if( isEB == 1 )
+        {
+          if( sigmaIetaIeta  > 0.01 ) isTight = false;
+          if( DphiIn         > 0.03 ) isTight = false;
+          if( DetaIn         > 0.004) isTight = false;
+          if( HOverE         > 0.12 ) isTight = false;
+          if( combIso/pt     > 0.10 ) isTight = false;
+
+          if( sigmaIetaIeta  > 0.01 ) isLoose = false;
+          if( DphiIn         > 0.06 ) isLoose = false;
+          if( DetaIn         > 0.004) isLoose = false;
+          if( HOverE         > 0.12 ) isLoose = false;
+          if( combIso/pt     > 0.15 ) isLoose = false;
+        }
+        // endcap
+        if( isEB != 1 )
+        {
+          if( sigmaIetaIeta  > 0.03 ) isTight = false;
+          if( DphiIn         > 0.02 ) isTight = false;
+          if( DetaIn         > 0.005) isTight = false;
+          if( HOverE         > 0.10 ) isTight = false;
+          if( combIso/pt     > 0.10 ) isTight = false;
+
+          if( sigmaIetaIeta  > 0.03 ) isLoose = false;
+          if( DphiIn         > 0.03 ) isLoose = false;
+          if( DetaIn         > 0.007) isLoose = false;
+          if( HOverE         > 0.10 ) isLoose = false;
+          if( combIso/pt     > 0.15 ) isLoose = false;
+        }
+
+        isWP70       = isTight;
+        isWP90noTrig = isLoose;
+      
+      }
+
+            
       int mishits = reader.GetInt("electrons_mishits")->at(eleIt);
       float dist = reader.GetFloat("electrons_dist")->at(eleIt);
       float dcot = reader.GetFloat("electrons_dcot")->at(eleIt);
+      
+      //NOTALEO
+      //int passConvVeto = reader.GetInt("electrons_passConvVeto")->at(eleIt);
+      bool passConvVeto = false;
+      if ( ( mishits == 0 ) && ( ( fabs(dist) > 0.02 ) || ( fabs(dcot) > 0.02 ) ) ) passConvVeto = true;
       
       /*std::cout << "eleIt: " << eleIt
                 << "   pt: " << pt
@@ -386,28 +403,19 @@ int main(int argc, char** argv)
                 << "   dist: " << dist
                 << "   dcot: " << dcot
                 << std::endl;*/
-      
-      
+            
       // ---------------
       // tight selection
       bool isTightElectron = false;
       if( ( pt > 20.)  &&
           ( fabs(eta) < 2.5 ) &&
           ( (fabs(etaSC) < 1.4442) || (fabs(etaSC) > 1.5660) ) &&
-          ( fabs(z-vars.PV_z) < 0.2 ) && 
+          ( fabs(z-vars.PV_z) < 0.1 ) && 
           ( fabs(dxy) < 0.02 ) &&
-          ( (QCDSelection == 0 && combIso/pt < 0.1 ) ||   // standard
-            (QCDSelection == 1 && combIso/pt > 0.1 )) &&   // QCD selection
-          ( (QCDSelection == 0 &&  ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) ) || // standard
-            (QCDSelection == 1 &&  ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) ) ) &&  // QCD selection
-          ( (QCDSelection == 0 &&  ( ( (isEB == 1) && (DphiIn < 0.060) )        || ( (isEB == 0) && (DphiIn < 0.030) ) ) ) || // standard
-            (QCDSelection == 1 &&  ( ( (isEB == 1) && (DphiIn < 0.800) )        || ( (isEB == 0) && (DphiIn < 0.700) ) ) ) ) &&  // QCD selection
-          ( (QCDSelection == 0 &&  ( ( (isEB == 1) && (DetaIn < 0.004) )        || ( (isEB == 0) && (DetaIn < 0.007) ) ) ) || // standard
-            (QCDSelection == 1 &&  ( ( (isEB == 1) && (DetaIn < 0.007) )        || ( (isEB == 0) && (DetaIn < 0.010) ) ) ) ) &&  // QCD selection
-          ( (QCDSelection == 0 &&  ( ( (isEB == 1) && (HOverE < 0.025) )        || ( (isEB == 0) && (HOverE < 0.025) ) ) ) || // standard
-            (QCDSelection == 1 &&  ( ( (isEB == 1) && (HOverE < 0.150) )        || ( (isEB == 0) && (HOverE < 0.070) ) ) ) ) &&  // QCD selection
-          ( mishits == 0 ) &&
-          ( ( fabs(dist) > 0.02 ) || ( fabs(dcot) > 0.02 ) ) )
+          ( passConvVeto ) &&
+          ( (QCDSelection == 0 && isWP70 ) ||   // standard
+            (QCDSelection == 1 && isWP95noIso && combIso/pt > 0.1 )) // QCD selection
+        )
       {
         isTightElectron = true;
         SetElectronVariables(vars, reader, eleIt, verbosity);
@@ -425,15 +433,14 @@ int main(int argc, char** argv)
       if( ( pt > 15. ) &&
           ( fabs(eta) < 2.5 ) &&
           ( (fabs(etaSC) < 1.4442) || (fabs(etaSC) > 1.5660) ) &&
-	  ( combIso/pt < 0.15) &&   // standard
-	  //( combIso/pt < 0.5) &&     // loose for QCD studies
-          ( ( (isEB == 1) && (sigmaIetaIeta < 0.010) ) || ( (isEB == 0) && (sigmaIetaIeta < 0.030) ) ) &&
-          ( ( (isEB == 1) && (DphiIn < 0.800) )        || ( (isEB == 0) && (DphiIn < 0.700) ) ) &&
-          ( ( (isEB == 1) && (DetaIn < 0.007) )        || ( (isEB == 0) && (DetaIn < 0.010) ) ) &&
-          ( ( (isEB == 1) && (HOverE < 0.150) )        || ( (isEB == 0) && (HOverE < 0.070) ) ) )
+          ( fabs(z-vars.PV_z) < 0.2 ) && 
+          ( fabs(dxy) < 0.04 ) &&
+          ( passConvVeto ) &&
+	        ( isWP90noTrig )
+	      )
       {
         isLooseElectron = true;
-	vars.electrons_loose.push_back( reader.Get4V("electrons")->at(eleIt) );
+       	vars.electrons_loose.push_back( reader.Get4V("electrons")->at(eleIt) );
         
         nLep_loose += 1;
         nEle_loose += 1;
@@ -460,12 +467,18 @@ int main(int argc, char** argv)
       float chIso  = reader.GetFloat("muons_chargedHadronIso")->at(muIt); 
       float nhIso  = reader.GetFloat("muons_neutralHadronIso")->at(muIt);
       float phIso  = reader.GetFloat("muons_photonIso")->at(muIt);
+      float puIso  = reader.GetFloat("muons_PUIso")->at(muIt);
       float effArea = GetEffArea(13, eta);
-      float combIso = chIso + std::max((double) (nhIso + phIso - vars.rhoForIsolationPFlow * effArea), 0.);
+      
+      // // EA correction
+      // float combIso = chIso + std::max((double) (nhIso + phIso - vars.rhoForIsolationPFlowMuons * effArea), 0.);
+      // DB correction
+      float combIso = chIso + std::max((double) (nhIso + phIso - 0.5 * puIso), 0.);
       
       int tracker    = reader.GetInt("muons_tracker")->at(muIt);
       int standalone = reader.GetInt("muons_standalone")->at(muIt);
       int global     = reader.GetInt("muons_global")->at(muIt);
+      int PF         = reader.GetInt("muons_pfMuon")->at(muIt);
       
       float z                        = reader.GetFloat("muons_z")->at(muIt);
       float dxy                      = reader.GetFloat("muons_dB")->at(muIt);
@@ -473,7 +486,22 @@ int main(int argc, char** argv)
       int numberOfMatches            = reader.GetInt("muons_numberOfMatches")->at(muIt);
       int numberOfValidTrackerHits   = reader.GetInt("muons_numberOfValidTrackerHits")->at(muIt);
       int numberOfValidMuonHits      = reader.GetInt("muons_numberOfValidMuonHits")->at(muIt);
+      int numberOfValidPixelHits      = reader.GetInt("muons_numberOfValidPixelHits")->at(muIt);
       int pixelLayersWithMeasurement = reader.GetInt("muons_pixelLayersWithMeasurement")->at(muIt);
+      int trackerLayersWithMeasurement = reader.GetInt("muons_trackerLayersWithMeasurement")->at(muIt);
+
+      /*std::cout << "event --> " << vars.eventId << "\n"
+                << "iMu   --> " << muIt << "\n"
+                << "chIso --> " << chIso << "\n"
+                << "nhIso --> " << nhIso << "\n" 
+                << "phIso --> " << phIso << "\n" 
+                << "PUIso --> " << puIso << "\n" 
+                << "eta   --> " << eta   << "\n" 
+                << "pt    --> " << pt << "\n" 
+                << "global--> " << global << "\n"
+                << "PF    --> " << PF << "\n"
+                << std::endl;*/
+
       
       /*std::cout << "muIt: " << muIt
                 << "   pt: " << pt
@@ -490,8 +518,7 @@ int main(int argc, char** argv)
                 << "   numberOfValidMuonHits: " << numberOfValidMuonHits
                 << "   pixelLayersWithMeasurement: " << pixelLayersWithMeasurement
                 << std::endl;*/
-      
-            
+                  
       // ---------------
       // tight selection
       bool isTightMuon = false;
@@ -499,17 +526,16 @@ int main(int argc, char** argv)
           ( fabs(eta) < 2.1 ) &&
           ( (QCDSelection == 0 && combIso/pt < 0.12)  ||   // standard
             (QCDSelection == 1 && combIso/pt > 0.12) ) &&   // QCD selection
-          ( fabs(z-vars.PV_z) < 0.2 ) && 
+          ( fabs(z-vars.PV_z) < 0.5 ) && 
           ( fabs(dxy) < 0.02 ) &&
-          ( tracker == 1 ) &&
-          //( standalone == 1 ) &&
           ( global == 1 ) &&
+          ( PF == 1 ) &&
           ( normalizedChi2 < 10. ) &&
-          ( pixelLayersWithMeasurement > 0 ) &&
-          ( numberOfValidTrackerHits > 10 ) &&
           ( numberOfValidMuonHits > 0 ) &&
           ( numberOfMatches > 1 ) && 
-          ( 1 == 1 ) )
+          ( numberOfValidPixelHits > 0 ) &&
+          ( trackerLayersWithMeasurement > 5 )
+        )
       {
         isTightMuon = true;
         SetMuonVariables(vars, reader, muIt, verbosity);
@@ -526,8 +552,10 @@ int main(int argc, char** argv)
       bool isLooseMuon = false;
       if( ( pt > 10. ) &&
           ( fabs(eta) < 2.5 ) &&
-	  ( combIso/pt < 0.20 ) &&
-          ( global == 1) )
+      	  ( combIso/pt < 0.20 ) &&
+          ( global == 1 || tracker == 1 )  &&
+          ( PF == 1 )
+        )
       {
         isLooseMuon = true;
         vars.muons_loose.push_back( reader.Get4V("muons")->at(muIt) );        
@@ -609,51 +637,6 @@ int main(int argc, char** argv)
     stepEvents[step] += 1;
     
     
-    
-    
-    
-    
-    /*if( leptonFLAVOUR == "mu")
-    {
-      std::cout << std::fixed << std::setprecision(6)
-                << vars.eventId << " "
-	        << vars.lep_pt << " "
-	        << vars.lep_eta << " "
-	        << vars.lep_tkIso << " "
-	        << vars.lep_global << " "
-	        << vars.lep_tracker << " "
-	        << vars.lep_dxy_BS << " "
-	        << fabs(vars.lep_z-vars.PV_z) << " "
-	        << vars.lep_normalizedChi2 << " "
-	        << vars.lep_numberOfMatches << " " 
-	        << vars.lep_numberOfValidTrackerHits << " "
-	        << vars.lep_numberOfValidMuonHits << " "
-	        << vars.lep_pixelLayersWithMeasurement << " " 
-	        << std::endl;    
-    }
-    
-    if( leptonFLAVOUR == "e")
-    {
-      std::cout << std::fixed << std::setprecision(6)
-                << vars.eventId << " "
-	        << vars.lep_pt << " "
-	        << vars.lep_eta << " "
-	        << vars.lep_tkIso << " "
-	        << vars.lep_dxy_BS << " "
-	        << vars.lep_sigmaIetaIeta << " " 
-	        << vars.lep_DphiIn << " " 
-	        << vars.lep_DetaIn << " " 
-	        << vars.lep_HOverE << " " 
-	        << vars.lep_mishits << " " 
-	        << vars.lep_dist << " " 
-	        << vars.lep_dcot << " " 
-	        << std::endl;
-     }*/
-    
-    
-    
-    
-    
     //*************************
     // STEP 11 -  >= 2 cnt jets
     step += 1;
@@ -666,14 +649,15 @@ int main(int argc, char** argv)
     std::string run;
     if( vars.dataFlag == 1 )
     {
-      if( vars.runId <= 173692 ) run = "2011A";
-      else                       run = "2011B";
+      if( vars.runId <= 191930 ) run = "2012A";
+      else                       run = "2012B";
+      
     }
     if( vars.dataFlag == 0 )
     {
-      float val = r.Uniform(0.,4680.45);
-      if( val <= 2168.25 ) run = "2011A";
-      else                 run = "2011B";
+      float val = r.Uniform(0.,intLumi);
+      if( val <= 531.579 ) run = "2012A";
+      else                 run = "2012B";
     }
     
     SetMetVariables(vars, reader, jetType, correctMet, run, JESScaleVariation, JECUncertainty, verbosity);
@@ -716,17 +700,12 @@ int main(int argc, char** argv)
       
       if(jetType == "PF")
       {
-        
-        if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_neutralHadronEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_neutralEmEnergyFraction")->at(jetIt) >= 0.99) ) continue;
+        if( (reader.GetFloat("jets_neutralHadronEnergyFraction")->at(jetIt) >= 0.99) ) continue;
+        if( (reader.GetFloat("jets_neutralEmEnergyFraction")->at(jetIt) >= 0.99) ) continue;
+        if( (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) + reader.GetInt("jets_neutralMultiplicity")->at(jetIt) <= 1) ) continue;
         if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_chargedHadronEnergyFraction")->at(jetIt) <= 0.) ) continue;
         if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_chargedEmEnergyFraction")->at(jetIt) >= 0.99) ) continue;
         if( (fabs(jet.eta()) < 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) <= 0) ) continue;
-        //if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_muonEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        
-        if( (fabs(jet.eta()) >= 2.4) && (reader.GetFloat("jets_neutralHadronEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        if( (fabs(jet.eta()) >= 2.4) && (reader.GetFloat("jets_neutralEmEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        if( (fabs(jet.eta()) >= 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) + reader.GetInt("jets_neutralMultiplicity")->at(jetIt) <= 1) ) continue;
       }
       
       SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD, JESScaleVariation, JECUncertainty, verbosity);
@@ -743,71 +722,6 @@ int main(int argc, char** argv)
     vars.jets_bTag2 = vars.jets_bTagOrdered.at(1);
     
 
-
-
-
-    /*std::cout << std::fixed << std::setprecision(6)
-              << "eventId: " << vars.eventId << " "
-              << vars.lep_pt << " "
-              << vars.lep_eta << " "
-              << std::endl;
-    
-    for(unsigned int jetIt = 0; jetIt < (reader.Get4V("jets")->size()); ++jetIt)
-    {
-      
-      ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);
-      
-      // jet et min
-      if( jet.pt() < 10. ) continue;
-      
-      // clean jets from selected lepton
-      float DR = deltaR(jet.eta(), jet.phi(), vars.lepchargedHadronIso.eta(), vars.lep.phi());
-      
-      if( (leptonFLAVOUR == "e")  && (DR < 0.3) ) continue;
-      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 11) && (DR < 0.3) ) continue;
-      
-      if( (leptonFLAVOUR == "mu") && (DR < 0.3) ) continue;
-      if( (leptonFLAVOUR == "emu") && (vars.lep_flavour == 13) && (DR < 0.3) ) continue;
-      
-      
-      // jetID
-      if(jetType == "Calo")
-      {
-        if( (fabs(jet.eta()) < 2.6) && (reader.GetFloat("jets_emEnergyFraction")->at(jetIt) < 0.01) ) continue;
-        if( reader.GetFloat("jets_emEnergyFraction")->at(jetIt) >= 0.98 ) continue;
-        if( reader.GetFloat("jets_n90Hits")->at(jetIt) < 2 ) continue;
-        if( reader.GetFloat("jets_fHPD")->at(jetIt) >= 0.98 ) continue;
-      }
-      
-      if(jetType == "PF")
-      {
-        
-        if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_neutralHadronEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_neutralEmEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_chargedHadronEnergyFraction")->at(jetIt) <= 0.) ) continue;
-        if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_chargedEmEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        if( (fabs(jet.eta()) < 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) <= 0) ) continue;
-        //if( (fabs(jet.eta()) < 2.4) && (reader.GetFloat("jets_muonEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        
-        if( (fabs(jet.eta()) >= 2.4) && (reader.GetFloat("jets_neutralHadronEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        if( (fabs(jet.eta()) >= 2.4) && (reader.GetFloat("jets_neutralEmEnergyFraction")->at(jetIt) >= 0.99) ) continue;
-        if( (fabs(jet.eta()) >= 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) + reader.GetInt("jets_neutralMultiplicity")->at(jetIt) <= 1) ) continue;
-      }
-      
-      std::cout << std::fixed << std::setprecision(6)
-                << ">>> jet: " << jetIt << " "
-		<< jet.pt() << " "
-		<< jet.eta() << " "
-		<< jet.phi() << " "
-		<< DR << " "
-		<< std::endl;
-      
-    } // loop on jets
-    */
-
-
-
-
     
     
     //**************
@@ -820,84 +734,6 @@ int main(int argc, char** argv)
     
     // fIll event counters
     stepEvents[step] += 1;
-    
-    
-    
-    
-    
-    
-    //**************
-    // TMVA training 
-    /*
-    if( TMVA4JetTraining == 1 )
-    {
-      // match with MC
-      std::vector<int> matchIt;
-      std::vector<int> matchIt_tag;
-      std::vector<int> matchIt_W;
-      int nMatching = -1;
-      int nMatching_tag = -1;
-      int nMatching_W = -1;
-      
-      if( vars.mH > 0 )
-      {
-        nMatching     = GetMatching(vars.jets, mcQuarks,     0.3, 0.5, 1.5, &matchIt);
-        nMatching_tag = GetMatching(vars.jets, mcQuarks_tag, 0.3, 0.5, 1.5, &matchIt_tag);
-        nMatching_W   = GetMatching(vars.jets, mcQuarks_W,   0.3, 0.5, 1.5, &matchIt_W);
-        
-	std::cout << "nMatching = " << nMatching << std::endl;
-        if( (nMatching == 4) && (matchIt.at(0) > matchIt.at(1)) )
-        {
-          int dummy = matchIt.at(0);
-          matchIt.at(0) = matchIt.at(1);
-          matchIt.at(1) = dummy;
-        }
-  
-        if( (nMatching == 4) && (matchIt.at(2) > matchIt.at(3)) )
-        {
-          int dummy = matchIt.at(2);
-          matchIt.at(2) = matchIt.at(3);
-          matchIt.at(3) = dummy;
-        }
-  
-        std::sort(matchIt_tag.begin(), matchIt_tag.end());
-        std::sort(matchIt_W.begin(), matchIt_W.end());
-      }
-      
-      // fill the ntuple with combinations
-      if(nMatching == 4)
-      {
-        std::vector<std::vector<int> > combinations;
-        int nCombinations = Build4JetCombinations(combinations,vars.nJets);
-        
-        for(int combIt = 0; combIt < nCombinations; ++combIt)
-        {
-          std::vector<int> tempCombination = combinations.at(combIt);
-          
-          vars.selectIt_tag.at(0) = tempCombination.at(0);
-          vars.selectIt_tag.at(1) = tempCombination.at(1);
-          vars.selectIt_W.at(0) = tempCombination.at(2);
-          vars.selectIt_W.at(1) = tempCombination.at(3);
-	        
-          SetWJJVariables(vars, reader, verbosity);
-          SetTagJJVariables(vars, reader, verbosity);
-          SetHVariables(vars, reader, verbosity);
-          
-          if(tempCombination == matchIt) vars.TMVA4Jet = 1;
-          else                           vars.TMVA4Jet = 0;          
-	        
-	        
-	        // Fill reduced tree
-	        FillVBFPreselectionTree(vars);
-        }
-        
-        // fIll event counters
-        stepEvents[step] += 1;
-      }
-    }
-    */
-    
-    
     
     
     

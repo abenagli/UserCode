@@ -24,7 +24,6 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("MCFlag",       &vars.MCFlag,             "MCFlag/I");
   vars.m_reducedTree -> Branch("totEvents",    &vars.totEvents,       "totEvents/I");
   vars.m_reducedTree -> Branch("crossSection", &vars.crossSection, "crossSection/F");
-  vars.m_reducedTree -> Branch("TMVA4Jet",     &vars.TMVA4Jet,         "TMVA4Jet/I");
   vars.m_reducedTree -> Branch("runId",        &vars.runId,               "runId/I");
   vars.m_reducedTree -> Branch("lumiId",       &vars.lumiId,             "lumiId/I");
   vars.m_reducedTree -> Branch("eventId",      &vars.eventId,           "eventId/L");
@@ -48,11 +47,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("PUit_n",               &vars.PUit_n,                             "PUit_n/I");
   vars.m_reducedTree -> Branch("PUoot_early_n",        &vars.PUoot_early_n,               "PUoot_early_n/I");
   vars.m_reducedTree -> Branch("PUoot_late_n",         &vars.PUoot_late_n,                 "PUoot_late_n/I");
-  vars.m_reducedTree -> Branch("rhoForIsolation",      &vars.rhoForIsolation,           "rhoForIsolation/F");
   vars.m_reducedTree -> Branch("rhoForIsolationPFlow", &vars.rhoForIsolationPFlow, "rhoForIsolationPFlow/F");
-  vars.m_reducedTree -> Branch("rhoForJets",           &vars.rhoForJets,                     "rhoForJets/F");
-  vars.m_reducedTree -> Branch("rhoForJetsPFlow",      &vars.rhoForJetsPFlow,           "rhoForJetsPFlow/F");
-  
   
   // HLT variables
   vars.m_reducedTree -> Branch("HLT_Names",  "std::vector<std::string>", &vars.p_HLT_Names);
@@ -105,6 +100,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep_mishits",           &vars.lep_mishits,                     "lep_mishits/I");
   vars.m_reducedTree -> Branch("lep_dist",              &vars.lep_dist,                           "lep_dist/F");
   vars.m_reducedTree -> Branch("lep_dcot",              &vars.lep_dcot,                           "lep_dcot/F");
+  vars.m_reducedTree -> Branch("lep_passConvVeto",      &vars.lep_passConvVeto,                   "lep_passConvVeto/I");
   vars.m_reducedTree -> Branch("lep_tracker",                    &vars.lep_tracker,                                       "lep_tracker/I");
   vars.m_reducedTree -> Branch("lep_standalone",                 &vars.lep_standalone,                                 "lep_standalone/I");
   vars.m_reducedTree -> Branch("lep_global",                     &vars.lep_global,                                         "lep_global/I");
@@ -115,9 +111,6 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("lep_pixelLayersWithMeasurement", &vars.lep_pixelLayersWithMeasurement, "lep_pixelLayersWithMeasurement/I");
   vars.m_reducedTree -> Branch("lep_mcMatched", &vars.lep_mcMatched, "lep_mcMatched/I");
   vars.m_reducedTree -> Branch("lep_mcMatchDR", &vars.lep_mcMatchDR, "lep_mcMatchDR/F");
-  vars.m_reducedTree -> Branch("lep_hltMatched", &vars.lep_hltMatched, "lep_hltMatched/I");
-  vars.m_reducedTree -> Branch("lep_hltMatchPt", &vars.lep_hltMatchPt, "lep_hltMatchPt/F");
-  vars.m_reducedTree -> Branch("lep_hltPass",    &vars.lep_hltPass,  "lep_hltMatchPass/I");
   
   if( doTnP == 1 )
   {
@@ -151,6 +144,7 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
     vars.m_reducedTree -> Branch("lep2_mishits",           &vars.lep2_mishits,                     "lep2_mishits/I");
     vars.m_reducedTree -> Branch("lep2_dist",              &vars.lep2_dist,                           "lep2_dist/F");
     vars.m_reducedTree -> Branch("lep2_dcot",              &vars.lep2_dcot,                           "lep2_dcot/F");
+    vars.m_reducedTree -> Branch("lep2_passConvVeto",      &vars.lep2_passConvVeto,                   "lep2_passConvVeto/I");
     vars.m_reducedTree -> Branch("lep2_tracker",                    &vars.lep2_tracker,                                       "lep2_tracker/I");
     vars.m_reducedTree -> Branch("lep2_standalone",                 &vars.lep2_standalone,                                 "lep2_standalone/I");
     vars.m_reducedTree -> Branch("lep2_global",                     &vars.lep2_global,                                         "lep2_global/I");
@@ -161,9 +155,6 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
     vars.m_reducedTree -> Branch("lep2_pixelLayersWithMeasurement", &vars.lep2_pixelLayersWithMeasurement, "lep2_pixelLayersWithMeasurement/I");
     vars.m_reducedTree -> Branch("lep2_mcMatched", &vars.lep2_mcMatched, "lep2_mcMatched/I");
     vars.m_reducedTree -> Branch("lep2_mcMatchDR", &vars.lep2_mcMatchDR, "lep2_mcMatchDR/F");
-    vars.m_reducedTree -> Branch("lep2_hltMatched", &vars.lep2_hltMatched, "lep2_hltMatched/I");
-    vars.m_reducedTree -> Branch("lep2_hltMatchPt", &vars.lep2_hltMatchPt, "lep2_hltMatchPt/F");
-    vars.m_reducedTree -> Branch("lep2_hltPass",    &vars.lep2_hltPass,       "lep2_hltPass/I");
   }
   
   
@@ -174,7 +165,6 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("nu2",   "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_nu2);
   vars.m_reducedTree -> Branch("met_et",       &vars.met_et,             "met_et/F");
   vars.m_reducedTree -> Branch("met_phi",      &vars.met_phi,           "met_phi/F");
-  vars.m_reducedTree -> Branch("sumEt",        &vars.sumEt,               "sumEt/F");
   vars.m_reducedTree -> Branch("lepMet_pt",    &vars.lepMet_pt,       "lepMet_pt/F");
   vars.m_reducedTree -> Branch("lepMet_mt",    &vars.lepMet_mt,       "lepMet_mt/F");
   vars.m_reducedTree -> Branch("lepMet_Dphi",  &vars.lepMet_Dphi,   "lepMet_Dphi/F");
@@ -241,18 +231,6 @@ void InitializeVBFPreselectionTree(VBFPreselectionVariables& vars, const std::st
   vars.m_reducedTree -> Branch("jet4_bTag", &vars.jet4_bTag, "jet4_bTag/F");
   vars.m_reducedTree -> Branch("jet5_bTag", &vars.jet5_bTag, "jet5_bTag/F");
   vars.m_reducedTree -> Branch("jet6_bTag", &vars.jet6_bTag, "jet6_bTag/F");
-  vars.m_reducedTree -> Branch("jet1_hltMatched", &vars.jet1_hltMatched, "jet1_hltMatched/I");
-  vars.m_reducedTree -> Branch("jet2_hltMatched", &vars.jet2_hltMatched, "jet2_hltMatched/I");
-  vars.m_reducedTree -> Branch("jet3_hltMatched", &vars.jet3_hltMatched, "jet3_hltMatched/I");
-  vars.m_reducedTree -> Branch("jet4_hltMatched", &vars.jet4_hltMatched, "jet4_hltMatched/I");
-  vars.m_reducedTree -> Branch("jet5_hltMatched", &vars.jet5_hltMatched, "jet5_hltMatched/I");
-  vars.m_reducedTree -> Branch("jet6_hltMatched", &vars.jet6_hltMatched, "jet6_hltMatched/I");
-  vars.m_reducedTree -> Branch("jet1_hltMatchPt", &vars.jet1_hltMatchPt, "jet1_hltMatchPt/F");
-  vars.m_reducedTree -> Branch("jet2_hltMatchPt", &vars.jet2_hltMatchPt, "jet2_hltMatchPt/F");
-  vars.m_reducedTree -> Branch("jet3_hltMatchPt", &vars.jet3_hltMatchPt, "jet3_hltMatchPt/F");
-  vars.m_reducedTree -> Branch("jet4_hltMatchPt", &vars.jet4_hltMatchPt, "jet4_hltMatchPt/F");
-  vars.m_reducedTree -> Branch("jet5_hltMatchPt", &vars.jet5_hltMatchPt, "jet5_hltMatchPt/F");
-  vars.m_reducedTree -> Branch("jet6_hltMatchPt", &vars.jet6_hltMatchPt, "jet6_hltMatchPt/F");
     
   // W-jet variables
   vars.m_reducedTree -> Branch("WJ1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &vars.p_WJ1);
@@ -422,11 +400,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.PUit_n = -1;
   vars.PUoot_early_n = -1;
   vars.PUoot_late_n = -1;
-  vars.rhoForIsolation = -99.;
   vars.rhoForIsolationPFlow = -99.;
-  vars.rhoForJets = -99.;
-  vars.rhoForJetsPFlow = -99.;
-  
   
   // PV variables
   vars.PV_n = -1;
@@ -469,6 +443,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.electrons_mishits.clear();
   vars.electrons_dist.clear();
   vars.electrons_dcot.clear();
+  vars.electrons_passConvVeto.clear();
   vars.muons_tracker.clear();
   vars.muons_standalone.clear();
   vars.muons_global.clear();
@@ -517,6 +492,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lep_mishits = -1;
   vars.lep_dist = -99.;
   vars.lep_dcot = -99.;
+  vars.lep_passConvVeto = -99;
   vars.lep_EOverP = -1.;
   vars.lep_tracker = -1;
   vars.lep_standalone = -1;
@@ -529,10 +505,6 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   
   vars.lep_mcMatched = -1;
   vars.lep_mcMatchDR = -99.;
-  vars.lep_hltMatched = -1;
-  vars.lep_hltMatchPt = -99.;
-  vars.lep_hltPass = -99;
-  
   
   vars.lep2 = ROOT::Math::XYZTVector(0., 0., 0., 0.);
   vars.p_lep2 = NULL;
@@ -565,6 +537,7 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.lep2_mishits = -1;
   vars.lep2_dist = -99.;
   vars.lep2_dcot = -99.;
+  vars.lep2_passConvVeto = -99;
   vars.lep2_EOverP = -1.;
   vars.lep2_tracker = -1;
   vars.lep2_standalone = -1;
@@ -577,10 +550,6 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   
   vars.lep2_mcMatched = -1;
   vars.lep2_mcMatchDR = -99.;
-  vars.lep2_hltMatched = -1;
-  vars.lep2_hltMatchPt = -99.;
-  vars.lep2_hltPass = -99;
-  
   
   // met variables 
   vars.met = ROOT::Math::XYZTVector(0., 0., 0., 0.);
@@ -593,7 +562,6 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.p_nu2 = NULL;
   vars.met_et = -1.;
   vars.met_phi = -1.;
-  vars.sumEt = -1.;
   
   vars.met_mcMatched = -1;
   vars.met_mcMatchDR = -99.;
@@ -703,20 +671,6 @@ void ClearVBFPreselectionVariables(VBFPreselectionVariables& vars)
   vars.jet4_bTag = -99.;
   vars.jet5_bTag = -99.;
   vars.jet6_bTag = -99.;
-  
-  vars.jet1_hltMatched = 0;
-  vars.jet2_hltMatched = 0;
-  vars.jet3_hltMatched = 0;
-  vars.jet4_hltMatched = 0;
-  vars.jet5_hltMatched = 0;
-  vars.jet6_hltMatched = 0;
-  vars.jet1_hltMatchPt = -99;
-  vars.jet2_hltMatchPt = -99;
-  vars.jet3_hltMatchPt = -99;
-  vars.jet4_hltMatchPt = -99;
-  vars.jet5_hltMatchPt = -99;
-  vars.jet6_hltMatchPt = -99;
-  
   
   // W-jet variables
   vars.selectIt_W.clear();
@@ -943,10 +897,7 @@ void SetPUVariables(VBFPreselectionVariables& vars, treeReader& reader, const in
     vars.PUoot_late_n  = (int)(reader.GetInt("mc_PUoot_late_NumInteractions")->at(0));
   }
   
-  vars.rhoForIsolation      = reader.GetFloat("rho_isolation")->at(0);
   vars.rhoForIsolationPFlow = reader.GetFloat("rho_isolationPFlow")->at(0);
-  vars.rhoForJets           = reader.GetFloat("rho_jets")->at(0);
-  vars.rhoForJetsPFlow      = reader.GetFloat("rho_jetsPFlow")->at(0);
 }
 
 
@@ -1041,24 +992,7 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader, cons
     vars.lep_mishits = vars.electrons_mishits.at(vars.selectIt_ele);
     vars.lep_dist = vars.electrons_dist.at(vars.selectIt_ele);
     vars.lep_dcot = vars.electrons_dcot.at(vars.selectIt_ele);
-    
-    // hlt matching
-    vars.lep_hltMatched = 0;
-    float thisDR_DPT = 1000.;
-    for(unsigned int hltEleIt = 0; hltEleIt < reader.Get4V("goodHLT_electrons")->size(); ++hltEleIt)
-    {
-      ROOT::Math::XYZTVector ele_hlt = reader.Get4V("goodHLT_electrons")->at(hltEleIt);
-      float thisDR = deltaR(ele_hlt.eta(), ele_hlt.phi(), vars.lep.eta(), vars.lep.phi());
-      // discard hlt ele more distant than dr = 0.1 from the offline ele
-      if( thisDR > 0.1 ) continue;
-      vars.lep_hltMatched = 1;
-      if( thisDR * fabs(vars.lep.pt() - ele_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(vars.lep.pt() - ele_hlt.pt()); 
-        vars.lep_hltMatchPt = ele_hlt.pt();
-        vars.lep_hltPass = reader.GetInt("goodHLT_electrons_pass")->at(hltEleIt);
-      }
-    }
+    vars.lep_passConvVeto = vars.electrons_passConvVeto.at(vars.selectIt_ele);
     
   }
   
@@ -1081,24 +1015,6 @@ void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader, cons
     vars.lep_numberOfValidTrackerHits = vars.muons_numberOfValidTrackerHits.at(vars.selectIt_mu);
     vars.lep_numberOfValidMuonHits = vars.muons_numberOfValidMuonHits.at(vars.selectIt_mu);
     vars.lep_pixelLayersWithMeasurement = vars.muons_pixelLayersWithMeasurement.at(vars.selectIt_mu);
-    
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    vars.lep_hltMatched = 0;
-    for(unsigned int hltMuIt = 0; hltMuIt < reader.Get4V("goodHLT_muons")->size(); ++hltMuIt)
-    {
-      ROOT::Math::XYZTVector mu_hlt = reader.Get4V("goodHLT_muons")->at(hltMuIt);
-      float thisDR = deltaR(mu_hlt.eta(), mu_hlt.phi(), vars.lep.eta(), vars.lep.phi());
-      // discard hlt mu more distant than dr = 0.1 from the offline mu
-      if( thisDR > 0.1 ) continue;
-      vars.lep_hltMatched = 1;
-      if( thisDR * fabs(vars.lep.pt() - mu_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(vars.lep.pt() - mu_hlt.pt()); 
-        vars.lep_hltMatchPt = mu_hlt.pt();
-        vars.lep_hltPass = reader.GetInt("goodHLT_muons_pass")->at(hltMuIt);
-      }
-    }
     
   }
   
@@ -1154,24 +1070,7 @@ void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader, con
     vars.lep2_mishits = vars.electrons_mishits.at(vars.selectIt_ele2);
     vars.lep2_dist = vars.electrons_dist.at(vars.selectIt_ele2);
     vars.lep2_dcot = vars.electrons_dcot.at(vars.selectIt_ele2);
-    
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    vars.lep2_hltMatched = 0;
-    for(unsigned int hltEleIt = 0; hltEleIt < reader.Get4V("goodHLT_electrons")->size(); ++hltEleIt)
-    {
-      ROOT::Math::XYZTVector ele_hlt = reader.Get4V("goodHLT_electrons")->at(hltEleIt);
-      float thisDR = deltaR(ele_hlt.eta(), ele_hlt.phi(), vars.lep2.eta(), vars.lep2.phi());
-      // discard hlt ele more distant than dr = 0.1 from the offline ele
-      if( thisDR > 0.1 ) continue;
-      vars.lep2_hltMatched = 1;
-      if( thisDR * fabs(vars.lep2.pt() - ele_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(vars.lep2.pt() - ele_hlt.pt()); 
-        vars.lep2_hltMatchPt = ele_hlt.pt();
-        vars.lep2_hltPass = reader.GetInt("goodHLT_electrons_pass")->at(hltEleIt);
-      }
-    }
+    vars.lep2_passConvVeto = vars.electrons_passConvVeto.at(vars.selectIt_ele2);
     
   }
   
@@ -1194,25 +1093,7 @@ void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader, con
     vars.lep2_numberOfValidTrackerHits = vars.muons_numberOfValidTrackerHits.at(vars.selectIt_mu2);
     vars.lep2_numberOfValidMuonHits = vars.muons_numberOfValidMuonHits.at(vars.selectIt_mu2);
     vars.lep2_pixelLayersWithMeasurement = vars.muons_pixelLayersWithMeasurement.at(vars.selectIt_mu2);
-    
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    vars.lep2_hltMatched = 0;
-    for(unsigned int hltMuIt = 0; hltMuIt < reader.Get4V("goodHLT_muons")->size(); ++hltMuIt)
-    {
-      ROOT::Math::XYZTVector mu_hlt = reader.Get4V("goodHLT_muons")->at(hltMuIt);
-      float thisDR = deltaR(mu_hlt.eta(), mu_hlt.phi(), vars.lep2.eta(), vars.lep2.phi());
-      // discard hlt mu more distant than dr = 0.1 from the offline mu
-      if( thisDR > 0.1 ) continue;
-      vars.lep2_hltMatched = 1;
-      if( thisDR * fabs(vars.lep2.pt() - mu_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(vars.lep2.pt() - mu_hlt.pt()); 
-        vars.lep2_hltMatchPt = mu_hlt.pt();
-        vars.lep2_hltPass = reader.GetInt("goodHLT_muons_pass")->at(hltMuIt);
-      }
-    }
-    
+        
   }
   
 }
@@ -1253,6 +1134,9 @@ void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, co
   vars.electrons_mishits.push_back(reader.GetInt("electrons_mishits")->at(eleIt));
   vars.electrons_dist.push_back(reader.GetFloat("electrons_dist")->at(eleIt));
   vars.electrons_dcot.push_back(reader.GetFloat("electrons_dcot")->at(eleIt));
+  //NOTALEO
+  //vars.electrons_passConvVeto.push_back(reader.GetInt("electrons_passConvVeto")->at(eleIt));
+  vars.electrons_passConvVeto.push_back(1);
 }
 
 
@@ -1295,15 +1179,12 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
 {
   if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetMetVariables" << std::endl;
   
-  // met :: NOTALEO: Met e sumEt
+  // met :: NOTALEO: Met
   if(jetType == "Calo")
     vars.met = reader.Get4V("type1Met")->at(0);
   if(jetType == "PF")
     vars.met = reader.Get4V("Met")->at(0);
-  
-//  vars.sumEt = reader.GetFloat("sumEt")->at(0);
-  vars.sumEt = 1.;
-  
+    
   
   if( correctMet == 1 )
   {
@@ -1342,8 +1223,8 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
     float metx = vars.met.px();
     float mety = vars.met.py();
     
-    metx -= (cx0 + cx1*vars.sumEt);
-    mety -= (cy0 + cy1*vars.sumEt);
+    metx -= (cx0 + cx1*vars.PV_n);
+    mety -= (cy0 + cy1*vars.PV_n);
     
     vars.met.SetPxPyPzE(metx,mety,0.,sqrt(metx*metx+mety*mety));
     
@@ -1396,8 +1277,7 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
   
   vars.lepMet_Dphi = deltaPhi(vars.lep.phi(), vars.met.phi());
   vars.lepMet_pt = vars.lepMet.pt();
-  vars.lepMet_mt = sqrt( vars.lep.mass() * vars.lep.mass() +
-			 2. * vars.lep.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lep.phi(), vars.met.phi()) ) ) );
+  vars.lepMet_mt = sqrt(2. * vars.lep.pt() * vars.met.pt() * ( 1 - cos(deltaPhi(vars.lep.phi(), vars.met.phi()) ) ) );
 }
 
 
@@ -1564,126 +1444,36 @@ void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const i
     vars.jet1 = jet;
     vars.p_jet1 = &vars.jet1;
     vars.jet1_bTag = vars.jets_bTag.at(vars.jets.size()-1);
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
-    {
-      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
-      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
-      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
-      if ( thisDR > 0.5 ) continue;
-      vars.jet1_hltMatched = 1;
-      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet1_hltMatchPt = jet_hlt.pt();
-      }
-    }
   }
   if( vars.jets.size() == 2 )
   {
     vars.jet2 = jet;
     vars.p_jet2 = &vars.jet2;
     vars.jet2_bTag = vars.jets_bTag.at(vars.jets.size()-1);
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
-    {
-      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
-      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
-      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
-      if ( thisDR > 0.5 ) continue;
-      vars.jet2_hltMatched = 1;
-      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet2_hltMatchPt = jet_hlt.pt();
-      }
-    }
   }
   if( vars.jets.size() == 3 )
   {
     vars.jet3 = jet;
     vars.p_jet3 = &vars.jet3;
     vars.jet3_bTag = vars.jets_bTag.at(vars.jets.size()-1);
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
-    {
-      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
-      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
-      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
-      if ( thisDR > 0.5 ) continue;
-      vars.jet3_hltMatched = 1;
-      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet3_hltMatchPt = jet_hlt.pt();
-      }
-    }
   }
   if( vars.jets.size() == 4 )
   {
     vars.jet4 = jet;
     vars.p_jet4 = &vars.jet4;
     vars.jet4_bTag = vars.jets_bTag.at(vars.jets.size()-1);
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
-    {
-      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
-      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
-      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
-      if ( thisDR > 0.5 ) continue;
-      vars.jet4_hltMatched = 1;
-      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet4_hltMatchPt = jet_hlt.pt();
-      }
-    }
   }
   if( vars.jets.size() == 5 )
   {
     vars.jet5 = jet;
     vars.p_jet5 = &vars.jet5;
     vars.jet5_bTag = vars.jets_bTag.at(vars.jets.size()-1);
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
-    {
-      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
-      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
-      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
-      if ( thisDR > 0.5 ) continue;
-      vars.jet5_hltMatched = 1;
-      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet5_hltMatchPt = jet_hlt.pt();
-      }
-    }
   }
   if( vars.jets.size() == 6 )
   {
     vars.jet6 = jet;
     vars.p_jet6 = &vars.jet6;
     vars.jet6_bTag = vars.jets_bTag.at(vars.jets.size()-1);
-    // hlt matching
-    float thisDR_DPT = 1000.;
-    for ( unsigned int hltJetIt = 0; hltJetIt < reader.Get4V("goodHLT_jets")->size(); ++hltJetIt )
-    {
-      ROOT::Math::XYZTVector jet_hlt = reader.Get4V("goodHLT_jets")->at(hltJetIt);
-      float thisDR = deltaR(jet_hlt.eta(), jet_hlt.phi(), jet.eta(), jet.phi());
-      // discard hlt Jet more distant than dr = 0.5 from the offline Jet
-      if ( thisDR > 0.5 ) continue;
-      vars.jet6_hltMatched = 1;
-      if ( thisDR * fabs(jet.pt() - jet_hlt.pt()) < thisDR_DPT ) 
-      {
-        thisDR_DPT = thisDR * fabs(jet.pt() - jet_hlt.pt()); 
-        vars.jet6_hltMatchPt = jet_hlt.pt();
-      }
-    }
   }
   
 }
