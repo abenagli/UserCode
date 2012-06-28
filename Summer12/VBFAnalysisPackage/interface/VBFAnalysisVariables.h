@@ -62,10 +62,7 @@ struct VBFAnalysisVariables
   int PUit_n;
   int PUoot_early_n;
   int PUoot_late_n;
-  float rhoForIsolation;
   float rhoForIsolationPFlow;
-  float rhoForJets;
-  float rhoForJetsPFlow;
   
   
   
@@ -152,7 +149,6 @@ struct VBFAnalysisVariables
   
   float met_et;
   float met_phi;
-  float sumEt;  
   
   int met_mcMatched;
   float met_mcMatchDR;

@@ -29,11 +29,7 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("PUit_n",               &vars.PUit_n);
   reducedTree -> SetBranchAddress("PUoot_early_n",        &vars.PUoot_early_n);
   reducedTree -> SetBranchAddress("PUoot_late_n",         &vars.PUoot_late_n);
-  reducedTree -> SetBranchAddress("rhoForIsolation",      &vars.rhoForIsolation);
   reducedTree -> SetBranchAddress("rhoForIsolationPFlow", &vars.rhoForIsolationPFlow);
-  reducedTree -> SetBranchAddress("rhoForJets",           &vars.rhoForJets);
-  reducedTree -> SetBranchAddress("rhoForJetsPFlow",      &vars.rhoForJetsPFlow);
-  
   
   // PDF variables
   vars.p_PDF_weights_CT10 = new std::vector<float> ;
@@ -131,7 +127,6 @@ void SetVBFPreselectionTreeBranches(VBFAnalysisVariables& vars, TTree* reducedTr
   reducedTree -> SetBranchAddress("nu1",   &vars.p_nu1);
   reducedTree -> SetBranchAddress("nu2",   &vars.p_nu2);
   reducedTree -> SetBranchAddress("met_et",      &vars.met_et);
-  reducedTree -> SetBranchAddress("sumEt",       &vars.sumEt);
   reducedTree -> SetBranchAddress("met_phi",     &vars.met_phi);
   reducedTree -> SetBranchAddress("lepMet_pt",   &vars.lepMet_pt);
   reducedTree -> SetBranchAddress("lepMet_mt",   &vars.lepMet_mt);

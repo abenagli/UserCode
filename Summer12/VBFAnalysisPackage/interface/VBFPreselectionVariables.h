@@ -561,11 +561,9 @@ void SetElectronVariables(VBFPreselectionVariables& vars, treeReader& reader, co
 void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& eleIt, const int& verbosity = 0);
 void SetLeptonVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
 void SetLepton2Variables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
-void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType,
-                     const int& correctMet, const std::string& run, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity = 0);
+void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const int& correctMet, const int& correctJER, const std::string& run, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity = 0);
 void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, const float& jetEtaCNT, const int& verbosity = 0);
-void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD,
-                     const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity = 0);
+void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD, const float& JESScaleVariation, const int& correctJER, TH2F* JECUncertainty, const int& verbosity = 0);
 void SetLeadingJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const float& jetEtaCNT, const int& verbosity = 0);
 void SetWJJVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);
 void SetTagJJVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& verbosity = 0);

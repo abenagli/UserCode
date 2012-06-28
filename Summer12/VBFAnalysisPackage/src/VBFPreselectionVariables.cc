@@ -1,5 +1,5 @@
 #include "VBFPreselectionVariables.h"
-
+#include "TRandom3.h"
 
 TFile* GetOutputRootFile(VBFPreselectionVariables& vars)
 {
@@ -1175,7 +1175,7 @@ void SetMuonVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 
 
 void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const std::string& jetType, 
-                     const int& correctMet, const std::string& run, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
+                     const int& correctMet, const int& correctJER, const std::string& run, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
 {
   if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetMetVariables" << std::endl;
   
@@ -1184,55 +1184,7 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
     vars.met = reader.Get4V("type1Met")->at(0);
   if(jetType == "PF")
     vars.met = reader.Get4V("Met")->at(0);
-    
-  
-  if( correctMet == 1 )
-  {
-    float cx0,cx1;
-    float cy0,cy1;
-    
-    if( vars.dataFlag == 1)
-    {
-      if( run == "2011A" )
-      {
-        cx1 = +0.004801; cx0 = -0.3365;
-        cy1 = -0.006124; cy0 = +0.2578;
-      }
-      if( run == "2011B" )
-      {
-        cx1 = +0.005162; cx0 = -0.3265;
-        cy1 = -0.006299; cy0 = -0.1956;
-      }
-    }
-    else
-    {
-      if( run == "2011A" )
-      {
-        cx1 = +0.0001815; cx0 = -0.09389;
-        cy1 = -0.003710;  cy0 = +0.1571;      
-      }
-      if( run == "2011B" )
-      {
-        cx1 = +0.00009587; cx0 = -0.1070;
-        cy1 = -0.003357;   cy0 = +0.01517;
-      }
-    }
-    
-    //std::cout << "bef met: " << vars.met.Et() << "   metx: " << vars.met.px() << "   mety: " << vars.met.py() << std::endl;
-    
-    float metx = vars.met.px();
-    float mety = vars.met.py();
-    
-    metx -= (cx0 + cx1*vars.PV_n);
-    mety -= (cy0 + cy1*vars.PV_n);
-    
-    vars.met.SetPxPyPzE(metx,mety,0.,sqrt(metx*metx+mety*mety));
-    
-    //std::cout << "aft met: " << vars.met.Et() << "   metx: " << vars.met.px() << "   mety: " << vars.met.py() << std::endl;
-  }
-  
-  
-  
+      
   if( JESScaleVariation != 0. )
   {
     ROOT::Math::XYZVector myMet = -1. * (vars.lep.Vect() );
@@ -1267,7 +1219,99 @@ void SetMetVariables(VBFPreselectionVariables& vars, treeReader& reader, const s
     //std::cout << "met: " << vars.met.Et() << "   myMet: " << sqrt(myMet.perp2()) << std::endl;
     vars.met.SetPxPyPzE(myScaledMet.X(),myScaledMet.Y(),0.,sqrt(myScaledMet.perp2()));
   }
+    
+  // JER
+  if ( correctJER == 1. && vars.dataFlag == 0 )
+  {
+    ROOT::Math::XYZVector myMet = -1. * (vars.lep.Vect() );
+    ROOT::Math::XYZVector myScaledMet = -1. * (vars.lep.Vect() );
+
+    for(unsigned int jetIt = 0; jetIt < (reader.Get4V("jets")->size()); ++jetIt)
+    {
+      ROOT::Math::XYZVector jet = (reader.Get4V("jets")->at(jetIt)).Vect();
+      ROOT::Math::XYZTVector jet_4V = reader.Get4V("jets")->at(jetIt);
+      ROOT::Math::XYZTVector genJet = reader.Get4V("genJets")->at(jetIt);  
+      int isGenMatched = reader.GetInt("jets_isGenMatched")->at(jetIt);    
+
+      float absEta = fabs(jet.eta());
+      float energy = jet_4V.E();
+
+      float smearingConstant = 1.;
+      if ( absEta < 0.5          ) smearingConstant = 1.052;
+      if ( absEta > 0.5 && absEta < 1.1 ) smearingConstant = 1.057;
+      if ( absEta > 1.1 && absEta < 1.7 ) smearingConstant = 1.096;
+      if ( absEta < 1.7 && absEta < 2.3 ) smearingConstant = 1.134;
+      if ( absEta < 2.3 && absEta < 5.0 ) smearingConstant = 1.288;
+
+      float eScale = 1;
+      if ( isGenMatched == 1 ) {
+       float dEn = energy - genJet.E();
+       eScale = std::max(0., genJet.E() + smearingConstant*dEn)/energy;	
+      }
+      // do not smear non matched jets
+      else eScale = 1;
+      
+      myMet -= jet;
+      myScaledMet -= eScale * jet;
+    }
+
+    ROOT::Math::XYZVector myUnclusterizedMet = (vars.met).Vect() - myMet;
+    // do not smear unclustered pfCandidates
+//    float smearingConstant = 1.05;
+//    float ptScale = 1;
+//    TRandom3 rand; 
+//    ptScale = std::max( 0., rand.Gaus( 1., smearingConstant - 1 ) );
+    myScaledMet += myUnclusterizedMet;
+    
+    //std::cout << "met: " << vars.met.Et() << "   myMet: " << sqrt(myMet.perp2()) << std::endl;
+    vars.met.SetPxPyPzE(myScaledMet.X(),myScaledMet.Y(),0.,sqrt(myScaledMet.perp2()));
+  }      
   
+  if( correctMet == 1 )
+  {
+    float cx0,cx1;
+    float cy0,cy1;
+    
+    if( vars.dataFlag == 1)
+    {
+      if( run == "2012A" )
+      {
+        cx1 = +2.65299e-01; cx0 = +3.54233e-01;
+        cy1 = -1.66425e-01; cy0 = +1.88923e-01;
+      }
+      if( run == "2012B" )
+      {
+        cx1 = +2.65299e-01; cx0 = +3.54233e-01;
+        cy1 = -1.66425e-01; cy0 = +1.88923e-01;
+      }
+    }
+    else
+    {
+      if( run == "2012A" )
+      {
+        cx1 = -6.61932e-02; cx0 = -2.99576e-02;
+        cy1 = -1.48617e-01; cy0 = +3.70819e-01;
+      }
+      if( run == "2012B" )
+      {
+        cx1 = -6.61932e-02; cx0 = -2.99576e-02;
+        cy1 = -1.48617e-01; cy0 = +3.70819e-01;
+      }
+    }
+    
+    //std::cout << "bef met: " << vars.met.Et() << "   metx: " << vars.met.px() << "   mety: " << vars.met.py() << std::endl;
+    
+    float metx = vars.met.px();
+    float mety = vars.met.py();
+    
+    metx -= (cx0 + cx1*vars.PV_n);
+    mety -= (cy0 + cy1*vars.PV_n);
+    
+    vars.met.SetPxPyPzE(metx,mety,0.,sqrt(metx*metx+mety*mety));
+    
+    //std::cout << "aft met: " << vars.met.Et() << "   metx: " << vars.met.px() << "   mety: " << vars.met.py() << std::endl;
+  }
+
   
   vars.p_met = &vars.met;
   vars.met_et = vars.p_met->Et();
@@ -1345,13 +1389,39 @@ void SetBTagVariables(VBFPreselectionVariables& vars, treeReader& reader, const 
 
 
 
-void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD, const float& JESScaleVariation, TH2F* JECUncertainty, const int& verbosity)
+void SetJetVariables(VBFPreselectionVariables& vars, treeReader& reader, const int& jetIt, const std::string& jetType, const float& jetEtaCNT, const float& jetEtaFWD, const float& JESScaleVariation, const int& correctJER, TH2F* JECUncertainty, const int& verbosity)
 {
   if( verbosity == 1 ) std::cout << ">>>>>>>>> VBFPreselectionVariables::SetJetVariables" << std::endl;
   
-  ROOT::Math::XYZTVector jet = reader.Get4V("jets")->at(jetIt);  
+  ROOT::Math::XYZTVector    jet = reader.Get4V("jets")->at(jetIt);  
+  ROOT::Math::XYZTVector genJet = reader.Get4V("genJets")->at(jetIt);  
+  int isGenMatched = reader.GetInt("jets_isGenMatched")->at(jetIt);    
   
+  // JER
+  if ( correctJER == 1. && vars.dataFlag == 0 )
+  {
+     float absEta = fabs(jet.eta());
+     float energy = jet.E();
+
+     float smearingConstant = 1.;
+     if ( absEta < 0.5          ) smearingConstant = 1.052;
+     if ( absEta > 0.5 && absEta < 1.1 ) smearingConstant = 1.057;
+     if ( absEta > 1.1 && absEta < 1.7 ) smearingConstant = 1.096;
+     if ( absEta < 1.7 && absEta < 2.3 ) smearingConstant = 1.134;
+     if ( absEta < 2.3 && absEta < 5.0 ) smearingConstant = 1.288;
+
+     float eScale = 1;
+     if ( isGenMatched == 1 ) {
+      float dEn = energy - genJet.E();
+      eScale = std::max(0., genJet.E() + smearingConstant*dEn)/energy;	
+     }
+     // do not smear non matched jets
+     else eScale = 1;
+
+     jet.SetPxPyPzE(eScale*jet.Px(),eScale*jet.Py(),eScale*jet.Pz(),fabs(eScale)*jet.E());
+  }
   
+  // JES
   if( JESScaleVariation != 0. )
   {
     float eta = jet.eta();

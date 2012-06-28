@@ -40,10 +40,13 @@ int main(int argc, char** argv)
   std::string jetType            = gConfigParser -> readStringOption("Input::jetType");
   std::string higgsMass          = gConfigParser -> readStringOption("Input::higgsMass");
   std::string JECUncertaintyFile = gConfigParser -> readStringOption("Input::JECUncertaintyFile");
+  std::string HiggsWeightFile    = gConfigParser -> readStringOption("Input::HiggsWeightFile");
     
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
   std::string outputRootFullFileName = outputRootFilePath + "/" + outputRootFileName + "_" + jetAlgorithm + ".root";
+
+  float intLumi           = gConfigParser -> readFloatOption("Input::intLumi");
   
   int entryFIRST          = gConfigParser -> readIntOption("Options::entryFIRST");
   int entryMAX            = gConfigParser -> readIntOption("Options::entryMAX");
@@ -54,12 +57,14 @@ int main(int argc, char** argv)
   float crossSection      = gConfigParser -> readFloatOption("Options::crossSection");
   int TMVA4JetTraining    = gConfigParser -> readIntOption("Options::TMVA4JetTraining");
   int correctMet          = gConfigParser -> readIntOption("Options::correctMet");
+  int correctJER          = gConfigParser -> readIntOption("Options::correctJER");
   float JESScaleVariation = gConfigParser -> readFloatOption("Options::JESScaleVariation");
   int ttSelection         = gConfigParser -> readIntOption("Options::ttSelection"); 
   int QCDSelection        = gConfigParser -> readIntOption("Options::QCDSelection"); 
   int doTnP               = gConfigParser -> readIntOption("Options::doTnP"); 
   int doPDFstudy          = gConfigParser -> readIntOption("Options::doPDFstudy");
-  float intLumi           = gConfigParser -> readFloatOption("Input::intLumi");
+  int genPtCorr           = gConfigParser -> readIntOption("Options::genPtCorr");
+  int genPtEtaWeight      = gConfigParser -> readIntOption("Options::genPtEtaWeight");
     
   int nJetCntMIN    = gConfigParser -> readIntOption("Cuts::nJetCntMIN");
   float lepJetDRMIN = gConfigParser -> readFloatOption("Cuts::lepJetDRMIN");
@@ -103,6 +108,12 @@ int main(int argc, char** argv)
     JECUncertainty = (TH2F*)( temp -> Get("histo") );
   }
   
+  // Get the Higgs PtEta reweighting file, if needed
+  TH2F* HiggsPtEtaWeight = NULL; 
+  if ( genPtEtaWeight ) {
+    TFile* temp2 = TFile::Open(HiggsWeightFile.c_str(),"READ");
+    HiggsPtEtaWeight = (TH2F*) ( temp2 -> Get("hRatio") ); 
+  }
   
   // Open old tree
   std::cout << ">>> VBFPreselection::Open old tree" << std::endl;
@@ -660,7 +671,7 @@ int main(int argc, char** argv)
       else                 run = "2012B";
     }
     
-    SetMetVariables(vars, reader, jetType, correctMet, run, JESScaleVariation, JECUncertainty, verbosity);
+    SetMetVariables(vars, reader, jetType, correctMet, correctJER, run, JESScaleVariation, JECUncertainty, verbosity);
     
     //****************
     SetBTagVariables(vars, reader, jetType, jetEtaCNT, verbosity);
@@ -708,7 +719,7 @@ int main(int argc, char** argv)
         if( (fabs(jet.eta()) < 2.4) && (reader.GetInt("jets_chargedMultiplicity")->at(jetIt) <= 0) ) continue;
       }
       
-      SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD, JESScaleVariation, JECUncertainty, verbosity);
+      SetJetVariables(vars, reader, jetIt, jetType, jetEtaCNT, jetEtaFWD, JESScaleVariation, correctJER, JECUncertainty, verbosity);
       
     } // loop on jets
     if( verbosity == 1)
@@ -800,8 +811,11 @@ int main(int argc, char** argv)
       SetThirdJetVariables(vars, reader, verbosity);
       SetHVariables(vars, reader, verbosity);
       if(vars.mH > 0.) SetMCVariables(vars, reader, verbosity);
-      if( (vars.mH > 0.) && (vars.mH < 1000.) ) vars.eventWeight = HiggsPtKFactors(vars.mc_H_pt,vars.mH);
-      
+      if( (vars.mH > 0.) && (vars.mH < 1000.) && genPtCorr == 1 ) vars.eventWeight = HiggsPtKFactors(vars.mc_H_pt,vars.mH);
+      if ( genPtEtaWeight ) {
+        int thisBin = HiggsPtEtaWeight -> FindBin( vars.mc_H_eta, vars.mc_H_pt );
+        vars.eventWeight *= HiggsPtEtaWeight -> GetBinContent(thisBin);
+      }
       
       // fIll event counters
       stepEvents[step] += 1;

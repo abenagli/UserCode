@@ -64,6 +64,7 @@ int main(int argc, char** argv)
   int entryMAX = gConfigParser -> readIntOption("Options::entryMAX");
   int entryMODULO = gConfigParser -> readIntOption("Options::entryMODULO");
   int firstSTEP = gConfigParser -> readIntOption("Options::firstSTEP");
+  int lastSTEP = gConfigParser -> readIntOption("Options::lastSTEP");
   std::string dataRunFlag  = gConfigParser -> readStringOption("Options::dataRunFlag");
   float crossSection = gConfigParser -> readFloatOption("Options::crossSection");
   int verbosity = gConfigParser -> readIntOption("Options::verbosity"); 
@@ -71,7 +72,8 @@ int main(int argc, char** argv)
   int applyMVA = gConfigParser -> readIntOption("Options::applyMVA"); 
   int ttSelection = gConfigParser -> readIntOption("Options::ttSelection"); 
   int useElePfMtHLT = gConfigParser -> readIntOption("Options::useElePfMtHLT");
-  
+  float intLumi     = gConfigParser -> readFloatOption("Input::intLumi");
+
   int HLTCUT = gConfigParser -> readIntOption("Cuts::HLTCUT");
   int EffCorrection = gConfigParser -> readIntOption("Cuts::EffCorrection");
   
@@ -243,7 +245,7 @@ int main(int argc, char** argv)
   for(int step = 1; step <= nStep; ++step)
   {
     //if( (step < firstSTEP) && (step != 6) ) continue;
-    if( step < firstSTEP ) continue;
+    if( step < firstSTEP || step > lastSTEP  ) continue;
     
     char treeName[50];
     sprintf(treeName, "ntu_%d", step);
@@ -302,11 +304,11 @@ int main(int argc, char** argv)
   HLTLumi_e.push_back(0.);
   HLTLumiIt = 0;
   
-  if( dataRunFlag == "2012A" )
+  if( dataRunFlag == "2012AB" )
   {
-    // 0-th - Run2012A
-    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+520);
-    dummyHLTRunRanges.first = 190450; dummyHLTRunRanges.second = 193686; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+    // 0-th - Run2012AB
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+3486);
+    dummyHLTRunRanges.first = 190456; dummyHLTRunRanges.second = 195775; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele27_WP80_v8");
     dummyHLTPathNames.push_back("HLT_Ele27_WP80_v9");
@@ -321,14 +323,15 @@ int main(int argc, char** argv)
   HLTLumi_mu.push_back(0.);
   HLTLumiIt = 0;
   
-  if( dataRunFlag == "2012A" )
+  if( dataRunFlag == "2012AB" )
   { 
-    // 0-th - Run2011A
-    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+520);
-    dummyHLTRunRanges.first = 190450; dummyHLTRunRanges.second = 193686; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
+    // 0-th - Run2011AB
+    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+3486);
+    dummyHLTRunRanges.first = 190456; dummyHLTRunRanges.second = 195775; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v11");
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v12");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v13");
     HLTPathNames_mu_DATA.push_back(dummyHLTPathNames);
     ++HLTLumiIt;
   }
@@ -336,10 +339,10 @@ int main(int argc, char** argv)
   //--------------
   // mc - electron
   
-  if( dataRunFlag == "2012A" )
+  if( dataRunFlag == "2012AB" )
   {
     // 0-th - Run2011A
-    HLTLabels_e.push_back("2011A-0");
+    HLTLabels_e.push_back("2011AB-0");
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele27_WP80_v2");
     dummyHLTPathNames.push_back("HLT_Ele27_WP80_v3");
@@ -361,13 +364,14 @@ int main(int argc, char** argv)
   //----------
   // mc - muon
   
-  if( dataRunFlag == "2012A" )
+  if( dataRunFlag == "2012AB" )
   {
     // 0-th - Run2011A
-    HLTLabels_mu.push_back("2011A-0");
+    HLTLabels_mu.push_back("2011AB-0");
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v8");
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v11");
+    dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v12");
                         
     if ( isOldNT ) {
       dummyHLTPathNames.clear();
@@ -377,12 +381,7 @@ int main(int argc, char** argv)
     HLTPathNames_mu_MC.push_back(dummyHLTPathNames);
   }
   
-  // define the quark-gluon likelihood
-  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/gwteraz/users/benaglia/data/QGPdfs/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2_CHS.root");
-  // define the angular likelihood
   HelicityLikelihoodDiscriminant* helicitylikeli = new HelicityLikelihoodDiscriminant();  
-  
-  
   
   // define MVA reader
   TMVA::Reader* MVAReader = new TMVA::Reader();
@@ -396,10 +395,6 @@ int main(int argc, char** argv)
     
     MVAReader -> BookMVA("kBDT_H250",MVAWeightsFile);
   }
-  
-  
-  
-  
   
   
   //********************
@@ -491,7 +486,7 @@ int main(int argc, char** argv)
     
     
     //*********************************
-    // JSON FILE AND DUPLIACTES IN DATA
+    // JSON FILE AND DUPLICATES IN DATA
     
     bool skipEvent = false;
     if( vars.dataFlag == 1 )
@@ -531,7 +526,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
     //if( step == 2 ) cloneTrees[step] -> Fill();
-    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP ) cloneTrees[step] -> Fill();
     
     
     
@@ -557,13 +552,11 @@ int main(int argc, char** argv)
       }
     }
     
-    
     unsigned int HLTPeriod = -1;
     std::string HLTLabel = "";
     std::vector<float> HLTLumi;
     std::vector<std::pair<int,int> > HLTRunRanges;
     std::vector<std::string> HLTPathNames;
-    
     
     // on data
     if( vars.dataFlag == 1 )
@@ -598,7 +591,7 @@ int main(int argc, char** argv)
       if( vars.lep_flavour == 13 ) HLTLumi = HLTLumi_mu;
       
       float dummyLumi = 0.;
-      if( dataRunFlag == "2012A")  dummyLumi = r.Uniform(0.,520.0);
+      if( dataRunFlag == "2012AB")  dummyLumi = r.Uniform(0.,intLumi);
       
       for(HLTPeriod = 0; HLTPeriod < HLTLumi.size()-1; ++HLTPeriod)
         if( (dummyLumi >= HLTLumi.at(HLTPeriod)) &&
@@ -617,9 +610,9 @@ int main(int argc, char** argv)
         if( AcceptHLTPath(*HLT_Names,*HLT_Accept,HLTPathNames.at(HLTIt),pathFound,verbosity) == true )
           skipEvent = false;
       }
+
     }
-    
-    
+        
     if( vars.lep_flavour == 11 ) HLTLabel = HLTLabels_e.at(HLTPeriod);
     if( vars.lep_flavour == 13 ) HLTLabel = HLTLabels_mu.at(HLTPeriod);
       
@@ -638,14 +631,12 @@ int main(int argc, char** argv)
     }
         
     if( (HLTCUT == 1) && (skipEvent == true) ) continue;
-    
-    
-    
+        
     //// electron trigger emulation
     if( (HLTCUT == 1) && (vars.lep_flavour == 11) )
     {
       
-      if( (HLTLabel == "2012A-0") && (vars.lep.pt() < 30.) ) continue;
+      if( (HLTLabel == "2012AB-0") && (vars.lep.pt() < 30.) ) continue;
       if( vars.lep_isEB == 1 )
       {
         if( (vars.lep_tkIso/vars.lep.pt()  > 0.2) ) continue;
@@ -674,7 +665,7 @@ int main(int argc, char** argv)
     //// muon trigger emulation
     if( (HLTCUT == 1) && (vars.lep_flavour == 13) )
     {
-      if( (HLTLabel == "2012A-0") && (vars.lep.pt() < 25.) ) continue;
+      if( (HLTLabel == "2012AB-0") && (vars.lep.pt() < 25.) ) continue;
       
       //if( (isoCUT == 1) && (vars.lep_tkIso  > 1.000) ) continue;
       //if( (isoCUT == 1) && (vars.lep_emIso  > 1.000) ) continue;
@@ -692,7 +683,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP ) cloneTrees[step] -> Fill();    
+    if( step >= firstSTEP && step <= lastSTEP ) cloneTrees[step] -> Fill();    
     
     
     
@@ -703,10 +694,9 @@ int main(int argc, char** argv)
     // STEP 4 - Initial cuts - lepton ID+iso
     step += 1;
     
-    
     bool isId = true;
         
-    if( vars.lep_flavour == 11 )
+    /*if( vars.lep_flavour == 11 )
     {
       // barrel
       if( vars.lep_isEB == 1 )
@@ -726,11 +716,11 @@ int main(int argc, char** argv)
         if( vars.lep_HOverE         > eleHOverEEEMAX )        isId = false;
       }    
       
-    }
+    }*/
     
     
     
-    if( vars.lep_flavour == 13 )
+    /*if( vars.lep_flavour == 13 )
     {
       if( vars.lep_tracker    != 1 ) isId = false;
       if( vars.lep_standalone != 1 ) isId = false;
@@ -740,7 +730,7 @@ int main(int argc, char** argv)
       if( vars.lep_normalizedChi2           > muNormalizedChi2MAX )           isId = false;
       if( vars.lep_numberOfValidTrackerHits < muNumberOfValidTrackerHitsMIN ) isId = false;
       if( vars.lep_numberOfValidMuonHits    < muNumberOfValidMuonHitsMIN )    isId = false;
-    }
+    }*/
     
     // normal id cut
     if( (idCUT == 1) && (isId == false) ) continue;
@@ -755,7 +745,7 @@ int main(int argc, char** argv)
      
     //float rho = 0.;
     
-    if( vars.lep_flavour == 11 )
+    /*if( vars.lep_flavour == 11 )
     {
       // barrel
       if( vars.lep_isEB == 1)
@@ -779,7 +769,7 @@ int main(int argc, char** argv)
       if( vars.lep_combIso/vars.lep.pt() > muCombIsoOverPtMAX ) isIsolated = false;
       
       if( vars.lep_combIso/vars.lep.pt() < muCombAntiIsoOverPtMAX ) isAntiIsolated = false;
-    }    
+    }*/    
     
     
     // normal isolation cut
@@ -812,7 +802,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP ) cloneTrees[step] -> Fill();
     
     
     
@@ -844,7 +834,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP ) cloneTrees[step] -> Fill();
     
     
     
@@ -870,7 +860,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
     //if( step == 6 ) cloneTrees[step] -> Fill();
-    if( step >= firstSTEP ) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP ) cloneTrees[step] -> Fill();
     
     
     
@@ -899,7 +889,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
        
     
@@ -925,7 +915,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     //************************************
@@ -959,7 +949,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -980,25 +970,8 @@ int main(int argc, char** argv)
       std::string lepEffMode = "RIH";
       if ( EffCorrection > 0 && vars.lep_flavour == 11 ) vars.leptonWeight = theEffCorrector -> getEleEff ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
       if ( EffCorrection > 0 && vars.lep_flavour == 13 ) vars.leptonWeight = theEffCorrector -> getMuEff  ( vars.lep.pt(), vars.lep.eta(), lepEffMode );
-      if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0  ) vars.metWeight = theEffCorrector -> getMetEff ( vars.met_et );
-      if ( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 1  ) vars.metWeight = theEffCorrector -> getMtEff  ( vars.lepMet_mt );
 
-      std::vector<float> jets_pt;
-      if ( vars.p_jet1->pt() > 15 && fabs(vars.p_jet1->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet1->pt());
-      if ( vars.p_jet2->pt() > 15 && fabs(vars.p_jet2->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet2->pt());
-      if ( vars.p_jet3->pt() > 15 && fabs(vars.p_jet3->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet3->pt());
-      if ( vars.p_jet4->pt() > 15 && fabs(vars.p_jet4->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet4->pt());
-      if ( vars.p_jet5->pt() > 15 && fabs(vars.p_jet5->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet5->pt());
-      if ( vars.p_jet6->pt() > 15 && fabs(vars.p_jet6->eta()) < 2.4 ) jets_pt.push_back(vars.p_jet6->pt());
-      std::vector<float> jets_eta;
-      if ( vars.p_jet1->pt() > 15 && fabs(vars.p_jet1->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet1->eta());
-      if ( vars.p_jet2->pt() > 15 && fabs(vars.p_jet2->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet2->eta());
-      if ( vars.p_jet3->pt() > 15 && fabs(vars.p_jet3->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet3->eta());
-      if ( vars.p_jet4->pt() > 15 && fabs(vars.p_jet4->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet4->eta());
-      if ( vars.p_jet5->pt() > 15 && fabs(vars.p_jet5->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet5->eta());
-      if ( vars.p_jet6->pt() > 15 && fabs(vars.p_jet6->eta()) < 2.4 ) jets_eta.push_back(vars.p_jet6->eta());
-      if( EffCorrection > 0 && vars.lep_flavour == 11 && useElePfMtHLT == 0 ) vars.jetWeight = theEffCorrector -> getJetEff ( jets_pt, jets_eta );
-      vars.eventWeight *= vars.leptonWeight*vars.metWeight*vars.jetWeight;
+      vars.eventWeight *= vars.leptonWeight;
     }
     
     // kinematic fit
@@ -1008,9 +981,9 @@ int main(int argc, char** argv)
     
     // qg likelihood
     if( vars.WJ1.pt() > 0. )
-      vars.WJ1_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ1.Pt(),vars.rhoForIsolationPFlow,vars.WJ1_chargedMultiplicity,vars.WJ1_neutralMultiplicity,vars.WJ1_ptD );
+      vars.WJ1_QGLikelihood = -1;
     if( vars.WJ2.pt() > 0. )
-      vars.WJ2_QGLikelihood = qglikeli -> computeQGLikelihoodPU( vars.WJ2.Pt(),vars.rhoForIsolationPFlow,vars.WJ2_chargedMultiplicity,vars.WJ2_neutralMultiplicity,vars.WJ2_ptD );
+      vars.WJ2_QGLikelihood = -1;
     if( vars.WJ2.pt() > vars.WJ1.pt() )
     {
       float QGLikelihoodDummy = vars.WJ2_QGLikelihood;
@@ -1052,7 +1025,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -1078,7 +1051,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -1104,7 +1077,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -1134,38 +1107,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
-    ////******************************************
-    //// STEP XX - Initial cuts - pt max/met  cuts
-    //step += 1;
-    //
-    //
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt1) < lepWJJPt1MIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt2) < lepWJJPt2MIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) ) && (fabs(vars.lepWJJ_pt3) < lepWJJPt3MIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) && (metCUT == 1) ) && (vars.met.Et() < metEtMIN) ) continue;
-    //if( ( (trainMVA == 0) && (applyMVA == 0) && (massDependentCUTS == 1) && (metCUT == 1) ) && (vars.met.Et() > metEtMAX) ) continue;
-    //
-    //
-    //// fill distributions
-    //stepEvents[step] += 1;
-    //stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
-    //if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    //if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
-    //if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    //if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    //if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    //if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    //
-    //if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -1189,7 +1131,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -1221,7 +1163,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -1247,36 +1189,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    
-    
-    
-    
-    
-    
-    
-    //**************************************
-    // STEP XX - Initial cuts - helicity BDT
-    //step += 1;
-    //
-    //if( vars.mva > -0.25 )
-    //{
-    //  // fill distributions
-    //  stepEvents[step] += 1;
-    //  stepEvents_PURescaled[step] += vars.eventWeight * vars.PUWeight;
-    //  if( vars.lep_flavour == 11 ) stepEvents_PURescaled_ele[step] += vars.eventWeight * vars.PUWeight;
-    //  if( vars.lep_flavour == 13 ) stepEvents_PURescaled_mu[step]  += vars.eventWeight * vars.PUWeight;
-    //  if( vars.lep_charge > 0. ) stepEvents_plus_int[step] += 1;
-    //  if( vars.lep_charge < 0. ) stepEvents_minus_int[step] += 1;
-    //  if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
-    //  if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
-    //  
-    //  if( step >= firstSTEP) cloneTrees[step] -> Fill();
-    //}
-    
-    
-    
-    
+    if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     //************************************
@@ -1298,7 +1211,7 @@ int main(int argc, char** argv)
     if( vars.lep_charge > 0. ) (stepEvents_plus[vars.nJets])[step] += 1;
     if( vars.lep_charge < 0. ) (stepEvents_minus[vars.nJets])[step] += 1;
     
-    //if( step >= firstSTEP) cloneTrees[step] -> Fill();
+    //if( step >= firstSTEP && step <= lastSTEP) cloneTrees[step] -> Fill();
     
     
     
@@ -1352,7 +1265,7 @@ int main(int argc, char** argv)
   for(step = 1; step <= nStep; ++step)
   {
     //if( (step < firstSTEP) && (step != 6) ) continue;
-    if( step < firstSTEP ) continue;
+    if( step < firstSTEP  || step > lastSTEP ) continue;
     cloneTrees[step] -> AutoSave();
   } 
   
