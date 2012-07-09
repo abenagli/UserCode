@@ -56,7 +56,8 @@ int main(int argc, char** argv)
     
   std::string imgFormat = gConfigParser -> readStringOption("Options::imgFormat");
   int step = gConfigParser -> readIntOption("Options::step");  
-  float lumi = gConfigParser -> readFloatOption("Options::lumi");
+  float lumiEle = gConfigParser -> readFloatOption("Options::lumiEle");
+  float lumiMu = gConfigParser -> readFloatOption("Options::lumiMu");
   bool PURescale = gConfigParser -> readBoolOption("Options::PURescale");
   bool weightEvent = gConfigParser -> readBoolOption("Options::weightEvent");
   bool stackSig = gConfigParser -> readBoolOption("Options::stackSig");
@@ -119,6 +120,7 @@ int main(int argc, char** argv)
   stack -> SetXLegend(0.76, 0.99);
   stack -> SetYLegend(0.30, 0.92);
   
+  float lumi = lumiEle*0.5 + lumiMu*0.5;
   stack -> DrawEvents("events", lumi, step, true, PURescale, stackSig);
   stack -> DrawEvents("eventsScaled", lumi, step, true, PURescale, stackSig);
   stack -> DrawEvents("eventsScaledStack", lumi, step, true, PURescale, stackSig);
@@ -126,8 +128,6 @@ int main(int argc, char** argv)
   stack -> DrawEvents("efficiencies", lumi, step, true, PURescale, stackSig);
   stack -> SetYaxisRange(0.01, 1.1);
   stack -> DrawEvents("efficienciesRelative", lumi, step, true, PURescale, stackSig);
-  
-  
   
   
   
@@ -157,288 +157,22 @@ int main(int argc, char** argv)
   
   
   
-  
-  
-  
-  
-  
-  
-    
-  
-  
   //---------------------------------------------  
   // Angles
   //---------------------------------------------
-  
-  variableNames.at(0) = "lepNuW_cphi";
-  histoName = "angles_cphi";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> SetXaxisTitle("cos#phi_{W_{1}-W_{2} decay planes}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepNuZ_cphi";
-  histoName = "angles_cphistar";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> SetXaxisTitle("cos#phi*_{W_{1} production-decay planes}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lep_ctheta";
-  histoName = "angles_ctheta1";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> SetXaxisTitle("cos#theta_{1}^{lepton-Higgs}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "WJ1_ctheta";
-  histoName = "angles_ctheta2";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> SetXaxisTitle("cos#theta_{2}^{jet_{1}-Higgs}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepNu_ctheta";
-  histoName = "angles_cthetastar";
-  stack -> SetXaxisRange(-1., 1.);
-  stack -> SetXaxisTitle("cos#theta*_{W_{1}-W_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "helicityLikelihood";
-  histoName = "angles_helicityLikelihood";
-  stack -> SetXaxisRange(0., 1.);
-  stack -> SetXaxisTitle("helicity likelihood discriminant");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  //---------------------------------------------  
-  // MVA & KF
-  //---------------------------------------------
-  //
-  //variableNames.at(0) = "mva";  
-  //histoName = "mva";
-  //stack -> SetXaxisRange(-0.8, 0.4);
-  //stack -> SetXaxisTitle("mva");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 24, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "chi2_KF/ndf_KF";
-  histoName = "chi2_KF";
-  stack -> SetXaxisRange(0., 100.);
-  stack -> SetXaxisTitle("(#chi^{2}/N_{dof}^{KF}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  //---------------------------------------------  
-  // PV & rho
-  //---------------------------------------------
-  
-  variableNames.at(0) = "PV_n";  
-  histoName    = "PV_n";
-  stack -> SetXaxisRange(-0.5, 34.5);
-  stack -> SetXaxisTitle("N_{PV}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 35, PURescale, weightEvent, stackSig);
-    
-  variableNames.at(0) = "PV_d0";  
-  histoName    = "PV_d0";
-  stack -> SetXaxisRange(0., 0.5);
-  stack -> SetXaxisTitle("d_{0}^{PV}");
-  stack -> SetUnit("cm");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 250, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "PV_z";
-  histoName    = "PV_z";
-  stack -> SetXaxisRange(-30., 30.);
-  stack -> SetXaxisTitle("z^{PV}");
-  stack -> SetUnit("cm");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "PV_nTracks";
-  histoName    = "PV_nTracks";
-  stack -> SetXaxisRange(0., 150);
-  stack -> SetXaxisTitle("N_{tracks}^{PV}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  //variableNames.at(0) = "PV_ndof";
-  //histoName    = "PV_ndof";
-  //stack -> SetXaxisRange(0., 250);
-  //stack -> SetXaxisTitle("N_{ndof}^{PV}");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  //variableNames.at(0) = "PV_normalizedChi2";
-  //histoName    = "PV_normalizedChi2";
-  //stack -> SetXaxisRange(0., 2.);
-  //stack -> SetXaxisTitle("#chi^{2}/N_{dof}^{PV}");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  
-  
-  variableNames.at(0) = "rhoForJets";
-  histoName    = "PU_rhoForJets";
-  stack -> SetXaxisRange(0., 30.);
-  stack -> SetXaxisTitle("#rho_{PU}^{0 < |#eta| <5.0}");
-  stack -> SetUnit("GeV/#Delta#eta#Delta#phi");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "rhoForIsolation";
-  histoName    = "PU_rhoForIsolation";
-  stack -> SetXaxisRange(0., 30.);
-  stack -> SetXaxisTitle("#rho_{PU}^{0 < |#eta| < 2.5}");
-  stack -> SetUnit("GeV/#Delta#eta#Delta#phi");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  //---------------------------------------------  
-  // lepton
-  //---------------------------------------------
-  
-  variableNames.at(0) = "lep.pt()";
-  histoName = "lep_pt";
-  stack -> SetXaxisRange(0., 200.);
-  stack -> SetXaxisTitle("p_{T}^{lepton}");
-  stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lep.phi()";
-  histoName = "lep_phi";
-  stack -> SetXaxisRange(-3.14159, 3.14159);
-  stack -> SetXaxisTitle("#phi_{lepton}");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lep.eta()";
-  histoName = "lep_eta";
-  stack -> SetXaxisRange(-2.5, 2.5);
-  stack -> SetXaxisTitle("#eta_{lepton}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "abs(lep.eta())";
-  histoName = "lep_absEta";
-  stack -> SetXaxisRange(0., 2.5);
-  stack -> SetXaxisTitle("|#eta|_{lepton}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 25, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "abs(lep_dB)/lep_edB";
-  histoName = "lep_3DipSig";
-  stack -> SetXaxisRange(0., 5.);
-  stack -> SetXaxisTitle("3DIP_{lepton}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lep_combIso/lep_pt";
-  histoName = "lep_relPfIso";
-  stack -> SetXaxisRange(0., 0.3);
-  stack -> SetXaxisTitle("relPfIso");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-
-  variableNames.at(0) = "lep_combIso";
-  histoName = "lep_pfIso";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("pfIso");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  
-  //---------------------------------------------  
-  // Met
-  //---------------------------------------------
-  
-  variableNames.at(0) = "met.Et()";  
-  histoName = "met_et";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("ME_{T}");
-  stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "met.phi()";  
-  histoName = "met_phi";
-  stack -> SetXaxisRange(-3.14159, 3.14159);
-  stack -> SetXaxisTitle("#phi_{ME_{T}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepMet_pt";
-  histoName = "lepMet_pt";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("p_{T}^{lepton+ME_{T}}");
-  stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepNu_m";
-  histoName = "lepNu_m";
-  stack -> SetXaxisRange(0., 150.);
-  stack -> SetXaxisTitle("m_{lepton+neutrino}");
-  stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepMet_mt";
-  histoName = "lepMet_mt";
-  stack -> SetXaxisRange(0., 150.);
-  stack -> SetXaxisTitle("m_{T}^{lepton+ME_{T}}");
-  stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepMet_Dphi";
-  histoName = "lepMet_Dphi";
-  stack -> SetXaxisRange(0., 3.14159);
-  stack -> SetXaxisTitle("#Delta#phi_{lepton-ME_{T}}");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   
   //---------------------------------------------  
   // electron
   //---------------------------------------------
+  
+  variableNames.at(0) = "PV_n";  
+  histoName    = "ele_PV_n";
+  cuts -> at(0) = "( lep_flavour == 11 )";
+  stack -> SetXaxisRange(-0.5, 49.5);
+  stack -> SetXaxisTitle("N_{PV}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 50, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_pt";
   histoName = "ele_pt";
@@ -446,7 +180,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("p_{T}^{electron}");
   stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 20, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep.eta()";
   histoName = "ele_eta";
@@ -454,7 +188,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-2.5, 2.5);
   stack -> SetXaxisTitle("#eta_{electron}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep.phi()";
   histoName = "ele_phi";
@@ -462,7 +196,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-3.14159, 3.14159);
   stack -> SetXaxisTitle("#phi_{electron}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 18, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "abs(lep_dB)/lep_edB";
   histoName = "ele_3DipSig";
@@ -470,7 +204,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 5.);
   stack -> SetXaxisTitle("3DIP_{electron}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 50, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_combIso/lep_pt";
   histoName = "ele_relPfIso";
@@ -478,7 +212,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 0.3);
   stack -> SetXaxisTitle("relPfIso");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 50, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "lep_combIso";
   histoName = "ele_pfIso";
@@ -486,122 +220,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("pfIso");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-
-  /*
-  variableNames.at(0) = "lep_sigmaIetaIeta";
-  histoName = "ele_sigmaIetaIeta_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.030);
-  stack -> SetXaxisTitle("EB #sigma_{I#etaI#eta}(electron)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_sigmaIetaIeta";
-  histoName = "ele_sigmaIetaIeta_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.030);
-  stack -> SetXaxisTitle("EE #sigma_{I#etaI#eta}(electron)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  variableNames.at(0) = "lep_DphiIn";
-  histoName = "ele_DphiIn_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(-0.040, 0.040);
-  stack -> SetXaxisTitle("EB #Delta#phi_{in}(electron)");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_DphiIn";
-  histoName = "ele_DphiIn_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(-0.040, 0.040);
-  stack -> SetXaxisTitle("EE #Delta#phi_{in}(electron)");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  variableNames.at(0) = "lep_DetaIn";
-  histoName = "ele_DetaIn_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(-0.010, 0.010);
-  stack -> SetXaxisTitle("EB #Delta#eta_{in}(electron)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_DetaIn";
-  histoName = "ele_DetaIn_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(-0.010, 0.010);
-  stack -> SetXaxisTitle("EE #Delta#eta_{in}(electron)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  variableNames.at(0) = "lep_HOverE";
-  histoName = "ele_HOverE_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.050);
-  stack -> SetXaxisTitle("EB H/E(electron)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_HOverE";
-  histoName = "ele_HOverE_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(0., 0.050);
-  stack -> SetXaxisTitle("EE H/E(electron)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  
-  
-  
-  variableNames.at(0) = "lep_dB";
-  histoName = "ele_dB_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(-0.03, 0.03);
-  stack -> SetXaxisTitle("EB d_{xy}(electron)");
-  stack -> SetUnit("cm");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_dB";
-  histoName = "ele_dB_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(-0.03, 0.03);
-  stack -> SetXaxisTitle("EE d_{xy}(electron)");
-  stack -> SetUnit("cm");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
-  
-  
-  
-  variableNames.at(0) = "lep_dz_PV";
-  histoName = "ele_dz_EB";
-  cuts -> at(0) = "( lep_isEB == 1 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(-0.03, 0.03);
-  stack -> SetXaxisTitle("EB d_{z}(electron)");
-  stack -> SetUnit("cm");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_dz_PV";
-  histoName = "ele_dz_EE";
-  cuts -> at(0) = "( lep_isEB == 0 && lep_flavour == 11 )";
-  stack -> SetXaxisRange(-0.03, 0.03);
-  stack -> SetXaxisTitle("EE d_{z}(electron)");
-  stack -> SetUnit("cm");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
-  */
-  
-  
-  
-  
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 50, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_tkIso/lep.pt()";
   histoName = "ele_tkRelIso";
@@ -609,7 +228,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 0.2);
   stack -> SetXaxisTitle("#Sigma p_{T}^{trk} / p_{T}^{electron}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 20, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_emIso/lep.pt()";
   histoName = "ele_emRelIso";
@@ -617,7 +236,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 0.2);
   stack -> SetXaxisTitle("#Sigma E_{T}^{em} / p_{T}^{electron}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 20, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_hadIso/lep.pt()";
   histoName = "ele_hadRelIso";
@@ -625,7 +244,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 0.2);
   stack -> SetXaxisTitle("#Sigma E_{T}^{had} / p_{T}^{electron}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 20, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "(lep_tkIso+max(0.,lep_emIso)+lep_hadIso)/lep.pt()";
   histoName = "ele_combRelIso";
@@ -633,7 +252,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 0.3);
   stack -> SetXaxisTitle("#Sigma (p_{T}^{trk}+max(0.,E_{T}*{em})+E_{T}^{had}) / p_{T}^{electron}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "(lep_tkIso+max(0.,lep_emIso)+lep_hadIso-rhoForIsolation*3.14159*0.3*0.3)/lep.pt()";
   histoName = "ele_combRelIso_PUCorr";
@@ -641,7 +260,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-0.3, 0.15);
   stack -> SetXaxisTitle("#Sigma (p_{T}^{trk}+max(0.,E_{T}^{em})+E_{T}^{had} - #rho_{PU}#pi#DeltaR^{2} ) / p_{T}^{electron}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 45, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 45, PURescale, weightEvent, stackSig, cuts);
   
   
   
@@ -654,7 +273,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("ME_{T}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "met.phi()";  
   histoName = "ele_met_phi";
@@ -662,7 +281,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-3.14159, 3.14159);
   stack -> SetXaxisTitle("#phi_{ME_{T}}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 18, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lepMet_mt";
   histoName = "ele_lepMet_mt";
@@ -670,7 +289,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 150.);
   stack -> SetXaxisTitle("m_{T}^{lepton+ME_{T}}");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 15, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lepMet_Dphi";
   histoName = "ele_lepMet_Dphi";
@@ -678,7 +297,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 3.14159);
   stack -> SetXaxisTitle("#Delta#phi_{lepton-ME_{T}}");
   stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 18, PURescale, weightEvent, stackSig, cuts);
   
   
   
@@ -693,7 +312,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("p_{T}^{jet_{1},jet_{2}}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts2);
+  stack -> Draw(variableNames2, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts2);
   
   variableNames.at(0) = "max(WJ1.pt(), WJ2.pt())";
   histoName = "ele_WJ1_pt";
@@ -701,7 +320,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("max p_{T}^{jet_{1},jet_{2}}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "min(WJ1.pt(), WJ2.pt())";
   histoName = "ele_WJ2_pt";
@@ -709,7 +328,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 150.);
   stack -> SetXaxisTitle("min p_{T}^{jet_{1},jet_{2}}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 15, PURescale, weightEvent, stackSig, cuts);
   
   
     
@@ -721,7 +340,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-5., 5.);
   stack -> SetXaxisTitle("#eta_{jet_{1},jet_{2}}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts2);
+  stack -> Draw(variableNames2, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts2);
   
   variableNames.at(0) = "max(abs(WJ1.eta()), abs(WJ2.eta()))";
   histoName = "ele_WJ1_absEta";
@@ -729,7 +348,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 2.5);
   stack -> SetXaxisTitle("max |#eta|_{jet_{1},jet_{2}}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 25, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 12, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "min(abs(WJ1.eta()), abs(WJ2.eta()))";
   histoName = "ele_WJ2_absEta";
@@ -737,7 +356,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 2.5);
   stack -> SetXaxisTitle("min |#eta|_{jet_{1},jet_{2}}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 25, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 12, PURescale, weightEvent, stackSig, cuts);
   
   
   
@@ -750,7 +369,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("m_{jj}");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "WJJ_m";
   histoName = "ele_WJJ_m_blind";
@@ -758,7 +377,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("m_{jj}");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "WJJ_pt";
   histoName = "ele_WJJ_pt";
@@ -766,7 +385,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("p_{T}^{jj}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "WJJ_eta";
   histoName = "ele_WJJ_eta";
@@ -774,7 +393,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-5., 5.);
   stack -> SetXaxisTitle("#eta^{jj}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "WJJ_Deta";
   histoName = "ele_WJJ_Deta";
@@ -782,7 +401,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 5.);
   stack -> SetXaxisTitle("#Delta#eta_{jj}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "WJJ_Dphi";
   histoName = "ele_WJJ_Dphi";
@@ -790,7 +409,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 3.14159);
   stack -> SetXaxisTitle("#Delta#phi_{jj}");
   stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 18, PURescale, weightEvent, stackSig, cuts);
   
   
   
@@ -804,7 +423,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-5., 5.);
   stack -> SetXaxisTitle("#eta_{l#nujj}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lepNuW_m";
   histoName = "ele_lepNuW_m";
@@ -812,7 +431,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(100., 800);
   stack -> SetXaxisTitle("m_{l#nujj}");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 70, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 35, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lepNuW_m_KF";
   histoName = "ele_lepNuW_m_KF";
@@ -820,7 +439,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(100., 800);
   stack -> SetXaxisTitle("m_{l#nujj} after KF");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 70, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 35, PURescale, weightEvent, stackSig, cuts);
   
   
   
@@ -836,6 +455,13 @@ int main(int argc, char** argv)
   //---------------------------------------------  
   // muon
   //---------------------------------------------
+  variableNames.at(0) = "PV_n";  
+  histoName    = "mu_PV_n";
+  cuts -> at(0) = "( lep_flavour == 13 )";
+  stack -> SetXaxisRange(-0.5, 49.5);
+  stack -> SetXaxisTitle("N_{PV}");
+  stack -> SetUnit("");
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 50, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_pt";
   histoName = "mu_pt";
@@ -843,7 +469,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 200.);
   stack -> SetXaxisTitle("p_{T}^{muon}");
   stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 20, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep.eta()";
   histoName = "mu_eta";
@@ -851,7 +477,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-2.5, 2.5);
   stack -> SetXaxisTitle("#eta_{muon}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep.phi()";
   histoName = "mu_phi";
@@ -859,7 +485,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-3.14159, 3.14159);
   stack -> SetXaxisTitle("#phi_{muon}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 18, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "abs(lep_dB)/lep_edB";
   histoName = "mu_3DipSig";
@@ -867,7 +493,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 5.);
   stack -> SetXaxisTitle("3DIP_{muon}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 50, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_combIso/lep_pt";
   histoName = "mu_relPfIso";
@@ -875,7 +501,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 0.3);
   stack -> SetXaxisTitle("relPfIso");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 50, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "lep_combIso";
   histoName = "mu_pfIso";
@@ -883,87 +509,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 10.);
   stack -> SetXaxisTitle("pfIso");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-  
-  /*
-  variableNames.at(0) = "lep_dB";
-  histoName = "mu_dB";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(-0.03, 0.03);
-  stack -> SetXaxisTitle("d_{xy}(muon)");
-  stack -> SetUnit("cm");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_dz_PV";
-  histoName = "mu_dz";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(-0.03, 0.03);
-  stack -> SetXaxisTitle("d_{z}(muon)");
-  stack -> SetUnit("cm");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "abs(lep_dB)/lep_edB";
-  histoName = "mu_3DipSig";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 5.);
-  stack -> SetXaxisTitle("3D ip(muon)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 100, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_normalizedChi2";
-  histoName = "mu_normalizedChi2";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("#chi^{2}/ndof(muon)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_numberOfValidTrackerHits";
-  histoName = "mu_numberOfValidTrackerHits";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 40.);
-  stack -> SetXaxisTitle("nHits_{tracker}(muon)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_numberOfValidMuonHits";  
-  histoName = "mu_numberOfValidMuonHits";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 60.);
-  stack -> SetXaxisTitle("nHits(muon)");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
-  */
-  
-  
-  
-  
-  
-  variableNames.at(0) = "lep_tkIso";
-  histoName = "mu_tkIso";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 4.);
-  stack -> SetXaxisTitle("#Sigma p_{T}^{trk}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-   
-  variableNames.at(0) = "lep_emIso";
-  histoName = "mu_emIso";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 4.);
-  stack -> SetXaxisTitle("#Sigma E_{T}^{em}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "lep_hadIso";
-  histoName = "mu_hadIso";
-  cuts -> at(0) = "( lep_flavour == 13 )";
-  stack -> SetXaxisRange(0., 4.);
-  stack -> SetXaxisTitle("#Sigma E_{T}^{had}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-  
-  
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 50, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_tkIso/lep.pt()";
   histoName = "mu_tkRelIso";
@@ -971,15 +517,15 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 0.2);
   stack -> SetXaxisTitle("#Sigma p_{T}^{trk} / p_{T}^{muon}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
-   
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 20, PURescale, weightEvent, stackSig, cuts);
+  
   variableNames.at(0) = "lep_emIso/lep.pt()";
   histoName = "mu_emRelIso";
   cuts -> at(0) = "( lep_flavour == 13 )";
   stack -> SetXaxisRange(0., 0.2);
   stack -> SetXaxisTitle("#Sigma E_{T}^{em} / p_{T}^{muon}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 20, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lep_hadIso/lep.pt()";
   histoName = "mu_hadRelIso";
@@ -987,23 +533,23 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 0.2);
   stack -> SetXaxisTitle("#Sigma E_{T}^{had} / p_{T}^{muon}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 20, PURescale, weightEvent, stackSig, cuts);
   
-  variableNames.at(0) = "(lep_tkIso+lep_emIso+lep_hadIso)/lep.pt()";
+  variableNames.at(0) = "(lep_tkIso+max(0.,lep_emIso)+lep_hadIso)/lep.pt()";
   histoName = "mu_combRelIso";
   cuts -> at(0) = "( lep_flavour == 13 )";
   stack -> SetXaxisRange(0., 0.3);
-  stack -> SetXaxisTitle("#Sigma (p_{T}^{trk}+E_{T}^{em}+E_{T}^{had}) / p_{T}^{muon}");
+  stack -> SetXaxisTitle("#Sigma (p_{T}^{trk}+max(0.,E_{T}*{em})+E_{T}^{had}) / p_{T}^{muon}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
   
-  variableNames.at(0) = "(lep_tkIso+lep_emIso+lep_hadIso-rhoForIsolation*3.14159*0.3*0.3)/lep.pt()";
+  variableNames.at(0) = "(lep_tkIso+max(0.,lep_emIso)+lep_hadIso-rhoForIsolation*3.14159*0.3*0.3)/lep.pt()";
   histoName = "mu_combRelIso_PUCorr";
   cuts -> at(0) = "( lep_flavour == 13 )";
   stack -> SetXaxisRange(-0.3, 0.15);
-  stack -> SetXaxisTitle("#Sigma (p_{T}^{trk}+E_{T}^{em}+E_{T}^{had}-#rho_{PU}#pi#DeltaR^{2}) / p_{T}^{muon}");
+  stack -> SetXaxisTitle("#Sigma (p_{T}^{trk}+max(0.,E_{T}^{em})+E_{T}^{had} - #rho_{PU}#pi#DeltaR^{2} ) / p_{T}^{muon}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 45, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 45, PURescale, weightEvent, stackSig, cuts);
   
   
   
@@ -1016,7 +562,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("ME_{T}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "met.phi()";  
   histoName = "mu_met_phi";
@@ -1024,7 +570,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-3.14159, 3.14159);
   stack -> SetXaxisTitle("#phi_{ME_{T}}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 18, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lepMet_mt";
   histoName = "mu_lepMet_mt";
@@ -1032,7 +578,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 150.);
   stack -> SetXaxisTitle("m_{T}^{lepton+ME_{T}}");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 15, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lepMet_Dphi";
   histoName = "mu_lepMet_Dphi";
@@ -1040,7 +586,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 3.14159);
   stack -> SetXaxisTitle("#Delta#phi_{lepton-ME_{T}}");
   stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 18, PURescale, weightEvent, stackSig, cuts);
   
   
   
@@ -1055,7 +601,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("p_{T}^{jet_{1},jet_{2}}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts2);
+  stack -> Draw(variableNames2, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts2);
   
   variableNames.at(0) = "max(WJ1.pt(), WJ2.pt())";
   histoName = "mu_WJ1_pt";
@@ -1063,7 +609,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("max p_{T}^{jet_{1},jet_{2}}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "min(WJ1.pt(), WJ2.pt())";
   histoName = "mu_WJ2_pt";
@@ -1071,7 +617,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 150.);
   stack -> SetXaxisTitle("min p_{T}^{jet_{1},jet_{2}}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 15, PURescale, weightEvent, stackSig, cuts);
   
   
     
@@ -1083,7 +629,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-5., 5.);
   stack -> SetXaxisTitle("#eta_{jet_{1},jet_{2}}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts2);
+  stack -> Draw(variableNames2, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts2);
   
   variableNames.at(0) = "max(abs(WJ1.eta()), abs(WJ2.eta()))";
   histoName = "mu_WJ1_absEta";
@@ -1091,7 +637,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 2.5);
   stack -> SetXaxisTitle("max |#eta|_{jet_{1},jet_{2}}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 25, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 12, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "min(abs(WJ1.eta()), abs(WJ2.eta()))";
   histoName = "mu_WJ2_absEta";
@@ -1099,7 +645,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 2.5);
   stack -> SetXaxisTitle("min |#eta|_{jet_{1},jet_{2}}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 25, PURescale, weightEvent, stackSig, cuts);  
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 12, PURescale, weightEvent, stackSig, cuts);
   
   
   
@@ -1107,12 +653,20 @@ int main(int argc, char** argv)
   
   
   variableNames.at(0) = "WJJ_m";
-  histoName = "mu_WJJ_m_blind";
-  cuts -> at(0) = "( lep_flavour == 11 ) && ( WJJ_m < 65 || WJJ_m > 95 )";
+  histoName = "mu_WJJ_m";
+  cuts -> at(0) = "( lep_flavour == 13 )";
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("m_{jj}");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
+
+  variableNames.at(0) = "WJJ_m";
+  histoName = "mu_WJJ_m_blind";
+  cuts -> at(0) = "( lep_flavour == 13 ) && ( WJJ_m < 65 || WJJ_m > 95 )";
+  stack -> SetXaxisRange(0., 300.);
+  stack -> SetXaxisTitle("m_{jj}");
+  stack -> SetUnit("GeV/c^{2}");
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "WJJ_pt";
   histoName = "mu_WJJ_pt";
@@ -1120,7 +674,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 300.);
   stack -> SetXaxisTitle("p_{T}^{jj}");
   stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 30, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "WJJ_eta";
   histoName = "mu_WJJ_eta";
@@ -1128,7 +682,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-5., 5.);
   stack -> SetXaxisTitle("#eta^{jj}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "WJJ_Deta";
   histoName = "mu_WJJ_Deta";
@@ -1136,7 +690,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 5.);
   stack -> SetXaxisTitle("#Delta#eta_{jj}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts);
 
   variableNames.at(0) = "WJJ_Dphi";
   histoName = "mu_WJJ_Dphi";
@@ -1144,7 +698,8 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(0., 3.14159);
   stack -> SetXaxisTitle("#Delta#phi_{jj}");
   stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig, cuts); 
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 18, PURescale, weightEvent, stackSig, cuts);
+  
   
   
   
@@ -1157,7 +712,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(-5., 5.);
   stack -> SetXaxisTitle("#eta_{l#nujj}");
   stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 25, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lepNuW_m";
   histoName = "mu_lepNuW_m";
@@ -1165,7 +720,7 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(100., 800);
   stack -> SetXaxisTitle("m_{l#nujj}");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 70, PURescale, weightEvent, stackSig, cuts);
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 35, PURescale, weightEvent, stackSig, cuts);
   
   variableNames.at(0) = "lepNuW_m_KF";
   histoName = "mu_lepNuW_m_KF";
@@ -1173,362 +728,9 @@ int main(int argc, char** argv)
   stack -> SetXaxisRange(100., 800);
   stack -> SetXaxisTitle("m_{l#nujj} after KF");
   stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 70, PURescale, weightEvent, stackSig, cuts);  
+  stack -> Draw(variableNames, histoName, method, lumiEle, step, 35, PURescale, weightEvent, stackSig, cuts);
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  //---------------------------------------------  
-  // Jets
-  //---------------------------------------------
-  
-  variableNames.at(0) = "nJets";
-  histoName = "jets_n";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("N_{jets}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, PURescale, weightEvent, stackSig);
-
-  variableNames.at(0) = "nJets_cnt";
-  histoName = "jets_cnt_n";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("N_{central jets}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, PURescale, weightEvent, stackSig);
-
-  variableNames.at(0) = "nJets_fwd";
-  histoName = "jets_fwd_n";
-  stack -> SetXaxisRange(0., 10.);
-  stack -> SetXaxisTitle("N_{forward jets}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 10, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "max(WJ1_bTag,WJ2_bTag)";
-  histoName = "WJets_bTag1_2j";
-  cuts -> at(0) = "nJets_cnt_pt30 == 2";
-  stack -> SetXaxisRange(-5., 10.);
-  stack -> SetXaxisTitle("max bTag_{jet_{1},jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "min(WJ1_bTag,WJ2_bTag)";
-  histoName = "WJets_bTag2_2j";
-  cuts -> at(0) = "nJets_cnt_pt30 == 2";
-  stack -> SetXaxisRange(-5., 10.);
-  stack -> SetXaxisTitle("min bTag_{jet_{1},jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);  
-  
-  variableNames.at(0) = "max(WJ1_bTag,WJ2_bTag)";
-  histoName = "WJets_bTag1_3j";
-  cuts -> at(0) = "nJets_cnt_pt30 == 3";
-  stack -> SetXaxisRange(-5., 10.);
-  stack -> SetXaxisTitle("max bTag_{jet_{1},jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "min(WJ1_bTag,WJ2_bTag)";
-  histoName = "WJets_bTag2_3j";
-  cuts -> at(0) = "nJets_cnt_pt30 == 3";
-  stack -> SetXaxisRange(-5., 10.);
-  stack -> SetXaxisTitle("min bTag_{jet_{1},jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  //---------------------------------------------
-  // W-Jets
-  //---------------------------------------------
-  
-  variableNames.at(0) = "WJJ_m";
-  histoName = "WJJ_m";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("m_{jj}");
-  stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "WJJ_m";
-  histoName = "WJJ_m_blind";
-  cuts -> at(0) = "( lep_flavour == 11 ) && ( WJJ_m < 65 || WJJ_m > 95 )";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("m_{jj}");
-  stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig, cuts);
-  
-  variableNames.at(0) = "WJJ_pt";
-  histoName = "WJJ_pt";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("p_{T}^{jj}");
-  stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);  
-  
-  variableNames.at(0) = "WJJ_eta";
-  histoName = "WJJ_eta";
-  stack -> SetXaxisRange(-5., 5.);
-  stack -> SetXaxisTitle("#eta^{jj}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);  
-  
-  variableNames.at(0) = "WJJ_Deta";
-  histoName = "WJJ_Deta";
-  stack -> SetXaxisRange(0., 5.);
-  stack -> SetXaxisTitle("#Delta#eta_{jj}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-
-  variableNames.at(0) = "WJJ_Dphi";
-  histoName = "WJJ_Dphi";
-  stack -> SetXaxisRange(0., 3.14159);
-  stack -> SetXaxisTitle("#Delta#phi_{jj}");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "WJJ_DR";
-  histoName = "WJJ_DR";
-  stack -> SetXaxisRange(0., 5.);
-  stack -> SetXaxisTitle("#DeltaR^{jj}");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);  
-  
-  variableNames.at(0) = "WJ1_lep_Dphi";
-  histoName = "WJ1_lep_Dphi";
-  stack -> SetXaxisRange(0., 3.14159);
-  stack -> SetXaxisTitle("#Delta#phi_{lepton-jet_{1}}");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "WJ1_met_Dphi";
-  histoName = "WJ1_met_Dphi";
-  stack -> SetXaxisRange(0., 3.14159);
-  stack -> SetXaxisTitle("#Delta#phi_{ME_{T}-jet_{1}}");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "WJ2_lep_Dphi";
-  histoName = "WJ2_lep_Dphi";
-  stack -> SetXaxisRange(0., 3.14159);
-  stack -> SetXaxisTitle("#Delta#phi_{lepton-jet_{2}}");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "WJ2_met_Dphi";
-  histoName = "WJ2_met_Dphi";
-  stack -> SetXaxisRange(0., 3.14159);
-  stack -> SetXaxisTitle("#Delta#phi_{ME_{T}-jet_{2}}");
-  stack -> SetUnit("rad");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "min(WJ1.pt(),WJ2.pt())/WJJ_m";
-  histoName = "WJ2_pt_over_WJJ_m";
-  stack -> SetXaxisRange(0., 2.);
-  stack -> SetXaxisTitle("p_{T}^{jet_{2}}/m_{jj}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  
-  
-  variableNames2.at(0) = "WJ1.pt()";
-  variableNames2.at(1) = "WJ2.pt()";
-  histoName = "WJ1_pt+WJ2_pt";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("p_{T}^{jet_{1},jet_{2}}");
-  stack -> SetUnit("GeV");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "max(WJ1.pt(), WJ2.pt())";
-  histoName = "WJ1_pt";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("max p_{T}^{jet_{1},jet_{2}}");
-  stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "min(WJ1.pt(), WJ2.pt())";
-  histoName = "WJ2_pt";
-  stack -> SetXaxisRange(0., 150.);
-  stack -> SetXaxisTitle("min p_{T}^{jet_{1},jet_{2}}");
-  stack -> SetUnit("GeV");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  
-    
-  variableNames2.at(0) = "WJ1.eta()";
-  variableNames2.at(1) = "WJ1.eta()";
-  histoName = "WJ1_eta+WJ2_eta";
-  stack -> SetXaxisRange(-5., 5.);
-  stack -> SetXaxisTitle("#eta_{jet_{1},jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames2, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "max(abs(WJ1.eta()), abs(WJ2.eta()))";
-  histoName = "WJ1_absEta";
-  stack -> SetXaxisRange(0., 2.5);
-  stack -> SetXaxisTitle("max |#eta|_{jet_{1},jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 25, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "min(abs(WJ1.eta()), abs(WJ2.eta()))";
-  histoName = "WJ2_absEta";
-  stack -> SetXaxisRange(0., 2.5);
-  stack -> SetXaxisTitle("min |#eta|_{jet_{1},jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 25, PURescale, weightEvent, stackSig);  
-  
-  
-  
-  variableNames.at(0) = "WJ1_bTag+WJ2_bTag";
-  histoName = "WJ1_bTag+WJ2_bTag";
-  stack -> SetXaxisRange(-5., 10.);
-  stack -> SetXaxisTitle("bTag^{jet_{1}}+bTag^{jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 60, PURescale, weightEvent, stackSig);
-  
-  
-  
-  variableNames.at(0) = "WJ1_QGLikelihood";
-  histoName = "WJ1_QGLikelihood";
-  stack -> SetXaxisRange(0., 1.);
-  stack -> SetXaxisTitle("quark-gluon likelihood_{jet_{1}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-    
-  variableNames.at(0) = "WJ2_QGLikelihood";
-  histoName = "WJ2_QGLikelihood";
-  stack -> SetXaxisRange(0., 1.);
-  stack -> SetXaxisTitle("quark-gluon likelihood_{jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-    
-  variableNames.at(0) = "WJ1_QGLikelihood * WJ2_QGLikelihood";
-  histoName = "WJJ_QGLikelihood";
-  stack -> SetXaxisRange(0., 1.);
-  stack -> SetXaxisTitle("quark-gluon likelihood_{jet_{1}} * likelihood_{jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);    
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  //---------------------------------------------
-  // Ordered pt
-  //---------------------------------------------
-  
-  variableNames.at(0) = "lepWJJ_pt1";
-  histoName = "lepWJJ_pt1";
-  stack -> SetXaxisRange(0., 300.);
-  stack -> SetXaxisTitle("1^{st} p_{T}(lepton,jet_{1},jet_{2})");
-  stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 30, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepWJJ_pt2";
-  histoName = "lepWJJ_pt2";
-  stack -> SetXaxisRange(0., 200.);
-  stack -> SetXaxisTitle("2^{nd} p_{T}(lepton,jet_{1},jet_{2})");
-  stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepWJJ_pt3";
-  histoName = "lepWJJ_pt3";
-  stack -> SetXaxisRange(0., 100.);
-  stack -> SetXaxisTitle("3^{rd} p_{T}(lepton,jet_{1},jet_{2})");
-  stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 20, PURescale, weightEvent, stackSig);
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  //---------------------------------------------
-  // Higgs
-  //---------------------------------------------
-    
-  variableNames.at(0) = "lepNuW_eta";
-  histoName = "lepNuW_eta";
-  stack -> SetXaxisRange(-5., 5.);
-  stack -> SetXaxisTitle("#eta_{l#nujj}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 50, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepNuW_m";
-  histoName = "lepNuW_m";
-  stack -> SetXaxisRange(100., 800);
-  stack -> SetXaxisTitle("m_{l#nujj}");
-  stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 70, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepNuW_m_KF";
-  histoName = "lepNuW_m_KF";
-  stack -> SetXaxisRange(100., 800);
-  stack -> SetXaxisTitle("m_{l#nujj} after KF");
-  stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 70, PURescale, weightEvent, stackSig);
-  
-  //variableNames.at(0) = "lepMetW_pt/lepNuW_m";
-  //histoName = "lepMetW_jacobian";
-  //stack -> SetXaxisRange(0., 1.);
-  //stack -> SetXaxisTitle("p_{T}^{lepton+ME_{T}+jet_{1}+jet_{2})/m_{l#nujj}");
-  //stack -> SetUnit("");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 25, PURescale, weightEvent, stackSig);
-  
-  //variableNames.at(0) = "lepW_pt";
-  //histoName = "lepW_pt";
-  //stack -> SetXaxisRange(0., 200);
-  //stack -> SetXaxisTitle("p_{T}^{lepton+jet_{1}+jet_{2})");
-  //stack -> SetUnit("GeV/c");
-  //stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepMetW_pt";
-  histoName = "lepMetW_pt";
-  stack -> SetXaxisRange(0., 200);
-  stack -> SetXaxisTitle("p_{T}^{lepton+ME_{T}+jet_{1}+jet_{2}}");
-  stack -> SetUnit("GeV/c");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 40, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepMetW_mt";
-  histoName = "lepMetW_mt";
-  stack -> SetXaxisRange(100., 800.);
-  stack -> SetXaxisTitle("m_{T}^{lepton+ME_{T}+jet_{1}+jet_{2}}");
-  stack -> SetUnit("GeV/c^{2}");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 35, PURescale, weightEvent, stackSig);
-  
-  variableNames.at(0) = "lepMetW_Dphi";
-  histoName = "lepMetW_Dphi";
-  stack -> SetXaxisRange(0., 3.14159);
-  stack -> SetXaxisTitle("#Delta#phi_{lepton+ME_{T}-jet_{1}+jet_{2}}");
-  stack -> SetUnit("");
-  stack -> Draw(variableNames, histoName, method, lumi, step, 36, PURescale, weightEvent, stackSig);
   
   
   

@@ -4,7 +4,6 @@
 #include <iomanip>
 #include <fstream>
 #include <cmath>
-#include <cstdlib>
 
 #include "TGraphAsymmErrors.h"
 #include "TCanvas.h"
@@ -12,6 +11,7 @@
 #include "TF1.h"
 #include "TLegend.h"
 #include "TAxis.h"
+#include "TLatex.h"
 
 
 
@@ -42,11 +42,11 @@ void SetGraphStyle(TGraph* g_lin, TGraph* g_log, const std::string& type);
 int main(int argc, char** argv)
 {
   setTDRStyle();
-  gStyle -> SetPadTopMargin(0.05);
-  gStyle -> SetPadBottomMargin(0.13);
-  gStyle -> SetPadLeftMargin(0.13);
-  gStyle -> SetPadRightMargin(0.10);
-    
+  gStyle->SetPadTopMargin(0.05);
+  gStyle->SetPadBottomMargin(0.13);
+  gStyle->SetPadLeftMargin(0.13);
+  gStyle->SetPadRightMargin(0.13);
+  
   if( argc < 3 )
   {
     std::cout << ">>> usage: ./drawExclusionPlot folder name   drawObserved(=1)   yMin_lin(0.) yMax_lin(15.)   yMin_log(0.1) yMax_log(15.)" << std::endl;
@@ -115,16 +115,16 @@ int main(int argc, char** argv)
   //--------------
   // define legend
   
-  TLegend* legend = new TLegend(0.280,0.84,0.75,0.99);
+  TLegend* legend = new TLegend(0.30,0.77,0.70,0.94);
   legend -> SetFillColor(kWhite);
   legend -> SetFillStyle(1001);  
   legend -> SetTextFont(42);  
-  legend -> SetTextSize(0.03);
+  legend -> SetTextSize(0.04);
   
-  legend -> AddEntry(g_lin_median,  "95% CL exclusion: median expected","L");
-  legend -> AddEntry(g_lin_1s,      "95% CL exclusion: 68% band",       "F");
-  legend -> AddEntry(g_lin_2s,      "95% CL exclusion: 95% band",       "F");
-  legend -> AddEntry(g_lin_observed,"95% CL exclusion: observed",       "PL");
+  legend -> AddEntry(g_lin_observed,"95% C.L. observed limit",  "PL");
+  legend -> AddEntry(g_lin_median,  "95% C.L. expected limit",  "L");
+  legend -> AddEntry(g_lin_1s,      "#pm1#sigma expected limit","F");
+  legend -> AddEntry(g_lin_2s,      "#pm2#sigma expected limit","F");
   
   TF1* f = new TF1("f", "1.", 0., 1000.);
   f -> SetLineColor(kRed+1);
@@ -132,12 +132,23 @@ int main(int argc, char** argv)
   
   
   
+  char lumiBuffer[200];
+  sprintf(lumiBuffer, "CMS 2011                             #sqrt{#font[52]{s}} = 7 TeV                       #scale[0.75]{#int}#font[52]{L}d#font[52]{t} = %.1f fb^{-1}",5.0);
+  TLatex* latex = new TLatex(0.14, 0.96, lumiBuffer);
+  latex -> SetNDC();
+  latex -> SetTextFont(42);
+  latex -> SetTextSize(0.04);
+  
   //-------------
   // draw TGraphs
   
-  TCanvas* c1 = new TCanvas("c1","",1000,750);
-  c1 -> SetGridx();
-  c1 -> SetGridy();
+  TCanvas* c1 = new TCanvas("c1","",744,522);
+  
+  g_lin_median -> GetYaxis() -> SetTitleOffset(1.);
+  g_lin_median -> GetXaxis() -> SetTitleSize(0.05);
+  g_lin_median -> GetYaxis() -> SetTitleSize(0.05);
+  g_lin_median -> GetXaxis() -> SetLabelSize(0.04);
+  g_lin_median -> GetYaxis() -> SetLabelSize(0.04);
   
   g_lin_median -> Draw("AL");
   g_lin_2s     -> Draw("3,same");
@@ -146,16 +157,23 @@ int main(int argc, char** argv)
   f            -> Draw("same");
   if( drawObserved >= 1 ) g_lin_observed -> Draw("PL,same");
   legend       -> Draw("same");
+  latex        -> Draw("same");
+  
+  c1 -> SetGridy();
   
   c1 -> Print(("lin_"+name+".pdf").c_str(),"pdf");
-  c1 -> Print(("lin_"+name+".png").c_str(),"png");
+  //c1 -> Print(("lin_"+name+".png").c_str(),"png");
   
   
   
-  TCanvas* c2 = new TCanvas("c2","",1000,750);
-  c2 -> SetGridx();
-  c2 -> SetGridy();
+  TCanvas* c2 = new TCanvas("c2","",744,522);
   c2 -> SetLogy();
+  
+  g_log_median -> GetYaxis() -> SetTitleOffset(1.);
+  g_log_median -> GetXaxis() -> SetTitleSize(0.05);
+  g_log_median -> GetYaxis() -> SetTitleSize(0.05);
+  g_log_median -> GetXaxis() -> SetLabelSize(0.04);
+  g_log_median -> GetYaxis() -> SetLabelSize(0.04);
   
   g_log_median -> Draw("AL");
   g_log_2s     -> Draw("3,same");
@@ -164,9 +182,12 @@ int main(int argc, char** argv)
   f            -> Draw("same");
   if( drawObserved >= 1 ) g_log_observed -> Draw("PL,same");
   legend       -> Draw("same");
-    
+  latex        -> Draw("same");
+  
+  c2 -> SetGridy();
+  
   c2 -> Print(("log_"+name+".pdf").c_str(),"pdf");
-  c2 -> Print(("log_"+name+".png").c_str(),"png");
+  //c2 -> Print(("log_"+name+".png").c_str(),"png");
   
   
   
@@ -311,11 +332,11 @@ void SetGraphStyle(TGraph* g_lin, TGraph* g_log, const std::string& type)
   //------------
   // axis titles
   
-  g_lin -> GetXaxis() -> SetTitle("m_{H}   (GeV/c^{2})");
-  g_log -> GetXaxis() -> SetTitle("m_{H}   (GeV/c^{2})");
+  g_lin -> GetXaxis() -> SetTitle("#font[52]{m}_{H} (GeV/#font[52]{c}^{2})");
+  g_log -> GetXaxis() -> SetTitle("#font[52]{m}_{H} (GeV/#font[52]{c}^{2})");
   
-  g_lin -> GetYaxis() -> SetTitle("r = #sigma_{95%CL} / #sigma_{SM}");
-  g_log -> GetYaxis() -> SetTitle("r = #sigma_{95%CL} / #sigma_{SM}");
+  g_lin -> GetYaxis() -> SetTitle("r = #sigma_{excluded} / #sigma_{SM}");
+  g_log -> GetYaxis() -> SetTitle("r = #sigma_{excluded} / #sigma_{SM}");
   
   
   
@@ -333,8 +354,8 @@ void SetGraphStyle(TGraph* g_lin, TGraph* g_log, const std::string& type)
   //---------------------
   // graphical attributes
   
-  g_lin -> SetLineWidth(2);
-  g_log -> SetLineWidth(2);
+  g_lin -> SetLineWidth(3);
+  g_log -> SetLineWidth(3);
   
   g_lin -> SetMarkerStyle(20);
   g_log -> SetMarkerStyle(20);
@@ -347,8 +368,8 @@ void SetGraphStyle(TGraph* g_lin, TGraph* g_log, const std::string& type)
     g_lin -> SetLineColor(kBlack);
     g_log -> SetLineColor(kBlack);
 
-    g_lin -> SetMarkerSize(1.);
-    g_log -> SetMarkerSize(1.);
+    g_lin -> SetMarkerSize(0.);
+    g_log -> SetMarkerSize(0.);
     
     g_lin -> SetMarkerColor(kBlack);
     g_log -> SetMarkerColor(kBlack);
@@ -359,14 +380,14 @@ void SetGraphStyle(TGraph* g_lin, TGraph* g_log, const std::string& type)
     g_lin -> SetLineStyle(2);
     g_log -> SetLineStyle(2);
     
-    g_lin -> SetLineColor(kBlue);
-    g_log -> SetLineColor(kBlue);
+    g_lin -> SetLineColor(kBlack);
+    g_log -> SetLineColor(kBlack);
     
     g_lin -> SetMarkerSize(0.);
     g_log -> SetMarkerSize(0.);
     
-    g_lin -> SetMarkerColor(kBlue);
-    g_log -> SetMarkerColor(kBlue);
+    g_lin -> SetMarkerColor(kBlack);
+    g_log -> SetMarkerColor(kBlack);
   }
   
   if( type == "1s" )
@@ -383,8 +404,8 @@ void SetGraphStyle(TGraph* g_lin, TGraph* g_log, const std::string& type)
     g_lin -> SetFillColor(kGreen);
     g_log -> SetFillColor(kGreen);
     
-    g_lin -> SetFillStyle(3001);
-    g_log -> SetFillStyle(3001);
+    g_lin -> SetFillStyle(1001);
+    g_log -> SetFillStyle(1001);
     
     g_lin -> SetMarkerSize(0.);
     g_log -> SetMarkerSize(0.);
@@ -407,8 +428,8 @@ void SetGraphStyle(TGraph* g_lin, TGraph* g_log, const std::string& type)
     g_lin -> SetFillColor(kYellow);
     g_log -> SetFillColor(kYellow);
     
-    g_lin -> SetFillStyle(3001);
-    g_log -> SetFillStyle(3001);
+    g_lin -> SetFillStyle(1001);
+    g_log -> SetFillStyle(1001);
     
     g_lin -> SetMarkerSize(0.);
     g_log -> SetMarkerSize(0.);

@@ -24,8 +24,6 @@ while (<USERCONFIG>)
     $User_Preferences{$var} = $value;
   }
 
-
-
 $CMSSWDir         = $User_Preferences{"CMSSWDir"};
 $INPUTDir         = $User_Preferences{"INPUTDir"};
 $xWidth           = $User_Preferences{"xWidth"};
@@ -45,6 +43,30 @@ print "xWidth = ".$xWidth."\n";
 
 
 
+if( @ARGV != 3 )
+{
+  print(">>> combineDatacards.pl::usage   perl combineDatacards.pl   params.CFG   flavour   charge\n");
+  exit;
+}
+
+$flavour = $ARGV[1];
+$charge  = $ARGV[2];
+
+if( !($flavour eq "e_mu") )
+{
+  $flavour = "_".$flavour;
+}
+
+if( $charge eq "pm" )
+{
+  $charge = "";
+}
+if ( !($charge eq "pm") && !($charge eq "p_m") )
+{
+  $charge = "_".$charge;
+}
+
+#@masses = (250,260,270,280,290,300,310,320,330,340,350,360,370,380,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600);
 @masses = (250,300,350,400,450,500,550,600);
 $nMasses = @masses;
 
@@ -93,11 +115,41 @@ for($massIt = 0; $massIt < $nMasses; ++$massIt)
 {
   $mass = $masses[$massIt];
   
-  $datacard_e    = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_e.txt";
-  $datacard_mu   = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_mu.txt";
-  $datacard_e_mu = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_e_mu.txt";
   
   
-  $combineCommand = "combineCards.py ".$datacard_e." ".$datacard_mu." > ".$datacard_e_mu."\n";
-  print JOBFILE $combineCommand."\n";
+  if( ($flavour eq "e_mu") && !($charge eq "p_m" ) )
+  {
+    $datacard_e    = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_e".$charge.".txt";
+    $datacard_mu   = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_mu".$charge.".txt";
+    $datacard_e_mu = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_e_mu".$charge.".txt";
+    
+    $combineCommand = "combineCards.py ".$datacard_e." ".$datacard_mu." > ".$datacard_e_mu."\n";
+    print JOBFILE $combineCommand."\n";
+  }
+  
+  
+  
+  if( !($flavour eq "e_mu") && ($charge eq "p_m") )
+  {
+    $datacard_p   = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass.$flavour."_p.txt";
+    $datacard_m   = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass.$flavour."_m.txt";
+    $datacard_p_m = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass.$flavour."_p_m.txt";
+    
+    $combineCommand = "combineCards.py ".$datacard_p." ".$datacard_m." > ".$datacard_p_m."\n";
+    print JOBFILE $combineCommand."\n";
+  }
+  
+  
+  
+  if( ($flavour eq "e_mu") && ($charge eq "p_m") )
+  {
+    $datacard_e_p      = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_e_p.txt";
+    $datacard_e_m      = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_e_m.txt";
+    $datacard_mu_p     = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_mu_p.txt";
+    $datacard_mu_m     = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_mu_m.txt";
+    $datacard_e_mu_p_m = $outputDir."/datacard_".$analysisMethod."_".$fitFunction."_".$combineTechnique."_".$mass."_e_mu_p_m.txt";
+    
+    $combineCommand = "combineCards.py ".$datacard_e_p." ".$datacard_e_m." ".$datacard_mu_p." ".$datacard_mu_m." > ".$datacard_e_mu_p_m."\n";
+    print JOBFILE $combineCommand."\n";
+  }
 }

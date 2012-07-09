@@ -257,6 +257,7 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     char xRangeMaxChar[50];
     sprintf(xRangeMaxChar,"%.10f",m_xRangeMax);
     TH1F* histoTemp = new TH1F((histoName+"Temp").c_str(),"",nBins,  m_xRangeMin, m_xRangeMax);
+    histoTemp -> Sumw2();
     
     // to include the upper edge of the last bin
     float* new_bins = new float[nBins+1];
@@ -380,7 +381,7 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
   m_legend -> SetFillColor(kWhite);
   m_legend -> SetFillStyle(4000);  
   m_legend -> SetTextFont(42);  
-  m_legend -> SetTextSize(0.04);
+  m_legend -> SetTextSize(0.057);
   
   
   
@@ -469,22 +470,22 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     
     //MakeHistogram::graphical settings
     // y-axis properties
-    histo_summed -> GetXaxis() -> SetTitleSize(0.04);
-    histo_summed -> GetXaxis() -> SetLabelSize(0.03);
-    histo_summed -> GetXaxis() -> SetTitleOffset(1.25);
+    histo_summed -> GetXaxis() -> SetTitleSize(0.071);
+    histo_summed -> GetXaxis() -> SetLabelSize(0.057);
+    histo_summed -> GetXaxis() -> SetTitleOffset(1.00);
     
     if( m_xAxisRange )
       histo_summed->GetXaxis()->SetRangeUser(m_xRangeMin-m_xWidth, m_xRangeMax+m_xWidth);
     
     std::string xAxisTitle = histoName;
     if( m_xAxisTitle ) xAxisTitle = m_xTitle;
-    if( m_unit != "" ) xAxisTitle += "   ("+m_unit+")";
+    if( m_unit != "" ) xAxisTitle += " ("+m_unit+")";
     histo_summed->GetXaxis()->SetTitle(xAxisTitle.c_str());
     
     // y-axis properties
-    histo_summed -> GetYaxis() -> SetTitleSize(0.04);
-    histo_summed -> GetYaxis() -> SetLabelSize(0.03);
-    histo_summed -> GetYaxis() -> SetTitleOffset(1.50);    
+    histo_summed -> GetYaxis() -> SetTitleSize(0.071);
+    histo_summed -> GetYaxis() -> SetLabelSize(0.057);
+    histo_summed -> GetYaxis() -> SetTitleOffset(1.00);    
     
     if( m_yAxisRange )
       histo_summed->GetYaxis()->SetRangeUser(m_yRangeMin, m_yRangeMax);
@@ -530,6 +531,7 @@ int drawTStack::MakeHistograms(std::vector<std::string>& variableNames, const st
     else
     {
       histo_summed -> SetMarkerStyle(20);
+      histo_summed -> SetMarkerSize(0.7);
       histo_summed -> SetMarkerColor(kBlack);      
     }
     
@@ -768,20 +770,36 @@ void drawTStack::FindMinimumMaximum(const std::string& mode)
   
   
   // FindMinimumMaximum::loop over summed samples to get global maximum
-  if( (m_bkgGlobalHisto != NULL) && ( (mode == "eventsScaled") || (mode == "sameAreaStack") || (mode == "integralStack") || (mode == "eventsScaledStack") ) )
+  if( (mode == "eventsScaled") || (mode == "sameAreaStack") || (mode == "integralStack") || (mode == "eventsScaledStack") )
   {
-    if( MyGetMaximum(m_bkgGlobalHisto, 1.E15, binMin, binMax) > m_globalMaximum )
-      m_globalMaximum = MyGetMaximum(m_bkgGlobalHisto, 1.E15, binMin, binMax);
-  }
-  
-  if( (m_dataGlobalHisto != NULL) && ( (mode == "eventsScaled") || (mode == "sameAreaStack") || (mode == "integralStack") || (mode == "eventsScaledStack") ) )
-  {
-    if( MyGetMaximum(m_dataGlobalHisto, 1.E15, binMin, binMax) > m_globalMaximum )
-      m_globalMaximum = MyGetMaximum(m_dataGlobalHisto, 1.E15, binMin, binMax);
+    m_globalMinimum = 999999999999.;
+    
+    if( m_bkgGlobalHisto != NULL )
+    {
+      if( MyGetMaximum(m_bkgGlobalHisto, 1.E15, binMin, binMax) > m_globalMaximum )
+        m_globalMaximum = MyGetMaximum(m_bkgGlobalHisto, 1.E15, binMin, binMax);
+      
+      if( MyGetMinimum(m_bkgGlobalHisto, 1.E-15, binMin, binMax) < m_globalMinimum )
+        m_globalMinimum = MyGetMinimum(m_bkgGlobalHisto, 1.E-15, binMin, binMax);
+    }
+    
+    if( m_dataGlobalHisto != NULL )
+    {
+      if( MyGetMaximum(m_dataGlobalHisto, 1.E15, binMin, binMax) > m_globalMaximum )
+        m_globalMaximum = MyGetMaximum(m_dataGlobalHisto, 1.E15, binMin, binMax);
+      
+      if( MyGetMinimum(m_dataGlobalHisto, 1.E-15, binMin, binMax) < m_globalMinimum )
+        m_globalMinimum = MyGetMinimum(m_dataGlobalHisto, 1.E-15, binMin, binMax);
+    }
   }
   
   if( mode == "integralStack" )
     m_globalMaximum = 1.;
+  
+  
+  
+  if( m_globalMinimum < m_globalMaximum/1.E+08)
+    m_globalMinimum = m_globalMaximum/1.E+08;
 }
 
 
@@ -835,14 +853,15 @@ void drawTStack::Draw(std::vector<std::string>& variableNames, const std::string
 
 void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::string& mode, const bool& stackSig, const bool& logy, const float& lumi)
 {
-  c = new TCanvas("c","c",800,800);
+  c = new TCanvas("c","c",572,522);
   c -> cd();
 
-  TPad* p1 = new TPad("p1","p1",0., 0.35, 1., 1.);
-  TPad* p2 = new TPad("p2","p2",0., 0., 1., 0.35);
+  TPad* p1 = new TPad("p1","p1",0.0, 0.3, 1.0, 1.0);
+  TPad* p2 = new TPad("p2","p2",0.0, 0.0, 1.0, 0.3);
+  p1 -> SetTopMargin(0.08);
   p1 -> SetBottomMargin(0.02);
-  p2 -> SetTopMargin(0.02);
-  p2 -> SetBottomMargin(0.5);
+  p2 -> SetTopMargin(0.04);
+  p2 -> SetBottomMargin(0.4);
   p1 -> SetGridx();
   p1 -> SetGridy();
   if( logy == true ) p1 -> SetLogy();
@@ -863,7 +882,7 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   
   std::string xAxisTitle = histoName;
   if( m_xAxisTitle ) xAxisTitle = m_xTitle;
-  if( m_unit != "" ) xAxisTitle += "   ("+m_unit+")";
+  if( m_unit != "" ) xAxisTitle += " ("+m_unit+")";
       
   
       
@@ -918,29 +937,29 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
       ratioHisto = DrawTStackDataMCRatio(m_sigStack,den,ratioGraph1s,ratioGraph2s);
     
     ratioHisto -> GetXaxis() -> SetLabelFont(42);
-    ratioHisto -> GetXaxis() -> SetLabelSize(0.065);
-    ratioHisto -> GetXaxis() -> SetLabelOffset(0.010);
+    ratioHisto -> GetXaxis() -> SetLabelSize(0.13);
     ratioHisto -> GetXaxis() -> SetTitle(xAxisTitle.c_str());
     ratioHisto -> GetXaxis() -> SetTitleFont(42);
-    ratioHisto -> GetXaxis() -> SetTitleSize(0.090);
+    ratioHisto -> GetXaxis() -> SetTitleSize(0.17);
+    ratioHisto -> GetXaxis() -> SetTitleOffset(0.95);
     
-    ratioHisto -> GetYaxis() -> SetRangeUser(0.4, 1.6);
-    ratioHisto -> GetYaxis() -> SetNdivisions(206);
+    ratioHisto -> GetYaxis() -> SetRangeUser(0.5, 1.5);
+    ratioHisto -> GetYaxis() -> SetNdivisions(204,false);
     ratioHisto -> GetYaxis() -> SetLabelFont(42);
-    ratioHisto -> GetYaxis() -> SetLabelSize(0.065);
+    ratioHisto -> GetYaxis() -> SetLabelSize(0.13);
     ratioHisto -> GetYaxis() -> SetTitle("data / MC");
     ratioHisto -> GetYaxis() -> SetTitleFont(42);
-    ratioHisto -> GetYaxis() -> SetTitleSize(0.090);
-    ratioHisto -> GetYaxis() -> SetTitleOffset(0.78);
+    ratioHisto -> GetYaxis() -> SetTitleSize(0.17);
+    ratioHisto -> GetYaxis() -> SetTitleOffset(0.415);
     
     ratioHisto -> Draw("P");
-    ratioGraph2s -> Draw("F,same");
+    //ratioGraph2s -> Draw("F,same");
     ratioGraph1s -> Draw("F,same");
     ratioHisto -> Draw("P,same");
       
     line = new TF1("line", "1.", -1000000., 1000000.);
     line -> SetLineWidth(2);
-    line -> SetLineColor(kRed);
+    line -> SetLineColor(kBlack);
     line -> Draw("same");
     
     p1 -> cd();
@@ -994,9 +1013,9 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
   // set y-axis properties
   firstStack->GetYaxis()->SetTitle(((TH1F*)(firstStack->GetStack()->Last()))->GetYaxis()->GetTitle());
   if(m_yAxisTitle) firstStack->GetYaxis()->SetTitle(m_yTitle.c_str());    
-  firstStack -> GetYaxis() -> SetLabelSize(0.035);
-  firstStack -> GetYaxis() -> SetTitleSize(0.05);
-  firstStack -> GetYaxis() -> SetTitleOffset(1.40);
+  firstStack -> GetYaxis() -> SetLabelSize(0.057);
+  firstStack -> GetYaxis() -> SetTitleSize(0.071);
+  firstStack -> GetYaxis() -> SetTitleOffset(1.00);
   
   
   if( logy == false)
@@ -1041,7 +1060,7 @@ void drawTStack::Draw(TCanvas* c, const std::string& histoName, const std::strin
     
     latex->SetNDC();
     latex->SetTextFont(42);
-    latex->SetTextSize(0.04);
+    latex->SetTextSize(0.057);
     latex->Draw("same");
   }
   
@@ -1161,7 +1180,7 @@ void drawTStack::DrawEvents(const std::string& mode,
   m_legend -> SetFillColor(kWhite);
   m_legend -> SetFillStyle(4000);
   m_legend -> SetTextFont(42);
-  m_legend -> SetTextSize(0.04);
+  m_legend -> SetTextSize(0.057);
   
   // DrawEvents::make outfiles
   std::ofstream* outFile = new std::ofstream((m_outputDir+mode+".txt").c_str(), std::ios::out);
@@ -1236,14 +1255,14 @@ void drawTStack::DrawEvents(const std::string& mode,
     
     // DrawEvents::graphical settings
     // x-axis properties
-    histo_summed -> GetXaxis() -> SetLabelSize(0.);
-    histo_summed -> GetXaxis() -> SetTitleSize(0.);
-    histo_summed -> GetXaxis() -> SetTitleOffset(0.);
-        
+    histo_summed -> GetXaxis() -> SetLabelSize(0.057);
+    histo_summed -> GetXaxis() -> SetTitleSize(0.071);
+    histo_summed -> GetXaxis() -> SetTitleOffset(1.00);
+    
     // y-axis properties
-    histo_summed -> GetYaxis() -> SetLabelSize(0.01);
-    histo_summed -> GetYaxis() -> SetTitleSize(0.02);
-    histo_summed -> GetYaxis() -> SetTitleOffset(1.50);
+    histo_summed -> GetYaxis() -> SetLabelSize(0.057);
+    histo_summed -> GetYaxis() -> SetTitleSize(0.071);
+    histo_summed -> GetYaxis() -> SetTitleOffset(1.00);
     
     if( m_yAxisRange )
       histo_summed->GetYaxis()->SetRangeUser(m_yRangeMin, m_yRangeMax);
@@ -1291,6 +1310,7 @@ void drawTStack::DrawEvents(const std::string& mode,
     else
     {
       histo_summed -> SetMarkerStyle(20);
+      histo_summed -> SetMarkerSize(0.7);
       histo_summed -> SetMarkerColor(kBlack);      
     }
     
@@ -1440,12 +1460,12 @@ void drawTStack::DrawEvents(const std::string& mode,
   struct stat st;
   c1 = new TCanvas("c","c",800,800);
   c1 -> cd();
-
-  TPad* p1 = new TPad("p1","p1",0., 0.35, 1., 1.);
-  TPad* p2 = new TPad("p2","p2",0., 0., 1., 0.35);
+  TPad* p1 = new TPad("p1","p1",0.0, 0.3, 1.0, 1.0);
+  TPad* p2 = new TPad("p2","p2",0.0, 0.0, 1.0, 0.3);
+  p1 -> SetTopMargin(0.08);
   p1 -> SetBottomMargin(0.02);
-  p2 -> SetTopMargin(0.02);
-  p2 -> SetBottomMargin(0.5);
+  p2 -> SetTopMargin(0.04);
+  p2 -> SetBottomMargin(0.4);
   p1 -> SetGridx();
   p1 -> SetGridy();
   if( logy == true ) p1 -> SetLogy();
@@ -1518,23 +1538,23 @@ void drawTStack::DrawEvents(const std::string& mode,
       ratioHisto = DrawTStackDataMCRatio(m_sigStack,den,ratioGraph1s,ratioGraph2s);
     
     ratioHisto -> GetXaxis() -> SetLabelFont(42);
-    ratioHisto -> GetXaxis() -> SetLabelSize(0.065);
-    ratioHisto -> GetXaxis() -> SetLabelOffset(0.010);
+    ratioHisto -> GetXaxis() -> SetLabelSize(0.13);
     ratioHisto -> GetXaxis() -> SetTitleFont(42);
-    ratioHisto -> GetXaxis() -> SetTitleSize(0.090);
+    ratioHisto -> GetXaxis() -> SetTitleSize(0.17);
+    ratioHisto -> GetXaxis() -> SetTitleOffset(0.95);
     
     ratioHisto -> LabelsOption("v");
-    ratioHisto -> GetYaxis() -> SetRangeUser(0.4, 1.6);
-    ratioHisto -> GetYaxis() -> SetNdivisions(206);
+    ratioHisto -> GetYaxis() -> SetRangeUser(0.5, 1.5);
+    ratioHisto -> GetYaxis() -> SetNdivisions(204,false);
     ratioHisto -> GetYaxis() -> SetLabelFont(42);
-    ratioHisto -> GetYaxis() -> SetLabelSize(0.065);
+    ratioHisto -> GetYaxis() -> SetLabelSize(0.13);
     ratioHisto -> GetYaxis() -> SetTitle("data / MC");
     ratioHisto -> GetYaxis() -> SetTitleFont(42);
-    ratioHisto -> GetYaxis() -> SetTitleSize(0.090);
-    ratioHisto -> GetYaxis() -> SetTitleOffset(0.78);
+    ratioHisto -> GetYaxis() -> SetTitleSize(0.17);
+    ratioHisto -> GetYaxis() -> SetTitleOffset(0.415);
     
     ratioHisto -> Draw("P");
-    ratioGraph2s -> Draw("F,same");
+    //ratioGraph2s -> Draw("F,same");
     ratioGraph1s -> Draw("F,same");
     ratioHisto -> Draw("P,same");
       
@@ -1574,17 +1594,17 @@ void drawTStack::DrawEvents(const std::string& mode,
   
   
   // set x-axis properties
-  firstStack -> GetXaxis() -> SetTitleSize(0.04);
-  firstStack -> GetXaxis() -> SetLabelSize(0.03);
+  firstStack -> GetXaxis() -> SetTitleSize(0.057);
+  firstStack -> GetXaxis() -> SetLabelSize(0.071);
   
   // set y-axis properties
   firstStack->GetYaxis()->SetTitle(((TH1F*)(firstStack->GetStack()->Last()))->GetYaxis()->GetTitle());
   if(m_yAxisTitle) firstStack->GetYaxis()->SetTitle(m_yTitle.c_str());    
   if( mode == "eventsScaledStack" )
     firstStack -> GetXaxis() -> SetLabelSize(0.);
-  firstStack -> GetYaxis() -> SetLabelSize(0.035);
-  firstStack -> GetYaxis() -> SetTitleSize(0.05);
-  firstStack -> GetYaxis() -> SetTitleOffset(1.40);
+  firstStack -> GetYaxis() -> SetLabelSize(0.057);
+  firstStack -> GetYaxis() -> SetTitleSize(0.071);
+  firstStack -> GetYaxis() -> SetTitleOffset(1.00);
   
   if( logy == false)
   {
@@ -1628,7 +1648,7 @@ void drawTStack::DrawEvents(const std::string& mode,
     
     latex->SetNDC();
     latex->SetTextFont(42);
-    latex->SetTextSize(0.04);
+    latex->SetTextSize(0.057);
     latex->Draw("same");
   }
   
@@ -1682,14 +1702,14 @@ void drawTStack::DrawEvents(const std::string& mode,
       c1 -> SetGridx();
       c1 -> SetGridy();
       
-      significance -> GetXaxis() -> SetTitleSize(0.04);
-      significance -> GetXaxis() -> SetLabelSize(0.03);
-      significance -> GetXaxis() -> SetTitleOffset(1.25);
+      significance -> GetXaxis() -> SetTitleSize(0.071);
+      significance -> GetXaxis() -> SetLabelSize(0.057);
+      significance -> GetXaxis() -> SetTitleOffset(0.95);
       
-      significance -> GetYaxis() -> SetTitleSize(0.04);
-      significance -> GetYaxis() -> SetLabelSize(0.03);
+      significance -> GetYaxis() -> SetTitleSize(0.071);
+      significance -> GetYaxis() -> SetLabelSize(0.057);
       significance -> GetYaxis() -> SetTitle("S / #sqrt{S+B}");
-      significance -> GetYaxis() -> SetTitleOffset(1.50);
+      significance -> GetYaxis() -> SetTitleOffset(1.00);
       significance -> GetYaxis() -> SetRangeUser(0.,2.);
 
       significance -> SetLineColor(kRed);
@@ -1720,11 +1740,11 @@ void drawTStack::DrawEvents(const std::string& mode,
   
   stepHisto -> GetXaxis() -> SetTitleSize(0.04);
   stepHisto -> GetXaxis() -> SetLabelSize(0.03);
-  stepHisto -> GetXaxis() -> SetTitleOffset(1.25);
+  stepHisto -> GetXaxis() -> SetTitleOffset(0.95);
 
   stepHisto -> GetYaxis() -> SetTitleSize(0.04);
   stepHisto -> GetYaxis() -> SetLabelSize(0.03);
-  stepHisto -> GetYaxis() -> SetTitleOffset(1.50);
+  stepHisto -> GetYaxis() -> SetTitleOffset(1.00);
   
   stepHisto -> SetLineWidth(3);
   
@@ -1944,11 +1964,11 @@ TH1F* DrawTStackDataMCRatio(THStack* hs, TH1F* dataGlobalHisto,
   int nPoints = lastHisto->GetNbinsX();
   
   ratioGraph1s -> Set(2*nPoints);
-  ratioGraph1s -> SetFillColor(kGreen);
-  ratioGraph1s -> SetLineColor(kGreen);
+  ratioGraph1s -> SetFillColor(15);
+  ratioGraph1s -> SetLineColor(15);
   ratioGraph2s -> Set(2*nPoints);
-  ratioGraph2s -> SetFillColor(kYellow);
-  ratioGraph2s -> SetLineColor(kYellow);
+  ratioGraph2s -> SetFillColor(12);
+  ratioGraph2s -> SetLineColor(12);
   
   for(int bin = 1; bin <= dataGlobalHisto->GetNbinsX(); ++bin)
   {

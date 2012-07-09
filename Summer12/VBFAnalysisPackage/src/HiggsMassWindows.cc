@@ -6,6 +6,7 @@ std::vector<int> GetMasses()
 {
   std::vector<int> masses;
   
+  masses.push_back(200);
   masses.push_back(250);
   masses.push_back(300);
   masses.push_back(350);

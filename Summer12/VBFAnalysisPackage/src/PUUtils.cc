@@ -7,7 +7,7 @@ double PURescaleFactor(TH1F* distrPU_DATA, TH1F* distrPU_MC, const double& nPU_M
   if(nPU_MC < 0.)
     return 1.;
   
-  else if(nPU_MC > 34.)
+  else if(nPU_MC > 50.)
     return 0.;
   
   else

@@ -53,9 +53,6 @@ int main(int argc, char** argv)
   std::string MVAWeightsFile = gConfigParser -> readStringOption("Input::MVAWeightsFile");
   std::string eleEffFileName = gConfigParser -> readStringOption("Input::eleEffFileName");
   std::string muEffFileName  = gConfigParser -> readStringOption("Input::muEffFileName");
-  std::string jetEffFileName = gConfigParser -> readStringOption("Input::jetEffFileName");
-  std::string metEffFileName = gConfigParser -> readStringOption("Input::metEffFileName");
-  std::string mtEffFileName  = gConfigParser -> readStringOption("Input::mtEffFileName");
   
   std::string outputRootFilePath = gConfigParser -> readStringOption("Output::outputRootFilePath");
   std::string outputRootFileName = gConfigParser -> readStringOption("Output::outputRootFileName");  
@@ -183,7 +180,7 @@ int main(int argc, char** argv)
   
   // get the efficiency correction histos
   EfficiencyCorrector* theEffCorrector;
-  if ( EffCorrection > 0 ) theEffCorrector = new EfficiencyCorrector(eleEffFileName, muEffFileName, metEffFileName, jetEffFileName, mtEffFileName);
+  if ( EffCorrection > 0 ) theEffCorrector = new EfficiencyCorrector(eleEffFileName, muEffFileName);
   
   // define map with events
   std::map<std::pair<int,std::pair<int,int> >,int> eventsMap;  
@@ -307,8 +304,8 @@ int main(int argc, char** argv)
   if( dataRunFlag == "2012AB" )
   {
     // 0-th - Run2012AB
-    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+3486);
-    dummyHLTRunRanges.first = 190456; dummyHLTRunRanges.second = 195775; HLTRunRanges_e.push_back(dummyHLTRunRanges);
+    HLTLumi_e.push_back(HLTLumi_e.at(HLTLumiIt)+ 5170);
+    dummyHLTRunRanges.first = 190456; dummyHLTRunRanges.second = 196531; HLTRunRanges_e.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_Ele27_WP80_v8");
     dummyHLTPathNames.push_back("HLT_Ele27_WP80_v9");
@@ -326,8 +323,8 @@ int main(int argc, char** argv)
   if( dataRunFlag == "2012AB" )
   { 
     // 0-th - Run2011AB
-    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+3486);
-    dummyHLTRunRanges.first = 190456; dummyHLTRunRanges.second = 195775; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
+    HLTLumi_mu.push_back(HLTLumi_mu.at(HLTLumiIt)+5170);
+    dummyHLTRunRanges.first = 190456; dummyHLTRunRanges.second = 196531; HLTRunRanges_mu.push_back(dummyHLTRunRanges);
     dummyHLTPathNames.clear();
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v11");
     dummyHLTPathNames.push_back("HLT_IsoMu24_eta2p1_v12");

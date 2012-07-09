@@ -1,5 +1,5 @@
 #include "HiggsMassFits.h"
-
+#include <algorithm>
 
 
 void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin, const float& xMax,
@@ -21,7 +21,7 @@ void FitHiggsMass(TF1** fitFunc, const std::string& funcName, const float& xMin,
   
   preFitFunc -> SetParameter(0,h->GetMaximum());
   preFitFunc -> SetParameter(1,mH);
-  preFitFunc -> SetParameter(2,width);
+  preFitFunc -> SetParameter(2,std::max(width,5.));
   
   preFitFunc -> SetNpx(10000);
   preFitFunc -> SetLineColor(kBlack);
@@ -524,15 +524,15 @@ void GetTurnOnParameters(const std::string& fitMethod,
     {
       mu = 178.;
       kT = 1.67;
-      //mu = 0.376;
-      //kT = 1.34;
+      //mu = 24.04;
+      //kT = 0.1067;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
       mu = 88.0;
       kT = 26.7;
-      //mu = 0.415;
-      //kT = 2.83;
+      //mu = 184.943;
+      //kT = 0.02;
     }
   }
   
@@ -560,17 +560,22 @@ void GetTurnOnParameters(const std::string& fitMethod,
   {
     if( (step <= 13) && (flavour == "e") && (additionalCuts == "none") )
     {
-      mu = 160.;
-      kT = 8.95;
-      //mu = 0.310;
-      //kT = 1.01;
+      //mu = 160.;
+      //kT = 8.95;
+      //works
+      mu = 24.04;
+      kT = 0.1067;
     }
     if( (step <= 13) && (flavour == "mu") && (additionalCuts == "none") )
     {
-      mu = 108.;
-      kT = 70.2;
-      //mu = 0.412;
-      //kT = 2.49;
+      //mu = 108.;
+      //kT = 70.2;
+      //~works
+      //mu = 24.04;
+      //kT = 0.1067;
+      //~works better
+      mu = 160.04;
+      kT = 10.;
     }
   }
   

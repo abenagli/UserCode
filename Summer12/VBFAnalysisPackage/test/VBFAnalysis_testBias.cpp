@@ -96,7 +96,7 @@ int main(int argc, char** argv)
   
   // define infile
   std::stringstream inFileName;
-  inFileName << inputDir << "/shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root";
+  inFileName << inputDir << "/shapes_" << analysisMethod << "_" << parentMethod << "_" << mass << "_" << flavour << ".root";
   
   std::stringstream inFileName2;
   inFileName2 << inputDir2 << "/countSignalEvents.root";
@@ -164,12 +164,8 @@ int main(int argc, char** argv)
   std::cout << "*** PARENT ***" << std::endl;
   std::cout << "***********************************************************" << std::endl;
   
-  std::stringstream parentName;
-  parentName << "H" << mass << "/fitFunc_" << mass << "_" << flavour << "_" << parentMethod;
-  
-  TF1* parent = (TF1*)( inFile2->Get(parentName.str().c_str()) );
-  parent -> SetName("parent");
-  parent -> Print();
+  RooGenericPdf* bkg = (RooGenericPdf*)( workspace->pdf("bkg") );
+//  parent -> Print();
   
   
   
@@ -219,7 +215,8 @@ int main(int argc, char** argv)
   //--------------------------------------
   // define background parent distribution
   
-  double n_parent_B = parent->Integral(lepNuWMMIN,lepNuWMMAX)/parent->Integral(xMin,xMax) * int(n_data_obs);
+  RooAbsReal* integral_parent_B = bkg -> createIntegral(*x,NormSet(*x),Range("signal"));
+  double n_parent_B = integral_parent_B ->getVal() * (n_data_obs);
   std::cout << ">>> n_parent_B: " << n_parent_B << std::endl; 
   
   
@@ -251,27 +248,21 @@ int main(int argc, char** argv)
   {
     if(toyIt%100 == 0) std::cout << ">>> generating toy " << toyIt << " / " << nToys << std::endl;
     
-    TH1F* h_B_toy = new TH1F("h_B_toy","",nBins,xMin,xMax);
-    h_B_toy -> Sumw2();
-    for(int bin = 1; bin <= h_B_toy->GetNbinsX(); ++bin)
-    {
-      float binCenter = h_B_toy -> GetBinCenter(bin);
-      float binLowEdge = binCenter - 0.5 * xWidth;
-      float binHigEdge = binCenter + 0.5 * xWidth;
-      float binContent = parent->Integral(binLowEdge,binHigEdge) / xWidth;
-      h_B_toy -> SetBinContent(bin,binContent);
-      h_B_toy -> SetBinError(bin,sqrt(binContent/bkgStrength));
+    RooDataHist* dh_B_toy = bkg -> generateBinned(*x,n_data_obs*bkgStrength) ;
+
+    TH1F* h_B_toy = (TH1F*) dh_B_toy -> createHistogram("dh_B_toy",*x);
+    for(int bin = 1; bin <= h_B_toy->GetNbinsX(); ++bin) { 
+      float binContent = h_B_toy -> GetBinContent(bin);
+      h_B_toy -> SetBinContent(bin,binContent/bkgStrength);
+      h_B_toy -> SetBinError(bin,sqrt(binContent)/bkgStrength);
     }
-    
-    RooDataHist* dh_B_toy = new RooDataHist("dh_B_toy","",RooArgList(*x),h_B_toy);
-    
+        
     RooDataSet* ds_S_toy = rooParentPdf_S -> generate(*x,int(n_H));
-    TH1* h_S_toy = ds_S_toy -> createHistogram("h_S_toy",*x);
+    TH1F* h_S_toy = (TH1F*) ds_S_toy -> createHistogram("h_S_toy",*x);
     
     TH1F* h_BS_toy = (TH1F*)( h_B_toy -> Clone("h_BS_toy") );
     h_BS_toy -> Add(h_S_toy);
     RooDataHist* dh_BS_toy = new RooDataHist("dh_BS_toy","",RooArgList(*x),h_BS_toy);
-    
     
     
     TF1* fitFunc;
@@ -381,7 +372,6 @@ int main(int argc, char** argv)
       outFile -> cd(dirName);
       
       h_B_toy -> Write();
-      parent -> Write();
       fitFunc -> Write();
       
       /*

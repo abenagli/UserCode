@@ -20,6 +20,7 @@
 #include "RooAbsPdf.h"
 #include "RooHistPdf.h"
 #include "RooGenericPdf.h"
+#include "RooExtendPdf.h"
 #include "RooWorkspace.h"
 #include "RooGaussian.h"
 
@@ -67,7 +68,7 @@ int main(int argc, char** argv)
   int blockTurnOn = gConfigParser -> readIntOption("Options::blockTurnOn");
   int blockParams = gConfigParser -> readIntOption("Options::blockParams");
   if( useTurnOn == 0 ) blockTurnOn = 1;
-
+    
   int sigSyst = gConfigParser -> readIntOption("Options::sigSyst");
   int bkgSyst = gConfigParser -> readIntOption("Options::bkgSyst");
 
@@ -75,21 +76,26 @@ int main(int argc, char** argv)
   char xWidthChar[50];
   sprintf(xWidthChar,"%d",int(xWidth));
   
-  int injMass = gConfigParser -> readIntOption("Options::injMass");
-  char injMassChar[50];
-  sprintf(injMassChar,"%d",injMass);  
-
   int step = gConfigParser -> readIntOption("Options::step");
   char stepChar[50];
   sprintf(stepChar,"%d",step);  
+
+  int injMass = gConfigParser -> readIntOption("Options::injMass");
+  char injMassChar[50];
+  sprintf(injMassChar,"%d",injMass);  
   
   std::string additionalCuts = gConfigParser -> readStringOption("Options::additionalCuts");
   
   std::string flavour = gConfigParser -> readStringOption("Options::flavour");
+  std::string charge  = gConfigParser -> readStringOption("Options::charge");
+  if( charge != "pm" ) charge = "_" + charge;
+  else                 charge.clear();
+
   
   float sigStrength = gConfigParser -> readFloatOption("Options::sigStrength");
+  float bkgStrength = gConfigParser -> readFloatOption("Options::bkgStrength");
   float sigInjStrength = gConfigParser -> readFloatOption("Options::sigInjStrength");
-
+  
   int nToys = gConfigParser -> readIntOption("Options::nToys");  
   std::string toyParent = gConfigParser -> readStringOption("Options::toyParent");
     
@@ -110,8 +116,14 @@ int main(int argc, char** argv)
   unsigned int nMasses = masses.size();
 
   std::vector<int> interpolated_masses;
-  interpolated_masses.push_back(275);
+  interpolated_masses.push_back(250);
+  interpolated_masses.push_back(350);
+  interpolated_masses.push_back(550);
 
+  interpolated_masses.push_back(260);
+  interpolated_masses.push_back(270);
+  interpolated_masses.push_back(280);
+  interpolated_masses.push_back(290);
   interpolated_masses.push_back(310);
   interpolated_masses.push_back(320);
   interpolated_masses.push_back(330);
@@ -120,18 +132,24 @@ int main(int argc, char** argv)
   interpolated_masses.push_back(370);
   interpolated_masses.push_back(380);
   interpolated_masses.push_back(390);
-
   interpolated_masses.push_back(410);
   interpolated_masses.push_back(420);
   interpolated_masses.push_back(430);
   interpolated_masses.push_back(440);
+  interpolated_masses.push_back(460);
+  interpolated_masses.push_back(470);
+  interpolated_masses.push_back(480);
+  interpolated_masses.push_back(490);
+  interpolated_masses.push_back(510);
+  interpolated_masses.push_back(520);
+  interpolated_masses.push_back(530);
+  interpolated_masses.push_back(540);
+  interpolated_masses.push_back(560);
+  interpolated_masses.push_back(570);
+  interpolated_masses.push_back(580);
+  interpolated_masses.push_back(590);
 
-  interpolated_masses.push_back(475);
-  interpolated_masses.push_back(525);
-  interpolated_masses.push_back(575);
-  
   unsigned int nInterpolatedMasses = interpolated_masses.size();
-  
   for(unsigned int iMass = 0; iMass < nInterpolatedMasses; ++iMass)
   {
     int mass = interpolated_masses[iMass];
@@ -155,9 +173,9 @@ int main(int argc, char** argv)
     std::stringstream ss;
     
     if( analysisMethod != "sidebands" )
-      ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root";
+      ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << charge << ".root";
     else
-      ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << mass << "_" << flavour << ".root";
+      ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << mass << "_" << flavour << charge << ".root";
     
     TFile* outFile = new TFile((ss.str()).c_str(),"RECREATE");
     
@@ -168,9 +186,9 @@ int main(int argc, char** argv)
       ss.str(std::string());
       
       if( analysisMethod != "sidebands" )
-        ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << "_" << toyParent << "_toy.root";
+        ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << charge << "_" << toyParent << "_toy.root";
       else
-        ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << mass << "_" << flavour << "_" << toyParent << "_toy.root";
+        ss << outputRootFilePath << "/" << outputRootFileName << "_" << analysisMethod << "_" << mass << "_" << flavour << charge << "_" << toyParent << "_toy.root";
       
       outFile_toy = new TFile((ss.str()).c_str(),"RECREATE");
     }  
@@ -220,7 +238,10 @@ int main(int argc, char** argv)
     RooRealVar* rooN_data_obs = NULL;
     std::map<std::string,RooRealVar*> rooN_H;
     
-    RooGenericPdf* pdf_bkg = NULL;
+    RooGenericPdf*  pdf_bkg_nonExt = NULL;
+    RooGenericPdf*  pdf_bkg_nonExt_clone = NULL;
+    RooExtendPdf* pdf_bkg = NULL;
+    RooRealVar* norm = NULL;
     int nPars;
     std::vector<RooRealVar*> pars;
     std::vector<std::string> parNames;
@@ -282,8 +303,8 @@ int main(int argc, char** argv)
         std::string injMassString(injMassChar);
   
         injSignal = (TH1F*)( inFile->Get(("H"+injMassString+"/h_ggH"+injMassString+"_"+flavour).c_str()) );
-        tmpInjSignal = (TH1F*) ( inFile->Get(("H"+injMassString+"/h_qqH"+injMassString+"_"+flavour).c_str()) );
-        injSignal -> Add(tmpInjSignal);
+        //tmpInjSignal = (TH1F*) ( inFile->Get(("H"+injMassString+"/h_qqH"+injMassString+"_"+flavour).c_str()) );
+        //injSignal -> Add(tmpInjSignal);
         injSignal -> Scale(sigInjStrength);
   
       }
@@ -295,11 +316,11 @@ int main(int argc, char** argv)
         std::stringstream histoName;
         
         histoName.str(std::string());
-        histoName << "H" << mass << "/h_data" << mass << "_" << flavour;
+        histoName << "H" << mass << "/h_data" << mass << "_" << flavour << charge;
         data = (TH1F*)( inFile->Get(histoName.str().c_str()) );
         
         histoName.str(std::string());
-        histoName << "H" << mass << "/h_dataFit" << mass << "_" << flavour << "_" << fitMethod;      
+        histoName << "H" << mass << "/h_dataFit" << mass << "_" << flavour << charge << "_" << fitMethod;      
         hint = (TH1F*)( inFile->Get(histoName.str().c_str()) );
         
         xMin = GetLepNuWMMIN(mass);
@@ -308,7 +329,11 @@ int main(int argc, char** argv)
       
       
       //------------------------------------------------------------------------
-      
+
+      // compute weights for interpolation
+      float weightLo, weightHi;
+      weightLo = 1. - (float) (mass - massLo)/(massHi - massLo);
+      weightHi = 1. - (float) (massHi - mass)/(massHi - massLo);
       
       if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") ) 
       {
@@ -316,13 +341,18 @@ int main(int argc, char** argv)
         
         // take the data hist from the mass lo folder
         histoName.str(std::string());
-        histoName << "H" << massLo << "/h_data" << massLo << "_" << flavour;
+        histoName << "H" << massLo << "/h_data" << massLo << "_" << flavour << charge;
         data = (TH1F*)( inFile->Get(histoName.str().c_str()) );
         if ( injMass > -1 ) data -> Add ( injSignal );
+                
+        float xMinLo = GetXFitMIN1(massLo,step,additionalCuts);
+        float xMaxLo = GetXFitMAX2(massLo);
         
-        xMin = GetXFitMIN1(massLo,step,additionalCuts);
-        xMax = GetXFitMAX2(massLo);
+        float xMinHi = GetXFitMIN1(massHi,step,additionalCuts);
+        float xMaxHi = GetXFitMAX2(massHi);
         
+        xMin = weightLo*xMinLo + weightHi*xMinHi; 
+        xMax = weightLo*xMaxLo + weightHi*xMaxHi; 
         
         if( toyIt == 0 )
           workspace = new RooWorkspace("workspace");
@@ -347,13 +377,20 @@ int main(int argc, char** argv)
         
         if( toyIt == 0 )
         {
-          nPars = DefineRooFitFunction(x,&pdf_bkg,pars,parNames,fitMethod,useTurnOn,blockTurnOn,blockParams,mass,step,flavour,additionalCuts);
+          nPars = DefineRooFitFunction(x,&pdf_bkg_nonExt,pars,parNames,fitMethod,useTurnOn,blockTurnOn,blockParams,mass,step,flavour,charge,additionalCuts);
           
           for(int parIt = 0; parIt < nPars; ++parIt)
             workspace -> import(*pars[parIt]);
           
-          workspace -> import(*pdf_bkg);
+          norm = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_norm").c_str(), "",n_data_obs,0.,1.E+08);
+          pdf_bkg = new RooExtendPdf("bkg","",*pdf_bkg_nonExt,*norm);
+          //pdf_bkg_nonExt_clone = (RooGenericPdf*) pdf_bkg_nonExt -> clone("bkg");
         }
+        
+        workspace -> import(*norm);
+        workspace -> import(*pdf_bkg);
+//        workspace -> import(*pdf_bkg_nonExt_clone);
+
       }
       
       
@@ -416,7 +453,7 @@ int main(int argc, char** argv)
       {
         std::stringstream funcName;
         funcName.str(std::string());
-        funcName << "H" << mass << "/fitFunc_" << massLo << "_" << flavour << "_" << toyParent;
+        funcName << "H" << mass << "/fitFunc_" << mass << "_" << flavour << charge << "_" << toyParent;
         
         TF1* data_fit = (TF1*)( inFile->Get(funcName.str().c_str()) );
         data_fit -> SetName("data_fit");
@@ -432,8 +469,8 @@ int main(int argc, char** argv)
       {
         // background
         bkg            = new TH1F("bkg",           "",nBins,xMin,xMax);
-        bkg_fitErrUp   = new TH1F(("bkg_CMS_HWWlvjj_"+flavour+"_bkgSystUp").c_str(),  "",nBins,xMin,xMax);
-        bkg_fitErrDown = new TH1F(("bkg_CMS_HWWlvjj_"+flavour+"_bkgSystDown").c_str(),"",nBins,xMin,xMax);
+        bkg_fitErrUp   = new TH1F(("bkg_CMS_HWWlvjj_"+flavour+charge+"_bkgSystUp").c_str(),  "",nBins,xMin,xMax);
+        bkg_fitErrDown = new TH1F(("bkg_CMS_HWWlvjj_"+flavour+charge+"_bkgSystDown").c_str(),"",nBins,xMin,xMax);
         
         for(int bin = 1; bin <= hint->GetNbinsX(); ++bin)
         {
@@ -485,7 +522,7 @@ int main(int argc, char** argv)
       
       std::vector<std::string> labels;
       labels.push_back("ggH");
-      labels.push_back("qqH");
+      //labels.push_back("qqH");
       
       std::vector<std::string> labels_syst;
       labels_syst.push_back("JESUp");
@@ -493,38 +530,30 @@ int main(int argc, char** argv)
       labels_syst.push_back("PUUp");
       labels_syst.push_back("PUDown");
       
-      // compute weights for interpolation
-      float weightLo, weightHi;
-      weightLo = 1. - (float) (mass - massLo)/(massHi - massLo);
-      weightHi = 1. - (float) (massHi - mass)/(massHi - massLo);
-
-      for(unsigned int labelIt = 0; labelIt < 2 + 2*labels_syst.size(); ++labelIt)
+      for(unsigned int labelIt = 0; labelIt < 1 + 1*labels_syst.size(); ++labelIt)
       {
+
         std::string label;
-        if(labelIt < 2) label = labels.at(labelIt);
-        else            label = labels.at(labelIt%2) + "_CMS_HWWlvjj_" + labels_syst.at((labelIt-2)/2);
-        
+        if(labelIt < 1) label = labels.at(labelIt);
+        else            label = labels.at(0) + "_CMS_HWWlvjj_" + labels_syst.at((labelIt-1)/1);
+                
         if( toyIt == 0 )
         {
           fileName.str(std::string());
-          if(labelIt < 2) fileName << inputDir << "/countSignalEvents.root";
-          else            fileName << inputDir << "/countSignalEvents_" + labels_syst.at((labelIt-2)/2) + ".root";
+          if(labelIt < 1) fileName << inputDir << "/countSignalEvents.root";
+          else            fileName << inputDir << "/countSignalEvents_" + labels_syst.at((labelIt-1)) + ".root";
           inFile2 = TFile::Open(fileName.str().c_str(),"READ");
           //std::cout << ">>> opened file " << fileName.str() << std::endl; 
           //std::cout << ">>>>>> label: " << label << std::endl;
           
-          if( labelIt%2 == 0 ) histoLo = (TH1F*)( inFile2->Get(("H"+massLoString+"/h_ggH"+massLoString+"_"+flavour).c_str()) );
-          if( labelIt%2 == 1 ) histoLo = (TH1F*)( inFile2->Get(("H"+massLoString+"/h_qqH"+massLoString+"_"+flavour).c_str()) );
-          if( labelIt%2 == 0 ) histoHi = (TH1F*)( inFile2->Get(("H"+massHiString+"/h_ggH"+massHiString+"_"+flavour).c_str()) );
-          if( labelIt%2 == 1 ) histoHi = (TH1F*)( inFile2->Get(("H"+massHiString+"/h_qqH"+massHiString+"_"+flavour).c_str()) );
-          histo = (TH1F*) histoLo -> Clone();
-          histo -> Scale(weightLo);
-          histo -> Add(histoHi, weightHi);
-          
-          if( labelIt%2 == 0 ) histoLo_fit = (TH1F*)( inFile2->Get(("H"+massLoString+"/h_ggH"+massLoString+"_"+flavour+"_fit").c_str()) );
-          if( labelIt%2 == 1 ) histoLo_fit = (TH1F*)( inFile2->Get(("H"+massLoString+"/h_qqH"+massLoString+"_"+flavour+"_fit").c_str()) );
-          if( labelIt%2 == 0 ) histoHi_fit = (TH1F*)( inFile2->Get(("H"+massHiString+"/h_ggH"+massHiString+"_"+flavour+"_fit").c_str()) );
-          if( labelIt%2 == 1 ) histoHi_fit = (TH1F*)( inFile2->Get(("H"+massHiString+"/h_qqH"+massHiString+"_"+flavour+"_fit").c_str()) );
+          histoLo = (TH1F*)( inFile2->Get(("H"+massLoString+"/h_ggH"+massLoString+"_"+flavour+charge).c_str()) );
+          histoHi = (TH1F*)( inFile2->Get(("H"+massHiString+"/h_ggH"+massHiString+"_"+flavour+charge).c_str()) );
+          histo = (TH1F*) histoHi -> Clone();
+          histo -> Reset();
+          histo -> Add(histoLo,histoHi,weightLo,weightHi);
+                      
+          histoLo_fit = (TH1F*)( inFile2->Get(("H"+massLoString+"/h_ggH"+massLoString+"_"+flavour+"_fit").c_str()) );
+          histoHi_fit = (TH1F*)( inFile2->Get(("H"+massHiString+"/h_ggH"+massHiString+"_"+flavour+"_fit").c_str()) );
           histo_fit = (TH1F*) histo -> Clone();
 
           TF1* fitFuncLo = histoLo_fit->GetFunction("fitFunc_scb");
@@ -557,9 +586,8 @@ int main(int argc, char** argv)
           }
           
           n_H[label] = H[label] -> Integral(binMin,binMax);
-          
-          
-          // smooth histogrammassChar
+                    
+          // smooth histogram
           if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
             H_fit[label] = (TH1F*)( H[label]->Clone(label.c_str()) );
           if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
@@ -575,7 +603,6 @@ int main(int argc, char** argv)
         }
         
         
-        
         if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
         {
           H_fit[label] -> Write();         
@@ -587,20 +614,19 @@ int main(int argc, char** argv)
           {
             TF1* fitFuncLo = histoLo_fit->GetFunction("fitFunc_scb");
             TF1* fitFuncHi = histoHi_fit->GetFunction("fitFunc_scb");
+            
             TF1* fitFunc = new TF1("fitFunc_scb", attenuatedCrystalBallLowHigh, xMin, xMax, 9);
             for ( int iPar = 0; iPar < 9; iPar++ ) {
               float parVal = fitFuncLo -> GetParameter(iPar) * weightLo + fitFuncHi -> GetParameter(iPar) * weightHi;
               fitFunc -> SetParameter(iPar, parVal);
             }
 
-            
             // use smooth histograms for the signal shapes
-            /*  
             dh_H[label] = new RooDataHist(("dh_"+label).c_str(),"",RooArgList(*x),H_fit[label]);
             pdf_H[label] = new RooHistPdf(label.c_str(),"",RooArgList(*x),*dh_H[label],2);
             workspace -> import(*pdf_H[label]);
-            */
             
+            /*
             // use a parametric function for the signal shapes
             double scb_muDouble     = 175.;
             double scb_kTDouble     = GetHiggsMassTurnOnWidth(massLo) * weightLo + GetHiggsMassTurnOnWidth(massHi) * weightHi ;
@@ -611,14 +637,14 @@ int main(int argc, char** argv)
             double scb_alpha2Double = fitFunc -> GetParameter(7);
             double scb_n2Double     = fitFunc -> GetParameter(8);
             
-            scb_mu[label]     = new RooRealVar(("CMS_HWWlvjj_"+flavour+"_scb_mu_"+label).c_str(),    "",scb_muDouble,scb_muDouble,scb_muDouble);
-            scb_kT[label]     = new RooRealVar(("CMS_HWWlvjj_"+flavour+"_scb_kT_"+label).c_str(),    "",scb_kTDouble,scb_kTDouble,scb_kTDouble);
-            scb_mean[label]   = new RooRealVar(("CMS_HWWlvjj_"+flavour+"_scb_mean_"+label).c_str(),  "",scb_meanDouble,scb_meanDouble,scb_meanDouble);
-            scb_sigma[label]  = new RooRealVar(("CMS_HWWlvjj_"+flavour+"_scb_sigma_"+label).c_str(), "",scb_sigmaDouble,scb_sigmaDouble,scb_sigmaDouble);
-            scb_alpha[label]  = new RooRealVar(("CMS_HWWlvjj_"+flavour+"_scb_alpha_"+label).c_str(), "",scb_alphaDouble,scb_alphaDouble,scb_alphaDouble);
-            scb_n[label]      = new RooRealVar(("CMS_HWWlvjj_"+flavour+"_scb_n_"+label).c_str(),     "",scb_nDouble,scb_nDouble,scb_nDouble);
-            scb_alpha2[label] = new RooRealVar(("CMS_HWWlvjj_"+flavour+"_scb_alpha2_"+label).c_str(),"",scb_alpha2Double,scb_alpha2Double,scb_alpha2Double);
-            scb_n2[label]     = new RooRealVar(("CMS_HWWlvjj_"+flavour+"_scb_n2_"+label).c_str(),    "",scb_n2Double,scb_n2Double,scb_n2Double);
+            scb_mu[label]     = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_scb_mu_"+label).c_str(),    "",scb_muDouble,scb_muDouble,scb_muDouble);
+            scb_kT[label]     = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_scb_kT_"+label).c_str(),    "",scb_kTDouble,scb_kTDouble,scb_kTDouble);
+            scb_mean[label]   = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_scb_mean_"+label).c_str(),  "",scb_meanDouble,scb_meanDouble,scb_meanDouble);
+            scb_sigma[label]  = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_scb_sigma_"+label).c_str(), "",scb_sigmaDouble,scb_sigmaDouble,scb_sigmaDouble);
+            scb_alpha[label]  = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_scb_alpha_"+label).c_str(), "",scb_alphaDouble,scb_alphaDouble,scb_alphaDouble);
+            scb_n[label]      = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_scb_n_"+label).c_str(),     "",scb_nDouble,scb_nDouble,scb_nDouble);
+            scb_alpha2[label] = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_scb_alpha2_"+label).c_str(),"",scb_alpha2Double,scb_alpha2Double,scb_alpha2Double);
+            scb_n2[label]     = new RooRealVar(("CMS_HWWlvjj_"+flavour+charge+"_scb_n2_"+label).c_str(),    "",scb_n2Double,scb_n2Double,scb_n2Double);
             
             pdf_scb[label] = new RooAttenuatedCrystalBallLowHigh(label.c_str(),"",*x,
                                                                                   *(scb_mu[label]),
@@ -644,10 +670,11 @@ int main(int argc, char** argv)
           workspace -> import(*(pdf_scb[label]));
           
           workspace -> import(*rooN_H[label]);
+          */
         }
       }
       
-      
+
       
       if( (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") )
       {
@@ -695,85 +722,6 @@ int main(int argc, char** argv)
       std::stringstream name;
       
       
-      
-      if( (analysisMethod == "fit") || (analysisMethod == "sidebands") )
-      {
-        /*
-        std::stringstream ss2;
-        if( analysisMethod != "sidebands" )
-          ss2 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_" << "bincounting" << "_" << mass << "_" << flavour << ".txt";
-        else
-        ss2 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << "bincounting" << "_" << mass << "_" << flavour << ".txt";
-        std::ofstream datacard_bc(ss2.str().c_str(),std::ios::out);
-        
-        datacard_bc << std::fixed;
-        datacard_bc << std::left;
-        datacard_bc << "********* H > WW > lvjj analysis for mH = " << mass << " GeV/c^2 *********" << std::endl;
-        datacard_bc << "********* counting experiment *********" << std::endl;
-        datacard_bc << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-        datacard_bc << "imax 1   # number of channels" << std::endl;
-        datacard_bc << "jmax 2   # number of processes - 1" << std::endl;
-        datacard_bc << "kmax " << 4 + labels_bc_num_names.size() << "   # number of nuisance parameters (sources of systematic uncertainties)" << std::endl;
-        datacard_bc << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-        datacard_bc << "bin                           " << setw(7) << flavour << std::endl;
-        datacard_bc << "observation                   " << std::setprecision(0) << setw(7) << n_data_obs << std::endl;    
-        datacard_bc  << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-        datacard_bc << "bin                           "
-                    << setw(7) << flavour << "    "
-                    << setw(7) << flavour << "    "
-                    << setw(7) << flavour << std::endl;
-        datacard_bc << "process                           ggH        qqH        bkg" << std::endl;
-        datacard_bc << "process                            -1         -2          1" << std::endl;
-        datacard_bc << "rate             " << std::setprecision(2)
-                    << setw(8) << n_H["ggH"] << "   "
-                    << setw(8) << n_H["qqH"] << "   "
-                    << setw(8) << n_bkg
-                    << std::endl;
-        datacard_bc << std::endl;
-        datacard_bc  << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-        datacard_bc << "fitErr                 lnN          -          -   " << std::setprecision(3) << setw(8) << 1.+n_bkg_err/n_bkg << std::endl;
-        datacard_bc << "lumi                   lnN      1.045      1.045          -" << std::endl;
-        datacard_bc << "other                  lnN      1.060      1.060          -" << std::endl;
-        datacard_bc << "QCDscale_ggH           lnN   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsQCDScaleSyst(mass,"gg","up")+HiggsQCDScaleSyst(mass,"gg","down")) << "   "
-                    << "       -" << "   " 
-                    << "       -" << std::endl;
-        datacard_bc << "QCDscale_qqH           lnN   "
-                    << "       -" << "   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsQCDScaleSyst(mass,"qq","up")+HiggsQCDScaleSyst(mass,"qq","down")) << "   "
-                    << "       -" << std::endl;
-        datacard_bc << "pdf_gg                 lnN   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsPDFSyst(mass,"gg","up")+HiggsPDFSyst(mass,"gg","down")) << "   "
-                    << "       -" << "   "
-                    << "       -" << std::endl;
-        datacard_bc << "pdf_qqbar              lnN   "
-                    << "       -" << "   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsPDFSyst(mass,"qq","up")+HiggsPDFSyst(mass,"qq","down")) << "   "
-                    << "       -" << std::endl;
-        datacard_bc << "theoryUncXS_HighMH     lnN   "
-                    << std::setprecision(3) << setw(8) << 1.+0.5*(HiggsHighMassSyst(mass,"gg","up")+HiggsHighMassSyst(mass,"gg","down")) << "   "
-                    << "       -" << "   "
-                    << "       -" << std::endl;
-        for(unsigned int labelIt = 0; labelIt < labels_bc_num_names.size(); ++labelIt)
-        {
-          double ggH_errUp   = fabs(n_H["ggH_CMS_HWWlvjj_"+labels_bc_num.at(2*labelIt)]   - n_H["ggH"]);
-          double qqH_errUp   = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_bc_num.at(2*labelIt)]   - n_H["qqH"]);
-          double ggH_errDown = fabs(n_H["ggH_CMS_HWWlvjj_"+labels_bc_num.at(2*labelIt+1)] - n_H["ggH"]);
-          double qqH_errDown = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_bc_num.at(2*labelIt+1)] - n_H["qqH"]);
-          
-          double ggH_errAve  = 0.5*(ggH_errUp + ggH_errDown);
-          double qqH_errAve  = 0.5*(qqH_errUp + qqH_errDown);
-          
-          datacard_bc << labels_bc_num_names.at(labelIt) << "    lnN   "
-                      << std::setprecision(3) << setw(8) << 1. + ggH_errAve/n_H["ggH"] << "   "
-                      << std::setprecision(3) << setw(8) << 1. + qqH_errAve/n_H["qqH"] << "   "
-                      << "       -" << std::endl;
-        }
-        */
-      }      
-      
-      
-      
       if( ( (analysisMethod == "sidebands") || (analysisMethod == "fitNoHoles") || (analysisMethod == "fakeNoHoles") ) &&
           ( toyIt < 2 ) )
       {
@@ -782,16 +730,16 @@ int main(int argc, char** argv)
         if( toyIt == 0 )
         {
           if( analysisMethod == "sidebands" )
-            ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_"<< "shapeanalysis" << "_" << mass << "_" << flavour << ".txt";
+            ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_"<< "shapeanalysis" << "_" << mass << "_" << flavour << charge << ".txt";
           else
-            ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_"<< "shapeanalysis" << "_" << mass << "_" << flavour << ".txt";
+            ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_"<< "shapeanalysis" << "_" << mass << "_" << flavour << charge << ".txt";
         }
         else
         {
           if( analysisMethod == "sidebands" )
-            ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_"<< "shapeanalysis" << "_" << mass << "_" << flavour << "_" << toyParent << "_toy.txt";
+            ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_"<< "shapeanalysis" << "_" << mass << "_" << flavour << charge << "_" << toyParent << "_toy.txt";
           else
-            ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_"<< "shapeanalysis" << "_" << mass << "_" << flavour << "_" << toyParent << "_toy.txt";
+            ss3 << outputRootFilePath << "/" << "datacard" << "_" << analysisMethod << "_" << fitMethod << "_"<< "shapeanalysis" << "_" << mass << "_" << flavour << charge << "_" << toyParent << "_toy.txt";
         }
 
         
@@ -805,74 +753,74 @@ int main(int argc, char** argv)
         
         datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
         datacard_sa << "imax 1   # number of channels" << std::endl;
-        datacard_sa << "jmax 2   # number of processes - 1" << std::endl;
+        datacard_sa << "jmax 1   # number of processes - 1" << std::endl;
         datacard_sa << "kmax *   # number of nuisance parameters (sources of systematic uncertainties)" << std::endl;
         
         datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
         if( analysisMethod == "sidebands" )
         {
-          datacard_sa << "shapes *          " << setw(4) << flavour << "   "
-                      << "shapes_" << analysisMethod << "_" << mass << "_" << flavour << ".root   "
+          datacard_sa << "shapes *          " << setw(4) << std::string(flavour+charge) << "   "
+                      << "shapes_" << analysisMethod << "_" << mass << "_" << flavour << charge << ".root   "
                       << "$PROCESS $PROCESS_$SYSTEMATIC" << std::endl;
-          datacard_sa << "shapes data_obs   " << setw(4) << flavour << "   "
-                      << "shapes_" << analysisMethod << "_" << mass << "_" << flavour << ".root   "
+          datacard_sa << "shapes data_obs   " << setw(4) << std::string(flavour+charge) << "   "
+                      << "shapes_" << analysisMethod << "_" << mass << "_" << flavour << charge << ".root   "
                       << "data_obs" << std::endl;
         }
         else
         {
           if( toyIt == 0 )
           {
-            datacard_sa << "shapes *          " << setw(4) << flavour << "   "
-                        << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root   "
+            datacard_sa << "shapes *          " << setw(4) << std::string(flavour+charge) << "   "
+                        << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << charge << ".root   "
                         << "workspace:$PROCESS workspace:$PROCESS_$SYSTEMATIC" << std::endl;
-            datacard_sa << "shapes data_obs   " << setw(4) << flavour << "   "
-                        << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << ".root   "
+            datacard_sa << "shapes data_obs   " << setw(4) << std::string(flavour+charge) << "   "
+                        << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << charge << ".root   "
                         << "workspace:data_obs" << std::endl;
           }
           else
           {
-            datacard_sa << "shapes *          " << setw(4) << flavour << "   "
-                        << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << "_" << toyParent << "_toy.root   "
+            datacard_sa << "shapes *          " << setw(4) << std::string(flavour+charge) << "   "
+                        << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << charge << "_" << toyParent << "_toy.root   "
                         << "workspace_TOYPARENT_toyTOYIT:$PROCESS workspace_TOYPARENT_toyTOYIT:$PROCESS_$SYSTEMATIC" << std::endl;
-            datacard_sa << "shapes data_obs   " << setw(4) << flavour << "   "
-                        << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << "_" << toyParent << "_toy.root   "
+            datacard_sa << "shapes data_obs   " << setw(4) << std::string(flavour+charge) << "   "
+                        << "shapes_" << analysisMethod << "_" << fitMethod << "_" << mass << "_" << flavour << charge << "_" << toyParent << "_toy.root   "
                         << "workspace_TOYPARENT_toyTOYIT:data_obs" << std::endl;
           }
         }
         datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
         datacard_sa << setw(33) << "bin" << "   "
-                    << setw(8) << flavour << std::endl;
+                    << setw(8) << std::string(flavour+charge) << std::endl;
         datacard_sa << setw(33) << "observation" << "   "
                     << std::setprecision(0) << setw(8) << n_data_obs << std::endl;    
         
         datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
         datacard_sa << setw(33) << "bin" << "   "
-                    << setw(8) << flavour << "   "
-                    << setw(8) << flavour << "   "
-                    << setw(8) << flavour << std::endl;
+                    << setw(8) << flavour+charge << "   "
+//                    << setw(8) << flavour+charge << "   "
+                    << setw(8) << flavour+charge << std::endl;
         
         datacard_sa << setw(33) << "process" << "   "
                     << setw(8) << "ggH" << "   "
-                    << setw(8) << "qqH" << "   "
+//                    << setw(8) << "qqH" << "   "
                     << setw(8) << "bkg" << std::endl;
         
         datacard_sa << setw(33) << "process" << "   "
                     << setw(8) << "-2" << "   "
-                    << setw(8) << "-1" << "   "
+//                    << setw(8) << "-1" << "   "
                     << setw(8) << "1" << std::endl;
         
         if( analysisMethod == "sidebands")
         {
           datacard_sa << setw(33) << "rate" << "   "
                       << std::setprecision(2) << setw(8) << n_H["ggH"] << "   "
-                      << std::setprecision(2) << setw(8) << n_H["qqH"] << "   "
+//                      << std::setprecision(2) << setw(8) << n_H["qqH"] << "   "
                       << std::setprecision(2) << setw(8) << n_bkg << std::endl;
         }
         else
         {
           datacard_sa << setw(33) << "rate" << "   "
                       << std::setprecision(2) << setw(8) << n_H["ggH"] << "   "
-                      << std::setprecision(2) << setw(8) << n_H["qqH"] << "   "
+//                      << std::setprecision(2) << setw(8) << n_H["qqH"] << "   "
                       << std::setprecision(2) << setw(8) << n_data_obs << std::endl;
         }
         
@@ -884,64 +832,50 @@ int main(int argc, char** argv)
         {
           datacard_sa << setw(25) << "lumi"     << "   " << setw(5) << "lnN" << "   "
                       << setw(8) << "1.022" << "   "
-                      << setw(8) << "1.022" << "   "
+//                      << setw(8) << "1.022" << "   "
                       << setw(8) << "-" << std::endl;
 
           float tmpHiggsQCDScaleSystUp = HiggsQCDScaleSyst(massLo,"gg","up") * weightLo + HiggsQCDScaleSyst(massHi,"gg","up") * weightHi;
           float tmpHiggsQCDScaleSystDown = HiggsQCDScaleSyst(massLo,"gg","down") * weightLo + HiggsQCDScaleSyst(massHi,"gg","down") * weightHi;
           datacard_sa << setw(25) << "QCDscale_ggH" << "   " << setw(5) << "lnN" << "   "
                       << setw(8) << 1.+0.5*(tmpHiggsQCDScaleSystUp+tmpHiggsQCDScaleSystDown) << "   "
-                      << setw(8) << "-" << "   " 
+//                      << setw(8) << "-" << "   " 
                       << setw(8) << "-" << std::endl;
         
-          tmpHiggsQCDScaleSystUp = HiggsQCDScaleSyst(massLo,"qq","up") * weightLo + HiggsQCDScaleSyst(massHi,"qq","up") * weightHi;
-          tmpHiggsQCDScaleSystDown = HiggsQCDScaleSyst(massLo,"qq","down") * weightLo + HiggsQCDScaleSyst(massHi,"qq","down") * weightHi;
-          datacard_sa << setw(25) << "QCDscale_qqH" << "   " << setw(5) << "lnN" << "   "
-                      << setw(8) << "-" << "   "
-                      << setw(8) << 1.+0.5*(tmpHiggsQCDScaleSystUp+tmpHiggsQCDScaleSystDown) << "   "
-                      << setw(8) << "-" << std::endl;
-
           float tmpHiggsPDFSystUp = HiggsPDFSyst(massLo,"gg","up") * weightLo + HiggsPDFSyst(massHi,"gg","up") * weightHi;
           float tmpHiggsPDFSystDown = HiggsPDFSyst(massLo,"gg","down") * weightLo + HiggsPDFSyst(massHi,"gg","down") * weightHi;
           datacard_sa << setw(25) << "pdf_gg" << "   " << setw(5) << "lnN" << "   "
                       << setw(8) << 1.+0.5*(tmpHiggsPDFSystUp+tmpHiggsPDFSystUp) << "   "
-                      << setw(8) << "-" << "   "
-                      << setw(8) << "-" << std::endl;
-
-          tmpHiggsPDFSystUp = HiggsPDFSyst(massLo,"qq","up") * weightLo + HiggsPDFSyst(massHi,"qq","up") * weightHi;
-          tmpHiggsPDFSystDown = HiggsPDFSyst(massLo,"qq","down") * weightLo + HiggsPDFSyst(massHi,"qq","down") * weightHi;
-          datacard_sa << setw(25) << "pdf_qqbar" << "   " << setw(5) << "lnN" << "   "
-                      << setw(8) << "-" << "   "
-                      << setw(8) << 1.+0.5*(tmpHiggsPDFSystUp+tmpHiggsPDFSystDown) << "   "
+//                      << setw(8) << "-" << "   "
                       << setw(8) << "-" << std::endl;
         
           float tmpHiggsHighMassSystUp = HiggsHighMassSyst(massLo,"gg","up") * weightLo + HiggsHighMassSyst(massHi,"gg","up") * weightHi;
           float tmpHiggsHighMassSystDown = HiggsHighMassSyst(massLo,"gg","down") * weightLo + HiggsHighMassSyst(massHi,"gg","down") * weightHi;
           datacard_sa << setw(25) << "theoryUncXS_HighMH" << "   " << setw(5) << "lnN" << "   "
                       << 1.+0.5*(tmpHiggsHighMassSystUp+tmpHiggsHighMassSystDown) << "   "
-                      << setw(8) << "-" << "   "
+//                      << setw(8) << "-" << "   "
                       << setw(8) << "-" << std::endl;
         
           for(unsigned int labelIt = 0; labelIt < labels_sa_num_names.size(); ++labelIt)
           {
             double ggH_errUp   = fabs(n_H["ggH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt)]   - n_H["ggH"]);
-            double qqH_errUp   = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt)]   - n_H["qqH"]);
+//            double qqH_errUp   = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt)]   - n_H["qqH"]);
             double ggH_errDown = fabs(n_H["ggH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt+1)] - n_H["ggH"]);
-            double qqH_errDown = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt+1)] - n_H["qqH"]);
+//            double qqH_errDown = fabs(n_H["qqH_CMS_HWWlvjj_"+labels_sa_num.at(2*labelIt+1)] - n_H["qqH"]);
           
             double ggH_errAve  = 0.5*(ggH_errUp + ggH_errDown);
-            double qqH_errAve  = 0.5*(qqH_errUp + qqH_errDown);
+//            double qqH_errAve  = 0.5*(qqH_errUp + qqH_errDown);
           
             datacard_sa << setw(25) << labels_sa_num_names.at(labelIt) << "   " << setw(5) << "lnN" << "   "
                         << setw(8) << 1. + ggH_errAve/n_H["ggH"] << "   "
-                        << setw(8) << 1. + qqH_errAve/n_H["qqH"] << "   "
+//                        << setw(8) << 1. + qqH_errAve/n_H["qqH"] << "   "
                         << setw(8) << "-" << std::endl;
           }
           for(unsigned int labelIt = 0; labelIt < labels_sa_shape_names.size(); ++labelIt)
           {
             datacard_sa << setw(25) << labels_sa_shape_names.at(labelIt) << "   " << setw(5) << "shape" << "   "
                         << setw(8) << "1." << "   "
-                        << setw(8) << "1." << "   "
+//                        << setw(8) << "1." << "   "
                         << setw(8) << "-" << std::endl;
           }
         
@@ -949,37 +883,37 @@ int main(int argc, char** argv)
           if( flavour == "e" )
             datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
                         << setw(8) << "1.003" << "   "
-                        << setw(8) << "1.003" << "   "
+//                        << setw(8) << "1.003" << "   "
                         << setw(8) << "-" << std::endl;
           if( flavour == "mu" )
             datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   " << setw(8)
                       << "1.010" << "   "
-                      << setw(8) << "1.010" << "   "
+//                      << setw(8) << "1.010" << "   "
                       << setw(8) << "-" << std::endl;
           
-          name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_mTHLT";
-          if( flavour == "e" )
-            datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
-                        << setw(8) << "1.014" << "   "
-                        << setw(8) << "1.014" << "   "
-                        << setw(8) << "-" << std::endl;
+//          name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_mTHLT";
+//        if( flavour == "e" )
+//            datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
+//                        << setw(8) << "1.014" << "   "
+//                        << setw(8) << "1.014" << "   "
+//                        << setw(8) << "-" << std::endl;
           
           name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_lep";
           if( flavour == "e" )
             datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
                         << setw(8) << "1.022" << "   "
-                        << setw(8) << "1.022" << "   "
+//                        << setw(8) << "1.022" << "   "
                         << setw(8) << "-" << std::endl;
           if( flavour == "mu" )
             datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
                         << setw(8) << "1.008" << "   "
-                        << setw(8) << "1.008" << "   "
+//                        << setw(8) << "1.008" << "   "
                         << setw(8) << "-" << std::endl;
           
           name.str(std::string()); name << "CMS_HWWlvjj_bTag";
           datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
                       << setw(8) << "1.010" << "   "
-                      << setw(8) << "1.010" << "   "
+//                      << setw(8) << "1.010" << "   "
                       << setw(8) << "-" << std::endl;
         }
         
@@ -989,7 +923,7 @@ int main(int argc, char** argv)
           float tmpFitBiasSyst = FitBiasSyst(massLo,flavour) * weightLo + FitBiasSyst(massHi,flavour) * weightHi;
           datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnN" << "   "
                       << setw(8) << 1.+tmpFitBiasSyst << "   "
-                      << setw(8) << 1.+tmpFitBiasSyst << "   "
+//                      << setw(8) << 1.+tmpFitBiasSyst << "   "
                       << setw(8) << "-" << std::endl;
         }
         
@@ -998,21 +932,21 @@ int main(int argc, char** argv)
           name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgSyst";
           datacard_sa << setw(25) << name.str() << "   " << setw(5) << "shape" << "   "
                       << setw(8) << "-" << "   "
-                      << setw(8) << "-" << "   "
+//                      << setw(8) << "-" << "   "
                       << setw(8) << "1." << std::endl;
         }
 
         
         if( analysisMethod == "fitNoHoles" )
-        {
+        {/*
           name.str(std::string()); name << "CMS_HWWlvjj_" << flavour << "_bkgNorm";
           datacard_sa << setw(25) << name.str() << "   " << setw(5) << "lnU"<< "   "
                       << setw(8) << "-" << "   "
-                      << setw(8) << "-" << "   "
-                      << setw(8) << "1.500" << std::endl;
+//                      << setw(8) << "-" << "   "
+                      << setw(8) << "1.500" << std::endl;*/
           
           datacard_sa << "-----------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-          
+
           int parItMin = 0;
           if( blockTurnOn == 1 ) parItMin = 2;
           if( blockParams == 1 ) parItMin = nPars;
@@ -1020,28 +954,29 @@ int main(int argc, char** argv)
           int parItMax = nPars;
           if( (blockTurnOn == 0) && (blockParams == 1) ) parItMax = 2; 
           
-          for(int parIt = parItMin; parIt < parItMax; ++parIt)
-          {
-            datacard_sa << setw(25) << parNames[parIt] << "   param   "
-                        << setw(12) << pars[parIt]->getVal() << "   1.   ["
-                        << pars[parIt]->getMin() << "," << pars[parIt]->getMax() << "]"  << std::endl; 
-          }
+          datacard_sa << setw(25) << norm->GetName() << "   flatParam   " << norm->getMin() << " " << norm->getMax() << std::endl;
+          
+          for(int parIt = parItMin; parIt < parItMax; ++parIt) 
+            datacard_sa << setw(25) << parNames[parIt] << "   flatParam   " << pars[parIt]->getMin() << " " << pars[parIt]->getMax() << std::endl;
+
         }
       }
-      
-      
-      if( data_obs != NULL )    delete data_obs;
-      if( dh_data_obs != NULL ) delete dh_data_obs;
-      
-      inFile  -> Close();
-      inFile2 -> Close();
+                  
     }
     
-    outFile -> Close();
-    if( nToys > 0 )
-      outFile_toy -> Close();
-  }
+    if( data_obs != NULL )    delete data_obs;
+    if( dh_data_obs != NULL ) delete dh_data_obs;
+    
+    inFile  -> Close();
+    inFile2 -> Close();
+
+    }
   
+   outFile -> Close();
+   if( nToys > 0 )
+    outFile_toy -> Close();
+
+  }
   
   
   return 1;
@@ -1055,28 +990,27 @@ int main(int argc, char** argv)
 float GetXFitMIN1(const float& mH, const int& step, const std::string& additionalCuts)
 {
   if( (step <= 13) && ( (additionalCuts == "none") || (additionalCuts == "mt50") ) )
-  {
-    /*
-    if     ( mH == 250. ) return 185.;
-    else if( mH == 300. ) return 205.;
-    else if( mH == 350. ) return 220.;
-    else if( mH == 400. ) return 230.;
-    else if( mH == 450. ) return 240.;
-    else if( mH == 500. ) return 240.;
-    else if( mH == 550. ) return 240.;
-    else if( mH == 600. ) return 235.;
+  {/*
+    if     ( mH == 200. ) return 180.;
+    else if( mH == 250. ) return 180.;
+    else if( mH == 300. ) return 200.;
+    else if( mH == 350. ) return 200.;
+    else if( mH == 400. ) return 250.;
+    else if( mH == 450. ) return 275.;
+    else if( mH == 500. ) return 300.;
+    else if( mH == 550. ) return 325.;
+    else if( mH == 600. ) return 350.;
     else return 1.;*/
     
-    if     ( mH == 200. ) return 180.;
-    if     ( mH == 250. ) return 180.;
-    else if( mH == 300. ) return 180.;
-    else if( mH == 350. ) return 180.;
-    else if( mH == 400. ) return 180.;
-    else if( mH == 450. ) return 180.;
-    else if( mH == 500. ) return 180.;
-    else if( mH == 550. ) return 180.;
-    else if( mH == 600. ) return 180.;
-    else return 1.;
+    if     ( mH == 200. ) return 250.;
+    else if( mH == 250. ) return 250.;
+    else if( mH == 300. ) return 250.;
+    else if( mH == 350. ) return 250.;
+    else if( mH == 400. ) return 250.;
+    else if( mH == 450. ) return 250.;
+    else if( mH == 500. ) return 250.;
+    else if( mH == 550. ) return 250.;
+    else if( mH == 600. ) return 250.;
   }
   
   if( (step <= 13) && (additionalCuts == "Dphi") )
@@ -1127,18 +1061,17 @@ float GetXFitMIN1(const float& mH, const int& step, const std::string& additiona
 
 
 float GetXFitMAX2(const float& mH)
-{
-  /*
-  if     ( mH == 250. ) return 495.;
-  else if( mH == 300. ) return 490.;
-  else if( mH == 350. ) return 515.;
-  else if( mH == 400. ) return 605.;
-  else if( mH == 450. ) return 680.;
-  else if( mH == 500. ) return 725.;
-  else if( mH == 550. ) return 760.;
-  else if( mH == 600. ) return 785.;
-  else return -1.;
-  */
+{/*
+  if     ( mH == 200. ) return 400.;
+  else if( mH == 250. ) return 400.;
+  else if( mH == 300. ) return 450.;
+  else if( mH == 350. ) return 550.;
+  else if( mH == 400. ) return 600.;
+  else if( mH == 450. ) return 650.;
+  else if( mH == 500. ) return 750.;
+  else if( mH == 550. ) return 775.;
+  else if( mH == 600. ) return 800.;
+  else return -1.;*/
   
   if     ( mH == 200. ) return 800.;
   else if( mH == 250. ) return 800.;

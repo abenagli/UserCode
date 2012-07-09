@@ -185,6 +185,25 @@ int main(int argc, char** argv)
     initPars[2] = roo_L1 -> getVal();
     initParNames[2] = "L1";
   }
+
+  if( fitMethod == "attenuatePowerLaw")
+  {    
+    RooRealVar* roo_mu = (RooRealVar*)( workspace->var(("CMS_HWWlvjj_"+flavour+"_mu").c_str()) );
+    initPars[0] = roo_mu -> getVal();
+    initParNames[0] = "mu";
+    
+    RooRealVar* roo_kT = (RooRealVar*)( workspace->var(("CMS_HWWlvjj_"+flavour+"_kT").c_str()) );
+    initPars[1] = roo_kT -> getVal();
+    initParNames[1] = "kT";
+    
+    RooRealVar* roo_n = (RooRealVar*)( workspace->var(("CMS_HWWlvjj_"+flavour+"_n").c_str()) );
+    initPars[2] = roo_n -> getVal();
+    initParNames[2] = "n";
+
+    RooRealVar* roo_a = (RooRealVar*)( workspace->var(("CMS_HWWlvjj_"+flavour+"_a").c_str()) );
+    initPars[3] = roo_a -> getVal();
+    initParNames[3] = "a";
+  }
   
   if( fitMethod == "doubleExponential")
   {
@@ -307,8 +326,20 @@ int main(int argc, char** argv)
   rooTotPdf_B -> fitTo(*data_obs,Extended(kTRUE),Save(),PrintLevel(-1));
   
   std::cout  << ">>> B: " << B -> getVal() << std::endl;
+
+
+  std::cout << "\n\n\n***********************************************************" << std::endl;
+  std::cout << "*** FIT B + S ***" << std::endl;
+  std::cout << "***********************************************************" << std::endl;
   
-  
+  RooRealVar* S = new RooRealVar("S","",n_ggH+n_qqH,-20.*(n_ggH+n_qqH),20.*(n_ggH+n_qqH));
+  RooAddPdf* rooTotPdf_BS = new RooAddPdf("rooTotPdf_BS3_toy","",RooArgList(*bkg,*ggH,*qqH),RooArgList(*B,*S,*S));
+  rooTotPdf_BS -> fitTo(*data_obs,Extended(kTRUE),Save(),PrintLevel(-1));
+
+  std::cout  << ">>> B:     " << B -> getVal() << std::endl;
+  std::cout  << ">>> S:     " << S -> getVal() << std::endl;
+  std::cout  << ">>> S_exp: " << n_ggH+n_qqH << std::endl;
+
   outFile -> cd();
   
   TCanvas* c_fit_B = new TCanvas("c_fit_B","c_fit_B");
@@ -320,11 +351,19 @@ int main(int argc, char** argv)
   delete plot_fit_B;
   delete c_fit_B;
   
+  TCanvas* c_fit_BS = new TCanvas("c_fit_BS","c_fit_BS");
+  RooPlot* plot_fit_BS = x->frame();
+  data_obs -> plotOn(plot_fit_BS);
+  rooTotPdf_BS -> plotOn(plot_fit_BS);
+  plot_fit_BS -> Draw();
+  c_fit_BS -> Write();
+  delete plot_fit_BS;
+  delete c_fit_BS;
   
   
   
   
-  
+  /*
   std::cout << "\n\n\n***********************************************************" << std::endl;
   std::cout << "*** TOY EXPERIMENTS ***" << std::endl;
   std::cout << "***********************************************************" << std::endl;
@@ -547,13 +586,13 @@ int main(int argc, char** argv)
   
   
   
-  
   outFile -> cd();
   
   h_diffB_parentB_fitB -> Write();
   h_diffB_parentBS_fitB -> Write();
   h_diffB_parentBS_fitBS -> Write();
   h_diffS_parentBS_fitBS -> Write();
+  */
   
   outFile -> Close();
   
