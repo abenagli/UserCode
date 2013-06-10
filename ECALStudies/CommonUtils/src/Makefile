@@ -46,7 +46,7 @@ LDFLAGS  =  -rdynamic -shared $(ARCHL)
 SONAME	 =  libEvent.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
-GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) -lGenVector
+GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) -lGenVector -lFoam -lMinuit -lRooFitCore -lRooFit -lMLP -lXMLIO -lTMVA -lTreePlayer
 
 
 #################################################
