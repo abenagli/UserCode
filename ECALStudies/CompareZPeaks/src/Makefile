@@ -32,7 +32,7 @@ ROOTCFLAGS    = $(shell root-config --cflags)
 ROOTGLIBS     = $(shell root-config --glibs)
 
 COMMONUTILSFLAGS = $(shell commonutils-config --include)
-COMMONUTILS = $(shell commonutils-config --libs)
+COMMONUTILSLIBS = $(shell commonutils-config --libs)
 
 CLHEPCFLAGS   =  $(shell clhep-config --include)
 CLHEPLIBS     =  $(shell clhep-config --libs)
@@ -40,16 +40,16 @@ CLHEPLIBS     =  $(shell clhep-config --libs)
 ARCHL = -m64
 
 CXX  =  c++
-CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(NTUPLEPACKAGEFLAGS) $(ROOTCFLAGS)
+CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(COMMONUTILSFLAGS) $(ROOTCFLAGS)
 CPP  =  c++
-CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(NTUPLEPACKAGEFLAGS) $(ROOTCFLAGS)
+CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(COMMONUTILSFLAGS) $(ROOTCFLAGS)
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)
-SONAME	 =  libEvent.so
+SONAME	 =  libCompareZPeaks.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
-GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) $(NTUPLEPACKAGEFLAGS) -lGenVector
+GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) $(COMMONUTILSLIBS)  -lGenVector -lFoam -lMinuit -lRooFitCore -lRooFit -lMLP -lXMLIO -lTMVA -lTreePlayer
 
 
 #################################################
@@ -60,12 +60,12 @@ LibSuf  =  .dylib
 
 ARCHL = -m32
 
-CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(COMMONUTILSFLAGS)
 
-CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(COMMONUTILSFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
-SONAME	 =  libEvent.dylib
+SONAME	 =  libCompareZPeaks.dylib
 SOFLAGS  =
 endif
 #################################################
@@ -78,12 +78,12 @@ LibSuf  =  .dylib
 
 ARCHL = -m64
 
-CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CPPFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(COMMONUTILSFLAGS)
 
-CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(NTUPLEPACKAGEFLAGS)
+CXXFLAGS  =  -Wall -W -Woverloaded-virtual -O2 $(ARCHL) -pipe -I$(HDR) $(ROOTCFLAGS) $(COMMONUTILSFLAGS)
 
 LDFLAGS  =  -dynamiclib -shared -single_module -undefined dynamic_lookup $(ARCHL)
-SONAME	 =  libEvent.dylib
+SONAME	 =  libCompareZPeaks.dylib
 SOFLAGS  =
 endif
 #################################################
@@ -126,7 +126,7 @@ $(LIB)$(SONAME): $(OBJS) $(OBJ)mydict.o
 	$(LD) $(LDFLAGS) $(OBJS) $(OBJ)mydict.o $(SOFLAGS) -o $(LIB)$(SONAME) 
 
 $(BIN)%$(BinSuf): $(PRG)%$(PrgSuf) $(HDRS) $(LIB)$(SONAME)
-	$(CPP) $(CPPFLAGS) -L$(LIB) $(GLIBS) -lEvent  -o $@ $<
+	$(CPP) $(CPPFLAGS) -L$(LIB) $(GLIBS) -lCompareZPeaks  -o $@ $<
 
 
 clean:
