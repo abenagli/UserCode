@@ -22,36 +22,88 @@
 
 
 
-bool maggiore(double i, double j);
-
-
-
-
-
-
 /** get the number of events from a list of files */
 std::map<int, int> GetTotalEvents(const std::string& histoName, const std::string& inputFileList);
 
 /** fill a chain from a list of files */
-bool FillChain(TChain& chain, const std::string& inputFileList);
+bool FillChain(TChain* chain, const std::string& inputFileList);
 
 /** get the parameters from a congiguration file */
-int parseConfigFile (const TString& config) ;
+int parseConfigFile (const TString& config);
 
 
 
 
 
+
+/** define sort function */
+bool maggiore(double i, double j);
+bool   minore(double i, double j);
 
 /** compute delta phi */
-double deltaPhi (const double& phi1, const double& phi2);
+double deltaPhi(const double& phi1, const double& phi2);
 
 /** compute delta eta */
-double deltaEta (const double& eta1, const double& eta2);
+double deltaEta(const double& eta1, const double& eta2);
 
 /** compute delta R */
-double deltaR (const double& eta1, const double& phi1,
-               const double& eta2, const double& phi2);
+double deltaR(const double& eta1, const double& phi1,
+              const double& eta2, const double& phi2);
+
+/** print 4-vector */
+void Print4V(const ROOT::Math::XYZTVector& p);
+
+
+
+
+
+
+/*** time sort a tree ***/
+struct Sorter
+{
+  int time;
+  int entry;
+  
+  bool operator() (const Sorter& s1, const Sorter& s2)
+  {
+    return s1.time < s2.time;
+  }
+};
+
+/*** time sort a tree ***/
+struct myEvent
+{
+  int runId;
+  int timeStampHigh;
+
+  int region;
+  int regionSM;
+  int regionLMR;
+  
+  float scE;
+  float P;
+
+  float scLaserCorr;
+  float seedLaserAlpha;
+  
+  bool operator() (const myEvent& s1, const myEvent& s2)
+  {
+    return s1.timeStampHigh < s2.timeStampHigh;
+  }
+};
+
+/*** time sort a tree ***/
+struct SorterLC
+{
+  float laserCorr;
+  int entry;
+  
+  bool operator() (const SorterLC& s1, const SorterLC& s2)
+  {
+    return s1.laserCorr < s2.laserCorr;
+  }
+};
+
 
 
 
@@ -157,71 +209,10 @@ int GetMatching(const std::vector<T1>& collection1, //---- RECO
 
 
 
-/** select jet pairs */
-double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
-                  const std::string& method,
-                  const double& etMin,
-                  const std::vector<int>* blacklist = 0);
-
-/** select jet pairs with Deta cut*/
-double SelectJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
-                  const std::string& method,
-                  const double& etMin,
-                  const double& DetaMin,
-                  const double& DetaMax,
-                  const std::vector<int>* blacklist = 0);
-
-/** select leptons */
-int SelectLepton(std::vector<ROOT::Math::XYZTVector>& leptons,
-                 const std::string& method,
-                 const double& ptMin,
-                 const std::vector<int>* blacklist = 0);
-
-/** select tag jet */
-double SelectTagJet(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
-                     const double& etMin,
-                     const double& etaMIN,
-                     const std::vector<int>* blacklist = 0);
-
-/** select tag jets */
-double SelectTagJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
-                     const double& etMin,
-                     const double& DetaMIN,
-                     const double& mjjMIN,                     
-                     const std::vector<int>* blacklist = 0);
-
-/** select W jets */
-double SelectWJets(std::vector<int>& it, std::vector<ROOT::Math::XYZTVector>& jets,
-                   const std::string& method,
-                   const double& etMin,
-                   const double& etaMAX,
-                   const double& DetaMAX,
-                   const double& mjjMAX,                     
-                   const std::vector<int>* blacklist = 0);
-
-/** select 4 jets */
-double Select4Jets(std::vector<int>& it_W, std::vector<int>& it_tag,
-                   std::vector<ROOT::Math::XYZTVector>& jets,
-                   const std::string& method,
-                   const double& etMin,
-                   const double& etaMAX,
-                   const double& DetaMAX,
-                   const double& mjjMAX);
-
-/** build combinations of n jets */
-int Build4JetCombinations(std::vector<std::vector<int> >& comb, const int& nJets);
-
-/** print combinations of n jets */
-void Print4JetCombination(const std::vector<int>& combination);
 
 
 
-/** print 4-vector */
-void Print4V(const ROOT::Math::XYZTVector& p);
-
-
-
-/** get electorn flag/severity level */
+/** get electron flag/severity level */
 bool GetElectronFlag(const std::string& flag);
 bool GetElectronSeverityLevel(const std::string& SeverityLevel);
 
