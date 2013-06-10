@@ -156,3 +156,19 @@ void Print4V(const ROOT::Math::XYZTVector& p)
 }
 
 //  ------------------------------------------------------------
+
+double DoKolmogorovTest(std::vector<double>& v1, std::vector<double>& v2)
+{
+  std::sort(v1.begin(),v1.end());
+  std::sort(v2.begin(),v2.end());
+
+  double* a1 = new double[v1.size()];
+  double* a2 = new double[v2.size()];
+
+  for(unsigned int i = 0; i < v1.size(); ++i) a1[i] = v1.at(i);
+  for(unsigned int i = 0; i < v2.size(); ++i) a2[i] = v2.at(i);
+
+  return TMath::KolmogorovTest(v1.size(),a1,v2.size(),a2,"");
+}
+
+//  ------------------------------------------------------------

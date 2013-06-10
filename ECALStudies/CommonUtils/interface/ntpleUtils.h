@@ -53,6 +53,8 @@ double deltaR(const double& eta1, const double& phi1,
 /** print 4-vector */
 void Print4V(const ROOT::Math::XYZTVector& p);
 
+/** Do Kolmogorov test */
+double DoKolmogorovTest(std::vector<double>& v1, std::vector<double>& v2);
 
 
 
