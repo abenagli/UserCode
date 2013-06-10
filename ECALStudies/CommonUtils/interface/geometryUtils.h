@@ -3,14 +3,12 @@
 
 #include <iostream>
 #include <fstream>
-#include <iomanip>
 #include <string>
-#include <sstream>
-#include <ctime>
 #include <map>
-#include <algorithm>
-#include <math.h>
 #include <vector>
+#include <algorithm>
+
+#include "TMath.h"
 
 
 
@@ -28,6 +26,7 @@ class TEndcapRegions
   int GetRegionId(const int,const int,const int,const std::string&);
   int GetEndcapRing(const int,const int,const int,const int, const std::string&);
   int GetEndcapIeta(const int,const int,const int);
+  int GetEndcapIphi(const int,const int,const int);
 };
 
 

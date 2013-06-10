@@ -75,17 +75,16 @@ int TEndcapRegions::GetEndcapRing(const int ix, const int iy, const int iz, cons
   else return int(((float)iEndcapRing[ix-1][iy-1][iSide]/(float)ringWidth)) + nRings*iSide;
 }
 
-int TEndcapRegions::GetEndcapIeta(const int ix, const int iy, const int iz)
+int TEndcapRegions::GetEndcapIphi(int ix, int iy, int iz)
 {
-  int iSide = iz;
-  if( iSide < 0 ) iSide = 0;
-  
-  int iEtaOffset = 86*iz;
-  int iEta = iEtaOffset + iz*iEndcapRing[ix-1][iy-1][iSide];
-   
- return iEta;
-}
+  double iX = ix-50.;
+  double iY = iy-50.;
+  int iPhi;
+  if( iY >= 0 ) iPhi =  90 + int( TMath::ATan(iY/iX)*360. / (2.*TMath::Pi()) );
+  else          iPhi = 270 + int( TMath::ATan(iY/iX)*360. / (2.*TMath::Pi()) );
 
+  return iPhi;
+}
 
 
 
