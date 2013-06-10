@@ -14,6 +14,7 @@ export LD_LIBRARY_PATH=${THISDIR}/lib:${LD_LIBRARY_PATH}
 
 export PATH=${THISDIR}/bin:${PATH}
 
+export COMMONUTILS=${THISDIR}/
 export COMMONUTILSINCLUDE=${THISDIR}/interface
 export COMMONUTILSLIB=${THISDIR}/lib
 fi
