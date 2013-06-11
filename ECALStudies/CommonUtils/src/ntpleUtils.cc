@@ -172,3 +172,27 @@ double DoKolmogorovTest(std::vector<double>& v1, std::vector<double>& v2)
 }
 
 //  ------------------------------------------------------------
+
+
+
+
+
+
+int MyFindBin(const double& val, const std::vector<double>* binEdges)
+{
+  for(unsigned int bin = 0; bin < binEdges->size()-1; ++bin)
+  {
+    if( (val >= binEdges->at(bin)) && (val < binEdges->at(bin+1)) )
+      return bin;
+  }
+  
+  return -1;
+}
+
+//  ------------------------------------------------------------
+
+int MyFindBin(const double& val, const double& min, const double& max, const double& invWidth)
+{
+  if( val < min || val >= max ) return -1;
+  return int( (val - min) * invWidth );
+}

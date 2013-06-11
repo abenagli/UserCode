@@ -63,6 +63,29 @@ double DoKolmogorovTest(std::vector<double>& v1, std::vector<double>& v2);
 
 
 
+
+/** Set binning of an histogram */
+template <class T>
+void MySetBins(T* h, std::vector<double>& bins)
+{
+  double* binEdges = new double[bins.size()];
+  for(unsigned int i = 0; i < bins.size(); ++i)
+    binEdges[i] = bins.at(i);
+  
+  h -> SetBins(bins.size()-1,binEdges);
+}
+
+/** Find bin number given bin edges */
+int MyFindBin(const double& val, const std::vector<double>* binEdges);
+
+/** Find bin number given bin size */
+int MyFindBin(const double& val, const double& min, const double& max, const double& invWidth);
+
+
+
+
+
+
 /*** time sort a tree ***/
 struct Sorter
 {
