@@ -38,7 +38,9 @@
 //-----------------
 // global functions
 
-void DrawZPeak(const std::string& category, const std::string& label, const int& rebin, const std::string& EBEE, const std::string& outFileName);
+void DrawZPeak(const std::string& category, const std::string& label, const int& rebin,
+               const bool& doVoigtianFit, const bool& doCrystalBallFit,
+               const std::string& EBEE, const std::string& outFileName);
 
 TH1F* ratioHisto(TH1F* h_num, TH1F* h_den, const double& xMax = -999., TArrow** line = NULL);
 
@@ -88,6 +90,9 @@ int main(int argc, char** argv)
   
   std::string energyScaleCorrType = gConfigParser -> readStringOption("Options::energyScaleCorrType");
   std::string energySmearingType  = gConfigParser -> readStringOption("Options::energySmearingType");
+  
+  bool doVoigtianFit    = gConfigParser -> readBoolOption("Options::doVoigtianFit");
+  bool doCrystalBallFit = gConfigParser -> readBoolOption("Options::doCrystalBallFit");
   
   std::string outFilePath = gConfigParser -> readStringOption("Output::outFilePath");
   
@@ -617,25 +622,25 @@ int main(int argc, char** argv)
   TCanvas* dummy = new TCanvas("dummy","",0,0,700,600);
   dummy -> Print((outFileName+"."+extension+"[").c_str(),extension.c_str());
   
-  DrawZPeak("EB-EB",          "[EB-EB]",                         1,"EB",outFileName);
-  DrawZPeak("EB-EB_hR9",      "[EB-EB   R9 > 0.94]",             1,"EB",outFileName);
-  DrawZPeak("EB-EB_lR9",      "[EB-EB   R9 < 0.94]",             1,"EB",outFileName);
-  DrawZPeak("EB-EB_eta>1",    "[EB-EB   |#eta| > 1]",            1,"EB",outFileName);
-  DrawZPeak("EB-EB_eta<1",    "[EB-EB   |#eta| < 1]",            1,"EB",outFileName);
-  DrawZPeak("EB-EB_hR9_eta<1","[EB-EB   R9 > 0.94   |#eta| < 1]",1,"EB",outFileName);
-  DrawZPeak("EB-EB_lR9_eta<1","[EB-EB   R9 < 0.94   |#eta| < 1]",1,"EB",outFileName);
-  DrawZPeak("EB-EB_hR9_eta>1","[EB-EB   R9 > 0.94   |#eta| > 1]",2,"EB",outFileName);
-  DrawZPeak("EB-EB_lR9_eta>1","[EB-EB   R9 < 0.94   |#eta| > 1]",2,"EB",outFileName);
+  DrawZPeak("EB-EB",          "[EB-EB]",                         1,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
+  DrawZPeak("EB-EB_hR9",      "[EB-EB   R9 > 0.94]",             1,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
+  DrawZPeak("EB-EB_lR9",      "[EB-EB   R9 < 0.94]",             1,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
+  DrawZPeak("EB-EB_eta>1",    "[EB-EB   |#eta| > 1]",            1,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
+  DrawZPeak("EB-EB_eta<1",    "[EB-EB   |#eta| < 1]",            1,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
+  DrawZPeak("EB-EB_hR9_eta<1","[EB-EB   R9 > 0.94   |#eta| < 1]",1,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
+  DrawZPeak("EB-EB_lR9_eta<1","[EB-EB   R9 < 0.94   |#eta| < 1]",1,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
+  DrawZPeak("EB-EB_hR9_eta>1","[EB-EB   R9 > 0.94   |#eta| > 1]",2,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
+  DrawZPeak("EB-EB_lR9_eta>1","[EB-EB   R9 < 0.94   |#eta| > 1]",2,doVoigtianFit,doCrystalBallFit,"EB",outFileName);
   
-  DrawZPeak("EE-EE",          "[EE-EE]",                         1,"EE",outFileName);
-  DrawZPeak("EE-EE_hR9",      "[EE-EE   R9 > 0.94]",             1,"EE",outFileName);
-  DrawZPeak("EE-EE_lR9",      "[EE-EE   R9 < 0.94]",             1,"EE",outFileName);
-  DrawZPeak("EE-EE_eta>2",    "[EE-EE   |#eta| > 2]",            1,"EE",outFileName);
-  DrawZPeak("EE-EE_eta<2",    "[EE-EE   |#eta| < 2]",            1,"EE",outFileName);
-  DrawZPeak("EE-EE_hR9_eta<2","[EE-EE   R9 > 0.94   |#eta| < 2]",2,"EE",outFileName);
-  DrawZPeak("EE-EE_lR9_eta<2","[EE-EE   R9 < 0.94   |#eta| < 2]",1,"EE",outFileName);
-  DrawZPeak("EE-EE_hR9_eta>2","[EE-EE   R9 > 0.94   |#eta| > 2]",1,"EE",outFileName);
-  DrawZPeak("EE-EE_lR9_eta>2","[EE-EE   R9 < 0.94   |#eta| > 2]",2,"EE",outFileName);
+  DrawZPeak("EE-EE",          "[EE-EE]",                         1,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
+  DrawZPeak("EE-EE_hR9",      "[EE-EE   R9 > 0.94]",             1,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
+  DrawZPeak("EE-EE_lR9",      "[EE-EE   R9 < 0.94]",             1,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
+  DrawZPeak("EE-EE_eta>2",    "[EE-EE   |#eta| > 2]",            1,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
+  DrawZPeak("EE-EE_eta<2",    "[EE-EE   |#eta| < 2]",            1,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
+  DrawZPeak("EE-EE_hR9_eta<2","[EE-EE   R9 > 0.94   |#eta| < 2]",2,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
+  DrawZPeak("EE-EE_lR9_eta<2","[EE-EE   R9 < 0.94   |#eta| < 2]",1,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
+  DrawZPeak("EE-EE_hR9_eta>2","[EE-EE   R9 > 0.94   |#eta| > 2]",1,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
+  DrawZPeak("EE-EE_lR9_eta>2","[EE-EE   R9 < 0.94   |#eta| > 2]",2,doVoigtianFit,doCrystalBallFit,"EE",outFileName);
   
   outFile -> Close();
   dummy -> Print((outFileName+"."+extension+"]").c_str(),extension.c_str());
@@ -646,7 +651,9 @@ int main(int argc, char** argv)
 
 
 
-void DrawZPeak(const std::string& category, const std::string& label, const int& rebin, const std::string& EBEE, const std::string& outFileName)
+void DrawZPeak(const std::string& category, const std::string& label, const int& rebin,
+               const bool& doVoigtianFit, const bool& doCrystalBallFit,
+               const std::string& EBEE, const std::string& outFileName)
 {
   TCanvas* c = new TCanvas(("c_mZ_"+category).c_str(),("mZ - "+category).c_str(),0,0,700,600);
   c -> cd();
@@ -734,7 +741,7 @@ void DrawZPeak(const std::string& category, const std::string& label, const int&
   // fit the plots
   TF1* f_mee_voigtian;
   TF1* f_mee_crystalBall;
-  FitZPeak(&f_mee_voigtian,&f_mee_crystalBall,"f_mee",h_mZ_MC[category],EBEE);
+  FitZPeak(doVoigtianFit,doCrystalBallFit,&f_mee_voigtian,&f_mee_crystalBall,"f_mee",h_mZ_MC[category],EBEE);
   double peakV,sigmaOL,peakCB,sigmaCB;
   TArrow* line;
   TArrow* line2;
@@ -780,7 +787,7 @@ void DrawZPeak(const std::string& category, const std::string& label, const int&
   
   TF1* f_c_mee_voigtian;
   TF1* f_c_mee_crystalBall;
-  FitZPeak(&f_c_mee_voigtian,&f_c_mee_crystalBall,"f_c_mee",h_mZ_DA[category],EBEE);
+  FitZPeak(doVoigtianFit,doCrystalBallFit,&f_c_mee_voigtian,&f_c_mee_crystalBall,"f_c_mee",h_mZ_DA[category],EBEE);
   
   double peakV_c,sigmaOL_c,peakCB_c,sigmaCB_c;
   TArrow* line_c;

@@ -10,7 +10,8 @@
 
 
 
-void FitZPeak(TF1** fitFunc_voigtian, TF1** fitFunc_crystalBall, const std::string& fitFuncName,
+void FitZPeak(const bool& doVoigtianFit, const bool& doCrystalBallFit,
+              TF1** fitFunc_voigtian, TF1** fitFunc_crystalBall, const std::string& fitFuncName,
               TH1F* histo,
               const std::string& EBEE = "EB");
 

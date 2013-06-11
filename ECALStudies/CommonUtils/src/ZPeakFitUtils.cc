@@ -6,11 +6,13 @@ const double _invRootPi = 1./sqrt(atan2(0.,-1.));
 
 
 
-void FitZPeak(TF1** fitFunc_voigtian, TF1** fitFunc_crystalBall, const std::string& fitFuncName,
+void FitZPeak(const bool& doVoigtianFit, const bool& doCrystalBallFit,
+              TF1** fitFunc_voigtian, TF1** fitFunc_crystalBall, const std::string& fitFuncName,
               TH1F* histo,
               const std::string& EBEE)
 {
   std::cout << ">>>>>>FitZPeak::Fitting histogram " << histo->GetName() << " with integral " << histo->Integral() << std::endl;
+  
   //-------------
   // gaussian fit
   
@@ -39,7 +41,7 @@ void FitZPeak(TF1** fitFunc_voigtian, TF1** fitFunc_crystalBall, const std::stri
   (*fitFunc_voigtian) -> SetLineStyle(1);
   (*fitFunc_voigtian) -> SetLineWidth(1);
   (*fitFunc_voigtian) -> SetLineColor(histo->GetMarkerColor());
-  //histo -> Fit((fitFuncName+"_voigtian").c_str(),"QNRS+");
+  if( doVoigtianFit ) histo -> Fit((fitFuncName+"_voigtian").c_str(),"QNRS+");
   
   
   //--------------------
@@ -58,7 +60,7 @@ void FitZPeak(TF1** fitFunc_voigtian, TF1** fitFunc_crystalBall, const std::stri
   (*fitFunc_crystalBall) -> SetLineColor(histo->GetMarkerColor());
   (*fitFunc_crystalBall) -> SetLineStyle(2);
   (*fitFunc_crystalBall) -> SetLineWidth(1);
-  //histo -> Fit((fitFuncName+"_crystalBall").c_str(),"QNRS+");
+  if( doCrystalBallFit) histo -> Fit((fitFuncName+"_crystalBall").c_str(),"QNRS+");
   
   
   delete f_gaus;
