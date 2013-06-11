@@ -196,3 +196,28 @@ int MyFindBin(const double& val, const double& min, const double& max, const dou
   if( val < min || val >= max ) return -1;
   return int( (val - min) * invWidth );
 }
+
+//  ------------------------------------------------------------
+
+double MyEval(TGraph* g, const double& x)
+{
+  double x1,x2,y1,y2;
+  g -> GetPoint(0,x1,y1);
+  g -> GetPoint(g->GetN()-1,x2,y2);
+  
+  if( x <  x1 ) return y1;
+  if( x >= x2 ) return y2;
+  
+  for(int point = 0; point < g->GetN()-1; ++point)
+  {
+    g -> GetPoint(point,  x1,y1);
+    g -> GetPoint(point+1,x2,y2);
+    
+    if( x >= x1 && x < x2 )
+    {
+      return y1 + (y2-y1)/(x2-x1)*(x-x1);
+    }
+  }
+  
+  return 1.;
+}

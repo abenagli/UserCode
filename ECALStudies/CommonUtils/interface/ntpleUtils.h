@@ -13,8 +13,9 @@
 #include <iomanip>
 
 #include "TFile.h"
-#include "TH1F.h"
 #include "TChain.h"
+#include "TH1F.h"
+#include "TGraph.h"
 #include "TVector3.h"
 #include "TMath.h"
 
@@ -80,6 +81,9 @@ int MyFindBin(const double& val, const std::vector<double>* binEdges);
 
 /** Find bin number given bin size */
 int MyFindBin(const double& val, const double& min, const double& max, const double& invWidth);
+
+/** Interpolate a TGraph */
+double MyEval(TGraph* g, const double& x);
 
 
 
