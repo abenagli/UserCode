@@ -1,6 +1,8 @@
 #ifndef ntpleUtils_h
 #define ntpleUtils_h
 
+#include "ConfigParser.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -14,8 +16,9 @@
 #include "TH1F.h"
 #include "TChain.h"
 #include "TVector3.h"
+#include "TMath.h"
+
 #include "Math/Vector4D.h"
-#include "ConfigParser.h"
 
 
 
