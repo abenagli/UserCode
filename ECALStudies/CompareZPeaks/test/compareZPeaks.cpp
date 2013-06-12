@@ -84,7 +84,7 @@ int main(int argc, char** argv)
   std::string enCorrType = gConfigParser -> readStringOption("Options::enCorrType");
   std::string dataLabel  = gConfigParser -> readStringOption("Options::dataLabel");
   
-  bool applyPUweight        = gConfigParser -> readBoolOption("Options::applyPUWeight");
+  bool applyPUWeight        = gConfigParser -> readBoolOption("Options::applyPUWeight");
   bool applyEnergyScaleCorr = gConfigParser -> readBoolOption("Options::applyEnergyScaleCorr");
   bool applyEnergySmearing  = gConfigParser -> readBoolOption("Options::applyEnergySmearing");
   
@@ -329,7 +329,7 @@ int main(int argc, char** argv)
     }
   
     float ww = 1.;
-    if( applyPUweight )
+    if( applyPUWeight )
     {
       ww *= PUWeights[int(npu+0.5)];
     }  
@@ -613,7 +613,7 @@ int main(int argc, char** argv)
   std::string outFileName = folderName + "/compareZPeaks";
   
   outFileName += "__" + enCorrType;
-  if( applyPUweight )        outFileName += "__MC_PUweight";
+  if( applyPUWeight )        outFileName += "__MC_PUweight";
   if( applyEnergySmearing )  outFileName += "__MC_energySmearing_" + energySmearingType;
   if( applyEnergyScaleCorr ) outFileName += "__DA_energyScaleCorr_" + energyScaleCorrType;
   
