@@ -204,6 +204,8 @@ int main(int argc, char** argv)
   // define outfiles
   std::string plotFolderName = outFilePath + "/" + year + "/";
   gSystem->mkdir(plotFolderName.c_str());
+  plotFolderName += dataLabel + "/";
+  gSystem->mkdir(plotFolderName.c_str());
   
   plotFolderName += catType; 
   plotFolderName += "_" + enCorrType;
@@ -588,7 +590,6 @@ int main(int argc, char** argv)
     
     
     // apply cuts
-    std::cout << "cat: " << cat << "   atoi: " << category << std::endl;
     if( MCClosure == true ) if( ientry%2 == 0 ) continue;
     if( scEneReg1*Rt1 < 30. ) continue;
     if( scEneReg2*Rt2 < 30. ) continue;
@@ -619,7 +620,7 @@ int main(int argc, char** argv)
     Zpt_DA.push_back((p1+p2).Pt());
     mee_DA.push_back(mee);
     Ht_DA.push_back(scEneReg1*Rt1 + scEneReg2*Rt2);
-    std::cout << "Ht: " << scEneReg1*Rt1 + scEneReg2*Rt2 << std::endl;
+    
     mee_fit_DA.push_back(mee);
     mee_gausFit_DA.push_back(mee);
     mee_mean_DA.push_back(mee);
