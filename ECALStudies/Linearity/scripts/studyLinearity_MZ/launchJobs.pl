@@ -13,17 +13,19 @@ while (<USERCONFIG>)
   $User_Preferences{$var} = $value;
 }
 
-$JOBCfgTemplate = $User_Preferences{"JOBCfgTemplate"};
-$INPUTFilesDA   = $User_Preferences{"INPUTFilesDA"};
-$INPUTFilesMC   = $User_Preferences{"INPUTFilesMC"};
-$USEGlobeNtuple = $User_Preferences{"USEGlobeNtuple"};
-$ENCorrType     = $User_Preferences{"ENCorrType"};
-$YEAR           = $User_Preferences{"YEAR"};
-$DATALabel      = $User_Preferences{"DATALabel"};
-$CATType        = $User_Preferences{"CATType"};
-$EVTSPerPoint   = $User_Preferences{"EVTSPerPoint"};
-$DPHIMax        = $User_Preferences{"DPHIMax"};
-$NCats          = $User_Preferences{"NCats"};
+$JOBCfgTemplate      = $User_Preferences{"JOBCfgTemplate"};
+$INPUTFilesDA        = $User_Preferences{"INPUTFilesDA"};
+$INPUTFilesMC        = $User_Preferences{"INPUTFilesMC"};
+$USEGlobeNtuple      = $User_Preferences{"USEGlobeNtuple"};
+$ENCorrType          = $User_Preferences{"ENCorrType"};
+$YEAR                = $User_Preferences{"YEAR"};
+$DATALabel           = $User_Preferences{"DATALabel"};
+$CATType             = $User_Preferences{"CATType"};
+$EVTSPerPoint        = $User_Preferences{"EVTSPerPoint"};
+$ENERGYScaleCorrType = $User_Preferences{"ENERGYScaleCorrType"};
+$ENERGYSmearingType  = $User_Preferences{"ENERGYSmearingType"};
+$DPHIMax             = $User_Preferences{"DPHIMax"};
+$NCats               = $User_Preferences{"NCats"};
 
 
 
@@ -31,8 +33,14 @@ $baseDir = $ENV{LINEARITY};
 $DphiLabel = sprintf("Dphi%dp%02d",int($DPHIMax),int($DPHIMax*100)%100);
 
 
+$globeLabel = "globe";
+if( $USEGlobeNtuple eq "false" )
+{
+  $globeLabel = "nonGlobe";
+}
 
-$jobDir = $baseDir."/data/".$YEAR."/".$DATALabel."/".$CATType."_".$ENCorrType."_".$DphiLabel."/jobs/";
+
+$jobDir = $baseDir."/data/".$YEAR."/".$DATALabel."/".$CATType."_".$globeLabel."_".$ENCorrType."_".$DphiLabel."/jobs/";
 print("jobDir: ".$jobDir."\n");
 
 $command = "mkdir -p ".$jobDir;
@@ -60,6 +68,8 @@ for($cat = 0; $cat < $NCats; ++$cat)
                                  "%g | sed -e s%CATTYPE%".$CATType.
                                  "%g | sed -e s%CATEGORY%".$cat.
                                  "%g | sed -e s%EVTSPERPOINT%".$evtsPerPoint[$cat].
+                                 "%g | sed -e s%ENERGYSCALECORRTYPE%".$ENERGYScaleCorrType.
+                                 "%g | sed -e s%ENERGYSMEARINGTYPE%".$ENERGYSmearingType.
                                  "%g | sed -e s%DPHIMAX%".$DPHIMax.
                                  "%g > ".$jobCfg);
   
