@@ -1510,7 +1510,7 @@ int main(int argc, char** argv)
         h_mee_HtBin_DA[HtBin] -> Draw("P,same");
         
         if( HtBin == 0 )         c_DAOverMC -> Print((outputPdf_DAMC+"[").c_str());
-        c_DAOverMC -> Print(outputPdf2_DAMC.c_str());
+        c_DAOverMC -> Print(outputPdf_DAMC.c_str());
         if( HtBin == nHtBins-1 ) c_DAOverMC -> Print((outputPdf_DAMC+"]").c_str());
         
         
