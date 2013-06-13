@@ -218,7 +218,7 @@ int main(int argc, char** argv)
   plotFolderName += "/";
   gSystem->mkdir(plotFolderName.c_str());
   
-  std::string label = std::string(Form("%devtsPerPoint",evtsPerPoint)) + "_cat" + Form("%d",category);
+  std::string label = "cat" + Form("%d",category) + "_" + std::string(Form("%devtsPerPoint",evtsPerPoint));
   outFile = TFile::Open((plotFolderName+"/studyLinearity_MZ_"+label+".root").c_str(),"RECREATE");
   
   
