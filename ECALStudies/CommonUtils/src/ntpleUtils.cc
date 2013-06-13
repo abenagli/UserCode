@@ -76,7 +76,7 @@ int parseConfigFile (const TString& config)
 {
   std::cout << ">>> Parsing " << config << " file" << std::endl ;
   
-  if (gConfigParser) return 1 ;
+  if( gConfigParser ) delete gConfigParser;
   gConfigParser = new ConfigParser();
   
   if( !(gConfigParser -> init(config)) )
