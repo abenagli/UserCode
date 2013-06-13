@@ -208,6 +208,7 @@ int main(int argc, char** argv)
   gSystem->mkdir(plotFolderName.c_str());
   
   plotFolderName += catType; 
+  plotFolderName += "_" + (useGlobeNtuple == true ? std::string("globe") : std::string("nonGlobe"));
   plotFolderName += "_" + enCorrType;
   plotFolderName += Form("_Dphi%dp%02d",int(DphiMax),int(DphiMax*100)%100);
   if( MCClosure == true )             plotFolderName += "_MCClosure";
@@ -1434,6 +1435,9 @@ int main(int argc, char** argv)
     subDir = baseDir -> mkdir("mee_HtBin");
     subDir -> cd();
     
+    std::string outputPdf_DAMC  = plotFolderName + "h_mee_HtBin_DAOverMC_" + catType+"_cat"+ Form("%d",category) + ".pdf";
+    std::string outputPdf2_DAMC = plotFolderName + "h_Zpt_HtBin_DAOverMC_" + catType+"_cat"+ Form("%d",category) + ".pdf";
+    
     std::string outputPdf_MC = plotFolderName + "h_mee_HtBin_MC_"   + catType+"_cat"+ Form("%d",category) + ".pdf";
     std::string outputPdf_DA = plotFolderName + "h_mee_HtBin_DATA_" + catType+"_cat"+ Form("%d",category) + ".pdf";
     
@@ -1450,7 +1454,7 @@ int main(int argc, char** argv)
       f_gausFit_HtBin_MC[HtBin] -> Write();
       f_gausFit_HtBin_DA[HtBin] -> Write();
       
-
+      
       
       if( step == 1 )
       {
@@ -1477,9 +1481,9 @@ int main(int argc, char** argv)
         h_Zpt_HtBin_MC[HtBin] -> Draw("hist");
         h_Zpt_HtBin_DA[HtBin] -> Draw("P,same");
         
-        char pngName[200];
-        sprintf(pngName,"%s/h_Zpt_cat%d_%s_HtBin%03d_DAOverMC.png",plotFolderName.c_str(),category,catType.c_str(),HtBin);
-        c_DAOverMC -> Print(pngName,"png");
+        if( HtBin == 0 )         c_DAOverMC -> Print((outputPdf2_DAMC+"[").c_str());
+        c_DAOverMC -> Print(outputPdf2_DAMC.c_str());
+        if( HtBin == nHtBins-1 ) c_DAOverMC -> Print((outputPdf2_DAMC+"]").c_str());
         
         
         
@@ -1505,8 +1509,9 @@ int main(int argc, char** argv)
         h_mee_HtBin_MC[HtBin] -> Draw("hist");
         h_mee_HtBin_DA[HtBin] -> Draw("P,same");
         
-        sprintf(pngName,"%s/h_mee_cat%d_%s_HtBin%03d_DAOverMC.png",plotFolderName.c_str(),category,catType.c_str(),HtBin);
-        c_DAOverMC -> Print(pngName,"png");
+        if( HtBin == 0 )         c_DAOverMC -> Print((outputPdf_DAMC+"[").c_str());
+        c_DAOverMC -> Print(outputPdf2_DAMC.c_str());
+        if( HtBin == nHtBins-1 ) c_DAOverMC -> Print((outputPdf_DAMC+"]").c_str());
         
         
         

@@ -40,16 +40,16 @@ CLHEPLIBS     =  $(shell clhep-config --libs)
 ARCHL = -m64
 
 CXX  =  c++
-CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(COMMONUTILSFLAGS) $(ROOTCFLAGS)
+CXXFLAGS  =  -Wall -O -fPIC -I$(HDR) $(COMMONUTILSFLAGS) $(ROOTCFLAGS) -I$(ROOFITSYS)/include
 CPP  =  c++
-CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(COMMONUTILSFLAGS) $(ROOTCFLAGS)
+CPPFLAGS  = -Wall $(ARCHL) -I$(HDR) $(COMMONUTILSFLAGS) $(ROOTCFLAGS) -I$(ROOFITSYS)/include
 
 LD       =  c++
 LDFLAGS  =  -rdynamic -shared $(ARCHL)
 SONAME	 =  libLinearity.so
 SOFLAGS  =  -Wl,-soname,$(SONAME)
 
-GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) $(COMMONUTILSLIBS)  -lGenVector -lFoam -lMinuit -lRooFitCore -lRooFit -lMLP -lXMLIO -lTMVA -lTreePlayer
+GLIBS   =  -lm -ldl -rdynamic $(ROOTGLIBS) $(COMMONUTILSLIBS) -L$(ROOFITSYS)/lib -lGenVector -lFoam -lMinuit -lRooFitCore -lRooFit -lMLP -lXMLIO -lTMVA -lTreePlayer
 
 
 #################################################
